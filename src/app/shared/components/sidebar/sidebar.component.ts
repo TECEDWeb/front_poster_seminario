@@ -2,6 +2,18 @@ import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
+import {
+  IonMenu,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonList,
+  IonItem,
+  IonButton,
+  IonIcon
+} from '@ionic/angular/standalone';
+
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -9,7 +21,18 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+
+    // 🔥 Ionic standalone components (OBLIGATORIO)
+    IonMenu,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonItem,
+    IonButton,
+    IonIcon
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
