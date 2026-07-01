@@ -85,7 +85,7 @@ export class LoginPage implements OnInit, AfterViewInit, OnDestroy {
     console.log("❌ LoginPage destruida");
   }
 
-  async onSubmit() {
+ async onSubmit() {
 
     console.log("🚀 LOGIN INICIADO");
 
@@ -97,8 +97,6 @@ export class LoginPage implements OnInit, AfterViewInit, OnDestroy {
     this.errorMensaje.set(null);
     this.cargando.set(true);
 
-    console.log("📡 Enviando login...");
-
     this.authService.login({
       cedula: this.cedula.trim(),
       password: this.password
@@ -108,39 +106,25 @@ export class LoginPage implements OnInit, AfterViewInit, OnDestroy {
 
         console.log("✅ LOGIN OK:", res);
 
-        try {
-          console.log("💾 Guardando sesión...");
+        await this.authService.setSession(res.usuario, res.token);
 
-          await this.authService.setSession(
-            res.usuario,
-            res.token
-          );
+        const usuario = this.authService.obtenerUsuario();
 
-          console.log("✅ Sesión guardada");
+        const ruta =
+          usuario?.rol === 'admin'
+            ? '/admin/dashboard'
+            : '/evaluador/dashboard';
 
-          const ruta = this.authService.rutaInicioSegunRol();
+        console.log("➡️ Navegando a:", ruta);
 
-          console.log("➡️ Navegando a:", ruta);
-
-          await this.router.navigateByUrl(ruta);
-
-          console.log("✅ Navegación completada");
-
-        } catch (e) {
-          console.error("❌ ERROR guardando sesión", e);
-        }
+        await this.router.navigateByUrl(ruta);
 
         this.cargando.set(false);
       },
 
       error: (err) => {
-
         console.error("❌ ERROR LOGIN:", err);
-
-        this.errorMensaje.set(
-          err?.error?.mensaje || "Error al iniciar sesión"
-        );
-
+        this.errorMensaje.set(err?.error?.mensaje || "Error al iniciar sesión");
         this.cargando.set(false);
       }
 

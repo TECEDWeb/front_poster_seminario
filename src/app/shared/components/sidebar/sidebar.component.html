@@ -21,8 +21,7 @@
     <ion-list lines="none">
 
       <!-- ADMIN -->
-      <ng-container *ngIf="usuario()?.rol === 'administrador'">
-
+      <ng-container *ngIf="usuario()?.rol === 'admin'">
         <ion-item routerLink="/admin/dashboard">Dashboard</ion-item>
         <ion-item routerLink="/admin/usuarios">Usuarios</ion-item>
         <ion-item routerLink="/admin/concursos">Concursos</ion-item>
@@ -30,8 +29,8 @@
         <ion-item routerLink="/admin/reportes">Reportes</ion-item>
 
       </ng-container>
-
       <!-- EVALUADOR -->
+       
       <ng-container *ngIf="usuario()?.rol === 'evaluador'">
 
         <ion-item routerLink="/evaluador/dashboard">Dashboard</ion-item>

@@ -2,9 +2,7 @@ import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
 
-export const roleGuard: CanActivateFn = async (
-  route: ActivatedRouteSnapshot
-) => {
+export const roleGuard: CanActivateFn = async (route) => {
 
   const router = inject(Router);
   const storage = inject(StorageService);
@@ -20,12 +18,12 @@ export const roleGuard: CanActivateFn = async (
 
   if (
     rolesPermitidos.length === 0 ||
-    rolesPermitidos.includes((usuario as any).rol)
+    rolesPermitidos.includes(usuario.rol)
   ) {
     return true;
   }
 
-  switch ((usuario as any).rol) {
+  switch (usuario.rol) {
 
     case 'admin':
       router.navigate(['/admin/dashboard']);

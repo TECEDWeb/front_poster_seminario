@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { StorageService } from './storage.service';
-import { LoginPayload, LoginResponse } from '../models/auth-reponse.model'; 
+import { LoginPayload, LoginResponse } from '../models/auth-reponse.model';
 import { Usuario } from '../models/usuario.model';
 
 const TOKEN_KEY = 'auth_token';
@@ -13,9 +13,6 @@ const USUARIO_KEY = 'auth_usuario';
 })
 export class AuthService {
 
-  // =========================
-  // STATE
-  // =========================
   private _usuario = signal<Usuario | null>(null);
   private _token = signal<string | null>(null);
 
@@ -24,7 +21,7 @@ export class AuthService {
   readonly autenticado = computed(() => !!this._token());
 
   readonly esAdministrador = computed(() =>
-    this._usuario()?.rol === 'administrador'
+    this._usuario()?.rol === 'admin'
   );
 
   readonly esEvaluador = computed(() =>
@@ -35,13 +32,9 @@ export class AuthService {
     private http: HttpClient,
     private storage: StorageService
   ) {
-    // ⚠️ IMPORTANTE: se ejecuta pero NO bloquea UI
     this.init();
   }
 
-  // =========================
-  // INIT SEGURO
-  // =========================
   private async init() {
     try {
       const token = await this.storage.getToken();
@@ -56,9 +49,6 @@ export class AuthService {
     }
   }
 
-  // =========================
-  // LOGIN
-  // =========================
   login(payload: LoginPayload) {
     return this.http.post<LoginResponse>(
       `${environment.apiUrl}/auth/login`,
@@ -66,9 +56,6 @@ export class AuthService {
     );
   }
 
-  // =========================
-  // GUARDAR SESIÓN
-  // =========================
   async setSession(usuario: Usuario, token: string) {
     this._usuario.set(usuario);
     this._token.set(token);
@@ -77,9 +64,6 @@ export class AuthService {
     await this.storage.setUsuario(usuario);
   }
 
-  // =========================
-  // LOGOUT
-  // =========================
   async logout() {
     this._usuario.set(null);
     this._token.set(null);
@@ -88,9 +72,6 @@ export class AuthService {
     await this.storage.remove(USUARIO_KEY);
   }
 
-  // =========================
-  // HELPERS
-  // =========================
   obtenerUsuario(): Usuario | null {
     return this._usuario();
   }
@@ -99,9 +80,6 @@ export class AuthService {
     return this._token();
   }
 
-  // =========================
-  // RUTA POR ROL
-  // =========================
   rutaInicioSegunRol(): string {
 
     const usuario = this._usuario();
@@ -110,7 +88,7 @@ export class AuthService {
 
     switch (usuario.rol) {
 
-      case 'administrador':
+      case 'admin':
         return '/admin/dashboard';
 
       case 'evaluador':
