@@ -6,24 +6,18 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const apiUrl = environment.apiUrl;
-
-  const esApi = apiUrl ? req.url.startsWith(apiUrl) : false;
-
-  const esLogin = req.url.includes('/auth/login');
-
-  if (!esApi || esLogin) {
-    return next(req);
-  }
-
   const token = authService.obtenerToken?.();
+
+  // 🔥 SOLO EXCLUIR LOGIN
+  const esLogin = req.url.includes('/auth/login');
 
   let request = req;
 
-  if (token) {
+  if (!esLogin && token) {
     request = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
@@ -34,15 +28,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(request).pipe(
     catchError((error) => {
 
-      if (error?.status === 401) {
-        try {
-          authService.logout?.();
-        } catch (e) {
-          console.error('Error en logout:', e);
-        }
+      if (error?.status === 401 || error?.status === 403) {
+
+        console.log('🔴 TOKEN INVALIDO O SIN PERMISOS');
+
+        authService.logout?.();
 
         if (router.url !== '/login') {
-          router.navigate(['/login']);
+          router.navigate(['/login'], { replaceUrl: true });
         }
       }
 
