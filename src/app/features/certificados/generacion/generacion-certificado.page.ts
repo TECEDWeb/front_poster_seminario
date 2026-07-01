@@ -1,13 +1,25 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+
+import {
+  IonContent,
+  IonButton,
+  IonSpinner
+} from '@ionic/angular/standalone';
 
 import { CertificadoService } from '../../../core/services/certificado.service';
 
 @Component({
   selector: 'app-generacion-certificado',
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [
+    CommonModule,
+
+    // Ionic Standalone
+    IonContent,
+    IonButton,
+    IonSpinner
+  ],
   templateUrl: './generacion-certificado.page.html',
   styleUrls: ['./generacion-certificado.page.scss']
 })
@@ -16,9 +28,11 @@ export class GeneracionCertificadoPage {
   loading = false;
   mensaje = '';
 
-  constructor(private certificadoService: CertificadoService) {}
+  constructor(
+    private certificadoService: CertificadoService
+  ) {}
 
-  generarCertificado() {
+  generarCertificado(): void {
 
     this.loading = true;
     this.mensaje = '';
@@ -31,13 +45,17 @@ export class GeneracionCertificadoPage {
     this.certificadoService.generar(data).subscribe({
 
       next: () => {
+
         this.mensaje = 'Certificado generado correctamente';
         this.loading = false;
+
       },
 
       error: () => {
+
         this.mensaje = 'Error al generar certificado';
         this.loading = false;
+
       }
 
     });
