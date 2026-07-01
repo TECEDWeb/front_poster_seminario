@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+
+import { IonSpinner } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-loading-spinner',
   standalone: true,
   imports: [
-    IonicModule
+    CommonModule,
+    IonSpinner
   ],
   templateUrl: './loading-spinner.component.html',
   styleUrls: ['./loading-spinner.component.scss']
 })
-export class LoadingSpinnerComponent {
-
-}
+export class LoadingSpinnerComponent {}

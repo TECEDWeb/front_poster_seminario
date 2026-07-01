@@ -1,7 +1,20 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController } from '@ionic/angular';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ModalController } from '@ionic/angular/standalone';
+
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
+  IonContent,
+  IonItem,
+  IonInput,
+  IonTextarea,
+  IonToggle
+} from '@ionic/angular/standalone';
 
 import { ConcursoService } from '../../../core/services/concurso.service';
 import { Concurso } from '../../../core/models/concurso.model';
@@ -9,7 +22,21 @@ import { Concurso } from '../../../core/models/concurso.model';
 @Component({
   selector: 'app-concurso-form-modal',
   standalone: true,
-  imports: [CommonModule, IonicModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonContent,
+    IonItem,
+    IonInput,
+    IonTextarea,
+    IonToggle
+  ],
   templateUrl: './concurso-form-modal.component.html',
   styleUrls: ['./concurso-form-modal.component.scss']
 })

@@ -2,7 +2,13 @@
 
   <ion-toolbar>
 
-    <ion-title>{{ titulo }}</ion-title>
+    <ion-title>
+      {{ titulo }}
+
+      <div *ngIf="subtitulo" class="subtitulo">
+        {{ subtitulo }}
+      </div>
+    </ion-title>
 
     <ng-content select="[end]"></ng-content>
 

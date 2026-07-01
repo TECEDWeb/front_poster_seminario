@@ -13,21 +13,15 @@ const USUARIO_KEY = 'auth_usuario';
 })
 export class AuthService {
 
-  // ==============================
+  // =========================
   // STATE
-  // ==============================
-
+  // =========================
   private _usuario = signal<Usuario | null>(null);
   private _token = signal<string | null>(null);
 
-  // Signals principales
   readonly usuario = computed(() => this._usuario());
   readonly token = computed(() => this._token());
   readonly autenticado = computed(() => !!this._token());
-
-  // Alias para compatibilidad con código anterior
-  readonly usuarioActual = computed(() => this._usuario());
-  readonly estaAutenticado = computed(() => !!this._token());
 
   readonly esAdministrador = computed(() =>
     this._usuario()?.rol === 'administrador'
@@ -41,13 +35,13 @@ export class AuthService {
     private http: HttpClient,
     private storage: StorageService
   ) {
+    // ⚠️ IMPORTANTE: se ejecuta pero NO bloquea UI
     this.init();
   }
 
-  // ==============================
-  // INICIALIZAR SESIÓN
-  // ==============================
-
+  // =========================
+  // INIT SEGURO
+  // =========================
   private async init() {
     try {
       const token = await this.storage.getToken();
@@ -58,14 +52,13 @@ export class AuthService {
         this._usuario.set(usuario);
       }
     } catch (error) {
-      console.error('Error inicializando sesión:', error);
+      console.error('Error init auth:', error);
     }
   }
 
-  // ==============================
+  // =========================
   // LOGIN
-  // ==============================
-
+  // =========================
   login(payload: LoginPayload) {
     return this.http.post<LoginResponse>(
       `${environment.apiUrl}/auth/login`,
@@ -73,26 +66,21 @@ export class AuthService {
     );
   }
 
-  // ==============================
+  // =========================
   // GUARDAR SESIÓN
-  // ==============================
-
+  // =========================
   async setSession(usuario: Usuario, token: string) {
     this._usuario.set(usuario);
     this._token.set(token);
 
     await this.storage.setToken(token);
     await this.storage.setUsuario(usuario);
-
-    localStorage.setItem('auth_token', token);
   }
 
-  // ==============================
+  // =========================
   // LOGOUT
-  // ==============================
-
+  // =========================
   async logout() {
-
     this._usuario.set(null);
     this._token.set(null);
 
@@ -100,10 +88,9 @@ export class AuthService {
     await this.storage.remove(USUARIO_KEY);
   }
 
-  // ==============================
-  // GETTERS
-  // ==============================
-
+  // =========================
+  // HELPERS
+  // =========================
   obtenerUsuario(): Usuario | null {
     return this._usuario();
   }
@@ -112,37 +99,14 @@ export class AuthService {
     return this._token();
   }
 
-  estaLogueado(): boolean {
-    return !!this._token();
-  }
-
-  tieneToken(): boolean {
-    return !!this._token();
-  }
-
-  // ==============================
-  // VALIDACIÓN DE ROLES
-  // ==============================
-
-  esAdmin(): boolean {
-    return this._usuario()?.rol === 'administrador';
-  }
-
-  esEvaluadorRol(): boolean {
-    return this._usuario()?.rol === 'evaluador';
-  }
-
-  // ==============================
-  // RUTA INICIAL
-  // ==============================
-
+  // =========================
+  // RUTA POR ROL
+  // =========================
   rutaInicioSegunRol(): string {
 
     const usuario = this._usuario();
 
-    if (!usuario) {
-      return '/login';
-    }
+    if (!usuario) return '/login';
 
     switch (usuario.rol) {
 
@@ -150,7 +114,7 @@ export class AuthService {
         return '/admin/dashboard';
 
       case 'evaluador':
-        return '/evaluador/proyectos-asignados';
+        return '/evaluador/dashboard';
 
       default:
         return '/login';
