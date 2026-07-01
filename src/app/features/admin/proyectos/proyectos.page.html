@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Proyectos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="btn-add">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-container">
+
+    <div class="page-header">
+      <div>
+        <h1>Proyectos</h1>
+        <p>{{ proyectos.length }} proyectos registrados</p>
+      </div>
+    </div>
+
+    <!-- Búsqueda -->
+    <ion-searchbar
+      [(ngModel)]="busqueda"
+      placeholder="Buscar por nombre o área..."
+      debounce="300"
+      class="list-search"
+      style="margin-bottom:12px">
+    </ion-searchbar>
+
+    <!-- Lista -->
+    <div class="pro-card">
+      <ion-list lines="none">
+        <ion-item-sliding *ngFor="let p of proyectos">
+          <ion-item class="proyecto-item">
+            <div class="proj-icon" slot="start">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
+            <ion-label>
+              <h2>{{ p.nombre }}</h2>
+              <p>
+                {{ p.area }}
+                <span *ngIf="p.participantes?.length">
+                  · {{ p.participantes.length }} participante{{ p.participantes.length !== 1 ? 's' : '' }}
+                </span>
+              </p>
+            </ion-label>
+            <div slot="end" class="badges-col">
+              <span class="badge badge-indigo">Nivel {{ p.nivel }}</span>
+              <span class="badge badge-slate" *ngIf="!p.activo">Inactivo</span>
+            </div>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="primary">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-list>
+
+      <div class="empty-state" *ngIf="proyectos.length === 0">
+        <ion-icon name="folder-open-outline"></ion-icon>
+        <h3>Sin proyectos</h3>
+        <p>Aún no hay proyectos registrados</p>
+        <ion-button size="small" class="btn-primary">Crear proyecto</ion-button>
+      </div>
+    </div>
+
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

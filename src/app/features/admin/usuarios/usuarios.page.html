@@ -1,0 +1,101 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title>Usuarios</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirCrear()">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <h1>Gestión de usuarios</h1>
+      <p>Administra evaluadores y accesos</p>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="resumen-row">
+
+      <div class="resumen-chip">
+        <span class="chip-val">{{ usuarios.length }}</span>
+        <span class="chip-lbl">Total</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="resumen-chip">
+        <span class="chip-val emerald">{{ totalActivos }}</span>
+        <span class="chip-lbl">Activos</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="resumen-chip">
+        <span class="chip-val indigo">{{ totalEvaluadores }}</span>
+        <span class="chip-lbl">Evaluadores</span>
+      </div>
+
+    </div>
+
+    <!-- SEARCH -->
+    <ion-searchbar
+      [(ngModel)]="busqueda"
+      placeholder="Buscar usuarios...">
+    </ion-searchbar>
+
+    <!-- LISTA -->
+    <div *ngFor="let u of usuarios">
+
+      <div class="user-row">
+
+        <div class="avatar">
+          {{ iniciales(u.nombre) }}
+        </div>
+
+        <div class="user-info">
+          <div>{{ u.nombre }}</div>
+          <div>{{ u.cedula }}</div>
+
+          <span>{{ u.rol }}</span>
+          <span>{{ u.activo ? 'Activo' : 'Inactivo' }}</span>
+        </div>
+
+        <div class="user-actions">
+
+          <ion-button fill="clear" (click)="editar(u)">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-button>
+
+          <ion-button fill="clear" (click)="cambiarEstado(u)">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>
+          </ion-button>
+
+          <ion-button fill="clear" (click)="resetPass(u)">
+            <ion-icon name="key-outline"></ion-icon>
+          </ion-button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- EMPTY -->
+    <div *ngIf="usuarios.length === 0 && !cargando">
+      Sin usuarios
+    </div>
+
+  </div>
+
+</ion-content>

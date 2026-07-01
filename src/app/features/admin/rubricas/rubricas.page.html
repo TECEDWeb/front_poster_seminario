@@ -1,0 +1,28 @@
+<app-header titulo="Dashboard Admin"></app-header>
+<ion-content id="main-content" class="ion-padding">
+
+  <h2>Rúbricas</h2>
+
+  <ion-card *ngFor="let r of rubricas">
+
+    <ion-card-header>
+      <ion-card-title>
+        Concurso {{ r.concursoId }}
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <p>
+        Secciones: {{ r.secciones.length }}
+      </p>
+
+      <p>
+        Niveles: {{ r.niveles.length }}
+      </p>
+
+    </ion-card-content>
+
+  </ion-card>
+
+</ion-content>

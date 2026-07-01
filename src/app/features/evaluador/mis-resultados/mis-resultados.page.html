@@ -1,0 +1,80 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Mis resultados</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-container">
+
+    <div class="page-header">
+      <div>
+        <h1>Mis evaluaciones</h1>
+        <p>Historial de proyectos que has evaluado</p>
+      </div>
+    </div>
+
+    <!-- Skeleton -->
+    <div *ngIf="loading">
+      <div class="resultado-skeleton" *ngFor="let i of [1,2,3]">
+        <ion-skeleton-text animated style="width:100%;height:14px;border-radius:4px;margin-bottom:8px"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:60%;height:12px;border-radius:4px;margin-bottom:6px"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:40%;height:12px;border-radius:4px"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <!-- Lista -->
+    <div *ngIf="!loading">
+      <div class="resultado-card" *ngFor="let e of evaluaciones">
+
+        <div class="resultado-header">
+          <div class="resultado-icon">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </div>
+          <div class="resultado-head">
+            <div class="resultado-nombre">{{ e.proyectoNombre }}</div>
+            <div class="resultado-concurso">{{ e.concursoNombre }}</div>
+          </div>
+          <div class="resultado-score">
+            <div class="score-val"
+              [ngClass]="{
+                'score-high': (e.porcentaje ?? 0) >= 70,
+                'score-mid':  (e.porcentaje ?? 0) >= 50 && (e.porcentaje ?? 0) < 70,
+                'score-low':  (e.porcentaje ?? 0) < 50
+              }">
+              {{ e.porcentaje ?? 0 }}%
+            </div>
+            <div class="score-lbl">{{ e.puntajeTotal }} pts</div>
+          </div>
+        </div>
+
+        <div class="resultado-meta">
+          <div class="meta-item">
+            <ion-icon name="person-outline"></ion-icon>
+            {{ e.evaluadorNombre }}
+          </div>
+          <div class="meta-item">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ e.fecha | date:'dd/MM/yyyy' }}
+          </div>
+          <div class="meta-item" *ngIf="e.puntajeMaximo">
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            {{ e.puntajeTotal }} / {{ e.puntajeMaximo }}
+          </div>
+        </div>
+
+      </div>
+
+      <div class="empty-state" *ngIf="evaluaciones.length === 0">
+        <ion-icon name="stats-chart-outline"></ion-icon>
+        <h3>Sin evaluaciones</h3>
+        <p>Aún no has evaluado ningún proyecto</p>
+        <ion-button size="small" routerLink="/evaluador/proyectos-asignados" class="btn-primary">
+          Ver proyectos asignados
+        </ion-button>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

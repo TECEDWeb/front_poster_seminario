@@ -1,0 +1,37 @@
+<ion-content class="ion-padding">
+
+  <h2>Consulta de Certificados</h2>
+
+  <ion-item>
+    <ion-input
+      label="Código de certificado"
+      labelPlacement="stacked"
+      [(ngModel)]="codigo">
+    </ion-input>
+  </ion-item>
+
+  <ion-button expand="block" (click)="buscar()">
+    Consultar
+  </ion-button>
+
+  <ion-text color="danger" *ngIf="error">
+    {{ error }}
+  </ion-text>
+
+  <ion-card *ngIf="resultado">
+
+    <ion-card-header>
+      <ion-card-title>Certificado válido</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <p><strong>Nombre:</strong> {{ resultado.nombre }}</p>
+      <p><strong>Proyecto:</strong> {{ resultado.proyecto }}</p>
+      <p><strong>Fecha:</strong> {{ resultado.fecha }}</p>
+
+    </ion-card-content>
+
+  </ion-card>
+
+</ion-content>

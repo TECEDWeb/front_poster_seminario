@@ -1,0 +1,7 @@
+{
+  "name": "front_poster",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

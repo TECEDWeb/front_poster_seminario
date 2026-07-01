@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-title>Mi panel</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-container">
+
+    <!-- Saludo -->
+    <div class="saludo-card">
+      <div class="saludo-avatar">
+        <ion-icon name="person-outline"></ion-icon>
+      </div>
+      <div>
+        <div class="saludo-texto">Bienvenido de vuelta</div>
+        <div class="saludo-sub">Tienes proyectos pendientes de evaluar</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid-3">
+      <app-stats-card
+        titulo="Asignados"
+        [valor]="asignados"
+        icono="folder-outline"
+        color="indigo">
+      </app-stats-card>
+      <app-stats-card
+        titulo="Pendientes"
+        [valor]="pendientes"
+        icono="time-outline"
+        color="amber">
+      </app-stats-card>
+      <app-stats-card
+        titulo="Completados"
+        [valor]="completados"
+        icono="checkmark-done-outline"
+        color="emerald">
+      </app-stats-card>
+    </div>
+
+    <!-- Progreso -->
+    <div class="progreso-card" *ngIf="asignados > 0">
+      <div class="progreso-header">
+        <span class="progreso-label">Progreso general</span>
+        <span class="progreso-pct">{{ porcentaje }}%</span>
+      </div>
+      <div class="progreso-bar">
+        <div class="progreso-fill" [style.width.%]="porcentaje"></div>
+      </div>
+      <div class="progreso-sub">{{ completados }} de {{ asignados }} proyectos evaluados</div>
+    </div>
+
+    <!-- Acceso rápido -->
+    <div class="section-title">
+      <h2>Acceso rápido</h2>
+    </div>
+
+    <div class="quick-grid">
+      <button class="quick-btn" routerLink="/evaluador/proyectos-asignados">
+        <div class="quick-icon indigo"><ion-icon name="clipboard-outline"></ion-icon></div>
+        <div class="quick-label">Proyectos asignados</div>
+        <div class="quick-sub">Ver y evaluar</div>
+        <ion-icon name="chevron-forward-outline" class="quick-arrow"></ion-icon>
+      </button>
+      <button class="quick-btn" routerLink="/evaluador/mis-resultados">
+        <div class="quick-icon emerald"><ion-icon name="stats-chart-outline"></ion-icon></div>
+        <div class="quick-label">Mis resultados</div>
+        <div class="quick-sub">Ver evaluaciones realizadas</div>
+        <ion-icon name="chevron-forward-outline" class="quick-arrow"></ion-icon>
+      </button>
+    </div>
+
+  </div>
+</ion-content>

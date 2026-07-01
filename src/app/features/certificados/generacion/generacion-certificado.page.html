@@ -1,0 +1,13 @@
+<ion-content class="ion-padding">
+
+  <h2>Generación de Certificados</h2>
+
+  <ion-button expand="block" (click)="generarCertificado()">
+    Generar Certificado
+  </ion-button>
+
+  <ion-spinner *ngIf="loading"></ion-spinner>
+
+  <p *ngIf="mensaje">{{ mensaje }}</p>
+
+</ion-content>

@@ -1,0 +1,37 @@
+<ion-menu contentId="eval-content">
+
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>Evaluador</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+
+      <ion-item routerLink="/evaluador/dashboard">
+        <ion-icon name="speedometer-outline" slot="start"></ion-icon>
+        Dashboard
+      </ion-item>
+
+      <ion-item routerLink="/evaluador/proyectos-asignados">
+        <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+        Proyectos asignados
+      </ion-item>
+
+      <ion-item routerLink="/evaluador/mis-resultados">
+        <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+        Mis resultados
+      </ion-item>
+
+    </ion-list>
+
+    <ion-button expand="block" color="danger" (click)="cerrarSesion()">
+      Cerrar sesión
+    </ion-button>
+
+  </ion-content>
+
+</ion-menu>
+
+<ion-router-outlet id="eval-content"></ion-router-outlet>

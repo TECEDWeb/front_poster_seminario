@@ -1,0 +1,138 @@
+/* =========================
+   BACKGROUND ION-CONTENT
+========================= */
+ion-content.login-content {
+  --background: linear-gradient(
+    160deg,
+    var(--ion-color-primary) 0%,
+    var(--ion-color-primary-shade) 100%
+  );
+
+  /* elimina padding interno de Ionic */
+  --padding-top: 0px;
+  --padding-bottom: 0px;
+}
+
+/* =========================
+   SCROLL BEHAVIOR (CLAVE)
+   NO usar flex aquí porque genera espacios raros
+========================= */
+ion-content.login-content::part(scroll) {
+  display: block;
+}
+
+/* =========================
+   CONTENEDOR PRINCIPAL
+   (control total del layout)
+========================= */
+.login-wrapper {
+  width: 100%;
+  min-height: 100%;
+
+  display: flex;
+  justify-content: center;
+
+  /* 👇 ESTE ES EL FIX DEL ESPACIO ARRIBA */
+  padding-top: 8vh;
+  padding-bottom: 24px;
+  padding-left: 24px;
+  padding-right: 24px;
+
+  box-sizing: border-box;
+}
+
+/* =========================
+   CARD LOGIN
+========================= */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+
+  background: var(--ion-color-light, #fff);
+  border-radius: 16px;
+
+  padding: 32px 24px;
+
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* =========================
+   BRAND / HEADER
+========================= */
+.login-brand {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-logo {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.login-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ion-color-dark);
+}
+
+.login-subtitle {
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+  margin: 4px 0 0;
+}
+
+/* =========================
+   FORM
+========================= */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* =========================
+   INPUTS
+========================= */
+.login-input {
+  --background: var(--ion-color-step-50, #f4f5f8);
+  --border-radius: 10px;
+  --padding-start: 12px;
+  border-radius: 10px;
+
+  ion-icon {
+    color: var(--ion-color-medium);
+    margin-right: 8px;
+  }
+}
+
+/* =========================
+   ERROR
+========================= */
+.login-error {
+  color: var(--ion-color-danger);
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* =========================
+   BUTTON
+========================= */
+.login-submit {
+  --border-radius: 10px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.login-footer {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--ion-color-medium);
+  margin-top: 20px;
+}
