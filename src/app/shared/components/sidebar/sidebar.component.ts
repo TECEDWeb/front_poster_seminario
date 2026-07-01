@@ -1,18 +1,21 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
-import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+
 import { AuthService } from '../../../core/services/auth.service';
-import { computed } from '@angular/core'; 
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule], // ← RouterModule aquí
+  imports: [
+    CommonModule,
+    RouterModule
+  ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
+
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -31,6 +34,6 @@ export class SidebarComponent {
 
   async cerrarSesion() {
     await this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 }

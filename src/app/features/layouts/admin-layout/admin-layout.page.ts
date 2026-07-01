@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
+
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
@@ -10,7 +12,8 @@ import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.com
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
+    IonApp,
+    IonRouterOutlet,
     SidebarComponent
   ],
   templateUrl: './admin-layout.page.html',

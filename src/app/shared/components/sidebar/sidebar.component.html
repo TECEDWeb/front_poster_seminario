@@ -10,7 +10,6 @@
 
   <ion-content>
 
-    <!-- USER SAFE -->
     <div class="user-info" *ngIf="usuario() as u">
       <div class="avatar">{{ iniciales() }}</div>
       <div>
@@ -22,7 +21,7 @@
     <ion-list lines="none">
 
       <!-- ADMIN -->
-      <ng-container *ngIf="usuario()?.rol === 'admin' || usuario()?.rol === 'administrador'">
+      <ng-container *ngIf="usuario()?.rol === 'administrador'">
 
         <ion-item routerLink="/admin/dashboard">Dashboard</ion-item>
         <ion-item routerLink="/admin/usuarios">Usuarios</ion-item>
