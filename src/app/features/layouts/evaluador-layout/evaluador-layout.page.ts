@@ -2,6 +2,19 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
+import {
+  IonApp,
+  IonMenu,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonList,
+  IonItem,
+  IonButton,
+  IonRouterOutlet
+} from '@ionic/angular/standalone';
+
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -9,7 +22,18 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+
+    IonApp,
+    IonMenu,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonItem,
+    IonButton,
+    IonRouterOutlet
   ],
   templateUrl: './evaluador-layout.page.html',
 })
