@@ -22,8 +22,6 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [
     CommonModule,
     RouterModule,
-
-    // 🔥 Ionic standalone components (OBLIGATORIO)
     IonMenu,
     IonHeader,
     IonToolbar,

@@ -13,12 +13,17 @@ const USUARIO_KEY = 'auth_usuario';
 })
 export class AuthService {
 
+  // =========================
+  // ESTADO REACTIVO
+  // =========================
   private _usuario = signal<Usuario | null>(null);
   private _token = signal<string | null>(null);
+  private _cargado = signal(false);
 
   readonly usuario = computed(() => this._usuario());
   readonly token = computed(() => this._token());
   readonly autenticado = computed(() => !!this._token());
+  readonly cargado = computed(() => this._cargado());
 
   readonly esAdministrador = computed(() =>
     this._usuario()?.rol === 'admin'
@@ -35,6 +40,9 @@ export class AuthService {
     this.init();
   }
 
+  // =========================
+  // INICIALIZAR SESIÓN
+  // =========================
   private async init() {
     try {
       const token = await this.storage.getToken();
@@ -44,11 +52,18 @@ export class AuthService {
         this._token.set(token);
         this._usuario.set(usuario);
       }
+
     } catch (error) {
       console.error('Error init auth:', error);
+    } finally {
+      // 🔥 IMPORTANTE: siempre marcar como cargado
+      this._cargado.set(true);
     }
   }
 
+  // =========================
+  // LOGIN
+  // =========================
   login(payload: LoginPayload) {
     return this.http.post<LoginResponse>(
       `${environment.apiUrl}/auth/login`,
@@ -56,6 +71,9 @@ export class AuthService {
     );
   }
 
+  // =========================
+  // GUARDAR SESIÓN
+  // =========================
   async setSession(usuario: Usuario, token: string) {
     this._usuario.set(usuario);
     this._token.set(token);
@@ -64,6 +82,9 @@ export class AuthService {
     await this.storage.setUsuario(usuario);
   }
 
+  // =========================
+  // LOGOUT
+  // =========================
   async logout() {
     this._usuario.set(null);
     this._token.set(null);
@@ -72,6 +93,9 @@ export class AuthService {
     await this.storage.remove(USUARIO_KEY);
   }
 
+  // =========================
+  // HELPERS
+  // =========================
   obtenerUsuario(): Usuario | null {
     return this._usuario();
   }
@@ -80,6 +104,9 @@ export class AuthService {
     return this._token();
   }
 
+  // =========================
+  // REDIRECCIÓN POR ROL
+  // =========================
   rutaInicioSegunRol(): string {
 
     const usuario = this._usuario();
