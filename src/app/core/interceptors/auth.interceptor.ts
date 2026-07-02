@@ -2,7 +2,6 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -12,11 +11,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const token = authService.obtenerToken?.();
 
-  // 🔥 SOLO EXCLUIR LOGIN
+  // 🔥 EXCLUIR SOLO LOGIN
   const esLogin = req.url.includes('/auth/login');
 
   let request = req;
 
+  // 📡 LOG DEBUG REQUEST
+  console.log('📡 HTTP REQUEST:', {
+    url: req.url,
+    method: req.method,
+    esLogin,
+    tieneToken: !!token
+  });
+
+  // 🔐 INYECTAR TOKEN
   if (!esLogin && token) {
     request = req.clone({
       setHeaders: {
@@ -28,9 +36,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(request).pipe(
     catchError((error) => {
 
-      if (error?.status === 401 || error?.status === 403) {
+      // 🧨 LOG COMPLETO DEL ERROR
+      console.log('🧨 HTTP ERROR DETECTADO:', {
+        status: error?.status,
+        url: error?.url,
+        message: error?.message,
+        error: error?.error
+      });
 
-        console.log('🔴 TOKEN INVALIDO O SIN PERMISOS');
+      // 🔴 401 = TOKEN INVALIDO → LOGOUT
+      if (error?.status === 401) {
+
+        console.log('🔴 401 - TOKEN INVÁLIDO');
 
         authService.logout?.();
 
@@ -39,7 +56,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      console.error('HTTP Error:', error);
+      // 🟠 403 = SIN PERMISOS → NO LOGOUT (IMPORTANTE)
+      if (error?.status === 403) {
+
+        console.log('🟠 403 - SIN PERMISOS (NO SE CIERRA SESIÓN)');
+      }
 
       return throwError(() => error);
     })
