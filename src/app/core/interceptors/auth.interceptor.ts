@@ -9,22 +9,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const token = authService.obtenerToken?.();
+  const token =
+    authService.obtenerToken?.() ??
+    localStorage.getItem('auth_token');
 
-  // 🔥 EXCLUIR SOLO LOGIN
   const esLogin = req.url.includes('/auth/login');
 
   let request = req;
 
-  // 📡 LOG DEBUG REQUEST
-  console.log('📡 HTTP REQUEST:', {
+  console.log('📡 REQUEST:', {
     url: req.url,
-    method: req.method,
     esLogin,
     tieneToken: !!token
   });
 
-  // 🔐 INYECTAR TOKEN
   if (!esLogin && token) {
     request = req.clone({
       setHeaders: {
@@ -36,17 +34,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(request).pipe(
     catchError((error) => {
 
-      // 🧨 LOG COMPLETO DEL ERROR
-      console.log('🧨 HTTP ERROR DETECTADO:', {
-        status: error?.status,
-        url: error?.url,
-        message: error?.message,
-        error: error?.error
-      });
+      console.log('🧨 ERROR HTTP:', error);
 
-      // 🔴 401 = TOKEN INVALIDO → LOGOUT
       if (error?.status === 401) {
-
         console.log('🔴 401 - TOKEN INVÁLIDO');
 
         authService.logout?.();
@@ -56,10 +46,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      // 🟠 403 = SIN PERMISOS → NO LOGOUT (IMPORTANTE)
       if (error?.status === 403) {
-
-        console.log('🟠 403 - SIN PERMISOS (NO SE CIERRA SESIÓN)');
+        console.log('🟠 403 - SIN PERMISOS');
       }
 
       return throwError(() => error);

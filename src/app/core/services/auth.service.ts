@@ -5,9 +5,6 @@ import { StorageService } from './storage.service';
 import { LoginPayload, LoginResponse } from '../models/auth-reponse.model';
 import { Usuario } from '../models/usuario.model';
 
-const TOKEN_KEY = 'auth_token';
-const USUARIO_KEY = 'auth_usuario';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -19,6 +16,9 @@ export class AuthService {
   private _usuario = signal<Usuario | null>(null);
   private _token = signal<string | null>(null);
   private _cargado = signal(false);
+
+  // 🔥 CACHE CRÍTICO (FIX 401)
+  private tokenCache: string | null = null;
 
   readonly usuario = computed(() => this._usuario());
   readonly token = computed(() => this._token());
@@ -48,15 +48,18 @@ export class AuthService {
       const token = await this.storage.getToken();
       const usuario = await this.storage.getUsuario<Usuario>();
 
-      if (token && usuario) {
+      if (token) {
         this._token.set(token);
+        this.tokenCache = token; // 🔥 IMPORTANTE
+      }
+
+      if (usuario) {
         this._usuario.set(usuario);
       }
 
     } catch (error) {
       console.error('Error init auth:', error);
     } finally {
-      // 🔥 IMPORTANTE: siempre marcar como cargado
       this._cargado.set(true);
     }
   }
@@ -75,22 +78,35 @@ export class AuthService {
   // GUARDAR SESIÓN
   // =========================
   async setSession(usuario: Usuario, token: string) {
+
     this._usuario.set(usuario);
     this._token.set(token);
 
+    // 🔥 CACHE INMEDIATO (CRÍTICO)
+    this.tokenCache = token;
+
+    // persistencia
     await this.storage.setToken(token);
     await this.storage.setUsuario(usuario);
+
+    // fallback extra (opcional pero útil)
+    localStorage.setItem('auth_token', token);
   }
 
   // =========================
   // LOGOUT
   // =========================
   async logout() {
+
     this._usuario.set(null);
     this._token.set(null);
 
-    await this.storage.remove(TOKEN_KEY);
-    await this.storage.remove(USUARIO_KEY);
+    this.tokenCache = null;
+
+    await this.storage.removeToken();
+    await this.storage.removeUsuario();
+
+    localStorage.removeItem('auth_token');
   }
 
   // =========================
@@ -101,7 +117,7 @@ export class AuthService {
   }
 
   obtenerToken(): string | null {
-    return this._token();
+    return this.tokenCache ?? this._token();
   }
 
   // =========================
