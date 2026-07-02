@@ -11,14 +11,11 @@ import { Usuario } from '../models/usuario.model';
 export class AuthService {
 
   // =========================
-  // ESTADO REACTIVO
+  // ESTADO
   // =========================
   private _usuario = signal<Usuario | null>(null);
   private _token = signal<string | null>(null);
   private _cargado = signal(false);
-
-  // 🔥 CACHE CRÍTICO (FIX 401)
-  private tokenCache: string | null = null;
 
   readonly usuario = computed(() => this._usuario());
   readonly token = computed(() => this._token());
@@ -41,7 +38,7 @@ export class AuthService {
   }
 
   // =========================
-  // INICIALIZAR SESIÓN
+  // INIT SESIÓN
   // =========================
   private async init() {
     try {
@@ -50,7 +47,6 @@ export class AuthService {
 
       if (token) {
         this._token.set(token);
-        this.tokenCache = token; // 🔥 IMPORTANTE
       }
 
       if (usuario) {
@@ -75,22 +71,15 @@ export class AuthService {
   }
 
   // =========================
-  // GUARDAR SESIÓN
+  // SET SESSION
   // =========================
   async setSession(usuario: Usuario, token: string) {
 
     this._usuario.set(usuario);
     this._token.set(token);
 
-    // 🔥 CACHE INMEDIATO (CRÍTICO)
-    this.tokenCache = token;
-
-    // persistencia
     await this.storage.setToken(token);
     await this.storage.setUsuario(usuario);
-
-    // fallback extra (opcional pero útil)
-    localStorage.setItem('auth_token', token);
   }
 
   // =========================
@@ -101,12 +90,8 @@ export class AuthService {
     this._usuario.set(null);
     this._token.set(null);
 
-    this.tokenCache = null;
-
     await this.storage.removeToken();
     await this.storage.removeUsuario();
-
-    localStorage.removeItem('auth_token');
   }
 
   // =========================
@@ -117,11 +102,16 @@ export class AuthService {
   }
 
   obtenerToken(): string | null {
-    return this.tokenCache ?? this._token();
+    return this._token();
+  }
+
+  // ⚠️ IMPORTANTE: versión síncrona para interceptor
+  getTokenSync(): string | null {
+    return this._token();
   }
 
   // =========================
-  // REDIRECCIÓN POR ROL
+  // RUTAS
   // =========================
   rutaInicioSegunRol(): string {
 
