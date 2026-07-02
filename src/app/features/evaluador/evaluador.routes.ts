@@ -4,6 +4,10 @@ export const EVALUADOR_ROUTES: Routes = [
 
   {
     path: '',
+    loadComponent: () =>
+      import('../layouts/evaluador-layout/evaluador-layout.page')
+        .then(m => m.EvaluadorLayoutPage),
+
     children: [
 
       {
@@ -41,7 +45,6 @@ export const EVALUADOR_ROUTES: Routes = [
       }
 
     ]
-
   }
 
 ];

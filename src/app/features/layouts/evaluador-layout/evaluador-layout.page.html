@@ -1,38 +1,39 @@
-<ion-menu contentId="eval-content">
+<ion-app>
 
-  <ion-header>
-    <ion-toolbar color="primary">
-      <ion-title>Evaluador</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-menu contentId="eval-content">
 
-  <ion-content>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Evaluador</ion-title>
+      </ion-toolbar>
+    </ion-header>
 
-    <ion-list>
+    <ion-content>
 
-      <ion-item routerLink="/evaluador/dashboard">
-        <ion-icon name="speedometer-outline" slot="start"></ion-icon>
-        Dashboard
-      </ion-item>
+      <ion-list>
 
-      <ion-item routerLink="/evaluador/proyectos-asignados">
-        <ion-icon name="folder-open-outline" slot="start"></ion-icon>
-        Proyectos asignados
-      </ion-item>
+        <ion-item routerLink="/evaluador/dashboard">
+          Dashboard
+        </ion-item>
 
-      <ion-item routerLink="/evaluador/mis-resultados">
-        <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
-        Mis resultados
-      </ion-item>
+        <ion-item routerLink="/evaluador/proyectos-asignados">
+          Proyectos asignados
+        </ion-item>
 
-    </ion-list>
+        <ion-item routerLink="/evaluador/mis-resultados">
+          Mis resultados
+        </ion-item>
 
-    <ion-button expand="block" color="danger" (click)="cerrarSesion()">
-      Cerrar sesión
-    </ion-button>
+      </ion-list>
 
-  </ion-content>
+      <ion-button expand="block" color="danger" (click)="cerrarSesion()">
+        Cerrar sesión
+      </ion-button>
 
-</ion-menu>
+    </ion-content>
 
-<ion-router-outlet id="eval-content"></ion-router-outlet>
+  </ion-menu>
+
+  <ion-router-outlet id="eval-content"></ion-router-outlet>
+
+</ion-app>
