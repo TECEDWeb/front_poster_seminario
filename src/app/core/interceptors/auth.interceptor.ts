@@ -9,7 +9,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const token = authService.obtenerToken(); // síncrono
+  const token = authService.obtenerTokenSync(); // 🔥 IMPORTANTE
 
   const esLogin = req.url.includes('/auth/login');
 
@@ -29,6 +29,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       console.log('🧨 HTTP ERROR DETECTADO:', error);
 
       if (error?.status === 401) {
+        console.log('🔴 401 - TOKEN INVÁLIDO');
         authService.logout();
         router.navigate(['/login'], { replaceUrl: true });
       }

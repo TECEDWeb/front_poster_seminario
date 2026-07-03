@@ -16,7 +16,7 @@ export class AuthService {
   private _usuario = signal<Usuario | null>(null);
   private _token = signal<string | null>(null);
   private _cargado = signal(false);
-
+  private tokenCache: string | null = null;
   readonly usuario = computed(() => this._usuario());
   readonly token = computed(() => this._token());
   readonly autenticado = computed(() => !!this._token());
@@ -47,6 +47,7 @@ export class AuthService {
 
       if (token) {
         this._token.set(token);
+        this.tokenCache = token;
       }
 
       if (usuario) {
@@ -77,6 +78,7 @@ export class AuthService {
 
     this._usuario.set(usuario);
     this._token.set(token);
+    this.tokenCache = token;
 
     await this.storage.setToken(token);
     await this.storage.setUsuario(usuario);
@@ -106,9 +108,9 @@ export class AuthService {
   }
 
   // ⚠️ IMPORTANTE: versión síncrona para interceptor
-  getTokenSync(): string | null {
-    return this._token();
-  }
+  obtenerTokenSync(): string | null {
+  return this._token() || this.tokenCache;
+}
 
   // =========================
   // RUTAS
