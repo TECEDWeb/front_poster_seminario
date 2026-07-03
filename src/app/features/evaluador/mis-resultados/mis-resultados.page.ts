@@ -43,7 +43,7 @@ import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
 export class MisResultadosPage implements OnInit {
 
   evaluaciones: ResumenEvaluacion[] = [];
-  loading = false;
+  loading = true;
 
   constructor(
     private evaluacionService: EvaluacionService
@@ -70,17 +70,14 @@ export class MisResultadosPage implements OnInit {
     this.evaluacionService.listarResumen().subscribe({
 
       next: (res: ResumenEvaluacion[]) => {
-
-        this.evaluaciones = res;
+        this.evaluaciones = res || [];
         this.loading = false;
-
       },
 
       error: (err) => {
-
         console.error('Error al cargar evaluaciones', err);
+        this.evaluaciones = [];
         this.loading = false;
-
       }
 
     });
