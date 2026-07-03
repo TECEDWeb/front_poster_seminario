@@ -1,34 +1,32 @@
 import { Component, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+
 import {
-  IonMenu,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
   IonList,
   IonItem,
-  IonButton,
-  IonIcon
+  IonButton
 } from '@ionic/angular/standalone';
-import { AuthService } from '../../../core/services/auth.service';
 
+import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [
     CommonModule,
+    NgIf,
     RouterModule,
-    IonMenu,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
     IonList,
     IonItem,
-    IonButton,
-    IonIcon
+    IonButton
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']

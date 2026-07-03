@@ -1,37 +1,7 @@
 <ion-app>
 
   <ion-menu contentId="eval-content">
-
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Evaluador</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
-
-      <ion-list>
-
-        <ion-item routerLink="/evaluador/dashboard">
-          Dashboard
-        </ion-item>
-
-        <ion-item routerLink="/evaluador/proyectos-asignados">
-          Proyectos asignados
-        </ion-item>
-
-        <ion-item routerLink="/evaluador/mis-resultados">
-          Mis resultados
-        </ion-item>
-
-      </ion-list>
-
-      <ion-button expand="block" color="danger" (click)="cerrarSesion()">
-        Cerrar sesión
-      </ion-button>
-
-    </ion-content>
-
+    <app-sidebar></app-sidebar>
   </ion-menu>
 
   <ion-router-outlet id="eval-content"></ion-router-outlet>
