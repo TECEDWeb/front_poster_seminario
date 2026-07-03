@@ -1,20 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import {
-  IonApp,
-  IonMenu,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonList,
-  IonItem,
-  IonButton,
-  IonRouterOutlet
-} from '@ionic/angular/standalone';
+import { RouterModule } from '@angular/router';
 
-import { AuthService } from '../../../core/services/auth.service';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-evaluador-layout',
@@ -23,25 +13,10 @@ import { AuthService } from '../../../core/services/auth.service';
     CommonModule,
     RouterModule,
     IonApp,
-    IonMenu,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonList,
-    IonItem,
-    IonButton,
-    IonRouterOutlet
+    IonRouterOutlet,
+    SidebarComponent
   ],
   templateUrl: './evaluador-layout.page.html',
+  styleUrls: ['./evaluador-layout.page.scss']
 })
-export class EvaluadorLayoutPage {
-
-  private authService = inject(AuthService);
-  private router = inject(Router);
-
-  async cerrarSesion() {
-    await this.authService.logout();
-    this.router.navigateByUrl('/login', { replaceUrl: true });
-  }
-}
+export class EvaluadorLayoutPage {}

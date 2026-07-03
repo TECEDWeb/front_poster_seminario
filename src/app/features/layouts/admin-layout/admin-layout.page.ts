@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
-import { AuthService } from '../../../core/services/auth.service';
+import { RouterModule } from '@angular/router';
+
+import { IonRouterOutlet } from '@ionic/angular/standalone';
+
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 
 @Component({
@@ -10,19 +11,11 @@ import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.com
   standalone: true,
   imports: [
     CommonModule,
-    IonApp,
+    RouterModule,
     IonRouterOutlet,
     SidebarComponent
   ],
   templateUrl: './admin-layout.page.html',
+  styleUrls: ['./admin-layout.page.scss']
 })
-export class AdminLayoutPage {
-
-  private authService = inject(AuthService);
-  private router = inject(Router);
-
-  async cerrarSesion() {
-    await this.authService.logout();
-    this.router.navigateByUrl('/login', { replaceUrl: true });
-  }
-}
+export class AdminLayoutPage {}

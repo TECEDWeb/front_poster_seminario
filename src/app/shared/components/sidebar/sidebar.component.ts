@@ -1,8 +1,9 @@
 import { Component, inject, computed } from '@angular/core';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
 import {
+  IonMenu,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -13,13 +14,14 @@ import {
 } from '@ionic/angular/standalone';
 
 import { AuthService } from '../../../core/services/auth.service';
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [
     CommonModule,
-    NgIf,
     RouterModule,
+    IonMenu,
     IonHeader,
     IonToolbar,
     IonTitle,
