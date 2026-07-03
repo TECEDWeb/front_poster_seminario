@@ -2,11 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import {
-  IonApp,
-  IonMenu,
-  IonRouterOutlet
-} from '@ionic/angular/standalone';
+import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 

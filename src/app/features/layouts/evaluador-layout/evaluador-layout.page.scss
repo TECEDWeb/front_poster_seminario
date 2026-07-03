@@ -1,5 +1,12 @@
-/* Evaluador Layout Styles */
-
 :host {
   display: block;
+  height: 100%;
+}
+
+ion-app {
+  height: 100%;
+}
+
+ion-router-outlet {
+  height: 100%;
 }

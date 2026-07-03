@@ -1,6 +1,12 @@
-/* Admin Layout Styles */
-/* Puedes dejarlo vacío o agregar estilos globales del layout */
-
 :host {
   display: block;
+  height: 100%;
+}
+
+ion-app {
+  height: 100%;
+}
+
+ion-router-outlet {
+  height: 100%;
 }

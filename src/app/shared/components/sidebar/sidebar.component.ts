@@ -39,11 +39,11 @@ export class SidebarComponent {
   private router = inject(Router);
 
   usuario = this.authService.usuario;
-
+  
   iniciales = computed(() => {
     const u = this.usuario();
     if (!u?.nombre) return '';
-
+  console.log('usuario sidebar:', this.usuario());
     return u.nombre
       .split(' ')
       .map(p => p[0])
