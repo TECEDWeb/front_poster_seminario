@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import {
   IonContent,
   IonCard,
@@ -8,9 +7,7 @@ import {
   IonCardTitle,
   IonCardContent
 } from '@ionic/angular/standalone';
-
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-
 import { RubricaService } from '../../../core/services/rubrica.service';
 import { RubricaConcurso } from 'src/app/core/models/rubrica.model';
 
@@ -19,15 +16,11 @@ import { RubricaConcurso } from 'src/app/core/models/rubrica.model';
   standalone: true,
   imports: [
     CommonModule,
-
-    // Ionic Standalone
     IonContent,
     IonCard,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-
-    // Componentes propios
     HeaderComponent
   ],
   templateUrl: './rubricas.page.html',

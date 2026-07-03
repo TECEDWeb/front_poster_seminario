@@ -52,17 +52,7 @@ import {
   styleUrls: ['./concursos.page.scss']
 })
 export class ConcursosPage implements OnInit {
-
-  // =========================
-  // DATA
-  // =========================
-
   concursos: Concurso[] = [];
-
-  // =========================
-  // UI
-  // =========================
-
   cargando = false;
 
   constructor(
@@ -86,29 +76,19 @@ export class ConcursosPage implements OnInit {
   }
 
   cargar() {
-
     this.cargando = true;
 
     this.concursoService.listar().subscribe({
-
       next: (res: any) => {
-
         this.concursos = res.concursos ?? res ?? [];
         this.cargando = false;
-
       },
 
       error: (err: any) => {
-
         console.error('Error cargando concursos:', err);
-
         this.concursos = [];
         this.cargando = false;
-
       }
-
     });
-
   }
-
 }

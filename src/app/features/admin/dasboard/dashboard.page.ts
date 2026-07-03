@@ -108,16 +108,10 @@ export class DashboardPage {
         this.cargando = false;
 
       },
-
       error: () => {
-
         this.error = true;
         this.cargando = false;
-
       }
-
     });
-
   }
-
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import {
   IonHeader,
   IonToolbar,
@@ -21,7 +20,6 @@ import {
   IonFab,
   IonFabButton
 } from '@ionic/angular/standalone';
-
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { Proyecto } from '../../../core/models/proyecto.model';
 
@@ -64,17 +62,7 @@ import {
   styleUrls: ['./proyectos.page.scss']
 })
 export class ProyectosPage implements OnInit {
-
-  // =========================
-  // DATA
-  // =========================
-
   proyectos: Proyecto[] = [];
-
-  // =========================
-  // SEARCH
-  // =========================
-
   busqueda = '';
 
   constructor(
@@ -98,25 +86,15 @@ export class ProyectosPage implements OnInit {
   cargar(): void {
 
     this.proyectoService.listar().subscribe({
-
       next: (res: any) => {
-
         console.log('PROYECTOS:', res);
-
         this.proyectos = res.proyectos ?? res ?? [];
-
       },
 
       error: (err) => {
-
         console.error(err);
-
         this.proyectos = [];
-
       }
-
     });
-
   }
-
 }

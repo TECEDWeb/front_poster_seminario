@@ -15,6 +15,6 @@ import { RouterModule } from '@angular/router';
 export class PublicLayoutPage {
 
   constructor() {
-    console.log('🟢 PublicLayout cargado');
+    console.log('PublicLayout cargado');
   }
 }

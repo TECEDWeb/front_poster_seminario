@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import {
   IonContent,
   IonItem,
@@ -22,8 +21,6 @@ import { CertificadoService } from '../../../core/services/certificado.service';
   imports: [
     CommonModule,
     FormsModule,
-
-    // Ionic Standalone
     IonContent,
     IonItem,
     IonInput,
@@ -53,21 +50,14 @@ export class ValidacionCertificadoPage {
     this.error = '';
 
     this.certificadoService.validar(this.codigo).subscribe({
-
       next: (res) => {
-
         this.resultado = res;
-
       },
 
       error: () => {
-
         this.error = 'Certificado no válido';
-
       }
-
     });
-
   }
 
 }

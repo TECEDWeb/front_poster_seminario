@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import {
   IonContent,
   IonItem,
@@ -13,7 +12,6 @@ import {
   IonCardTitle,
   IonCardContent
 } from '@ionic/angular/standalone';
-
 import { CertificadoService } from '../../../core/services/certificado.service';
 
 @Component({
@@ -22,7 +20,6 @@ import { CertificadoService } from '../../../core/services/certificado.service';
   imports: [
     CommonModule,
     FormsModule,
-
     IonContent,
     IonItem,
     IonInput,

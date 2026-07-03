@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import {
   IonHeader,
   IonToolbar,
@@ -11,7 +10,6 @@ import {
   IonIcon,
   IonContent
 } from '@ionic/angular/standalone';
-
 import { addIcons } from 'ionicons';
 import {
   downloadOutline,
@@ -21,7 +19,6 @@ import {
   trophyOutline,
   barChartOutline
 } from 'ionicons/icons';
-
 import { ReporteService } from '../../../core/services/reporte.service';
 import { ReporteStats, Ranking } from 'src/app/core/models/reporte.model';
 
@@ -46,18 +43,10 @@ import { ReporteStats, Ranking } from 'src/app/core/models/reporte.model';
 })
 export class ReportesPage implements OnInit {
 
-  // ======================
-  // STATS
-  // ======================
-
   reportes: ReporteStats = {
     proyectos: 0,
     evaluaciones: 0
   };
-
-  // ======================
-  // RANKING
-  // ======================
 
   ranking: Ranking[] = [];
 

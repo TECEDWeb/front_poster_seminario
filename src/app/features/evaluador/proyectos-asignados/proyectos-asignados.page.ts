@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import {
   IonHeader,
   IonToolbar,
@@ -11,9 +10,7 @@ import {
   IonIcon,
   IonButton
 } from '@ionic/angular/standalone';
-
 import { Router } from '@angular/router';
-
 import { addIcons } from 'ionicons';
 import {
   documentTextOutline,
@@ -21,7 +18,6 @@ import {
   clipboardOutline,
   checkmarkCircleOutline
 } from 'ionicons/icons';
-
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { Proyecto } from '../../../core/models/proyecto.model';
 
@@ -30,8 +26,6 @@ import { Proyecto } from '../../../core/models/proyecto.model';
   standalone: true,
   imports: [
     CommonModule,
-
-    // Ionic Standalone
     IonHeader,
     IonToolbar,
     IonButtons,

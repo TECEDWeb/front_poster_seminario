@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import {
   IonHeader,
   IonToolbar,
@@ -12,7 +11,6 @@ import {
   IonIcon,
   IonButton
 } from '@ionic/angular/standalone';
-
 import { addIcons } from 'ionicons';
 import {
   checkmarkCircleOutline,
@@ -21,7 +19,6 @@ import {
   barChartOutline,
   statsChartOutline
 } from 'ionicons/icons';
-
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
 
@@ -30,8 +27,6 @@ import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
   standalone: true,
   imports: [
     CommonModule,
-
-    // Ionic Standalone
     IonHeader,
     IonToolbar,
     IonButtons,

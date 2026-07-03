@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
 import {
   IonApp,
   IonMenu,
@@ -23,7 +22,6 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [
     CommonModule,
     RouterModule,
-
     IonApp,
     IonMenu,
     IonHeader,

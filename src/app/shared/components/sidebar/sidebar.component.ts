@@ -1,7 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
 import {
   IonMenu,
   IonHeader,
@@ -13,7 +12,6 @@ import {
   IonButton,
   IonIcon
 } from '@ionic/angular/standalone';
-
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({

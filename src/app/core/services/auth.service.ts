@@ -76,12 +76,16 @@ export class AuthService {
   // =========================
   async setSession(usuario: Usuario, token: string) {
 
+    console.log("setSession TOKEN:", token);
+    console.log("setSession USUARIO:", usuario);
+
     this._usuario.set(usuario);
     this._token.set(token);
-    this.tokenCache = token;
 
     await this.storage.setToken(token);
     await this.storage.setUsuario(usuario);
+
+    console.log("TOKEN EN MEMORIA:", this._token());
   }
 
   // =========================

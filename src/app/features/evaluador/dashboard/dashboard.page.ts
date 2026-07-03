@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import {
   IonHeader,
   IonToolbar,
@@ -26,8 +25,6 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-
-    // Ionic Standalone
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -35,8 +32,6 @@ import {
     IonTitle,
     IonContent,
     IonIcon,
-
-    // Componentes propios
     StatsCardComponent
   ],
   templateUrl: './dashboard.page.html',

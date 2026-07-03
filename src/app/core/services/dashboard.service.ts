@@ -12,7 +12,7 @@ export class DashboardService {
   constructor(private http: HttpClient) {}
 
   obtenerResumenAdmin() {
-    console.log('🟣 LLAMANDO DASHBOARD ADMIN');
+    console.log('LLAMANDO DASHBOARD ADMIN');
     return this.http.get<any>(`${this.apiUrl}/admin`);
   }
 }

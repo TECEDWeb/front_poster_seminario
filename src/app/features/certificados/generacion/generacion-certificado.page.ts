@@ -1,12 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import {
-  IonContent,
-  IonButton,
-  IonSpinner
-} from '@ionic/angular/standalone';
-
+import { IonContent, IonButton, IonSpinner } from '@ionic/angular/standalone';
 import { CertificadoService } from '../../../core/services/certificado.service';
 
 @Component({
@@ -14,8 +8,6 @@ import { CertificadoService } from '../../../core/services/certificado.service';
   standalone: true,
   imports: [
     CommonModule,
-
-    // Ionic Standalone
     IonContent,
     IonButton,
     IonSpinner

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import {
   IonHeader,
   IonToolbar,
@@ -13,7 +12,6 @@ import {
   IonContent,
   IonSearchbar
 } from '@ionic/angular/standalone';
-
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -21,7 +19,6 @@ import {
   swapHorizontalOutline,
   keyOutline
 } from 'ionicons/icons';
-
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { Usuario } from '../../../core/models/usuario.model';
 
@@ -31,8 +28,6 @@ import { Usuario } from '../../../core/models/usuario.model';
   imports: [
     CommonModule,
     FormsModule,
-
-    // Ionic Standalone
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -49,12 +44,10 @@ import { Usuario } from '../../../core/models/usuario.model';
 export class UsuariosPage implements OnInit {
 
   usuarios: Usuario[] = [];
-
   modalAbierto = false;
   editando = false;
   guardando = false;
   cargando = false;
-
   busqueda = '';
 
   form: any = {
@@ -84,10 +77,6 @@ export class UsuariosPage implements OnInit {
     this.cargar();
   }
 
-  // =========================
-  // LISTAR
-  // =========================
-
   cargar(): void {
 
     this.cargando = true;
@@ -111,10 +100,6 @@ export class UsuariosPage implements OnInit {
     });
 
   }
-
-  // =========================
-  // MODAL
-  // =========================
 
   abrirCrear(): void {
 
@@ -175,10 +160,6 @@ export class UsuariosPage implements OnInit {
 
   }
 
-  // =========================
-  // ESTADO
-  // =========================
-
   cambiarEstado(u: Usuario): void {
 
     this.usuarioService.cambiarEstado(u.id).subscribe({
@@ -210,10 +191,6 @@ export class UsuariosPage implements OnInit {
       .toUpperCase();
 
   }
-
-  // =========================
-  // GETTERS
-  // =========================
 
   get totalActivos(): number {
 

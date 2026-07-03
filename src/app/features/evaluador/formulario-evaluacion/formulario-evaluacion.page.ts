@@ -1,12 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import {
-  IonContent
-} from '@ionic/angular/standalone';
-
+import {  IonContent } from '@ionic/angular/standalone';
 import { ActivatedRoute } from '@angular/router';
-
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 
 @Component({
@@ -14,11 +9,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   standalone: true,
   imports: [
     CommonModule,
-
-    // Ionic Standalone
     IonContent,
-
-    // Componentes propios
     HeaderComponent
   ],
   templateUrl: './formulario-evaluacion.page.html',
