@@ -64,24 +64,31 @@ export class MisResultadosPage implements OnInit {
   }
 
   cargar(): void {
-
     this.loading = true;
 
     this.evaluacionService.listarResumen().subscribe({
+      next: (res: any) => {
 
-      next: (res: ResumenEvaluacion[]) => {
-        this.evaluaciones = res || [];
+        console.log('RESUMEN API:', res);
+
+        // 🔥 FIX CLAVE: asegurar array
+        this.evaluaciones = Array.isArray(res)
+          ? res
+          : res?.data
+          ? res.data
+          : res
+          ? [res]
+          : [];
+
         this.loading = false;
       },
 
       error: (err) => {
         console.error('Error al cargar evaluaciones', err);
-        this.evaluaciones = [];
+        this.evaluaciones = []; // 🔥 IMPORTANTE
         this.loading = false;
       }
-
     });
-
   }
 
 }
