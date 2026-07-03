@@ -1,16 +1,16 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { StorageService } from '../services/storage.service';
 
-export const roleGuard: CanActivateFn = (route) => {
+export const roleGuard: CanActivateFn = async (route) => {
 
   const router = inject(Router);
-  const authService = inject(AuthService);
+  const storage = inject(StorageService);
 
-  const usuario = authService.obtenerUsuario();
+  const usuario = await storage.getUsuario();
 
   if (!usuario) {
-    router.navigate(['/login']);
+    router.navigate(['/login'], { replaceUrl: true });
     return false;
   }
 
@@ -23,6 +23,6 @@ export const roleGuard: CanActivateFn = (route) => {
     return true;
   }
 
-  router.navigate(['/login']);
+  router.navigate(['/login'], { replaceUrl: true });
   return false;
 };
