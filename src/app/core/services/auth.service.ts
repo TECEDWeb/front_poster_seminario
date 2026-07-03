@@ -107,7 +107,6 @@ export class AuthService {
     return this._token();
   }
 
-  // ⚠️ IMPORTANTE: versión síncrona para interceptor
   obtenerTokenSync(): string | null {
   return this._token() || this.tokenCache;
 }

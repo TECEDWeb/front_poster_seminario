@@ -104,9 +104,19 @@ export class LoginPage implements OnInit, AfterViewInit, OnDestroy {
 
       next: async (res) => {
 
-        console.log("✅ LOGIN OK:", res);
+        console.log("============== LOGIN RESPONSE ==============");
+        console.log(res);
 
-        await this.authService.setSession(res.usuario, res.token);
+        console.log("TOKEN:", res.data.token);
+        console.log("USUARIO:", res.data.usuario);
+
+        console.log("===========================================");
+
+        await this.authService.setSession(
+          res.data.usuario,
+          res.data.token
+        );
+        console.log("TOKEN EN AUTH:", this.authService.obtenerToken());
 
         const usuario = this.authService.obtenerUsuario();
 

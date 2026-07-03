@@ -6,9 +6,12 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
+  token(arg0: string, token: any): unknown;
   ok: boolean;
-  token: string;
-  usuario: Usuario;
+  data: {
+    token: string;
+    usuario: Usuario;
+  };
   mensaje?: string;
 }
 
