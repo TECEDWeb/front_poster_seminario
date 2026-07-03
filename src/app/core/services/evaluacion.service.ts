@@ -15,22 +15,22 @@ export class EvaluacionService {
   constructor(private http: HttpClient) {}
 
   // =====================================================
-  // CRUD BÁSICO
+  // CRUD BÁSICO (si lo usas en admin)
   // =====================================================
 
-  listar(): Observable<Evaluacion[]> {
-    return this.http.get<Evaluacion[]>(this.apiUrl);
+  listar(): Observable<any> {
+    return this.http.get(`${this.apiUrl}`);
   }
 
-  obtener(id: number): Observable<Evaluacion> {
-    return this.http.get<Evaluacion>(`${this.apiUrl}/${id}`);
+  obtener(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`);
   }
 
-  crear(data: Evaluacion): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+  crear(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, data);
   }
 
-  actualizar(id: number, data: Evaluacion): Observable<any> {
+  actualizar(id: number, data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, data);
   }
 
@@ -39,11 +39,11 @@ export class EvaluacionService {
   }
 
   // =====================================================
-  // DASHBOARD / RESUMEN
+  // DASHBOARD / REPORTES
   // =====================================================
 
-  listarResumen(): Observable<ResumenEvaluacion[]> {
-    return this.http.get<ResumenEvaluacion[]>(`${this.apiUrl}/resumen`);
+  listarResumen(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/resumen`);
   }
 
   getResumen(): Observable<any> {
@@ -58,19 +58,23 @@ export class EvaluacionService {
     return this.http.get(`${this.apiUrl}/asignados`);
   }
 
+  getReporteAdmin(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reporte-admin`);
+  }
+
   // =====================================================
-  // FORMULARIO DE EVALUACIÓN (NUEVO)
+  // FORMULARIO DE EVALUACIÓN (IMPORTANTE)
   // =====================================================
 
   /**
-   * Trae rúbrica + secciones + criterios + niveles
+   * Backend: GET /evaluaciones/:id/formulario
    */
   getFormulario(id: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/${id}/formulario`);
   }
 
   /**
-   * Guarda evaluación con detalles
+   * Backend: POST /evaluaciones/:id/guardar
    */
   guardar(id: number, payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${id}/guardar`, payload);
