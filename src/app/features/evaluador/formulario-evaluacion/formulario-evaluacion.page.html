@@ -1,9 +1,50 @@
-<app-header titulo="Dashboard Evaluador"></app-header>
+<app-header titulo="Formulario de Evaluación"></app-header>
 
-<ion-content id="main-content" class="ion-padding">
+<ion-content class="ion-padding">
 
-  <h2>Evaluar Proyecto #{{ proyectoId }}</h2>
+  <h2 *ngIf="formulario">
+    {{ formulario.rubrica.nombre }}
+  </h2>
 
-  <p>Aquí irá el formulario de evaluación con rúbrica.</p>
+  <div *ngFor="let seccion of formulario?.secciones">
+
+    <h3 style="margin-top: 20px; font-weight: bold;">
+      {{ seccion.nombre }}
+    </h3>
+
+    <div *ngFor="let criterio of seccion.criterios"
+         style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd;">
+
+      <p><b>{{ criterio.texto }}</b></p>
+
+      <ion-radio-group
+        [(ngModel)]="respuestas[criterio.id]"
+      >
+
+        <ion-item *ngFor="let nivel of criterio.niveles">
+          <ion-label>
+            {{ nivel.nombre }} ({{ nivel.puntaje }})
+          </ion-label>
+
+          <ion-radio
+            slot="start"
+            [value]="nivel.id"
+            (ionSelect)="seleccionar(criterio.id, nivel.id)"
+          ></ion-radio>
+        </ion-item>
+
+      </ion-radio-group>
+
+    </div>
+  </div>
+
+  <ion-item>
+    <ion-label position="stacked">Observaciones</ion-label>
+    <textarea [(ngModel)]="observacion"></textarea>
+  </ion-item>
+
+  <ion-button expand="block" (click)="guardar()">
+    Guardar Evaluación
+  </ion-button>
 
 </ion-content>
