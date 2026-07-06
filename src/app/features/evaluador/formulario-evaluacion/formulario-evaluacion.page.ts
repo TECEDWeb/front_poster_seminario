@@ -12,118 +12,281 @@ import {
   IonLabel
 } from '@ionic/angular/standalone';
 
-import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { EvaluacionService } from 'src/app/core/services/evaluacion.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { EvaluacionService } from '../../../core/services/evaluacion.service';
+
 
 @Component({
   selector: 'app-formulario-evaluacion',
   standalone: true,
+
   imports: [
     CommonModule,
     FormsModule,
+
     IonContent,
     IonButton,
     IonRadioGroup,
     IonRadio,
     IonItem,
     IonLabel,
+
     HeaderComponent
   ],
+
   templateUrl: './formulario-evaluacion.page.html',
   styleUrls: ['./formulario-evaluacion.page.scss']
 })
 export class FormularioEvaluacionPage implements OnInit {
 
+
   evaluacionId!: number;
 
   formulario: any = null;
 
-  respuestas: { [key: number]: number } = {};
-  observacion: string = '';
+
+  respuestas: {
+    [criterioId: number]: number
+  } = {};
+
+
+  observacion = '';
 
   cargando = false;
+
 
   constructor(
     private route: ActivatedRoute,
     private evaluacionService: EvaluacionService
   ) {}
 
+
   ngOnInit(): void {
 
     const id = this.route.snapshot.paramMap.get('id');
 
+
     if (!id) {
-      console.error('❌ No se recibió ID en la ruta');
+
+      console.error(
+        '❌ No existe parámetro id en la ruta'
+      );
+
       return;
     }
+
 
     this.evaluacionId = Number(id);
 
-    if (isNaN(this.evaluacionId)) {
-      console.error('❌ ID inválido:', id);
+
+    if (Number.isNaN(this.evaluacionId)) {
+
+      console.error(
+        '❌ ID evaluación inválido:',
+        id
+      );
+
       return;
     }
 
+
+    console.log(
+      '🟢 Evaluación cargada:',
+      this.evaluacionId
+    );
+
+
     this.cargarFormulario();
+
   }
+
+
 
   cargarFormulario(): void {
 
+
     this.cargando = true;
 
-    this.evaluacionService.getFormulario(this.evaluacionId)
+
+    this.evaluacionService
+      .getFormulario(this.evaluacionId)
       .subscribe({
 
         next: (res: any) => {
 
-          this.formulario = res?.data ?? null;
 
-          if (!this.formulario) {
-            console.error('❌ Formulario no encontrado o vacío:', res);
+          console.log(
+            '🟢 FORMULARIO RECIBIDO:',
+            res
+          );
+
+
+          if (res?.ok === false) {
+
+            console.error(
+              '❌ Backend respondió error:',
+              res.mensaje
+            );
+
+            this.formulario = null;
+
+          } else {
+
+
+            this.formulario =
+              res?.data ?? null;
+
+
           }
 
+
           this.cargando = false;
+
+
         },
+
 
         error: (err) => {
 
-          console.error('❌ Error cargando formulario:', err);
+
+          console.error(
+            '❌ Error HTTP formulario:',
+            err
+          );
+
 
           this.formulario = null;
+
           this.cargando = false;
+
+
         }
 
+
       });
+
   }
 
-  seleccionar(criterioId: number, nivelId: number): void {
+
+
+
+  seleccionar(
+    criterioId: number,
+    nivelId: number
+  ): void {
+
+
+    console.log(
+      'Respuesta:',
+      criterioId,
+      nivelId
+    );
+
+
     this.respuestas[criterioId] = nivelId;
+
   }
+
+
+
 
   guardar(): void {
 
-    const detalles = Object.keys(this.respuestas).map(id => ({
-      criterio_id: Number(id),
-      nivel_id: this.respuestas[+id]
-    }));
+
+
+    const detalles =
+      Object.keys(this.respuestas)
+      .map(id => ({
+
+        criterio_id: Number(id),
+
+        nivel_id:
+          this.respuestas[
+            Number(id)
+          ]
+
+      }));
+
+
+
+    if (detalles.length === 0) {
+
+
+      alert(
+        'Debe seleccionar al menos una respuesta'
+      );
+
+
+      return;
+
+    }
+
+
 
     const payload = {
-      observacion: this.observacion,
+
+      observacion:
+        this.observacion,
+
       detalles
+
     };
 
-    this.evaluacionService.guardar(this.evaluacionId, payload)
+
+
+    console.log(
+      '📤 ENVIANDO EVALUACIÓN:',
+      payload
+    );
+
+
+
+    this.evaluacionService
+      .guardar(
+        this.evaluacionId,
+        payload
+      )
       .subscribe({
 
-        next: () => {
-          alert('✅ Evaluación guardada correctamente');
+
+        next: (res) => {
+
+
+          console.log(
+            '✅ Guardado:',
+            res
+          );
+
+
+          alert(
+            'Evaluación guardada correctamente'
+          );
+
+
         },
 
+
         error: (err) => {
-          console.error('❌ Error guardando evaluación:', err);
-          alert('Error al guardar evaluación');
+
+
+          console.error(
+            '❌ Error guardando:',
+            err
+          );
+
+
+          alert(
+            'Error al guardar evaluación'
+          );
+
+
         }
 
+
       });
+
+
   }
+
+
 }

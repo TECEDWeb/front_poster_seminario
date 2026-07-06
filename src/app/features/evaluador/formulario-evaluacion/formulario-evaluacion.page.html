@@ -1,63 +1,176 @@
 <app-header titulo="Formulario de Evaluación"></app-header>
 
+
 <ion-content class="ion-padding">
 
-  <!-- LOADING -->
+
+  <!-- CARGANDO -->
+
   <div *ngIf="cargando">
-    <p>Cargando formulario...</p>
-  </div>
 
-  <!-- TITULO RUBRICA -->
-  <h2 *ngIf="formulario">
-    {{ formulario?.rubrica?.nombre }}
-  </h2>
-
-  <!-- SECCIONES -->
-  <div *ngFor="let seccion of formulario?.secciones || []">
-
-    <h3 class="seccion-titulo">
-      {{ seccion?.nombre }}
+    <h3>
+      Cargando formulario...
     </h3>
 
-    <!-- CRITERIOS -->
-    <div *ngFor="let criterio of seccion?.criterios || []" class="criterio-card">
+  </div>
 
-      <p class="criterio-texto">
-        <b>{{ criterio?.texto }}</b>
-      </p>
 
-      <ion-radio-group [(ngModel)]="respuestas[criterio.id]">
 
-        <!-- NIVELES -->
-        <ion-item *ngFor="let nivel of criterio?.niveles || []">
+  <!-- FORMULARIO -->
 
-          <ion-label>
-            {{ nivel.nombre }} ({{ nivel.puntaje }})
-          </ion-label>
+  <ng-container *ngIf="!cargando && formulario">
 
-          <ion-radio
-            slot="start"
-            [value]="nivel.id"
-            (ionSelect)="seleccionar(criterio.id, nivel.id)">
-          </ion-radio>
 
-        </ion-item>
+    <h2 class="titulo-rubrica">
+      {{ formulario.rubrica?.nombre }}
+    </h2>
 
-      </ion-radio-group>
+
+
+    <div
+      class="seccion"
+      *ngFor="let seccion of formulario.secciones || []"
+    >
+
+
+      <h3 class="seccion-titulo">
+
+        {{ seccion.nombre }}
+
+      </h3>
+
+
+
+
+      <div
+        class="criterio-card"
+        *ngFor="let criterio of seccion.criterios || []"
+      >
+
+
+        <p class="criterio-texto">
+
+          <b>
+            {{ criterio.texto }}
+          </b>
+
+        </p>
+
+
+
+
+        <ion-radio-group
+          [(ngModel)]="respuestas[criterio.id]"
+        >
+
+
+
+          <ion-item
+            *ngFor="let nivel of criterio.niveles || []"
+          >
+
+
+            <ion-radio
+              slot="start"
+              [value]="nivel.id"
+              (ionSelect)="
+                seleccionar(
+                  criterio.id,
+                  nivel.id
+                )
+              "
+            >
+            </ion-radio>
+
+
+
+            <ion-label>
+
+              {{ nivel.nombre }}
+
+              -
+
+              {{ nivel.puntaje }}
+
+              puntos
+
+            </ion-label>
+
+
+          </ion-item>
+
+
+
+        </ion-radio-group>
+
+
+
+      </div>
+
 
     </div>
 
+
+
+
+
+    <ion-item class="observacion-box">
+
+      <ion-label position="stacked">
+
+        Observaciones
+
+      </ion-label>
+
+
+      <textarea
+        [(ngModel)]="observacion"
+        rows="5">
+      </textarea>
+
+
+    </ion-item>
+
+
+
+
+
+    <ion-button
+      expand="block"
+      (click)="guardar()"
+    >
+
+      Guardar Evaluación
+
+    </ion-button>
+
+
+
+  </ng-container>
+
+
+
+
+
+  <!-- SIN DATOS -->
+
+
+  <div
+    *ngIf="!cargando && !formulario"
+    class="empty"
+  >
+
+    <h3>
+      No existe formulario disponible
+    </h3>
+
+    <p>
+      Verifique la asignación del proyecto.
+    </p>
+
+
   </div>
 
-  <!-- OBSERVACIONES -->
-  <ion-item class="observacion-box">
-    <ion-label position="stacked">Observaciones</ion-label>
-    <textarea [(ngModel)]="observacion"></textarea>
-  </ion-item>
 
-  <!-- BOTON GUARDAR -->
-  <ion-button expand="block" (click)="guardar()">
-    Guardar Evaluación
-  </ion-button>
 
 </ion-content>
