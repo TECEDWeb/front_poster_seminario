@@ -96,17 +96,19 @@ export class ReportesPage implements OnInit {
 
       next: (res: any) => {
 
-        this.ranking = (res ?? []).map((r: any) => ({
+        const lista = res.data ?? [];
+
+        this.ranking = lista.map((r: any) => ({
           nombre: r.nombre,
-          promedio: r.promedio,
-          evaluadorNombre: r.evaluadorNombre ?? r.evaluador ?? null
+          promedio: Number(r.promedio),
+          evaluadorNombre: r.calificacion
         }));
 
       },
-
       error: (err) => {
 
         console.error('Error ranking:', err);
+        this.ranking = [];
 
       }
 
