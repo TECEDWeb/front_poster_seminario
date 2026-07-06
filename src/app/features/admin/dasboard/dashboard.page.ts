@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
 import {
   IonHeader,
   IonToolbar,
@@ -13,10 +12,8 @@ import {
   IonIcon,
   IonSkeletonText
 } from '@ionic/angular/standalone';
-
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { StatsCardComponent } from '../../../shared/components/stats-card/stats-card.component';
-
 import { addIcons } from 'ionicons';
 import {
   peopleOutline,
@@ -38,8 +35,6 @@ import {
   imports: [
     CommonModule,
     RouterModule,
-
-    // Ionic Standalone
     IonHeader,
     IonToolbar,
     IonButtons,

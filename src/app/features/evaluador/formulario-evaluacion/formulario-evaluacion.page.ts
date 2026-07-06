@@ -23,14 +23,12 @@ import { EvaluacionService } from '../../../core/services/evaluacion.service';
   imports: [
     CommonModule,
     FormsModule,
-
     IonContent,
     IonButton,
     IonRadioGroup,
     IonRadio,
     IonItem,
     IonLabel,
-
     HeaderComponent
   ],
 

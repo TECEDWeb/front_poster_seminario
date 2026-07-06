@@ -38,10 +38,6 @@
         {{ seccion.nombre }}
 
       </h3>
-
-
-
-
       <div
         class="criterio-card"
         *ngFor="let criterio of seccion.criterios || []"
@@ -55,16 +51,9 @@
           </b>
 
         </p>
-
-
-
-
         <ion-radio-group
           [(ngModel)]="respuestas[criterio.id]"
         >
-
-
-
           <ion-item
             *ngFor="let nivel of criterio.niveles || []"
           >
