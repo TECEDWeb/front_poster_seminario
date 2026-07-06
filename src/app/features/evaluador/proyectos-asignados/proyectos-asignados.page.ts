@@ -19,11 +19,12 @@ import {
   checkmarkCircleOutline
 } from 'ionicons/icons';
 import { ProyectoService } from '../../../core/services/proyecto.service';
-import { Proyecto } from '../../../core/models/proyecto.model';
+import { ProyectoAsignado } from '../../../core/models/proyecto.model';
 
 @Component({
   selector: 'app-proyectos-asignados',
   standalone: true,
+
   imports: [
     CommonModule,
     IonHeader,
@@ -35,17 +36,20 @@ import { Proyecto } from '../../../core/models/proyecto.model';
     IonIcon,
     IonButton
   ],
+
   templateUrl: './proyectos-asignados.page.html',
   styleUrls: ['./proyectos-asignados.page.scss']
 })
+
 export class ProyectosAsignadosPage implements OnInit {
 
-  proyectos: Proyecto[] = [];
+  proyectos: ProyectoAsignado[] = [];
 
   constructor(
     private proyectoService: ProyectoService,
     private router: Router
   ) {
+
 
     addIcons({
       documentTextOutline,
@@ -53,41 +57,45 @@ export class ProyectosAsignadosPage implements OnInit {
       clipboardOutline,
       checkmarkCircleOutline
     });
-
   }
 
   ngOnInit(): void {
-    this.cargar();
+    this.cargarProyectos();
   }
 
-  cargar(): void {
-
+  cargarProyectos(): void {
     this.proyectoService.listar().subscribe({
 
-      next: (res: Proyecto[]) => {
+      next: (res: any) => {
+        console.log(
+          '🟢 RESPUESTA PROYECTOS ASIGNADOS:',
+          res
+        );
 
-        this.proyectos = res;
+        this.proyectos =
+          res?.data ?? res ?? [];
 
+        console.log(
+          '🟢 LISTA FINAL:',
+          this.proyectos
+        );
       },
-
       error: (err) => {
-
-        console.error('Error cargando proyectos:', err);
+        console.error(
+          '❌ ERROR CARGANDO PROYECTOS ASIGNADOS:',
+          err
+        );
         this.proyectos = [];
-
       }
-
     });
-
   }
 
-  evaluar(id: number): void {
+  evaluar(evaluacionId: number): void {
+    console.log( '➡️ ABRIENDO FORMULARIO:', evaluacionId );
 
     this.router.navigate([
       '/evaluador/formulario-evaluacion',
-      id
+      evaluacionId
     ]);
-
   }
-
 }

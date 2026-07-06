@@ -1,56 +1,181 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
-    <ion-title>Proyectos asignados</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Proyectos asignados
+    </ion-title>
   </ion-toolbar>
+
 </ion-header>
 
+
 <ion-content>
-  <div class="page-container">
 
-    <div class="page-header">
-      <div>
-        <h1>Proyectos asignados</h1>
-        <p>{{ proyectos.length }} proyectos para evaluar</p>
-      </div>
+<div class="page-container">
+
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Proyectos asignados
+      </h1>
+
+
+      <p>
+        {{ proyectos.length }} proyectos para evaluar
+      </p>
+
+
     </div>
+  </div>
 
-    <!-- Lista -->
-    <div class="proyecto-card" *ngFor="let p of proyectos">
-      <div class="proyecto-header">
-        <div class="proyecto-icon">
-          <ion-icon name="document-text-outline"></ion-icon>
+  <div
+    class="proyecto-card"
+    *ngFor="let p of proyectos"
+  >
+
+    <div class="proyecto-header">
+
+
+      <div class="proyecto-icon">
+
+        <ion-icon
+          name="document-text-outline">
+        </ion-icon>
+
+      </div>
+      <div class="proyecto-head">
+
+
+        <div class="proyecto-nombre">
+
+          {{ p.proyecto.nombre }}
+
         </div>
-        <div class="proyecto-head">
-          <div class="proyecto-nombre">{{ p.nombre }}</div>
-          <div class="proyecto-area">{{ p.area }} · Nivel {{ p.nivel }}</div>
+
+        <div class="proyecto-area">
+
+          {{ p.proyecto.tipo || 'Proyecto' }}
+
         </div>
-        <span class="badge badge-amber" *ngIf="!p.yaEvaluado">Pendiente</span>
-        <span class="badge badge-emerald" *ngIf="p.yaEvaluado">Evaluado</span>
       </div>
 
-      <p class="proyecto-desc" *ngIf="p.descripcion">{{ p.descripcion }}</p>
+      <span
+        class="badge badge-amber"
+        *ngIf="!p.yaEvaluado">
 
-      <div class="participantes" *ngIf="p.participantes?.length">
-        <ion-icon name="people-outline"></ion-icon>
-        {{ p.participantes.length }} participante{{ p.participantes.length !== 1 ? 's' : '' }}
-      </div>
+        Pendiente
 
-      <ion-button
-        expand="block"
-        class="btn-evaluar"
-        [disabled]="p.yaEvaluado"
-        (click)="p.id ? evaluar(p.id) : null">
-        <ion-icon [name]="p.yaEvaluado ? 'checkmark-circle-outline' : 'clipboard-outline'" slot="start"></ion-icon>
-        {{ p.yaEvaluado ? 'Ya evaluado' : 'Evaluar proyecto' }}
-      </ion-button>
+      </span>
+
+      <span
+        class="badge badge-emerald"
+        *ngIf="p.yaEvaluado">
+
+        Evaluado
+
+      </span>
+
+
+
     </div>
 
-    <div class="empty-state" *ngIf="proyectos.length === 0">
-      <ion-icon name="clipboard-outline"></ion-icon>
-      <h3>Sin proyectos asignados</h3>
-      <p>El administrador aún no te ha asignado proyectos</p>
+    <p
+      class="proyecto-desc"
+      *ngIf="p.proyecto.descripcion">
+
+      {{ p.proyecto.descripcion }}
+
+    </p>
+
+    <div
+      class="participantes"
+      *ngIf="p.proyecto.participantes?.length"
+    >
+
+
+      <ion-icon
+        name="people-outline">
+      </ion-icon>
+
+
+      {{ p.proyecto.participantes.length }}
+
+      participante{{ 
+        p.proyecto.participantes.length !== 1 
+        ? 's' 
+        : '' 
+      }}
+
+
     </div>
+
+    <!-- BOTON -->
+
+    <ion-button
+
+      expand="block"
+
+      class="btn-evaluar"
+
+      [disabled]="p.yaEvaluado || !p.puedeEditar"
+
+
+      (click)="evaluar(p.evaluacionId)"
+
+    >
+
+      <ion-icon
+
+        [name]="
+          p.yaEvaluado
+          ? 'checkmark-circle-outline'
+          : 'clipboard-outline'
+        "
+
+        slot="start">
+
+      </ion-icon>
+
+      {{
+        p.yaEvaluado
+        ? 'Ya evaluado'
+        : 'Evaluar proyecto'
+      }}
+    </ion-button>
+  </div>
+
+  <!-- SIN DATOS -->
+
+
+  <div
+
+    class="empty-state"
+
+    *ngIf="proyectos.length === 0"
+
+  >
+    <ion-icon
+      name="clipboard-outline">
+    </ion-icon>
+
+
+    <h3>
+      Sin proyectos asignados
+    </h3>
+
+
+    <p>
+      El administrador aún no te ha asignado proyectos
+    </p>
 
   </div>
+
+</div>
+
+
 </ion-content>
