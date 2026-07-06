@@ -2,20 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent,
   IonHeader,
   IonToolbar,
+  IonButtons,
+  IonMenuButton,
   IonTitle,
-  IonButton,
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
+  IonContent,
   IonCard,
   IonCardHeader,
   IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
+  IonItem,
+  IonLabel,
+  IonSelect,
+  IonSelectOption,
+  IonButton,
   IonIcon
 } from '@ionic/angular/standalone';
 
@@ -37,6 +39,8 @@ import { AsignacionService } from '../../../core/services/asignacion.service';
     IonItem,
     IonLabel,
     IonSelect,
+    IonButtons,
+    IonMenuButton,
     IonSelectOption,
     IonCard,
     IonCardHeader,
