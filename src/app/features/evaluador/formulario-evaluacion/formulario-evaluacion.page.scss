@@ -1,3 +1,25 @@
-h2 {
+.seccion-titulo {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+  border-left: 4px solid #6366f1;
+  padding-left: 10px;
+}
+
+.criterio-card {
   margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.criterio-texto {
+  margin-bottom: 10px;
+}
+
+.observacion-box {
+  margin-top: 20px;
+  border-radius: 10px;
 }

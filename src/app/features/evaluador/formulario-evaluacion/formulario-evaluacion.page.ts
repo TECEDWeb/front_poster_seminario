@@ -1,10 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonButton, IonRadioGroup, IonRadio, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
+import {
+  IonContent,
+  IonButton,
+  IonRadioGroup,
+  IonRadio,
+  IonItem,
+  IonLabel
+} from '@ionic/angular/standalone';
+
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { EvaluacionService } from 'src/app/core/services/evaluacion.service';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-formulario-evaluacion',
@@ -26,37 +35,76 @@ import { FormsModule } from '@angular/forms';
 export class FormularioEvaluacionPage implements OnInit {
 
   evaluacionId!: number;
+
   formulario: any = null;
 
-  respuestas: any = {};
+  respuestas: { [key: number]: number } = {};
   observacion: string = '';
+
+  cargando = false;
 
   constructor(
     private route: ActivatedRoute,
     private evaluacionService: EvaluacionService
   ) {}
 
-  ngOnInit() {
-    this.evaluacionId = Number(this.route.snapshot.paramMap.get('id'));
+  ngOnInit(): void {
+
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (!id) {
+      console.error('❌ No se recibió ID en la ruta');
+      return;
+    }
+
+    this.evaluacionId = Number(id);
+
+    if (isNaN(this.evaluacionId)) {
+      console.error('❌ ID inválido:', id);
+      return;
+    }
+
     this.cargarFormulario();
   }
 
-  cargarFormulario() {
+  cargarFormulario(): void {
+
+    this.cargando = true;
+
     this.evaluacionService.getFormulario(this.evaluacionId)
-      .subscribe(res => {
-        this.formulario = res.data;
+      .subscribe({
+
+        next: (res: any) => {
+
+          this.formulario = res?.data ?? null;
+
+          if (!this.formulario) {
+            console.error('❌ Formulario no encontrado o vacío:', res);
+          }
+
+          this.cargando = false;
+        },
+
+        error: (err) => {
+
+          console.error('❌ Error cargando formulario:', err);
+
+          this.formulario = null;
+          this.cargando = false;
+        }
+
       });
   }
 
-  seleccionar(criterioId: number, nivelId: number) {
+  seleccionar(criterioId: number, nivelId: number): void {
     this.respuestas[criterioId] = nivelId;
   }
 
-  guardar() {
+  guardar(): void {
 
     const detalles = Object.keys(this.respuestas).map(id => ({
       criterio_id: Number(id),
-      nivel_id: this.respuestas[id]
+      nivel_id: this.respuestas[+id]
     }));
 
     const payload = {
@@ -65,8 +113,17 @@ export class FormularioEvaluacionPage implements OnInit {
     };
 
     this.evaluacionService.guardar(this.evaluacionId, payload)
-      .subscribe(() => {
-        alert('Evaluación guardada correctamente');
+      .subscribe({
+
+        next: () => {
+          alert('✅ Evaluación guardada correctamente');
+        },
+
+        error: (err) => {
+          console.error('❌ Error guardando evaluación:', err);
+          alert('Error al guardar evaluación');
+        }
+
       });
   }
 }

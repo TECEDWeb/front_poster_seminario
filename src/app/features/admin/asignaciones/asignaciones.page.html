@@ -1,76 +1,98 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Asignación de Proyectos</ion-title>
+  <ion-toolbar class="toolbar-custom">
+
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title>Asignación de proyectos</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button class="btn-add">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="assign-content">
 
-  <!-- CARD PRINCIPAL -->
-  <ion-card class="form-card">
+  <div class="page-wrapper">
 
-    <ion-card-header>
-      <ion-card-title>Asignar evaluador</ion-card-title>
-      <ion-card-subtitle>
-        Selecciona un proyecto y un evaluador
-      </ion-card-subtitle>
-    </ion-card-header>
+    <!-- HEADER -->
+    <div class="page-hero">
+      <h1>Asignación de evaluadores</h1>
+      <p>Selecciona un proyecto y asígnalo a un evaluador disponible</p>
+    </div>
 
-    <ion-card-content>
+    <!-- CARD -->
+    <ion-card class="form-card">
 
-      <!-- PROYECTO -->
-      <ion-item class="custom-item">
-        <ion-label position="stacked">
-          Proyecto
-        </ion-label>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="swap-horizontal-outline"></ion-icon>
+          Asignar evaluador
+        </ion-card-title>
+        <ion-card-subtitle>
+          Gestión de asignaciones de evaluación
+        </ion-card-subtitle>
+      </ion-card-header>
 
-        <ion-select
-          [(ngModel)]="proyectoId"
-          interface="action-sheet"
-          placeholder="Selecciona un proyecto">
+      <ion-card-content>
 
-          <ion-select-option
-            *ngFor="let p of proyectos"
-            [value]="p.id">
-            {{ p.nombre }}
-          </ion-select-option>
+        <!-- PROYECTO -->
+        <div class="field">
+          <label>Proyecto</label>
 
-        </ion-select>
-      </ion-item>
+          <ion-item class="custom-item" lines="none">
+            <ion-select
+              [(ngModel)]="proyectoId"
+              interface="action-sheet"
+              placeholder="Selecciona un proyecto">
 
-      <!-- EVALUADOR -->
-      <ion-item class="custom-item">
-        <ion-label position="stacked">
-          Evaluador
-        </ion-label>
+              <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
+                {{ p.nombre }}
+              </ion-select-option>
 
-        <ion-select
-          [(ngModel)]="evaluadorId"
-          interface="action-sheet"
-          placeholder="Selecciona un evaluador">
+            </ion-select>
+          </ion-item>
+        </div>
 
-          <ion-select-option
-            *ngFor="let e of evaluadores"
-            [value]="e.id">
-            {{ e.nombre }}
-          </ion-select-option>
+        <!-- EVALUADOR -->
+        <div class="field">
+          <label>Evaluador</label>
 
-        </ion-select>
-      </ion-item>
+          <ion-item class="custom-item" lines="none">
+            <ion-select
+              [(ngModel)]="evaluadorId"
+              interface="action-sheet"
+              placeholder="Selecciona un evaluador">
 
-      <!-- BOTÓN -->
-      <ion-button
-        expand="block"
-        class="assign-btn"
-        (click)="guardar()"
-        [disabled]="!proyectoId || !evaluadorId">
+              <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
+                {{ e.nombre }}
+              </ion-select-option>
 
-        <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-        Asignar proyecto
+            </ion-select>
+          </ion-item>
+        </div>
 
-      </ion-button>
+        <!-- BOTÓN -->
+        <ion-button
+          expand="block"
+          class="assign-btn"
+          (click)="guardar()"
+          [disabled]="!proyectoId || !evaluadorId">
 
-    </ion-card-content>
-  </ion-card>
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          Asignar proyecto
+
+        </ion-button>
+
+      </ion-card-content>
+    </ion-card>
+
+  </div>
 
 </ion-content>
