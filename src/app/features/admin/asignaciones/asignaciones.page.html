@@ -1,42 +1,76 @@
 <ion-header>
-    <ion-toolbar>
-        <ion-title>
-        Asignar proyectos
-        </ion-title>
-    </ion-toolbar>
+  <ion-toolbar color="primary">
+    <ion-title>Asignación de Proyectos</ion-title>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-    <ion-item>
-        <ion-label>
-        Proyecto
-        </ion-label>
-        <ion-select [(ngModel)]="proyectoId">
-            <ion-select-option
-                *ngFor="let p of proyectos"
-                [value]="p.id">
-                {{p.nombre}}
-            </ion-select-option>
-        </ion-select>
-    </ion-item>
-    
-    <ion-item>
-        <ion-label>
-        Evaluador
+
+  <!-- CARD PRINCIPAL -->
+  <ion-card class="form-card">
+
+    <ion-card-header>
+      <ion-card-title>Asignar evaluador</ion-card-title>
+      <ion-card-subtitle>
+        Selecciona un proyecto y un evaluador
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <!-- PROYECTO -->
+      <ion-item class="custom-item">
+        <ion-label position="stacked">
+          Proyecto
         </ion-label>
 
-        <ion-select [(ngModel)]="evaluadorId">
-            <ion-select-option
+        <ion-select
+          [(ngModel)]="proyectoId"
+          interface="action-sheet"
+          placeholder="Selecciona un proyecto">
+
+          <ion-select-option
+            *ngFor="let p of proyectos"
+            [value]="p.id">
+            {{ p.nombre }}
+          </ion-select-option>
+
+        </ion-select>
+      </ion-item>
+
+      <!-- EVALUADOR -->
+      <ion-item class="custom-item">
+        <ion-label position="stacked">
+          Evaluador
+        </ion-label>
+
+        <ion-select
+          [(ngModel)]="evaluadorId"
+          interface="action-sheet"
+          placeholder="Selecciona un evaluador">
+
+          <ion-select-option
             *ngFor="let e of evaluadores"
             [value]="e.id">
-            {{e.nombre}}
-            </ion-select-option>
-        </ion-select>
-    </ion-item>
+            {{ e.nombre }}
+          </ion-select-option>
 
-    <ion-button
+        </ion-select>
+      </ion-item>
+
+      <!-- BOTÓN -->
+      <ion-button
         expand="block"
-        (click)="guardar()">
-        Asignar
-    </ion-button>
+        class="assign-btn"
+        (click)="guardar()"
+        [disabled]="!proyectoId || !evaluadorId">
+
+        <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+        Asignar proyecto
+
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>
