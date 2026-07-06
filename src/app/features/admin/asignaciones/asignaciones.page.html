@@ -1,0 +1,42 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+        Asignar proyectos
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <ion-item>
+        <ion-label>
+        Proyecto
+        </ion-label>
+        <ion-select [(ngModel)]="proyectoId">
+            <ion-select-option
+                *ngFor="let p of proyectos"
+                [value]="p.id">
+                {{p.nombre}}
+            </ion-select-option>
+        </ion-select>
+    </ion-item>
+    
+    <ion-item>
+        <ion-label>
+        Evaluador
+        </ion-label>
+
+        <ion-select [(ngModel)]="evaluadorId">
+            <ion-select-option
+            *ngFor="let e of evaluadores"
+            [value]="e.id">
+            {{e.nombre}}
+            </ion-select-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-button
+        expand="block"
+        (click)="guardar()">
+        Asignar
+    </ion-button>
+</ion-content>
