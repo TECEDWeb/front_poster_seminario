@@ -34,8 +34,6 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-
-    // Ionic Standalone
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -52,12 +50,11 @@ import {
   styleUrls: ['./concursos.page.scss']
 })
 export class ConcursosPage implements OnInit {
+
   concursos: Concurso[] = [];
   cargando = false;
 
-  constructor(
-    private concursoService: ConcursoService
-  ) {
+  constructor(private concursoService: ConcursoService) {
 
     addIcons({
       addOutline,
@@ -71,24 +68,41 @@ export class ConcursosPage implements OnInit {
 
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.cargar();
   }
 
-  cargar() {
+  cargar(): void {
+
     this.cargando = true;
 
     this.concursoService.listar().subscribe({
+
       next: (res: any) => {
-        this.concursos = res.concursos ?? res ?? [];
+
+        // 🔒 normalización segura
+        const data = res?.data ?? res?.concursos ?? res ?? [];
+
+        this.concursos = Array.isArray(data) ? data : [];
+
         this.cargando = false;
+
       },
 
-      error: (err: any) => {
-        console.error('Error cargando concursos:', err);
+      error: (err) => {
+
+        console.error('❌ Error cargando concursos:', err);
+
         this.concursos = [];
         this.cargando = false;
+
       }
+
     });
+
   }
+  trackById(index: number, item: any): number {
+    return item?.id ?? index;
+  }
+
 }

@@ -1,7 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
     <ion-title>Concursos</ion-title>
+
     <ion-buttons slot="end">
       <ion-button class="btn-add">
         <ion-icon name="add-outline" slot="start"></ion-icon>
@@ -12,6 +16,7 @@
 </ion-header>
 
 <ion-content>
+
   <div class="page-container">
 
     <div class="page-header">
@@ -21,72 +26,102 @@
       </div>
     </div>
 
-    <!-- Skeleton -->
+    <!-- LOADING -->
     <div *ngIf="cargando">
       <div class="concurso-skeleton" *ngFor="let i of [1,2,3]">
-        <ion-skeleton-text animated style="width:100%;height:16px;border-radius:4px;margin-bottom:8px"></ion-skeleton-text>
-        <ion-skeleton-text animated style="width:60%;height:12px;border-radius:4px"></ion-skeleton-text>
+        <ion-skeleton-text animated
+          style="width:100%;height:16px;border-radius:4px;margin-bottom:8px">
+        </ion-skeleton-text>
+
+        <ion-skeleton-text animated
+          style="width:60%;height:12px;border-radius:4px">
+        </ion-skeleton-text>
       </div>
     </div>
 
-    <!-- Lista -->
+    <!-- LISTA -->
     <div *ngIf="!cargando">
-      <div class="concurso-card" *ngFor="let c of concursos">
+
+      <div class="concurso-card" *ngFor="let c of concursos || []; trackBy: trackById">
 
         <div class="concurso-top">
+
           <div class="concurso-icon" [ngClass]="c.activo ? 'icon-amber' : 'icon-slate'">
             <ion-icon name="trophy-outline"></ion-icon>
           </div>
+
           <div class="concurso-head">
             <div class="concurso-nombre">{{ c.nombre }}</div>
             <div class="concurso-tipo" *ngIf="c.tipo">{{ c.tipo }}</div>
           </div>
+
           <span class="badge" [ngClass]="c.activo ? 'badge-emerald' : 'badge-slate'">
             {{ c.activo ? 'Activo' : 'Inactivo' }}
           </span>
+
         </div>
 
         <div class="concurso-body">
-          <p class="concurso-desc" *ngIf="c.descripcion">{{ c.descripcion }}</p>
+
+          <p class="concurso-desc" *ngIf="c.descripcion">
+            {{ c.descripcion }}
+          </p>
 
           <div class="concurso-meta">
+
             <div class="meta-item" *ngIf="c.fechaInicio">
               <ion-icon name="calendar-outline"></ion-icon>
               Inicio: {{ c.fechaInicio | date:'dd/MM/yyyy' }}
             </div>
+
             <div class="meta-item" *ngIf="c.fechaFin">
               <ion-icon name="calendar-outline"></ion-icon>
               Fin: {{ c.fechaFin | date:'dd/MM/yyyy' }}
             </div>
+
             <div class="meta-item" *ngIf="c.puntajeMaximo">
               <ion-icon name="star-outline"></ion-icon>
               Puntaje máx: {{ c.puntajeMaximo }}
             </div>
+
           </div>
+
         </div>
 
         <div class="concurso-actions">
+
           <ion-button fill="clear" size="small">
             <ion-icon name="create-outline" slot="start"></ion-icon>
             Editar
           </ion-button>
+
           <ion-button fill="clear" size="small" routerLink="/admin/rubricas">
             <ion-icon name="list-outline" slot="start"></ion-icon>
             Rúbrica
           </ion-button>
+
           <ion-button fill="clear" size="small" color="danger">
             <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
           </ion-button>
+
         </div>
 
       </div>
 
+      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="concursos.length === 0">
+
         <ion-icon name="trophy-outline"></ion-icon>
+
         <h3>Sin concursos</h3>
         <p>Crea el primer concurso científico</p>
-        <ion-button size="small" class="btn-primary">Crear concurso</ion-button>
+
+        <ion-button size="small" class="btn-primary">
+          Crear concurso
+        </ion-button>
+
       </div>
+
     </div>
 
   </div>
@@ -96,4 +131,5 @@
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
 </ion-content>
