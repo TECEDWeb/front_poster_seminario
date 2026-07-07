@@ -21,7 +21,8 @@ import {
   IonLabel,
   IonSpinner,
   IonSearchbar,
-  IonSelect,
+  IonInput,        // ← AÑADIR
+  IonSelect,       // ← AÑADIR
   IonSelectOption
 } from '@ionic/angular/standalone';
 import { RubricaService } from '../../../core/services/rubrica.service';
@@ -68,6 +69,7 @@ import {
     IonChip,
     IonLabel,
     IonSpinner,
+    IonInput,
     IonSearchbar,
     IonSelect,
     IonSelectOption

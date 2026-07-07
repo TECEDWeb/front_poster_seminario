@@ -22,7 +22,8 @@ import {
   IonChip,
   IonDatetime,
   IonLabel,
-  IonSkeletonText
+  IonSkeletonText,
+  IonSpinner  
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -73,7 +74,8 @@ import { AuthService } from '../../../core/services/auth.service';
     IonChip,
     IonDatetime,
     IonLabel,
-    IonSkeletonText
+    IonSkeletonText,
+    IonSpinner  
   ],
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss']

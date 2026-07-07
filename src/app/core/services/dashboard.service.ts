@@ -111,4 +111,10 @@ export class DashboardService {
     return this.http.post(`${this.apiUrl}/notificaciones/leer`, {});
   }
 
+  contarNotificaciones(): Observable<number> {
+    return this.http.get(`${this.apiUrl}/notificaciones/contar`).pipe(
+      map((res: any) => res?.data?.count ?? res?.count ?? 0)
+    );
+  }
+
 }

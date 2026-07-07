@@ -290,8 +290,10 @@ $radius: 16px;
       &.avatar-evaluador {
         background: #10b981;
       }
-      &.avatar-coordinador {
-        background: #f59e0b;
+      .avatar {
+        &.avatar-coordinador {
+          background: #f59e0b;
+        }
       }
     }
 

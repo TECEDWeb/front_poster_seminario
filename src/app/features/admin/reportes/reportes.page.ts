@@ -13,7 +13,10 @@ import {
   IonSkeletonText,
   IonChip,
   IonLabel,
-  IonSpinner
+  IonSpinner,
+  IonInput,        // ← AÑADIR
+  IonSelect,       // ← AÑADIR
+  IonSelectOption 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -61,7 +64,10 @@ interface StatCard {
     IonSkeletonText,
     IonChip,
     IonLabel,
-    IonSpinner
+    IonSpinner,
+    IonInput,   
+    IonSelect,       
+    IonSelectOption 
   ],
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss']

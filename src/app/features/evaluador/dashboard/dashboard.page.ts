@@ -128,20 +128,22 @@ export class DashboardPage implements OnInit {
   }
 
   cargarActividadesRecientes(): void {
+    // Siempre asegurar que sea un array
+    this.actividadesRecientes = [];
+    
     this.evaluadorService.getActividadesRecientes().subscribe({
       next: (res: any) => {
         console.log('Actividades recientes:', res);
         const data = res?.data ?? res ?? [];
-        this.actividadesRecientes = data.map((item: any) => ({
+        this.actividadesRecientes = Array.isArray(data) ? data.map((item: any) => ({
           icon: this.getIconForActivity(item.tipo),
           color: this.getColorForActivity(item.tipo),
           texto: item.descripcion || item.texto,
           tiempo: this.formatTimeAgo(item.fecha)
-        }));
+        })) : [];
       },
       error: (err) => {
         console.error('Error cargando actividades:', err);
-        // Si falla, mostrar actividades vacías
         this.actividadesRecientes = [];
       }
     });

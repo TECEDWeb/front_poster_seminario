@@ -83,7 +83,7 @@ export class DashboardPage implements OnInit {
 
   today: Date = new Date();
   recentActivities: Activity[] = [];
-
+  notificacionesPendientes: number = 0;
   constructor() {
     addIcons({
       peopleOutline,
@@ -151,5 +151,30 @@ export class DashboardPage implements OnInit {
   // Método para recargar manualmente
   recargar() {
     this.cargarResumen();
+  }
+
+  verNotificaciones(): void {
+    console.log('Ver notificaciones');
+    // Aquí puedes abrir un modal o navegar a la página de notificaciones
+    alert('Abrir panel de notificaciones');
+  }
+
+  verTodasActividades(): void {
+    console.log('Ver todas las actividades');
+    // Aquí puedes navegar a la página de actividades
+    // this.router.navigate(['/admin/actividades']);
+    alert('Ver todas las actividades');
+  }
+
+  // En cargarResumen() o en el constructor, cargar notificaciones
+  cargarNotificaciones(): void {
+    this.dashboardService.contarNotificaciones().subscribe({
+      next: (count) => {
+        this.notificacionesPendientes = count;
+      },
+      error: () => {
+        this.notificacionesPendientes = 0;
+      }
+    });
   }
 }
