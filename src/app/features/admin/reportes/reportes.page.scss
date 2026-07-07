@@ -1,87 +1,33 @@
-.section-title {
+.page-container {
 
-  margin-bottom: 20px;
-
-}
-
-
-.section-title h2 {
-
-  font-size: 28px;
-
-  font-weight: bold;
+  padding: 20px;
 
 }
-
 
 
 .pro-card {
 
   background: white;
 
-  border-radius: 15px;
+  border-radius: 20px;
 
-  padding: 20px;
-
-  margin-bottom: 20px;
-
-  box-shadow:
-    0 4px 12px rgba(0,0,0,.15);
-
-}
-
-
-
-.detalle {
-
-  display: flex;
-
-  gap: 30px;
+  padding: 25px;
 
   margin-bottom: 20px;
 
-}
+  box-shadow: 0 5px 20px rgba(0,0,0,.2);
 
+}
 
 
 .ranking-row {
 
-  display:flex;
+  display: flex;
 
-  justify-content:space-between;
+  justify-content: space-between;
 
-  align-items:center;
+  padding: 15px;
 
-  padding:15px;
-
-  border-bottom:1px solid #ddd;
-
-}
-
-
-
-.rank-nombre {
-
-  font-weight:bold;
-
-}
-
-
-
-.rank-meta {
-
-  font-size:14px;
-
-  opacity:.7;
-
-}
-
-
-
-.rank-puntaje {
-
-  font-size:22px;
-
-  font-weight:bold;
+  border-bottom: 1px solid #ddd;
 
 }
