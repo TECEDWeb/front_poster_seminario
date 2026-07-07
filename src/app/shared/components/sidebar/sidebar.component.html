@@ -1,33 +1,85 @@
-<div class="user-info" *ngIf="usuario() as u">
-  <div class="avatar">{{ iniciales() }}</div>
-  <div>
-    <div>{{ u.nombre }}</div>
-    <div>{{ u.rol }}</div>
+<div class="menu-container">
+
+  <div class="user-info" *ngIf="usuario() as u">
+
+    <div class="avatar">
+      {{ iniciales() }}
+    </div>
+
+    <div class="user-data">
+      <strong>{{ u.nombre }}</strong>
+      <span>{{ u.rol }}</span>
+    </div>
+
   </div>
+
+
+  <ion-list lines="none">
+
+    <ng-container *ngIf="usuario()?.rol === 'admin'">
+
+      <ion-item routerLink="/admin/asignaciones">
+        Asignaciones
+      </ion-item>
+
+      <ion-item routerLink="/admin/dashboard">
+        Dashboard
+      </ion-item>
+
+      <ion-item routerLink="/admin/usuarios">
+        Usuarios
+      </ion-item>
+
+      <ion-item routerLink="/admin/concursos">
+        Concursos
+      </ion-item>
+
+      <ion-item routerLink="/admin/proyectos">
+        Proyectos
+      </ion-item>
+
+      <ion-item routerLink="/admin/reportes">
+        Reportes
+      </ion-item>
+
+      <ion-item routerLink="/admin/rubricas">
+        Rúbricas
+      </ion-item>
+
+    </ng-container>
+
+
+    <ng-container *ngIf="usuario()?.rol === 'evaluador'">
+
+      <ion-item routerLink="/evaluador/dashboard">
+        Dashboard
+      </ion-item>
+
+      <ion-item routerLink="/evaluador/proyectos-asignados">
+        Proyectos
+      </ion-item>
+
+      <ion-item routerLink="/evaluador/mis-resultados">
+        Resultados
+      </ion-item>
+
+    </ng-container>
+
+
+  </ion-list>
+
+
+  <div class="logout">
+
+    <ion-button
+      expand="block"
+      (click)="cerrarSesion()">
+
+      Cerrar sesión
+
+    </ion-button>
+
+  </div>
+
+
 </div>
-
-<ion-list lines="none">
-
-  <ng-container *ngIf="usuario()?.rol === 'admin'">
-    <ion-item routerLink="/admin/asignaciones">Asignaciones</ion-item>
-    <ion-item routerLink="/admin/dashboard">Dashboard</ion-item>
-    <ion-item routerLink="/admin/usuarios">Usuarios</ion-item>
-    <ion-item routerLink="/admin/concursos">Concursos</ion-item>
-    <ion-item routerLink="/admin/proyectos">Proyectos</ion-item>
-    <ion-item routerLink="/admin/reportes">Reportes</ion-item>
-    <ion-item routerLink="/admin/rubricas">Rubricas</ion-item>
-    
-
-  </ng-container>
-
-  <ng-container *ngIf="usuario()?.rol === 'evaluador'">
-    <ion-item routerLink="/evaluador/dashboard">Dashboard</ion-item>
-    <ion-item routerLink="/evaluador/proyectos-asignados">Proyectos</ion-item>
-    <ion-item routerLink="/evaluador/mis-resultados">Resultados</ion-item>
-  </ng-container>
-
-</ion-list>
-
-<ion-button expand="block" color="danger" (click)="cerrarSesion()">
-  Cerrar sesión
-</ion-button>

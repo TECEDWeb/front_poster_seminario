@@ -1,40 +1,152 @@
+/* ==========================================================================
+   THEME VARIABLES
+   Sistema de Evaluación de Proyectos Científicos
+   ========================================================================== */
+
 :root {
-  /* =========================
-     PRIMARY COLORS
-  ========================= */
-  --ion-color-primary: #0054e9;
-  --ion-color-primary-rgb: 0, 84, 233;
+
+  /*==========================================================================
+    COLORES PRINCIPALES
+  ==========================================================================*/
+
+  --ion-color-primary: #2563eb;
+  --ion-color-primary-rgb: 37,99,235;
   --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #004acd;
-  --ion-color-primary-tint: #1a65eb;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: #1d4ed8;
+  --ion-color-primary-tint: #3b82f6;
 
-  /* =========================
-     SECONDARY
-  ========================= */
-  --ion-color-secondary: #3dc2ff;
-  --ion-color-secondary-rgb: 61, 194, 255;
+  --ion-color-secondary: #0ea5e9;
+  --ion-color-secondary-rgb: 14,165,233;
   --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #36abe0;
-  --ion-color-secondary-tint: #50c8ff;
+  --ion-color-secondary-shade: #0284c7;
+  --ion-color-secondary-tint: #38bdf8;
 
-  /* =========================
-     SUCCESS / WARNING / DANGER
-  ========================= */
-  --ion-color-success: #2dd36f;
-  --ion-color-warning: #ffc409;
-  --ion-color-danger: #eb445a;
+  --ion-color-success: #10b981;
+  --ion-color-success-rgb: 16,185,129;
 
-  /* =========================
-     BACKGROUND GLOBAL
-  ========================= */
-  --ion-background-color: #f4f5f8;
-  --ion-text-color: #222428;
+  --ion-color-warning: #f59e0b;
+  --ion-color-warning-rgb: 245,158,11;
 
-  /* =========================
-     LOGIN FIX (IMPORTANTE)
-  ========================= */
-  --login-bg-start: var(--ion-color-primary);
-  --login-bg-end: var(--ion-color-primary-shade);
+  --ion-color-danger: #ef4444;
+  --ion-color-danger-rgb: 239,68,68;
+
+  --ion-color-medium: #64748b;
+  --ion-color-light: #f8fafc;
+  --ion-color-dark: #1e293b;
+
+  /*==========================================================================
+    BACKGROUND
+  ==========================================================================*/
+
+  --ion-background-color: #f4f7fb;
+  --ion-background-color-rgb: 244,247,251;
+
+  --ion-text-color: #1e293b;
+  --ion-text-color-rgb: 30,41,59;
+
+  --ion-border-color: #e2e8f0;
+
+  --ion-item-background: #ffffff;
+
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-color: #1e293b;
+
+  --ion-card-background: #ffffff;
+
+  /*==========================================================================
+    APP COLORS
+  ==========================================================================*/
+
+  --app-primary: #2563eb;
+  --app-primary-hover: #1d4ed8;
+
+  --app-success: #10b981;
+  --app-warning: #f59e0b;
+  --app-danger: #ef4444;
+
+  --app-bg: #f4f7fb;
+  --app-surface: #ffffff;
+
+  --app-text: #1e293b;
+  --app-text-light: #64748b;
+
+  --app-border: #e2e8f0;
+
+  /*==========================================================================
+    BADGES
+  ==========================================================================*/
+
+  --badge-blue-bg: #dbeafe;
+  --badge-blue-text: #1d4ed8;
+
+  --badge-green-bg: #dcfce7;
+  --badge-green-text: #15803d;
+
+  --badge-yellow-bg: #fef3c7;
+  --badge-yellow-text: #b45309;
+
+  --badge-red-bg: #fee2e2;
+  --badge-red-text: #b91c1c;
+
+  --badge-gray-bg: #e2e8f0;
+  --badge-gray-text: #475569;
+
+  /*==========================================================================
+    SHADOWS
+  ==========================================================================*/
+
+  --shadow-xs:
+      0 1px 2px rgba(15,23,42,.04);
+
+  --shadow-sm:
+      0 2px 8px rgba(15,23,42,.05);
+
+  --shadow-md:
+      0 8px 20px rgba(15,23,42,.08);
+
+  --shadow-lg:
+      0 18px 40px rgba(15,23,42,.10);
+
+  --shadow-xl:
+      0 30px 60px rgba(15,23,42,.14);
+
+  /*==========================================================================
+    BORDER RADIUS
+  ==========================================================================*/
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /*==========================================================================
+    TRANSITIONS
+  ==========================================================================*/
+
+  --transition-fast: .20s ease;
+  --transition-normal: .30s ease;
+  --transition-slow: .45s ease;
+
+}
+
+/* ==========================================================================
+   FORZAR MODO CLARO
+   ========================================================================== */
+
+html,
+body,
+ion-app {
+
+  background: var(--app-bg);
+  color: var(--app-text);
+
+}
+
+body {
+
+  color-scheme: light;
+
 }

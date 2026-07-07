@@ -1,37 +1,372 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
 
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
-@import "@ionic/angular/css/float-elements.css";
-@import "@ionic/angular/css/text-alignment.css";
-@import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+html {
+  color-scheme: light;
+}
+
+
+body {
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+
+ion-app {
+  background: var(--app-bg);
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+ion-content {
+  --background: var(--app-bg);
+}
+
+
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: var(--app-text);
+  font-weight:700;
+}
+
+
+
+p {
+  color: var(--app-text-light);
+}
+
+
+ion-header {
+  ion-toolbar {
+    --background: #ffffff;
+    --color: var(--app-text);
+    box-shadow:
+      0 4px 16px rgba(15,23,42,.06);
+    border-bottom:
+      1px solid var(--app-border);
+  }
+
+  ion-title {
+    font-size:18px;
+    font-weight:700;
+    color:var(--app-text);
+  }
+
+}
+
+
+
+
+ion-menu {
+  --background:#ffffff;
+}
+
+
+ion-menu ion-content {
+  --background:#ffffff;
+}
+
+
+ion-menu ion-item {
+  --background:#ffffff;
+  --color:var(--app-text);
+  border-radius:12px;
+  margin:4px 10px;
+
+}
+
+
+ion-menu ion-item:hover {
+  --background:#eff6ff;
+}
+
+
+ion-button {
+  font-weight:600;
+  text-transform:none;
+  --border-radius:
+      var(--radius-md);
+}
+
+
+
+.btn-primary {
+  --background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    );
+  --color:white;
+}
+
+
+
+.btn-add {
+  --background:#2563eb;
+  --color:white;
+  --border-radius:12px;
+  font-weight:700;
+}
+
+
+.page-container {
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+  padding:24px;
+}
+
+
+
+
+.page-header {
+  margin-bottom:24px;
+}
+
+.page-header h1 {
+  margin:0;
+  font-size:32px;
+  font-weight:800;
+  letter-spacing:-.5px;
+
+}
+
+.page-header p {
+  margin-top:8px;
+  font-size:15px;
+}
+
+
+.card {
+  background:white;
+  border-radius:
+      var(--radius-xl);
+  box-shadow:
+      var(--shadow-md);
+  border:
+      1px solid var(--app-border);
+}
+
+
+
+
+ion-card {
+  background:white;
+  border-radius:
+      var(--radius-xl);
+  box-shadow:
+      var(--shadow-md);
+  margin:0;
+}
+
+
+ion-card-title {
+  color:var(--app-text);
+  font-weight:800;
+
+}
+
+
+ion-item {
+  --background:#ffffff;
+  --color:var(--app-text);
+}
+
+
+
+.form-field {
+  margin-bottom:18px;
+}
+
+
+.form-label {
+  display:block;
+  margin-bottom:8px;
+  color:#475569;
+  font-weight:600;
+  font-size:14px;
+}
+
+ion-input,
+ion-select,
+ion-textarea {
+  --background:#ffffff;
+  --color:
+      var(--app-text);
+  --placeholder-color:
+      #94a3b8;
+}
+
+
+ion-searchbar {
+  --background:#ffffff;
+  --border-radius:16px;
+  --box-shadow:
+      var(--shadow-sm);
+  --placeholder-color:#94a3b8;
+}
+
+
+
+ion-list {
+  background:transparent;
+}
+
+ion-item {
+  --inner-padding-end:16px;
+}
+
+
+.badge {
+  display:inline-flex;
+  align-items:center;
+  padding:6px 14px;
+  border-radius:
+      var(--radius-pill);
+  font-size:12px;
+  font-weight:700;
+}
+
+
+
+.badge-success {
+  background:
+      var(--badge-green-bg);
+  color:
+      var(--badge-green-text);
+}
+
+
+
+.badge-warning {
+  background:
+      var(--badge-yellow-bg);
+  color:
+      var(--badge-yellow-text);
+}
+
+
+
+.badge-danger {
+  background:
+      var(--badge-red-bg);
+  color:
+      var(--badge-red-text);
+}
+
+
+
+.badge-gray {
+  background:
+      var(--badge-gray-bg);
+  color:
+      var(--badge-gray-text);
+}
+
+
+
+.empty-state {
+  text-align:center;
+  padding:60px 20px;
+}
+
+
+
+.empty-state ion-icon {
+  font-size:70px;
+  color:#94a3b8;
+}
+
+
+
+.empty-state h3 {
+  margin-top:20px;
+  color:var(--app-text);
+  font-size:22px;
+
+}
+
+
+
+ion-skeleton-text {
+  --background:
+      #e2e8f0;
+
+}
+
+
+
+ion-fab-button {
+  --background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    );
+  --box-shadow:
+      var(--shadow-lg);
+}
+
+
+
+ion-card,
+ion-button,
+ion-item {
+  transition:
+      transform .25s ease,
+      box-shadow .25s ease;
+}
+
+
+
+ion-card:hover {
+  transform:translateY(-2px);
+  box-shadow:
+      var(--shadow-lg);
+
+}
+
+
+@media(max-width:768px){
+  .page-container {
+    padding:16px;
+  }
+
+
+
+  .page-header h1 {
+    font-size:26px;
+  }
+
+  ion-title {
+    font-size:16px;
+  }
+}
+
+@media(max-width:480px){
+  .page-container {
+    padding:12px;
+  }
+
+  ion-button {
+    font-size:14px;
+  }
+
+}
