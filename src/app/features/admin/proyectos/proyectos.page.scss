@@ -1,106 +1,335 @@
+:host {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+}
+
+ion-content {
+  --background: var(--bg);
+}
+
+/* ==========================
+   TOOLBAR
+========================== */
+
 ion-toolbar {
-  --background: white;
-  --color: #0f172a;
-  --border-color: #e2e8f0;
-  ion-title { font-weight: 600; font-size: 16px; }
+  --background: #ffffff;
+  --border-color: transparent;
+  box-shadow: 0 3px 15px rgba(0,0,0,.06);
 }
 
-ion-content { --background: #f8fafc; }
-
-.page-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px 16px 80px;
+ion-title{
+  font-weight:700;
+  color:var(--text);
 }
 
-.page-header {
-  margin-bottom: 16px;
-  h1 { font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 3px; }
-  p  { font-size: 13px; color: #64748b; margin: 0; }
+.btn-add{
+  --background: var(--primary);
+  --color:white;
+  --border-radius:12px;
+  font-weight:600;
 }
 
-.btn-add {
-  --background: #6366f1;
-  --color: white;
-  --border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  height: 34px;
+/* ==========================
+   PAGE
+========================== */
+
+.page-container{
+  max-width:1200px;
+  margin:auto;
+  padding:28px;
 }
 
-.list-search {
-  --background: white;
-  --border-radius: 10px;
-  --box-shadow: none;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0;
+.page-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:22px;
 }
 
-.pro-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  overflow: hidden;
-
-  ion-list { --background: transparent; }
+.page-header h1{
+  margin:0;
+  font-size:30px;
+  font-weight:800;
+  color:var(--text);
 }
 
-.proyecto-item {
-  --padding-start: 14px;
-  --inner-padding-end: 14px;
-  --border-color: #f8fafc;
-  --min-height: 62px;
-
-  h2 { font-size: 14px; font-weight: 600; color: #0f172a; }
-  p  { font-size: 12px; color: #64748b; margin-top: 2px; }
+.page-header p{
+  margin-top:6px;
+  color:var(--muted);
 }
 
-.proj-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: #eef2ff;
-  color: #6366f1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+/* ==========================
+   SEARCH
+========================== */
+
+.list-search{
+
+  --background:white;
+  --border-radius:16px;
+
+  --box-shadow:0 8px 25px rgba(15,23,42,.08);
+
+  --placeholder-color:#94a3b8;
+
+  margin-bottom:22px;
+
 }
 
-.badges-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+/* ==========================
+   CARD
+========================== */
+
+.pro-card{
+
+  background:white;
+
+  border-radius:24px;
+
+  overflow:hidden;
+
+  box-shadow:0 12px 35px rgba(15,23,42,.08);
+
 }
 
-.badge {
-  display: inline-flex;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 20px;
+/* ==========================
+   ITEMS
+========================== */
 
-  &.badge-indigo { background: #eef2ff; color: #4338ca; }
-  &.badge-slate  { background: #f1f5f9; color: #64748b; }
+.proyecto-item{
+
+  --background:white;
+
+  --padding-start:18px;
+
+  --padding-end:18px;
+
+  --inner-padding-end:0;
+
+  min-height:92px;
+
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 24px;
-  text-align: center;
+.proyecto-item:not(:last-child){
 
-  ion-icon { font-size: 44px; color: #cbd5e1; margin-bottom: 10px; }
-  h3 { font-size: 15px; font-weight: 600; color: #64748b; margin: 0 0 4px; }
-  p  { font-size: 13px; color: #94a3b8; margin: 0 0 14px; }
+  border-bottom:1px solid #eef2f7;
+
 }
 
-.btn-primary {
-  --background: #6366f1;
-  --border-radius: 10px;
-  --color: white;
-  font-weight: 600;
+.proyecto-item:hover{
+
+  --background:#f8fbff;
+
+}
+
+.proj-icon{
+
+  width:54px;
+  height:54px;
+
+  border-radius:16px;
+
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:white;
+
+  font-size:24px;
+
+  margin-right:16px;
+
+  box-shadow:0 8px 18px rgba(37,99,235,.30);
+
+}
+
+ion-label h2{
+
+  font-size:17px;
+  font-weight:700;
+
+  color:var(--text);
+
+  margin-bottom:6px;
+
+}
+
+ion-label p{
+
+  color:var(--muted);
+
+  font-size:14px;
+
+}
+
+/* ==========================
+   BADGES
+========================== */
+
+.badges-col{
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:flex-end;
+
+  gap:8px;
+
+}
+
+.badge{
+
+  padding:6px 14px;
+
+  border-radius:999px;
+
+  font-size:12px;
+
+  font-weight:700;
+
+}
+
+.badge-indigo{
+
+  background:#dbeafe;
+
+  color:#1d4ed8;
+
+}
+
+.badge-slate{
+
+  background:#e2e8f0;
+
+  color:#475569;
+
+}
+
+/* ==========================
+   SLIDING OPTIONS
+========================== */
+
+ion-item-options{
+
+  border-radius:18px;
+
+  overflow:hidden;
+
+}
+
+ion-item-option{
+
+  font-size:18px;
+
+}
+
+/* ==========================
+   EMPTY
+========================== */
+
+.empty-state{
+
+  padding:70px 30px;
+
+  text-align:center;
+
+}
+
+.empty-state ion-icon{
+
+  font-size:70px;
+
+  color:#94a3b8;
+
+}
+
+.empty-state h3{
+
+  margin-top:20px;
+
+  font-size:22px;
+
+  font-weight:700;
+
+  color:var(--text);
+
+}
+
+.empty-state p{
+
+  color:var(--muted);
+
+  margin:10px 0 22px;
+
+}
+
+.btn-primary{
+
+  --background:linear-gradient(135deg,#2563eb,#1d4ed8);
+
+  --border-radius:14px;
+
+  font-weight:600;
+
+}
+
+/* ==========================
+   FAB
+========================== */
+
+ion-fab-button{
+
+  --background:linear-gradient(135deg,#2563eb,#1d4ed8);
+
+  --box-shadow:0 12px 30px rgba(37,99,235,.35);
+
+}
+
+ion-fab-button:hover{
+
+  transform:scale(1.05);
+
+  transition:.25s;
+
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media(max-width:768px){
+
+  .page-container{
+
+    padding:16px;
+
+  }
+
+  .page-header{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:10px;
+
+  }
+
+  .badges-col{
+
+    align-items:flex-start;
+
+    margin-top:10px;
+
+  }
+
 }

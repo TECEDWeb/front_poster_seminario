@@ -9,12 +9,14 @@
 <ion-list lines="none">
 
   <ng-container *ngIf="usuario()?.rol === 'admin'">
+    <ion-item routerLink="/admin/asignaciones">Asignaciones</ion-item>
     <ion-item routerLink="/admin/dashboard">Dashboard</ion-item>
     <ion-item routerLink="/admin/usuarios">Usuarios</ion-item>
     <ion-item routerLink="/admin/concursos">Concursos</ion-item>
     <ion-item routerLink="/admin/proyectos">Proyectos</ion-item>
     <ion-item routerLink="/admin/reportes">Reportes</ion-item>
-    <ion-item routerLink="/admin/asignaciones">Asignaciones</ion-item>
+    <ion-item routerLink="/admin/rubricas">Rubricas</ion-item>
+    
 
   </ng-container>
 
