@@ -53,14 +53,13 @@
     <!-- FILTROS -->
     <div class="filter-bar" *ngIf="!cargando && rubricas.length > 0">
       <div class="filter-group search-group">
-        <ion-icon name="search-outline" class="search-icon"></ion-icon>
-        <ion-input
+        <ion-searchbar
           [(ngModel)]="filtroBusqueda"
           (ionInput)="aplicarFiltros()"
           placeholder="Buscar por ID de concurso..."
-          class="filter-input"
-          clear-input="true">
-        </ion-input>
+          class="filter-search"
+          animated>
+        </ion-searchbar>
       </div>
 
       <div class="filter-group">

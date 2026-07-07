@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms'; 
 import {
   IonHeader,
   IonToolbar,
@@ -53,6 +54,7 @@ interface StatCard {
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule, 
     IonHeader,
     IonToolbar,
     IonButtons,

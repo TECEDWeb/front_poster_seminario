@@ -54,14 +54,13 @@
     <!-- FILTROS -->
     <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0">
       <div class="filter-group search-group">
-        <ion-icon name="search-outline" class="search-icon"></ion-icon>
-        <ion-input
+        <ion-searchbar
           [(ngModel)]="filtroBusqueda"
           (ionInput)="aplicarFiltros()"
           placeholder="Buscar proyecto..."
-          class="filter-input"
-          clear-input="true">
-        </ion-input>
+          class="filter-search"
+          animated>
+        </ion-searchbar>
       </div>
 
       <div class="filter-group">
