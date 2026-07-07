@@ -1,11 +1,19 @@
-<ion-card>
+<ion-card class="stats-card" [class]="'stats-' + color">
   <ion-card-content>
-
-    <ion-icon [name]="icono"></ion-icon>
-
-    <h2>{{ valor }}</h2>
-
-    <p>{{ titulo }}</p>
-
+    <div class="stats-header">
+      <div class="stats-icon" [class]="'bg-' + color">
+        <ion-icon [name]="icono"></ion-icon>
+      </div>
+      <div class="stats-trend" *ngIf="trend !== undefined && trend !== null">
+        <span [class]="trend >= 0 ? 'trend-up' : 'trend-down'">
+          <ion-icon [name]="trend >= 0 ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+          {{ trend >= 0 ? '+' : '' }}{{ trend }}%
+        </span>
+      </div>
+    </div>
+    <div class="stats-content">
+      <span class="stats-value">{{ valor }}</span>
+      <span class="stats-title">{{ titulo }}</span>
+    </div>
   </ion-card-content>
 </ion-card>

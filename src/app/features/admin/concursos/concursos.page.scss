@@ -1,419 +1,598 @@
-/*==================================================
-  FONDO
-==================================================*/
+// ============================================
+// VARIABLES
+// ============================================
+$primary: #2563eb;
+$primary-dark: #1d4ed8;
+$text-dark: #0f172a;
+$text-gray: #64748b;
+$text-light: #94a3b8;
+$border: #e2e8f0;
+$bg-light: #f8fafc;
+$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+$shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+$shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+$radius: 16px;
 
-ion-content{
-  --background:#f4f7fb;
+// ============================================
+// CONTENT
+// ============================================
+.concursos-content {
+  --background: #f1f5f9;
 }
 
-.page-container{
-  max-width:1200px;
-  margin:auto;
-  padding:28px 22px 80px;
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+
+  @media (min-width: 768px) {
+    padding: 32px 32px 80px;
+  }
 }
 
-/*==================================================
-  TOOLBAR
-==================================================*/
+// ============================================
+// TOOLBAR
+// ============================================
+.toolbar-custom {
+  --background: #ffffff;
+  --border-color: #e9edf5;
+  --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 
-ion-toolbar{
+  ion-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-  --background:#ffffff;
-  --border-color:#e6ebf3;
+    .title-text {
+      font-weight: 700;
+      font-size: 20px;
+      color: #0f172a;
+    }
 
+    .title-badge {
+      font-size: 11px;
+      background: #dbeafe;
+      color: #2563eb;
+      padding: 2px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+  }
+
+  .btn-add {
+    --background: #2563eb;
+    --color: #ffffff;
+    --border-radius: 10px;
+    font-weight: 600;
+    height: 38px;
+    font-size: 13px;
+    --box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+
+    ion-icon {
+      font-size: 18px;
+    }
+  }
 }
 
-ion-title{
+// ============================================
+// PAGE HEADER
+// ============================================
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
 
-  font-size:20px;
-  font-weight:700;
-  color:#1f2937;
+  .header-left {
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
 
+    p {
+      margin: 6px 0 0;
+      color: #64748b;
+      font-size: 15px;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    gap: 16px;
+
+    .stats-mini {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 20px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #eef2f7;
+      min-width: 70px;
+
+      .stat-count {
+        font-size: 22px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+      }
+
+      .stat-label {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      &.active .stat-count {
+        color: #059669;
+      }
+    }
+  }
 }
 
-.btn-add{
+// ============================================
+// FILTER BAR
+// ============================================
+.filter-bar {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
 
-  --background:#2563eb;
-  --color:#fff;
-  --border-radius:10px;
+  .filter-group {
+    flex: 1;
+    min-width: 200px;
 
-  font-weight:600;
+    .filter-search {
+      --background: white;
+      --border-radius: 12px;
+      --box-shadow: $shadow-sm;
+      --border-color: #e2e8f0;
+      --placeholder-color: #94a3b8;
+      --placeholder-opacity: 0.7;
+      padding: 0;
+      height: 44px;
 
+      --icon-color: #94a3b8;
+    }
+
+    .filter-select {
+      --background: white;
+      --border-radius: 12px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      height: 44px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      min-width: 170px;
+      font-size: 14px;
+      color: #0f172a;
+    }
+  }
 }
 
-/*==================================================
-  HEADER
-==================================================*/
+// ============================================
+// LOADING SKELETONS
+// ============================================
+.loading-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
 
-.page-header{
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  margin-bottom:28px;
-
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-.page-header h1{
+.concurso-skeleton {
+  background: white;
+  padding: 24px;
+  border-radius: $radius;
+  border: 1px solid #f1f5f9;
 
-  margin:0;
+  .skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
 
-  font-size:34px;
+    .skeleton-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+    }
 
-  font-weight:700;
+    .skeleton-text-group {
+      flex: 1;
 
-  color:#1f2937;
+      .skeleton-title {
+        height: 18px;
+        width: 70%;
+        margin-bottom: 8px;
+      }
 
+      .skeleton-subtitle {
+        height: 12px;
+        width: 40%;
+      }
+    }
+  }
+
+  .skeleton-desc {
+    height: 14px;
+    width: 90%;
+    margin-bottom: 16px;
+  }
+
+  .skeleton-meta {
+    display: flex;
+    gap: 12px;
+
+    .skeleton-meta-item {
+      height: 12px;
+      width: 80px;
+      border-radius: 4px;
+    }
+  }
 }
 
-.page-header p{
+// ============================================
+// CONCURSOS GRID
+// ============================================
+.concursos-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 
-  margin-top:8px;
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-  color:#6b7280;
-
-  font-size:15px;
-
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-/*==================================================
-  GRID
-==================================================*/
+// ============================================
+// CONCURSO CARD
+// ============================================
+.concurso-card {
+  background: white;
+  border-radius: $radius;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
-.concurso-card{
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    border-color: #e2e8f0;
+  }
 
-  background:#fff;
+  &.card-active {
+    border-left: 4px solid #f59e0b;
+  }
 
-  border-radius:22px;
+  &.card-inactive {
+    border-left: 4px solid #94a3b8;
+    opacity: 0.75;
+  }
 
-  border:1px solid #edf2f7;
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 20px 16px;
 
-  box-shadow:0 10px 25px rgba(0,0,0,.05);
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
 
-  margin-bottom:22px;
+      &.icon-amber {
+        background: #fffbeb;
+        color: #f59e0b;
+      }
 
-  transition:.25s;
+      &.icon-slate {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+    }
 
-  overflow:hidden;
+    .card-info {
+      flex: 1;
+      min-width: 0;
 
+      .card-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.3;
+      }
+
+      .card-type {
+        display: inline-block;
+        margin-top: 4px;
+        font-size: 12px;
+        color: #94a3b8;
+        background: #f1f5f9;
+        padding: 2px 12px;
+        border-radius: 12px;
+      }
+    }
+
+    .card-status {
+      flex-shrink: 0;
+
+      .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+
+        .status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          display: inline-block;
+        }
+
+        &.status-active {
+          background: #dcfce7;
+          color: #15803d;
+
+          .status-dot {
+            background: #22c55e;
+            animation: pulse-dot 2s ease-in-out infinite;
+          }
+        }
+
+        &.status-inactive {
+          background: #f1f5f9;
+          color: #64748b;
+
+          .status-dot {
+            background: #94a3b8;
+          }
+        }
+      }
+    }
+  }
+
+  .card-body {
+    padding: 0 20px 16px;
+    flex: 1;
+
+    .card-description {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #64748b;
+        background: #f8fafc;
+        padding: 4px 12px;
+        border-radius: 8px;
+        border: 1px solid #f1f5f9;
+
+        ion-icon {
+          font-size: 14px;
+          color: #94a3b8;
+        }
+
+        strong {
+          color: #475569;
+          font-weight: 600;
+        }
+
+        .days-remaining {
+          color: #059669;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-top: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .actions-left {
+      .chip-category {
+        height: 24px;
+        font-size: 11px;
+        background: #f1f5f9;
+        color: #475569;
+        margin: 0;
+
+        ion-icon {
+          font-size: 12px;
+        }
+        ion-label {
+          font-size: 11px;
+        }
+      }
+    }
+
+    .actions-right {
+      display: flex;
+      gap: 4px;
+
+      .action-btn {
+        --border-radius: 8px;
+        --padding-start: 8px;
+        --padding-end: 8px;
+        height: 32px;
+        font-size: 12px;
+        font-weight: 500;
+        --color: #64748b;
+
+        ion-icon {
+          font-size: 16px;
+        }
+
+        &:hover {
+          --color: #2563eb;
+        }
+
+        &.danger:hover {
+          --color: #ef4444;
+        }
+      }
+    }
+  }
 }
 
-.concurso-card:hover{
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
 
-  transform:translateY(-3px);
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
 
-  box-shadow:0 18px 35px rgba(0,0,0,.10);
+    ion-icon {
+      font-size: 40px;
+      color: #94a3b8;
+    }
+  }
 
+  h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0 0 24px;
+    color: #64748b;
+    font-size: 15px;
+  }
+
+  .btn-primary {
+    --background: #2563eb;
+    --border-radius: 12px;
+    font-weight: 600;
+    --box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+
+    ion-icon {
+      font-size: 18px;
+    }
+  }
 }
 
-/*==================================================
-  HEADER CARD
-==================================================*/
+// ============================================
+// FAB
+// ============================================
+ion-fab-button {
+  --background: #2563eb;
+  --box-shadow: 0 8px 24px rgba(37,99,235,0.4);
 
-.concurso-top{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:18px;
-
-  padding:24px;
-
+  ion-icon {
+    font-size: 24px;
+  }
 }
 
-.concurso-icon{
-
-  width:64px;
-
-  height:64px;
-
-  border-radius:18px;
-
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  font-size:28px;
-
+// ============================================
+// ANIMATIONS
+// ============================================
+@keyframes pulse-dot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
 }
 
-.icon-amber{
-
-  background:#fff7ed;
-
-  color:#ea580c;
-
-}
-
-.icon-slate{
-
-  background:#f1f5f9;
-
-  color:#64748b;
-
-}
-
-.concurso-head{
-
-  flex:1;
-
-}
-
-.concurso-nombre{
-
-  font-size:20px;
-
-  font-weight:700;
-
-  color:#1f2937;
-
-}
-
-.concurso-tipo{
-
-  margin-top:5px;
-
-  color:#64748b;
-
-  font-size:14px;
-
-}
-
-.badge{
-
-  padding:8px 18px;
-
-  border-radius:30px;
-
-  font-size:13px;
-
-  font-weight:700;
-
-}
-
-.badge-emerald{
-
-  background:#dcfce7;
-
-  color:#15803d;
-
-}
-
-.badge-slate{
-
-  background:#e5e7eb;
-
-  color:#4b5563;
-
-}
-
-/*==================================================
-  BODY
-==================================================*/
-
-.concurso-body{
-
-  padding:0 24px 22px;
-
-}
-
-.concurso-desc{
-
-  color:#475569;
-
-  line-height:1.7;
-
-  margin-bottom:18px;
-
-}
-
-.concurso-meta{
-
-  display:flex;
-
-  flex-wrap:wrap;
-
-  gap:12px;
-
-}
-
-.meta-item{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:8px;
-
-  background:#f8fafc;
-
-  border:1px solid #e5e7eb;
-
-  border-radius:12px;
-
-  padding:10px 14px;
-
-  color:#475569;
-
-  font-size:14px;
-
-}
-
-.meta-item ion-icon{
-
-  color:#2563eb;
-
-}
-
-/*==================================================
-  ACTIONS
-==================================================*/
-
-.concurso-actions{
-
-  display:flex;
-
-  justify-content:flex-end;
-
-  gap:8px;
-
-  padding:18px 24px;
-
-  border-top:1px solid #eef2f7;
-
-}
-
-.concurso-actions ion-button{
-
-  --border-radius:10px;
-
-  font-weight:600;
-
-}
-
-/*==================================================
-  LOADING
-==================================================*/
-
-.concurso-skeleton{
-
-  background:white;
-
-  padding:24px;
-
-  border-radius:20px;
-
-  margin-bottom:18px;
-
-  box-shadow:0 8px 18px rgba(0,0,0,.05);
-
-}
-
-/*==================================================
-  EMPTY
-==================================================*/
-
-.empty-state{
-
-  margin-top:70px;
-
-  text-align:center;
-
-}
-
-.empty-state ion-icon{
-
-  font-size:70px;
-
-  color:#94a3b8;
-
-}
-
-.empty-state h3{
-
-  margin-top:20px;
-
-  font-size:24px;
-
-  color:#334155;
-
-}
-
-.empty-state p{
-
-  color:#64748b;
-
-}
-
-.btn-primary{
-
-  margin-top:18px;
-
-  --background:#2563eb;
-
-  --border-radius:12px;
-
-}
-
-/*==================================================
-  FAB
-==================================================*/
-
-ion-fab-button{
-
-  --background:#2563eb;
-
-  --box-shadow:0 10px 25px rgba(37,99,235,.35);
-
-}
-
-/*==================================================
-  RESPONSIVE
-==================================================*/
-
-@media(max-width:768px){
-
-.page-container{
-
-padding:18px;
-
-}
-
-.page-header{
-
-flex-direction:column;
-align-items:flex-start;
-
-}
-
-.page-header h1{
-
-font-size:28px;
-
-}
-
-.concurso-top{
-
-flex-wrap:wrap;
-
-}
-
-.badge{
-
-margin-left:auto;
-
-}
-
-.concurso-actions{
-
-flex-wrap:wrap;
-
-justify-content:center;
-
-}
-
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 480px) {
+  .page-header {
+    .header-right {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  .filter-bar {
+    flex-direction: column;
+
+    .filter-group {
+      min-width: 100%;
+    }
+  }
+
+  .concurso-card {
+    .card-header {
+      flex-wrap: wrap;
+    }
+
+    .card-actions {
+      flex-direction: column;
+      align-items: stretch;
+
+      .actions-right {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    }
+  }
 }

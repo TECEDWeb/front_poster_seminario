@@ -1,101 +1,363 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
 
-    <ion-title>Usuarios</ion-title>
+    <ion-title>
+      <span class="title-text">Usuarios</span>
+      <span class="title-badge">Gestión</span>
+    </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button (click)="abrirCrear()">
+      <ion-button class="btn-add" (click)="abrirCrear()">
         <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nuevo
+        Nuevo usuario
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content class="usuarios-content">
   <div class="page-container">
 
+    <!-- HEADER -->
     <div class="page-header">
-      <h1>Gestión de usuarios</h1>
-      <p>Administra evaluadores y accesos</p>
+      <div class="header-left">
+        <h1>Gestión de usuarios</h1>
+        <p>Administra evaluadores y accesos al sistema</p>
+      </div>
+      <div class="header-right">
+        <div class="stats-mini">
+          <span class="stat-count">{{ usuarios.length }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count emerald">{{ totalActivos }}</span>
+          <span class="stat-label">Activos</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count indigo">{{ totalEvaluadores }}</span>
+          <span class="stat-label">Evaluadores</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count purple">{{ totalAdministradores }}</span>
+          <span class="stat-label">Admin</span>
+        </div>
+      </div>
     </div>
 
-    <!-- RESUMEN -->
-    <div class="resumen-row">
-
-      <div class="resumen-chip">
-        <span class="chip-val">{{ usuarios.length }}</span>
-        <span class="chip-lbl">Total</span>
+    <!-- FILTROS Y BÚSQUEDA -->
+    <div class="filter-bar">
+      <div class="search-group">
+        <ion-searchbar
+          [(ngModel)]="busqueda"
+          (ionInput)="filtrarUsuarios()"
+          placeholder="Buscar por nombre, cédula o email..."
+          class="filter-search"
+          animated>
+          <ion-icon name="search-outline" slot="start"></ion-icon>
+        </ion-searchbar>
       </div>
 
-      <div class="divider"></div>
-
-      <div class="resumen-chip">
-        <span class="chip-val emerald">{{ totalActivos }}</span>
-        <span class="chip-lbl">Activos</span>
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroRol"
+          (ionChange)="filtrarUsuarios()"
+          placeholder="Todos los roles"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los roles</ion-select-option>
+          <ion-select-option value="admin">Administrador</ion-select-option>
+          <ion-select-option value="evaluador">Evaluador</ion-select-option>
+          <ion-select-option value="coordinador">Coordinador</ion-select-option>
+        </ion-select>
       </div>
 
-      <div class="divider"></div>
-
-      <div class="resumen-chip">
-        <span class="chip-val indigo">{{ totalEvaluadores }}</span>
-        <span class="chip-lbl">Evaluadores</span>
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroEstado"
+          (ionChange)="filtrarUsuarios()"
+          placeholder="Todos los estados"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los estados</ion-select-option>
+          <ion-select-option value="activo">Activos</ion-select-option>
+          <ion-select-option value="inactivo">Inactivos</ion-select-option>
+        </ion-select>
       </div>
-
     </div>
 
-    <!-- SEARCH -->
-    <ion-searchbar
-      [(ngModel)]="busqueda"
-      placeholder="Buscar usuarios...">
-    </ion-searchbar>
-
-    <!-- LISTA -->
-    <div *ngFor="let u of usuarios">
-
-      <div class="user-row">
-
-        <div class="avatar">
-          {{ iniciales(u.nombre) }}
+    <!-- LOADING -->
+    <div class="loading-grid" *ngIf="cargando">
+      <div class="user-skeleton" *ngFor="let i of [1,2,3,4,5]">
+        <div class="skeleton-header">
+          <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
+          <div class="skeleton-text-group">
+            <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+          </div>
         </div>
-
-        <div class="user-info">
-          <div>{{ u.nombre }}</div>
-          <div>{{ u.cedula }}</div>
-
-          <span>{{ u.rol }}</span>
-          <span>{{ u.activo ? 'Activo' : 'Inactivo' }}</span>
+        <div class="skeleton-actions">
+          <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
         </div>
-
-        <div class="user-actions">
-
-          <ion-button fill="clear" (click)="editar(u)">
-            <ion-icon name="create-outline"></ion-icon>
-          </ion-button>
-
-          <ion-button fill="clear" (click)="cambiarEstado(u)">
-            <ion-icon name="swap-horizontal-outline"></ion-icon>
-          </ion-button>
-
-          <ion-button fill="clear" (click)="resetPass(u)">
-            <ion-icon name="key-outline"></ion-icon>
-          </ion-button>
-
-        </div>
-
       </div>
-
     </div>
 
-    <!-- EMPTY -->
-    <div *ngIf="usuarios.length === 0 && !cargando">
-      Sin usuarios
+    <!-- LISTA DE USUARIOS -->
+    <div class="usuarios-list" *ngIf="!cargando">
+      <div class="usuario-card" *ngFor="let u of usuariosFiltrados || []; trackBy: trackById">
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="avatar" [class]="getAvatarColor(u.rol)">
+            {{ iniciales(u.nombre) }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-name">{{ u.nombre }}</div>
+            <div class="user-details">
+              <span class="detail-item">
+                <ion-icon name="card-outline"></ion-icon>
+                {{ u.cedula }}
+              </span>
+              <span class="detail-item" *ngIf="u.email">
+                <ion-icon name="mail-outline"></ion-icon>
+                {{ u.email }}
+              </span>
+            </div>
+          </div>
+
+          <div class="user-status">
+            <span class="status-badge" [class]="u.activo ? 'status-active' : 'status-inactive'">
+              <span class="status-dot"></span>
+              {{ u.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="user-tags">
+            <span class="tag" [class]="'tag-' + getRolClass(u.rol)">
+              <ion-icon [name]="getRolIcon(u.rol)"></ion-icon>
+              {{ getRolLabel(u.rol) }}
+            </span>
+            <span class="tag tag-email" *ngIf="u.email">
+              <ion-icon name="mail-outline"></ion-icon>
+              {{ u.email }}
+            </span>
+            <span class="tag tag-phone" *ngIf="u.telefono">
+              <ion-icon name="call-outline"></ion-icon>
+              {{ u.telefono }}
+            </span>
+          </div>
+
+          <div class="user-meta" *ngIf="u.ultimoAcceso">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Último acceso: {{ u.ultimoAcceso | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <ion-button fill="clear" size="small" class="action-btn" (click)="editar(u)">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+
+          <ion-button fill="clear" size="small" class="action-btn" (click)="cambiarEstado(u)">
+            <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
+            {{ u.activo ? 'Desactivar' : 'Activar' }}
+          </ion-button>
+
+          <ion-button fill="clear" size="small" class="action-btn" (click)="resetPass(u)">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+            Resetear pass
+          </ion-button>
+
+          <ion-button fill="clear" size="small" class="action-btn danger" (click)="confirmarEliminar(u)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="usuariosFiltrados?.length === 0">
+        <div class="empty-icon">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <h3>No hay usuarios</h3>
+        <p *ngIf="!busqueda && filtroRol === 'todos' && filtroEstado === 'todos'">
+          Comienza creando el primer usuario del sistema
+        </p>
+        <p *ngIf="busqueda || filtroRol !== 'todos' || filtroEstado !== 'todos'">
+          No se encontraron usuarios con los filtros aplicados
+        </p>
+        <ion-button class="btn-primary" (click)="abrirCrear()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Crear usuario
+        </ion-button>
+      </div>
     </div>
 
   </div>
 
+  <!-- FAB -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="abrirCrear()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- MODAL DE USUARIO -->
+  <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ editando ? 'Editar usuario' : 'Nuevo usuario' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="modal-container">
+          <form (ngSubmit)="guardar()" #userForm="ngForm">
+            <!-- Cédula -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="card-outline"></ion-icon>
+                Cédula
+                <span class="required">*</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.cedula"
+                  name="cedula"
+                  placeholder="Ingrese la cédula"
+                  required>
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Nombre -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="person-outline"></ion-icon>
+                Nombre completo
+                <span class="required">*</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.nombre"
+                  name="nombre"
+                  placeholder="Ingrese el nombre completo"
+                  required>
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Email -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="mail-outline"></ion-icon>
+                Correo electrónico
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.email"
+                  name="email"
+                  type="email"
+                  placeholder="correo@ejemplo.com">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Rol -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="briefcase-outline"></ion-icon>
+                Rol
+                <span class="required">*</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-select
+                  [(ngModel)]="form.rol"
+                  name="rol"
+                  placeholder="Seleccione un rol"
+                  interface="popover"
+                  required>
+                  <ion-select-option value="admin">Administrador</ion-select-option>
+                  <ion-select-option value="evaluador">Evaluador</ion-select-option>
+                  <ion-select-option value="coordinador">Coordinador</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <!-- Password -->
+            <div class="form-field" *ngIf="!editando || form.password">
+              <label class="field-label">
+                <ion-icon name="key-outline"></ion-icon>
+                {{ editando ? 'Nueva contraseña (opcional)' : 'Contraseña' }}
+                <span class="required" *ngIf="!editando">*</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.password"
+                  name="password"
+                  type="password"
+                  [placeholder]="editando ? 'Dejar en blanco para mantener' : 'Ingrese la contraseña'"
+                  [required]="!editando">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Estado -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="toggle-outline"></ion-icon>
+                Estado
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-toggle
+                  [(ngModel)]="form.activo"
+                  name="activo"
+                  color="primary">
+                  {{ form.activo ? 'Activo' : 'Inactivo' }}
+                </ion-toggle>
+              </ion-item>
+            </div>
+
+            <!-- Botones -->
+            <div class="form-actions">
+              <ion-button
+                type="button"
+                fill="outline"
+                class="cancel-btn"
+                (click)="cerrarModal()">
+                Cancelar
+              </ion-button>
+
+              <ion-button
+                type="submit"
+                class="submit-btn"
+                [disabled]="!userForm.form.valid || guardando">
+                <ion-icon
+                  [name]="guardando ? 'refresh-outline' : 'checkmark-outline'"
+                  slot="start"
+                  [class.spinning]="guardando">
+                </ion-icon>
+                {{ guardando ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear usuario') }}
+              </ion-button>
+            </div>
+          </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

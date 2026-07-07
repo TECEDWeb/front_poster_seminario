@@ -1,80 +1,214 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
-    <ion-title>Proyectos</ion-title>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title>
+      <span class="title-text">Proyectos</span>
+      <span class="title-badge">Investigación</span>
+    </ion-title>
+
     <ion-buttons slot="end">
-      <ion-button class="btn-add">
+      <ion-button class="btn-add" routerLink="/admin/proyectos/nuevo">
         <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nuevo
+        Nuevo proyecto
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="proyectos-content">
   <div class="page-container">
 
+    <!-- HEADER -->
     <div class="page-header">
-      <div>
-        <h1>Proyectos</h1>
-        <p>{{ proyectos.length }} proyectos registrados</p>
+      <div class="header-left">
+        <h1>Gestión de proyectos</h1>
+        <p>{{ proyectos.length }} proyectos registrados en el sistema</p>
+      </div>
+      <div class="header-right">
+        <div class="stats-mini">
+          <span class="stat-count">{{ proyectosActivos }}</span>
+          <span class="stat-label">Activos</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count">{{ proyectos.length - proyectosActivos }}</span>
+          <span class="stat-label">Inactivos</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count">{{ totalParticipantes }}</span>
+          <span class="stat-label">Participantes</span>
+        </div>
       </div>
     </div>
 
-    <!-- Búsqueda -->
-    <ion-searchbar
-      [(ngModel)]="busqueda"
-      placeholder="Buscar por nombre o área..."
-      debounce="300"
-      class="list-search"
-      style="margin-bottom:12px">
-    </ion-searchbar>
+    <!-- FILTROS Y BÚSQUEDA -->
+    <div class="filter-bar">
+      <div class="search-group">
+        <ion-searchbar
+          [(ngModel)]="busqueda"
+          (ionInput)="filtrarProyectos()"
+          placeholder="Buscar por nombre, área o nivel..."
+          class="filter-search"
+          animated>
+          <ion-icon name="search-outline" slot="start"></ion-icon>
+        </ion-searchbar>
+      </div>
 
-    <!-- Lista -->
-    <div class="pro-card">
-      <ion-list lines="none">
-        <ion-item-sliding *ngFor="let p of proyectos">
-          <ion-item class="proyecto-item">
-            <div class="proj-icon" slot="start">
-              <ion-icon name="document-text-outline"></ion-icon>
-            </div>
-            <ion-label>
-              <h2>{{ p.nombre }}</h2>
-              <p>
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroNivel"
+          (ionChange)="filtrarProyectos()"
+          placeholder="Todos los niveles"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los niveles</ion-select-option>
+          <ion-select-option value="Básico">Básico</ion-select-option>
+          <ion-select-option value="Intermedio">Intermedio</ion-select-option>
+          <ion-select-option value="Avanzado">Avanzado</ion-select-option>
+        </ion-select>
+      </div>
+
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroEstado"
+          (ionChange)="filtrarProyectos()"
+          placeholder="Todos los estados"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los estados</ion-select-option>
+          <ion-select-option value="activo">Activos</ion-select-option>
+          <ion-select-option value="inactivo">Inactivos</ion-select-option>
+        </ion-select>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading-grid" *ngIf="cargando">
+      <div class="proyecto-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+        <div class="skeleton-header">
+          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+          <div class="skeleton-text-group">
+            <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+          </div>
+        </div>
+        <div class="skeleton-meta">
+          <ion-skeleton-text animated class="skeleton-badge"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-badge"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
+
+    <!-- LISTA DE PROYECTOS -->
+    <div class="proyectos-grid" *ngIf="!cargando">
+      <div class="proyecto-card" 
+           *ngFor="let p of proyectosFiltrados || []; trackBy: trackById"
+           [class.card-active]="p.activo"
+           [class.card-inactive]="!p.activo">
+
+        <!-- Header -->
+        <div class="card-header">
+          <div class="card-icon" [class]="p.activo ? 'icon-indigo' : 'icon-slate'">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+
+          <div class="card-info">
+            <h3 class="card-title">{{ p.nombre }}</h3>
+            <div class="card-meta-tags">
+              <span class="tag tag-area" *ngIf="p.area">
+                <ion-icon name="business-outline"></ion-icon>
                 {{ p.area }}
-                <span *ngIf="p.participantes?.length">
-                  · {{ p.participantes.length }} participante{{ p.participantes.length !== 1 ? 's' : '' }}
-                </span>
-              </p>
-            </ion-label>
-            <div slot="end" class="badges-col">
-              <span class="badge badge-indigo">Nivel {{ p.nivel }}</span>
-              <span class="badge badge-slate" *ngIf="!p.activo">Inactivo</span>
+              </span>
+              <span class="tag tag-nivel" *ngIf="p.nivel">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                Nivel {{ p.nivel }}
+              </span>
             </div>
-          </ion-item>
-          <ion-item-options side="end">
-            <ion-item-option color="primary">
-              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-            </ion-item-option>
-            <ion-item-option color="danger">
-              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </ion-list>
+          </div>
 
-      <div class="empty-state" *ngIf="proyectos.length === 0">
-        <ion-icon name="folder-open-outline"></ion-icon>
-        <h3>Sin proyectos</h3>
-        <p>Aún no hay proyectos registrados</p>
-        <ion-button size="small" class="btn-primary">Crear proyecto</ion-button>
+          <div class="card-status">
+            <span class="status-badge" [class]="p.activo ? 'status-active' : 'status-inactive'">
+              <span class="status-dot"></span>
+              {{ p.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+          <p class="card-description" *ngIf="p.descripcion">
+            {{ p.descripcion | slice:0:100 }}{{ p.descripcion.length > 100 ? '...' : '' }}
+          </p>
+
+          <div class="card-participants">
+            <div class="participants-header">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>Participantes ({{ p.participantes?.length || 0 }})</span>
+            </div>
+            <div class="participants-list">
+              <div class="participant-chip" *ngFor="let part of (p.participantes || []).slice(0, 3)">
+                {{ part.nombre }}
+              </div>
+              <div class="participant-more" *ngIf="(p.participantes?.length || 0) > 3">
+                +{{ (p.participantes?.length || 0) - 3 }} más
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <div class="actions-left">
+            <ion-chip class="chip-concurso" *ngIf="p.concursoId">
+              <ion-icon name="trophy-outline"></ion-icon>
+              <ion-label>En concurso</ion-label>
+            </ion-chip>
+          </div>
+
+          <div class="actions-right">
+            <ion-button fill="clear" size="small" class="action-btn" routerLink="/admin/proyectos/{{ p.id }}">
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              Ver
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn" routerLink="/admin/proyectos/editar/{{ p.id }}">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn danger" (click)="confirmarEliminar(p)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0">
+        <div class="empty-icon">
+          <ion-icon name="folder-open-outline"></ion-icon>
+        </div>
+        <h3>No hay proyectos</h3>
+        <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos'">
+          Comienza creando el primer proyecto de investigación
+        </p>
+        <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos'">
+          No se encontraron proyectos con los filtros aplicados
+        </p>
+        <ion-button class="btn-primary" routerLink="/admin/proyectos/nuevo">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Crear proyecto
+        </ion-button>
       </div>
     </div>
 
   </div>
 
+  <!-- FAB -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary">
+    <ion-fab-button color="primary" routerLink="/admin/proyectos/nuevo">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>

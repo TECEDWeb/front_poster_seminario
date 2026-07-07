@@ -1,12 +1,16 @@
+// concurso.model.ts
 export interface Concurso {
   id: number;
   nombre: string;
-  descripcion?: string | null;
-  tipo?: string | null;
-  fechaInicio?: string | null;
-  fechaFin?: string | null;
-  puntajeMaximo?: number | null;
-  activo: boolean;
+  descripcion?: string;
+  tipo?: string;
+  categoria?: string;
+  activo?: boolean;
+  fechaInicio?: string;
+  fechaFin?: string;
+  puntajeMaximo?: number;
+  participantes?: number; // Añadir esta propiedad
+  // ... otras propiedades
 }
 
 /** Indica si, a la fecha actual, todavía se pueden registrar/editar evaluaciones. */

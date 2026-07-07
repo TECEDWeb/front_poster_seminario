@@ -1,135 +1,211 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
 
-    <ion-title>Concursos</ion-title>
+    <ion-title>
+      <span class="title-text">Concursos</span>
+      <span class="title-badge">Científicos</span>
+    </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button class="btn-add">
+      <ion-button class="btn-add" routerLink="/admin/concursos/nuevo">
         <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nuevo
+        Nuevo concurso
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content class="concursos-content">
   <div class="page-container">
 
+    <!-- HEADER -->
     <div class="page-header">
-      <div>
-        <h1>Concursos</h1>
-        <p>Gestiona los concursos científicos del sistema</p>
+      <div class="header-left">
+        <h1>Gestión de concursos</h1>
+        <p>Administra los concursos científicos y sus convocatorias</p>
+      </div>
+      <div class="header-right">
+        <div class="stats-mini">
+          <span class="stat-count">{{ concursos.length }}</span>
+          <span class="stat-label">Total concursos</span>
+        </div>
+        <div class="stats-mini active">
+          <span class="stat-count">{{ concursosActivos }}</span>
+          <span class="stat-label">Activos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTROS (Opcional) -->
+    <div class="filter-bar" *ngIf="!cargando && concursos.length > 0">
+      <div class="filter-group">
+        <ion-searchbar
+          [(ngModel)]="filtroTexto"
+          (ionInput)="filtrarConcursos()"
+          placeholder="Buscar concurso..."
+          class="filter-search"
+          animated>
+        </ion-searchbar>
+      </div>
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroEstado"
+          (ionChange)="filtrarConcursos()"
+          placeholder="Todos los estados"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los estados</ion-select-option>
+          <ion-select-option value="activo">Activos</ion-select-option>
+          <ion-select-option value="inactivo">Inactivos</ion-select-option>
+          <ion-select-option value="finalizado">Finalizados</ion-select-option>
+        </ion-select>
       </div>
     </div>
 
     <!-- LOADING -->
-    <div *ngIf="cargando">
-      <div class="concurso-skeleton" *ngFor="let i of [1,2,3]">
-        <ion-skeleton-text animated
-          style="width:100%;height:16px;border-radius:4px;margin-bottom:8px">
-        </ion-skeleton-text>
-
-        <ion-skeleton-text animated
-          style="width:60%;height:12px;border-radius:4px">
-        </ion-skeleton-text>
+    <div class="loading-grid" *ngIf="cargando">
+      <div class="concurso-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+        <div class="skeleton-header">
+          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+          <div class="skeleton-text-group">
+            <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+          </div>
+        </div>
+        <ion-skeleton-text animated class="skeleton-desc"></ion-skeleton-text>
+        <div class="skeleton-meta">
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
+        </div>
       </div>
     </div>
 
     <!-- LISTA -->
-    <div *ngIf="!cargando">
+    <div class="concursos-grid" *ngIf="!cargando">
+      <div class="concurso-card" 
+           *ngFor="let c of concursosFiltrados || []; trackBy: trackById"
+           [class.card-active]="c.activo"
+           [class.card-inactive]="!c.activo">
 
-      <div class="concurso-card" *ngFor="let c of concursos || []; trackBy: trackById">
-
-        <div class="concurso-top">
-
-          <div class="concurso-icon" [ngClass]="c.activo ? 'icon-amber' : 'icon-slate'">
+        <!-- Header Card -->
+        <div class="card-header">
+          <div class="card-icon" [class]="c.activo ? 'icon-amber' : 'icon-slate'">
             <ion-icon name="trophy-outline"></ion-icon>
           </div>
 
-          <div class="concurso-head">
-            <div class="concurso-nombre">{{ c.nombre }}</div>
-            <div class="concurso-tipo" *ngIf="c.tipo">{{ c.tipo }}</div>
+          <div class="card-info">
+            <h3 class="card-title">{{ c.nombre }}</h3>
+            <span class="card-type" *ngIf="c.tipo">{{ c.tipo }}</span>
           </div>
 
-          <span class="badge" [ngClass]="c.activo ? 'badge-emerald' : 'badge-slate'">
-            {{ c.activo ? 'Activo' : 'Inactivo' }}
-          </span>
-
+          <div class="card-status">
+            <span class="status-badge" [class]="c.activo ? 'status-active' : 'status-inactive'">
+              <span class="status-dot"></span>
+              {{ c.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
         </div>
 
-        <div class="concurso-body">
-
-          <p class="concurso-desc" *ngIf="c.descripcion">
-            {{ c.descripcion }}
+        <!-- Body Card -->
+        <div class="card-body">
+          <p class="card-description" *ngIf="c.descripcion">
+            {{ c.descripcion | slice:0:120 }}{{ c.descripcion.length > 120 ? '...' : '' }}
           </p>
 
-          <div class="concurso-meta">
-
+          <div class="card-meta">
             <div class="meta-item" *ngIf="c.fechaInicio">
               <ion-icon name="calendar-outline"></ion-icon>
-              Inicio: {{ c.fechaInicio | date:'dd/MM/yyyy' }}
+              <span>
+                <strong>Inicio:</strong> {{ c.fechaInicio | date:'dd/MM/yyyy' }}
+              </span>
             </div>
 
             <div class="meta-item" *ngIf="c.fechaFin">
               <ion-icon name="calendar-outline"></ion-icon>
-              Fin: {{ c.fechaFin | date:'dd/MM/yyyy' }}
+              <span>
+                <strong>Fin:</strong> {{ c.fechaFin | date:'dd/MM/yyyy' }}
+                <span class="days-remaining" *ngIf="c.activo && calcularDiasRestantes(c.fechaFin) >= 0">
+                  ({{ calcularDiasRestantes(c.fechaFin) }} días restantes)
+                </span>
+              </span>
             </div>
 
             <div class="meta-item" *ngIf="c.puntajeMaximo">
               <ion-icon name="star-outline"></ion-icon>
-              Puntaje máx: {{ c.puntajeMaximo }}
+              <span>
+                <strong>Puntaje máx:</strong> {{ c.puntajeMaximo }}
+              </span>
             </div>
 
+            <div class="meta-item" *ngIf="c.participantes !== undefined">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>
+                <strong>Participantes:</strong> {{ c.participantes }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <div class="actions-left">
+            <ion-chip class="chip-category" *ngIf="c.categoria">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              <ion-label>{{ c.categoria }}</ion-label>
+            </ion-chip>
           </div>
 
+          <div class="actions-right">
+            <ion-button fill="clear" size="small" class="action-btn" routerLink="/admin/concursos/{{ c.id }}">
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              Ver
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn" routerLink="/admin/concursos/editar/{{ c.id }}">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn" routerLink="/admin/rubricas">
+              <ion-icon name="list-outline" slot="start"></ion-icon>
+              Rúbrica
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn danger" (click)="confirmarEliminar(c)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
         </div>
-
-        <div class="concurso-actions">
-
-          <ion-button fill="clear" size="small">
-            <ion-icon name="create-outline" slot="start"></ion-icon>
-            Editar
-          </ion-button>
-
-          <ion-button fill="clear" size="small" routerLink="/admin/rubricas">
-            <ion-icon name="list-outline" slot="start"></ion-icon>
-            Rúbrica
-          </ion-button>
-
-          <ion-button fill="clear" size="small" color="danger">
-            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-
-        </div>
-
       </div>
 
       <!-- EMPTY STATE -->
-      <div class="empty-state" *ngIf="concursos.length === 0">
-
-        <ion-icon name="trophy-outline"></ion-icon>
-
-        <h3>Sin concursos</h3>
-        <p>Crea el primer concurso científico</p>
-
-        <ion-button size="small" class="btn-primary">
+      <div class="empty-state" *ngIf="concursosFiltrados?.length === 0">
+        <div class="empty-icon">
+          <ion-icon name="trophy-outline"></ion-icon>
+        </div>
+        <h3>No hay concursos</h3>
+        <p *ngIf="!filtroTexto && filtroEstado === 'todos'">
+          Comienza creando el primer concurso científico
+        </p>
+        <p *ngIf="filtroTexto || filtroEstado !== 'todos'">
+          No se encontraron concursos con los filtros aplicados
+        </p>
+        <ion-button class="btn-primary" routerLink="/admin/concursos/nuevo">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
           Crear concurso
         </ion-button>
-
       </div>
-
     </div>
 
   </div>
 
+  <!-- FAB -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary">
+    <ion-fab-button color="primary" routerLink="/admin/concursos/nuevo">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
 </ion-content>

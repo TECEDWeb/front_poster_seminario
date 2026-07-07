@@ -63,35 +63,31 @@
         </div>
       </div>
 
-      <!-- Stats Cards -->
+      <!-- Stats Cards - Sin trend -->
       <div class="stats-grid-container" *ngIf="!cargando && !error">
         <app-stats-card
           titulo="Usuarios"
           [valor]="usuarios"
           icono="people-outline"
-          color="indigo"
-          [trend]="+12">
+          color="indigo">
         </app-stats-card>
         <app-stats-card
           titulo="Concursos"
           [valor]="concursos"
           icono="trophy-outline"
-          color="amber"
-          [trend]="+5">
+          color="amber">
         </app-stats-card>
         <app-stats-card
           titulo="Proyectos"
           [valor]="proyectos"
           icono="folder-outline"
-          color="emerald"
-          [trend]="-2">
+          color="emerald">
         </app-stats-card>
         <app-stats-card
           titulo="Evaluaciones"
           [valor]="reportes"
           icono="document-text-outline"
-          color="violet"
-          [trend]="+8">
+          color="violet">
         </app-stats-card>
       </div>
     </div>

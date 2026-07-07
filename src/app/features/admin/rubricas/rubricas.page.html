@@ -1,28 +1,180 @@
-<app-header titulo="Dashboard Admin"></app-header>
-<ion-content id="main-content" class="ion-padding">
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
 
-  <h2>Rúbricas</h2>
+    <ion-title>
+      <span class="title-text">Rúbricas</span>
+      <span class="title-badge">Evaluación</span>
+    </ion-title>
 
-  <ion-card *ngFor="let r of rubricas">
+    <ion-buttons slot="end">
+      <ion-button class="btn-add" routerLink="/admin/rubricas/nuevo">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nueva rúbrica
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-    <ion-card-header>
-      <ion-card-title>
-        Concurso {{ r.concursoId }}
-      </ion-card-title>
-    </ion-card-header>
+<ion-content class="rubricas-content">
+  <div class="page-container">
 
-    <ion-card-content>
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="header-left">
+        <h1>Gestión de rúbricas</h1>
+        <p>Administra las rúbricas de evaluación para concursos</p>
+      </div>
+      <div class="header-right">
+        <div class="stats-mini">
+          <span class="stat-count">{{ rubricas.length }}</span>
+          <span class="stat-label">Rúbricas</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count">{{ totalSecciones }}</span>
+          <span class="stat-label">Secciones</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count">{{ totalNiveles }}</span>
+          <span class="stat-label">Niveles</span>
+        </div>
+      </div>
+    </div>
 
-      <p>
-        Secciones: {{ r.secciones.length }}
-      </p>
+    <!-- LOADING -->
+    <div class="loading-grid" *ngIf="cargando">
+      <div class="rubrica-skeleton" *ngFor="let i of [1,2,3,4]">
+        <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+        <div class="skeleton-stats">
+          <ion-skeleton-text animated class="skeleton-stat"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-stat"></ion-skeleton-text>
+        </div>
+        <div class="skeleton-criterios">
+          <ion-skeleton-text animated class="skeleton-criterio" *ngFor="let j of [1,2,3]"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
 
-      <p>
-        Niveles: {{ r.niveles.length }}
-      </p>
+    <!-- LISTA DE RÚBRICAS -->
+    <div class="rubricas-grid" *ngIf="!cargando">
+      <div class="rubrica-card" *ngFor="let r of rubricas; trackBy: trackById">
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="card-icon">
+            <ion-icon name="checkbox-outline"></ion-icon>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Rúbrica #{{ r.concursoId }}</h3>
+            <span class="card-subtitle">Concurso ID: {{ r.concursoId }}</span>
+          </div>
+          <div class="card-actions-header">
+            <ion-button fill="clear" size="small" class="action-icon-btn" routerLink="/admin/rubricas/editar/{{ r.concursoId }}">
+              <ion-icon name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" class="action-icon-btn danger" (click)="confirmarEliminar(r)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
 
-    </ion-card-content>
+        <!-- Card Stats -->
+        <div class="card-stats">
+          <div class="stat-item">
+            <ion-icon name="layers-outline"></ion-icon>
+            <div class="stat-content">
+              <span class="stat-label">Secciones</span>
+              <span class="stat-value">{{ r.secciones?.length || 0 }}</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <ion-icon name="list-outline"></ion-icon>
+            <div class="stat-content">
+              <span class="stat-label">Niveles</span>
+              <span class="stat-value">{{ r.niveles?.length || 0 }}</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <div class="stat-content">
+              <span class="stat-label">Criterios</span>
+              <span class="stat-value">{{ totalCriterios(r) }}</span>
+            </div>
+          </div>
+        </div>
 
-  </ion-card>
+        <!-- Secciones -->
+        <div class="secciones-section" *ngIf="r.secciones?.length">
+          <div class="secciones-header">
+            <ion-icon name="layers-outline"></ion-icon>
+            <span>Secciones</span>
+          </div>
+          <div class="secciones-list">
+            <div class="seccion-item" *ngFor="let s of r.secciones.slice(0, 3)">
+              <span class="seccion-nombre">{{ s.nombre }}</span>
+              <span class="seccion-criterios">{{ s.criterios?.length || 0 }} criterios</span>
+            </div>
+            <div class="seccion-more" *ngIf="r.secciones.length > 3">
+              +{{ r.secciones.length - 3 }} secciones más
+            </div>
+          </div>
+        </div>
 
+        <!-- Niveles -->
+        <div class="niveles-section" *ngIf="r.niveles?.length">
+          <div class="niveles-header">
+            <ion-icon name="list-outline"></ion-icon>
+            <span>Niveles de desempeño</span>
+          </div>
+          <div class="niveles-list">
+            <div class="nivel-item" *ngFor="let n of r.niveles.slice(0, 4)">
+              <span class="nivel-nombre">{{ n.nombre }}</span>
+              <span class="nivel-puntaje">{{ n.puntaje }} pts</span>
+            </div>
+            <div class="nivel-more" *ngIf="r.niveles.length > 4">
+              +{{ r.niveles.length - 4 }} niveles más
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <ion-button fill="outline" size="small" class="action-btn" routerLink="/admin/rubricas/{{ r.concursoId }}">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver detalle
+          </ion-button>
+          <ion-button fill="outline" size="small" class="action-btn" routerLink="/admin/rubricas/editar/{{ r.concursoId }}">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+          <ion-button fill="outline" size="small" class="action-btn" (click)="exportarRubrica(r)">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Exportar
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="rubricas.length === 0">
+        <div class="empty-icon">
+          <ion-icon name="checkbox-outline"></ion-icon>
+        </div>
+        <h3>No hay rúbricas</h3>
+        <p>Crea la primera rúbrica para un concurso</p>
+        <ion-button class="btn-primary" routerLink="/admin/rubricas/nuevo">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Crear rúbrica
+        </ion-button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAB -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" routerLink="/admin/rubricas/nuevo">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

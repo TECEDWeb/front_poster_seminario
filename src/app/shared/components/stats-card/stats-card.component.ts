@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import {
   IonCard,
   IonCardContent,
@@ -24,4 +23,7 @@ export class StatsCardComponent {
   @Input() titulo = '';
   @Input() valor: number | string = '';
   @Input() icono = 'stats-chart';
+  @Input() color: string = 'indigo';
+  @Input() trend?: number | null; // Añadir propiedad trend opcional
+
 }

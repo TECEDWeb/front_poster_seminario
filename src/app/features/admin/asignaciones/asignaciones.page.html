@@ -1,97 +1,217 @@
 <ion-header>
   <ion-toolbar class="toolbar-custom">
-
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
 
-    <ion-title>Asignación de proyectos</ion-title>
+    <ion-title>
+      <span class="title-text">Asignación de proyectos</span>
+      <span class="title-badge">Evaluación</span>
+    </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button class="btn-add">
+      <ion-button class="btn-add" (click)="openNewProject()">
         <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nuevo
+        Nuevo proyecto
       </ion-button>
     </ion-buttons>
-
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="assign-content">
-
   <div class="page-wrapper">
 
-    <!-- HEADER -->
-    <div class="page-hero">
-      <p>Selecciona un proyecto y asígnalo a un evaluador disponible</p>
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-icon blue">
+          <ion-icon name="folder-open-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ proyectos.length }}</span>
+          <span class="stat-label">Proyectos disponibles</span>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-icon green">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ evaluadores.length }}</span>
+          <span class="stat-label">Evaluadores activos</span>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-icon purple">
+          <ion-icon name="checkmark-done-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ asignacionesCount || 0 }}</span>
+          <span class="stat-label">Asignaciones realizadas</span>
+        </div>
+      </div>
     </div>
 
-    <!-- CARD -->
+    <!-- MAIN CARD -->
     <ion-card class="form-card">
-
       <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="swap-horizontal-outline"></ion-icon>
-          Asignar evaluador
-        </ion-card-title>
-        <ion-card-subtitle>
-          Gestión de asignaciones de evaluación
-        </ion-card-subtitle>
+        <div class="card-header-content">
+          <div class="card-header-left">
+            <ion-card-title>
+              <ion-icon name="swap-horizontal-outline"></ion-icon>
+              Nueva asignación
+            </ion-card-title>
+            <ion-card-subtitle>
+              Asigna un proyecto a un evaluador para su revisión
+            </ion-card-subtitle>
+          </div>
+          <div class="card-header-right">
+            <ion-chip class="status-chip">
+              <ion-icon name="time-outline"></ion-icon>
+              <ion-label>Asignación rápida</ion-label>
+            </ion-chip>
+          </div>
+        </div>
       </ion-card-header>
 
       <ion-card-content>
+        <form (ngSubmit)="guardar()" #assignForm="ngForm">
+          <!-- PROYECTO -->
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label">
+                <ion-icon name="folder-outline"></ion-icon>
+                Proyecto a asignar
+                <span class="required">*</span>
+              </label>
 
-        <!-- PROYECTO -->
-        <div class="field">
-          <label>Proyecto</label>
+              <ion-item class="custom-item" lines="none">
+                <ion-select
+                  [(ngModel)]="proyectoId"
+                  name="proyectoId"
+                  interface="action-sheet"
+                  placeholder="Selecciona un proyecto"
+                  [class.has-value]="proyectoId">
 
-          <ion-item class="custom-item" lines="none">
-            <ion-select
-              [(ngModel)]="proyectoId"
-              interface="action-sheet"
-              placeholder="Selecciona un proyecto">
+                  <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
+                    <div class="option-content">
+                      <span class="option-title">{{ p.nombre }}</span>
+                      <span class="option-sub">{{ p.categoria || 'Sin categoría' }}</span>
+                    </div>
+                  </ion-select-option>
 
-              <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
-                {{ p.nombre }}
-              </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
 
-            </ion-select>
-          </ion-item>
-        </div>
+            <!-- EVALUADOR -->
+            <div class="field">
+              <label class="field-label">
+                <ion-icon name="person-outline"></ion-icon>
+                Evaluador asignado
+                <span class="required">*</span>
+              </label>
 
-        <!-- EVALUADOR -->
-        <div class="field">
-          <label>Evaluador</label>
+              <ion-item class="custom-item" lines="none">
+                <ion-select
+                  [(ngModel)]="evaluadorId"
+                  name="evaluadorId"
+                  interface="action-sheet"
+                  placeholder="Selecciona un evaluador"
+                  [class.has-value]="evaluadorId">
 
-          <ion-item class="custom-item" lines="none">
-            <ion-select
-              [(ngModel)]="evaluadorId"
-              interface="action-sheet"
-              placeholder="Selecciona un evaluador">
+                  <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
+                    <div class="option-content">
+                      <span class="option-title">{{ e.nombre }}</span>
+                      <span class="option-sub">{{ e.especialidad || 'Evaluador' }}</span>
+                    </div>
+                  </ion-select-option>
 
-              <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
-                {{ e.nombre }}
-              </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+          </div>
 
-            </ion-select>
-          </ion-item>
-        </div>
+          <!-- OPCIONAL: FECHA LÍMITE -->
+          <div class="field optional-field">
+            <label class="field-label">
+              <ion-icon name="calendar-outline"></ion-icon>
+              Fecha límite (opcional)
+            </label>
 
-        <!-- BOTÓN -->
-        <ion-button
-          expand="block"
-          class="assign-btn"
-          (click)="guardar()"
-          [disabled]="!proyectoId || !evaluadorId">
+            <ion-item class="custom-item" lines="none">
+              <ion-datetime
+                [(ngModel)]="fechaLimite"
+                name="fechaLimite"
+                presentation="date"
+                placeholder="Selecciona una fecha"
+                class="custom-datetime">
+              </ion-datetime>
+            </ion-item>
+          </div>
 
-          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-          Asignar proyecto
+          <!-- BOTONES -->
+          <div class="form-actions">
+            <ion-button
+              type="button"
+              fill="outline"
+              class="cancel-btn"
+              (click)="resetForm()">
+              Cancelar
+            </ion-button>
 
-        </ion-button>
+            <ion-button
+              type="submit"
+              class="assign-btn"
+              [disabled]="!proyectoId || !evaluadorId || submitting">
 
+              <ion-icon 
+                [name]="submitting ? 'refresh-outline' : 'checkmark-circle-outline'" 
+                slot="start"
+                [class.spinning]="submitting">
+              </ion-icon>
+              {{ submitting ? 'Asignando...' : 'Asignar proyecto' }}
+
+            </ion-button>
+          </div>
+        </form>
       </ion-card-content>
     </ion-card>
 
-  </div>
+    <!-- TABLA DE ASIGNACIONES RECIENTES -->
+    <div class="recent-assignments" *ngIf="asignacionesRecientes?.length">
+      <div class="section-header">
+        <h3>Asignaciones recientes</h3>
+        <ion-button fill="clear" size="small" class="view-all">
+          Ver todas <ion-icon name="arrow-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
 
+      <div class="assignments-list">
+        <div class="assignment-item" *ngFor="let a of asignacionesRecientes">
+          <div class="assignment-avatar" [class]="a.status || 'pending'">
+            <ion-icon [name]="getStatusIcon(a.status)"></ion-icon>
+          </div>
+          <div class="assignment-info">
+            <div class="assignment-main">
+              <span class="assignment-project">{{ a.proyecto_nombre }}</span>
+              <span class="assignment-evaluator">{{ a.evaluador_nombre }}</span>
+            </div>
+            <div class="assignment-meta">
+              <span class="assignment-date">
+                <ion-icon name="time-outline"></ion-icon>
+                {{ a.fecha_asignacion | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+              <span class="assignment-status" [class]="a.status || 'pending'">
+                {{ getStatusText(a.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </ion-content>

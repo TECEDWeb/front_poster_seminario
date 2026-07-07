@@ -1,252 +1,550 @@
-/* ===========================
-   FONDO
-=========================== */
+// ============================================
+// VARIABLES
+// ============================================
+$primary: #2563eb;
+$primary-dark: #1d4ed8;
+$text-dark: #0f172a;
+$text-gray: #64748b;
+$text-light: #94a3b8;
+$border: #e2e8f0;
+$bg-light: #f8fafc;
+$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+$shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+$shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+$radius: 16px;
 
+// ============================================
+// CONTENT
+// ============================================
 .assign-content {
-  --background: #f4f7fb;
+  --background: #f1f5f9;
 }
 
-.page-wrapper{
-  max-width:900px;
-  margin:auto;
-  padding:32px 20px 60px;
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+
+  @media (min-width: 768px) {
+    padding: 32px 32px 60px;
+  }
 }
 
-/* ===========================
-   TOOLBAR
-=========================== */
+// ============================================
+// TOOLBAR
+// ============================================
+.toolbar-custom {
+  --background: #ffffff;
+  --border-color: #e9edf5;
+  --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 
-.toolbar-custom{
+  ion-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-  --background:#ffffff;
-  --border-color:#e9edf5;
+    .title-text {
+      font-weight: 700;
+      font-size: 20px;
+      color: #0f172a;
+    }
 
-  ion-title{
-    font-weight:700;
-    font-size:20px;
-    color:#1f2937;
+    .title-badge {
+      font-size: 11px;
+      background: #dbeafe;
+      color: #2563eb;
+      padding: 2px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
   }
 
+  .btn-add {
+    --background: #2563eb;
+    --color: #ffffff;
+    --border-radius: 10px;
+    font-weight: 600;
+    height: 38px;
+    font-size: 13px;
+    --box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+
+    ion-icon {
+      font-size: 18px;
+    }
+  }
 }
 
-/* ===========================
-   HERO
-=========================== */
+// ============================================
+// STATS ROW
+// ============================================
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
 
-.page-hero{
-
-  margin-bottom:28px;
-
-  h1{
-    margin:0;
-    font-size:32px;
-    font-weight:700;
-    color:#1f2937;
-    letter-spacing:-0.5px;
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
   }
 
-  p{
-    margin-top:8px;
-    color:#6b7280;
-    font-size:15px;
+  .stat-item {
+    background: white;
+    border-radius: $radius;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #eef2f7;
+    transition: all 0.2s ease;
+    cursor: default;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+
+      &.blue {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+      &.green {
+        background: #d1fae5;
+        color: #059669;
+      }
+      &.purple {
+        background: #ede9fe;
+        color: #7c3aed;
+      }
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+      }
+
+      .stat-label {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// ============================================
+// FORM CARD
+// ============================================
+.form-card {
+  border-radius: 20px;
+  box-shadow: $shadow-md;
+  border: 1px solid #eef2f7;
+  background: #ffffff;
+  margin-bottom: 32px;
+
+  ion-card-header {
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid #f1f5f9;
   }
 
-}
-
-/* ===========================
-   CARD
-=========================== */
-
-.form-card{
-
-  border-radius:22px;
-
-  box-shadow:
-      0 10px 30px rgba(0,0,0,.05);
-
-  border:1px solid #eef2f7;
-
-  background:#fff;
-
-}
-
-.form-card ion-card-header{
-
-  padding:24px 28px 12px;
-
-}
-
-.form-card ion-card-title{
-
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-  font-size:22px;
-  font-weight:700;
-
-  color:#1f2937;
-
-}
-
-.form-card ion-card-title ion-icon{
-
-  color:#2563eb;
-  font-size:26px;
-
-}
-
-.form-card ion-card-subtitle{
-
-  margin-top:8px;
-  color:#6b7280;
-  font-size:14px;
-
-}
-
-.form-card ion-card-content{
-
-  padding:24px 28px 30px;
-
-}
-
-/* ===========================
-   CAMPOS
-=========================== */
-
-.field{
-
-  margin-bottom:24px;
-
-}
-
-.field label{
-
-  display:block;
-
-  margin-bottom:10px;
-
-  font-weight:600;
-
-  color:#374151;
-
-  font-size:15px;
-
-}
-
-.custom-item{
-
-  --background:#f8fafc;
-
-  --border-radius:14px;
-
-  --padding-start:18px;
-
-  --inner-padding-end:18px;
-
-  border:1px solid #dbe4ef;
-
-  transition:.25s;
-
-}
-
-.custom-item:hover{
-
-  border-color:#2563eb;
-
-  box-shadow:0 0 0 4px rgba(37,99,235,.08);
-
-}
-
-ion-select{
-
-  width:100%;
-
-  font-size:15px;
-
-  color:#111827;
-
-}
-
-/* ===========================
-   BOTÓN PRINCIPAL
-=========================== */
-
-.assign-btn{
-
-  margin-top:12px;
-
-  --border-radius:14px;
-
-  height:52px;
-
-  font-weight:700;
-
-  font-size:15px;
-
-  --background:linear-gradient(
-      135deg,
-      #2563eb,
-      #1d4ed8
-  );
-
-  --box-shadow:
-      0 10px 20px rgba(37,99,235,.30);
-
-}
-
-.assign-btn:hover{
-
-  transform:translateY(-2px);
-
-}
-
-.assign-btn ion-icon{
-
-  font-size:20px;
-
-}
-
-/* ===========================
-   BOTÓN NUEVO
-=========================== */
-
-.btn-add{
-
-  --background:#2563eb;
-
-  --color:#fff;
-
-  --border-radius:10px;
-
-  font-weight:600;
-
-  height:38px;
-
-}
-
-/* ===========================
-   RESPONSIVE
-=========================== */
-
-@media(max-width:768px){
-
-  .page-wrapper{
-
-      padding:20px 14px 40px;
-
+  .card-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .card-header-left {
+      flex: 1;
+
+      ion-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 22px;
+        font-weight: 700;
+        color: #0f172a;
+
+        ion-icon {
+          color: #2563eb;
+          font-size: 26px;
+        }
+      }
+
+      ion-card-subtitle {
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 400;
+      }
+    }
+
+    .card-header-right {
+      .status-chip {
+        background: #eef2ff;
+        color: #4f46e5;
+        font-weight: 500;
+        height: 28px;
+        padding: 0 12px;
+        
+        ion-icon {
+          color: #4f46e5;
+          font-size: 14px;
+        }
+        ion-label {
+          font-size: 12px;
+          font-weight: 500;
+        }
+      }
+    }
   }
 
-  .page-hero h1{
+  ion-card-content {
+    padding: 28px;
+  }
+}
 
-      font-size:26px;
+// ============================================
+// FORM FIELDS
+// ============================================
+.field-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  margin-bottom: 20px;
+
+  &.optional-field {
+    margin-top: 4px;
   }
 
-  .form-card ion-card-content{
+  .field-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
 
-      padding:20px;
+    ion-icon {
+      color: #64748b;
+      font-size: 16px;
+    }
 
+    .required {
+      color: #ef4444;
+      font-weight: 700;
+      margin-left: 2px;
+    }
+  }
+}
+
+.custom-item {
+  --background: #f8fafc;
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.2s ease;
+  min-height: 50px;
+
+  &:hover {
+    border-color: #94a3b8;
   }
 
+  &:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+    background: #ffffff;
+  }
+
+  &.has-value {
+    border-color: #2563eb;
+    background: #ffffff;
+  }
+
+  ion-select {
+    width: 100%;
+    font-size: 14px;
+    color: #0f172a;
+    --placeholder-color: #94a3b8;
+    --placeholder-opacity: 1;
+  }
+}
+
+.option-content {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+
+  .option-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0f172a;
+  }
+
+  .option-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 1px;
+  }
+}
+
+.custom-datetime {
+  width: 100%;
+  --padding-start: 0;
+  --background: transparent;
+}
+
+// ============================================
+// FORM ACTIONS
+// ============================================
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+
+  .cancel-btn {
+    --border-color: #e2e8f0;
+    --color: #64748b;
+    --border-radius: 12px;
+    height: 48px;
+    font-weight: 600;
+    flex: 1;
+
+    &:hover {
+      --border-color: #94a3b8;
+    }
+  }
+
+  .assign-btn {
+    --border-radius: 12px;
+    height: 48px;
+    font-weight: 700;
+    font-size: 15px;
+    flex: 2;
+    --background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    --box-shadow: 0 4px 16px rgba(37,99,235,0.35);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      --box-shadow: 0 6px 24px rgba(37,99,235,0.45);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      --box-shadow: none;
+    }
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    .spinning {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// ============================================
+// RECENT ASSIGNMENTS
+// ============================================
+.recent-assignments {
+  background: white;
+  border-radius: $radius;
+  padding: 24px 28px;
+  border: 1px solid #eef2f7;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+
+    h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .view-all {
+      --color: #2563eb;
+      font-weight: 500;
+      font-size: 13px;
+    }
+  }
+
+  .assignments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .assignment-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f1f5f9;
+      }
+
+      .assignment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+
+        &.pending {
+          background: #fef3c7;
+          color: #d97706;
+        }
+        &.completed {
+          background: #d1fae5;
+          color: #059669;
+        }
+        &.in-progress {
+          background: #dbeafe;
+          color: #2563eb;
+        }
+        &.rejected {
+          background: #fecaca;
+          color: #dc2626;
+        }
+      }
+
+      .assignment-info {
+        flex: 1;
+        min-width: 0;
+
+        .assignment-main {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 4px 8px;
+          margin-bottom: 4px;
+
+          .assignment-project {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+          }
+
+          .assignment-evaluator {
+            font-size: 13px;
+            color: #64748b;
+          }
+        }
+
+        .assignment-meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 4px 8px;
+
+          .assignment-date {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #94a3b8;
+
+            ion-icon {
+              font-size: 14px;
+            }
+          }
+
+          .assignment-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+
+            &.pending {
+              background: #fef3c7;
+              color: #d97706;
+            }
+            &.completed {
+              background: #d1fae5;
+              color: #059669;
+            }
+            &.in-progress {
+              background: #dbeafe;
+              color: #2563eb;
+            }
+            &.rejected {
+              background: #fecaca;
+              color: #dc2626;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 480px) {
+  .form-card ion-card-content {
+    padding: 20px 16px;
+  }
+
+  .form-card ion-card-header {
+    padding: 20px 16px 12px;
+  }
+
+  .card-header-content .card-header-left ion-card-title {
+    font-size: 19px;
+  }
+
+  .recent-assignments {
+    padding: 16px;
+  }
 }

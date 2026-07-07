@@ -1,427 +1,169 @@
 <ion-header>
-
-  <ion-toolbar>
-
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
 
-
     <ion-title>
-      Reportes
+      <span class="title-text">Reportes</span>
+      <span class="title-badge">Análisis</span>
     </ion-title>
 
-
     <ion-buttons slot="end">
-
-      <ion-button
-        fill="solid"
-        color="success"
-        (click)="exportar()">
-
-        <ion-icon
-          name="download-outline"
-          slot="start">
-        </ion-icon>
-
-        Excel
-
+      <ion-button class="btn-export" (click)="exportar()">
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Exportar Excel
       </ion-button>
-
-
     </ion-buttons>
-
-
   </ion-toolbar>
-
 </ion-header>
 
+<ion-content class="reportes-content">
+  <div class="page-container">
 
-
-
-<ion-content>
-
-
-<div class="page-container">
-
-
-  <!-- TITULO -->
-
-  <div class="header-section">
-
-    <div>
-
-      <h1>
-        Reportes y estadísticas
-      </h1>
-
-      <p>
-        Resumen general de evaluaciones realizadas
-      </p>
-
-    </div>
-
-
-  </div>
-
-
-
-
-  <!-- TARJETAS ESTADISTICAS -->
-
-
-  <div class="stats-container">
-
-
-    <div class="stat-card blue">
-
-
-      <ion-icon
-        name="folder-outline">
-      </ion-icon>
-
-
-      <div>
-
-        <span>
-          Proyectos
-        </span>
-
-        <strong>
-          {{ reportes.proyectos }}
-        </strong>
-
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="header-left">
+        <h1>Reportes y estadísticas</h1>
+        <p>Resumen general de evaluaciones y rendimiento de proyectos</p>
       </div>
-
-
-    </div>
-
-
-
-
-    <div class="stat-card green">
-
-
-      <ion-icon
-        name="checkmark-done-outline">
-      </ion-icon>
-
-
-      <div>
-
-        <span>
-          Evaluaciones
-        </span>
-
-        <strong>
-          {{ reportes.evaluaciones }}
-        </strong>
-
-      </div>
-
-
-    </div>
-
-
-
-
-    <div class="stat-card orange">
-
-
-      <ion-icon
-        name="stats-chart-outline">
-      </ion-icon>
-
-
-      <div>
-
-        <span>
-          Completadas
-        </span>
-
-        <strong>
-          {{ reportes.completadas }}
-        </strong>
-
-      </div>
-
-
-    </div>
-
-
-
-
-    <div class="stat-card purple">
-
-
-      <ion-icon
-        name="trophy-outline">
-      </ion-icon>
-
-
-      <div>
-
-        <span>
-          Promedio
-        </span>
-
-        <strong>
-          {{ reportes.promedio }}
-        </strong>
-
-      </div>
-
-
-    </div>
-
-
-  </div>
-
-
-
-
-
-  <!-- BOTONES GENERALES -->
-
-
-  <div class="download-panel">
-
-
-    <h2>
-      Descargar reporte general
-    </h2>
-
-
-    <div class="download-buttons">
-
-
-      <ion-button
-        color="success"
-        (click)="exportar()">
-
-
-        <ion-icon
-          name="download-outline"
-          slot="start">
-        </ion-icon>
-
-
-        Excel
-
-
-      </ion-button>
-
-
-
-      <ion-button
-        color="danger"
-        disabled>
-
-
-        <ion-icon
-          name="document-outline"
-          slot="start">
-        </ion-icon>
-
-
-        PDF
-
-
-      </ion-button>
-
-
-
-    </div>
-
-
-  </div>
-
-
-
-
-
-  <!-- PROYECTOS -->
-
-
-  <div class="section-title">
-
-    <h2>
-      Reportes por proyecto
-    </h2>
-
-  </div>
-
-
-
-
-
-  <div
-    class="pro-card"
-    *ngFor="let p of proyectos">
-
-
-
-    <div class="project-header">
-
-
-      <h2>
-        {{p.proyecto}}
-      </h2>
-
-
-    </div>
-
-
-
-
-
-    <div class="detalle">
-
-
-      <div>
-
-        <span>
-          Evaluaciones
-        </span>
-
-
-        <strong>
-          {{p.evaluaciones}}
-        </strong>
-
-
-      </div>
-
-
-
-      <div>
-
-        <span>
-          Promedio
-        </span>
-
-
-        <strong>
-          {{p.promedio | number:'1.1-2'}}
-          pts
-        </strong>
-
-
-      </div>
-
-
-
-    </div>
-
-
-
-
-
-
-    <div class="evaluadores-title">
-
-      Evaluadores
-
-    </div>
-
-
-
-
-
-    <div
-      class="ranking-row"
-      *ngFor="let e of p.evaluadores">
-
-
-      <div class="rank-info">
-
-
-        <div class="rank-nombre">
-
-          {{e.nombre}}
-
+      <div class="header-right">
+        <div class="last-update">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Última actualización: {{ fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
+      </div>
+    </div>
 
-
-
-        <div class="rank-meta">
-
-          {{e.rol}}
-
+    <!-- STATS CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card" [class]="'stat-' + stat.color" *ngFor="let stat of statsCards">
+        <div class="stat-icon">
+          <ion-icon [name]="stat.icon"></ion-icon>
         </div>
-
-
+        <div class="stat-content">
+          <span class="stat-label">{{ stat.label }}</span>
+          <span class="stat-value">{{ stat.value }}</span>
+          <span class="stat-change" *ngIf="stat.change !== undefined" [class]="stat.change >= 0 ? 'change-up' : 'change-down'">
+            <ion-icon [name]="stat.change >= 0 ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+            {{ stat.change >= 0 ? '+' : '' }}{{ stat.change }}%
+          </span>
+        </div>
       </div>
-
-
-
-      <div class="rank-puntaje">
-
-        {{e.puntaje}}
-
-      </div>
-
-
-
     </div>
 
-
-
-
-
-    <!-- BOTONES POR PROYECTO -->
-
-
-    <div class="project-buttons">
-
-
-      <ion-button
-        size="small"
-        color="success">
-
-
-        <ion-icon
-          name="download-outline"
-          slot="start">
-        </ion-icon>
-
-
-        Excel
-
-
-      </ion-button>
-
-
-
-
-      <ion-button
-        size="small"
-        color="danger"
-        disabled>
-
-
-        <ion-icon
-          name="document-outline"
-          slot="start">
-        </ion-icon>
-
-
-        PDF
-
-
-      </ion-button>
-
-
-
+    <!-- LOADING -->
+    <div class="loading-grid" *ngIf="cargando">
+      <div class="report-skeleton" *ngFor="let i of [1,2,3]">
+        <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-stats"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-row" *ngFor="let j of [1,2,3]"></ion-skeleton-text>
+      </div>
     </div>
 
+    <!-- REPORTES POR PROYECTO -->
+    <div class="proyectos-section" *ngIf="!cargando">
+      <div class="section-header">
+        <div class="section-header-left">
+          <h2>Reportes por proyecto</h2>
+          <span class="section-count">{{ proyectos.length }} proyectos</span>
+        </div>
+        <div class="section-header-right">
+          <ion-button fill="outline" size="small" class="filter-btn" (click)="toggleFilter()">
+            <ion-icon name="funnel-outline"></ion-icon>
+            Filtrar
+          </ion-button>
+        </div>
+      </div>
 
+      <div class="proyectos-grid">
+        <div class="proyecto-card" *ngFor="let p of proyectosFiltrados || []; trackBy: trackById">
+          <!-- Card Header -->
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon" [class]="getRandomColor(p.proyecto)">
+                <span class="icon-letter">{{ p.proyecto?.charAt(0) || 'P' }}</span>
+              </div>
+              <h3 class="card-title">{{ p.proyecto }}</h3>
+            </div>
+            <div class="card-status">
+              <span class="status-badge" [class]="getStatusClass(p.promedio)">
+                {{ getStatusText(p.promedio) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="card-stats">
+            <div class="stat-item">
+              <span class="stat-item-label">Evaluaciones</span>
+              <span class="stat-item-value">{{ p.evaluaciones }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-item-label">Promedio</span>
+              <span class="stat-item-value highlight">{{ p.promedio | number:'1.1-2' }}</span>
+            </div>
+            <div class="stat-item" *ngIf="p.puntajeMaximo">
+              <span class="stat-item-label">Puntaje máx</span>
+              <span class="stat-item-value">{{ p.puntajeMaximo }}</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-bar-container">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width]="getPorcentaje(p.promedio, p.puntajeMaximo) + '%'"></div>
+            </div>
+            <span class="progress-label">{{ getPorcentaje(p.promedio, p.puntajeMaximo) }}%</span>
+          </div>
+
+          <!-- Evaluadores -->
+          <div class="evaluadores-section">
+            <div class="evaluadores-header">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>Evaluadores ({{ p.evaluadores?.length || 0 }})</span>
+            </div>
+
+            <div class="evaluadores-list">
+              <div class="evaluador-item" *ngFor="let e of (p.evaluadores || []).slice(0, 4)">
+                <div class="evaluador-info">
+                  <span class="evaluador-nombre">{{ e.nombre }}</span>
+                  <span class="evaluador-rol">{{ e.rol || 'Evaluador' }}</span>
+                </div>
+                <div class="evaluador-puntaje">
+                  {{ e.puntaje }}
+                  <span class="puntaje-max" *ngIf="p.puntajeMaximo">/ {{ p.puntajeMaximo }}</span>
+                </div>
+              </div>
+              <div class="evaluador-more" *ngIf="(p.evaluadores?.length || 0) > 4">
+                +{{ (p.evaluadores?.length || 0) - 4 }} evaluadores más
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card-actions">
+            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyecto(p)">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Excel
+            </ion-button>
+            <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(p)" disabled>
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              Ver detalle
+            </ion-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0">
+        <div class="empty-icon">
+          <ion-icon name="stats-chart-outline"></ion-icon>
+        </div>
+        <h3>No hay datos disponibles</h3>
+        <p>No se encontraron reportes para mostrar</p>
+      </div>
+    </div>
 
   </div>
-
-
-
-</div>
-
-
 </ion-content>

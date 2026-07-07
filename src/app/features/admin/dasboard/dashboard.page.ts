@@ -61,8 +61,6 @@ interface Activity {
     IonBadge,
     IonChip,
     IonLabel,
-
-    // Componentes propios
     StatsCardComponent
   ],
   templateUrl: './dashboard.page.html',
@@ -80,10 +78,8 @@ export class DashboardPage {
   cargando = true;
   error = false;
 
-  // Propiedad para la fecha actual
   today: Date = new Date();
 
-  // Actividades recientes (mock data)
   recentActivities: Activity[] = [
     {
       icon: 'person-add-outline',

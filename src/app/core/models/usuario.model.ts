@@ -10,6 +10,8 @@ export interface Usuario {
   departamento?: string | null;
   activo?: boolean;
   createdAt?: string;
+  ultimoAcceso?: string; 
+  
 }
 
 export interface CrearUsuarioPayload {
