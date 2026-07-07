@@ -51,12 +51,12 @@
       </div>
     </div>
 
-    <!-- FILTROS -->
+    <!-- FILTROS - CORREGIDO -->
     <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0">
       <div class="filter-group search-group">
         <ion-searchbar
           [(ngModel)]="filtroBusqueda"
-          (ionInput)="aplicarFiltros()"
+          (ionChange)="aplicarFiltros()"
           placeholder="Buscar proyecto..."
           class="filter-search"
           animated>
@@ -78,7 +78,12 @@
         </ion-select>
       </div>
 
-      <ion-button fill="clear" size="small" class="btn-clear-filters" (click)="limpiarFiltros()" *ngIf="filtroBusqueda || filtroStatus !== 'todos'">
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        class="btn-clear-filters" 
+        (click)="limpiarFiltros()" 
+        *ngIf="filtroBusqueda || filtroStatus !== 'todos'">
         <ion-icon name="close-outline"></ion-icon>
         Limpiar
       </ion-button>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import {
   IonHeader,
   IonToolbar,
@@ -15,9 +15,9 @@ import {
   IonChip,
   IonLabel,
   IonSpinner,
-  IonInput,        // ← AÑADIR
-  IonSelect,       // ← AÑADIR
-  IonSelectOption 
+  IonSearchbar,   // ← CAMBIAR: Usar IonSearchbar en lugar de IonInput
+  IonSelect,
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -54,7 +54,7 @@ interface StatCard {
   imports: [
     CommonModule,
     RouterModule,
-    FormsModule, 
+    FormsModule,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -67,9 +67,9 @@ interface StatCard {
     IonChip,
     IonLabel,
     IonSpinner,
-    IonInput,   
-    IonSelect,       
-    IonSelectOption 
+    IonSearchbar,   // ← CAMBIAR
+    IonSelect,
+    IonSelectOption
   ],
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss']
@@ -90,7 +90,7 @@ export class ReportesPage implements OnInit {
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
 
-  // Filtros
+  // Filtros - Inicializar con valor por defecto
   filtroBusqueda: string = '';
   filtroStatus: string = 'todos';
 
@@ -187,7 +187,7 @@ export class ReportesPage implements OnInit {
     let filtered = [...this.proyectos];
 
     // Filtro por búsqueda
-    if (this.filtroBusqueda.trim()) {
+    if (this.filtroBusqueda && this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
       filtered = filtered.filter(p =>
         p.proyecto?.toLowerCase().includes(texto) ||
@@ -257,15 +257,11 @@ export class ReportesPage implements OnInit {
     const id = proyecto.id || proyecto.proyecto_id;
     if (id) {
       console.log('Ver detalle del proyecto:', id);
-      // Aquí puedes navegar a la página de detalle
-      // this.router.navigate(['/admin/reportes/detalle', id]);
       alert(`Ver detalle del proyecto: ${proyecto.proyecto}`);
     }
   }
 
   toggleFilter(): void {
-    // Mostrar/ocultar panel de filtros
-    // Por ahora solo aplica el filtro
     this.aplicarFiltros();
   }
 
