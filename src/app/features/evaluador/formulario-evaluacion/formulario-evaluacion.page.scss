@@ -1,25 +1,183 @@
-.seccion-titulo {
-  margin-top: 20px;
-  font-weight: bold;
-  color: #2c3e50;
-  border-left: 4px solid #6366f1;
-  padding-left: 10px;
+.loading,
+.empty {
+
+  text-align:center;
+  margin-top:40px;
+
 }
+
+
+
+.titulo {
+
+  background:#f5f7fb;
+
+  padding:20px;
+
+  border-radius:12px;
+
+  margin-bottom:20px;
+
+
+}
+
+
+
+.titulo h1 {
+
+  margin:0;
+
+  font-size:24px;
+
+  font-weight:700;
+
+}
+
+
+
+.seccion {
+
+
+  margin-bottom:25px;
+
+
+}
+
+
+
+
+.seccion-titulo {
+
+
+  background:#1e88e5;
+
+  color:white;
+
+  padding:12px 15px;
+
+  border-radius:10px 10px 0 0;
+
+  margin:0;
+
+
+}
+
+
+
+.descripcion {
+
+
+  background:#eef5ff;
+
+  padding:12px;
+
+  margin:0;
+
+  font-size:14px;
+
+}
+
+
+
 
 .criterio-card {
-  margin-bottom: 15px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+
+  background:white;
+
+  border-radius:12px;
+
+  padding:15px;
+
+  margin-top:15px;
+
+  box-shadow:
+  0 3px 10px rgba(0,0,0,.08);
+
+
 }
 
-.criterio-texto {
-  margin-bottom: 10px;
+
+
+.criterio {
+
+
+  font-size:15px;
+
+  line-height:1.5;
+
+  font-weight:600;
+
+
 }
 
-.observacion-box {
-  margin-top: 20px;
-  border-radius: 10px;
+
+
+
+ion-item {
+
+
+  --background:transparent;
+
+  margin-top:5px;
+
+
+}
+
+
+
+ion-label span {
+
+
+  font-size:13px;
+
+  color:#666;
+
+
+}
+
+
+
+.observacion {
+
+
+  margin-top:30px;
+
+}
+
+
+
+textarea {
+
+
+  width:100%;
+
+  border-radius:10px;
+
+  border:1px solid #ccc;
+
+  padding:10px;
+
+  margin-top:10px;
+
+  resize:none;
+
+
+}
+
+
+
+
+.guardar {
+
+
+  margin-top:25px;
+
+  height:50px;
+
+  font-size:16px;
+
+  font-weight:bold;
+
+
 }

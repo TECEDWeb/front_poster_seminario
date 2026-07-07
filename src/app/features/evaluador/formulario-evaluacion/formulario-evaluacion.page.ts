@@ -42,7 +42,6 @@ export class FormularioEvaluacionPage implements OnInit {
 
   formulario: any = null;
 
-
   respuestas: {
     [criterioId: number]: number
   } = {};
@@ -53,39 +52,34 @@ export class FormularioEvaluacionPage implements OnInit {
   cargando = false;
 
 
+
   constructor(
     private route: ActivatedRoute,
     private evaluacionService: EvaluacionService
   ) {}
 
 
+
   ngOnInit(): void {
 
-    const id = this.route.snapshot.paramMap.get('id');
+
+    const id =
+      this.route.snapshot.paramMap.get('id');
 
 
     if (!id) {
 
       console.error(
-        '❌ No existe parámetro id en la ruta'
+        '❌ No existe ID evaluación'
       );
 
       return;
+
     }
 
 
     this.evaluacionId = Number(id);
 
-
-    if (Number.isNaN(this.evaluacionId)) {
-
-      console.error(
-        '❌ ID evaluación inválido:',
-        id
-      );
-
-      return;
-    }
 
 
     console.log(
@@ -94,124 +88,179 @@ export class FormularioEvaluacionPage implements OnInit {
     );
 
 
+
     this.cargarFormulario();
 
   }
 
 
 
- cargarFormulario(): void {
+
+  cargarFormulario(): void {
+
 
     this.cargando = true;
+
+
 
     this.evaluacionService
       .getFormulario(this.evaluacionId)
       .subscribe({
 
-        next: (res: any) => {
 
-          console.log("=======================================");
-          console.log("🟢 RESPUESTA COMPLETA DEL BACKEND");
-          console.log(res);
 
-          console.log("🟢 res.ok");
-          console.log(res?.ok);
+        next: (res:any)=>{
 
-          console.log("🟢 res.data");
-          console.log(res?.data);
 
-          console.log("🟢 res.data.rubrica");
-          console.log(res?.data?.rubrica);
+          console.log(
+            "================================"
+          );
 
-          console.log("🟢 res.data.secciones");
-          console.log(res?.data?.secciones);
+          console.log(
+            "🟢 RESPUESTA BACKEND",
+            res
+          );
 
-          console.log("=======================================");
 
-          if (res?.ok === false) {
 
-            console.error("❌ Backend respondió:");
-            console.error(res.mensaje);
+          if(res?.ok === false){
+
+
+            console.error(
+              "❌ Backend error",
+              res.mensaje
+            );
+
 
             this.formulario = null;
 
-          } else {
 
-            this.formulario = res.data;
+          }
+          else {
 
-            console.log("🟢 FORMULARIO GUARDADO");
-            console.log(this.formulario);
 
-            console.log("🟢 TOTAL SECCIONES:");
-            console.log(this.formulario?.secciones?.length);
+            /*
+              La respuesta viene:
+
+              res
+                |
+                data
+                  |
+                  ok
+                  |
+                  data
+                    |
+                    rubrica
+                    secciones
+
+            */
+
+
+            this.formulario =
+              res.data.data;
+
+
+
+            console.log(
+              "🟢 FORMULARIO CARGADO",
+              this.formulario
+            );
+
+
+            console.log(
+              "🟢 SECCIONES:",
+              this.formulario?.secciones?.length
+            );
 
           }
 
-          this.cargando = false;
+
+
+          this.cargando=false;
+
 
         },
 
-        error: (err) => {
 
-          console.error("❌ ERROR HTTP");
-          console.error(err);
 
-          this.formulario = null;
-          this.cargando = false;
+        error:(err)=>{
+
+
+          console.error(
+            "❌ ERROR HTTP",
+            err
+          );
+
+
+          this.formulario=null;
+
+          this.cargando=false;
+
 
         }
 
+
+
       });
 
+
   }
+
 
 
 
 
   seleccionar(
-    criterioId: number,
-    nivelId: number
-  ): void {
+    criterioId:number,
+    nivelId:number
+  ):void{
 
 
     console.log(
-      'Respuesta:',
-      criterioId,
-      nivelId
+      "Respuesta seleccionada",
+      {
+        criterioId,
+        nivelId
+      }
     );
 
 
-    this.respuestas[criterioId] = nivelId;
+    this.respuestas[criterioId]=nivelId;
+
 
   }
 
 
 
 
-  guardar(): void {
 
+  guardar():void{
 
 
     const detalles =
       Object.keys(this.respuestas)
-      .map(id => ({
+      .map(id=>({
 
-        criterio_id: Number(id),
+
+        criterio_id:Number(id),
+
 
         nivel_id:
           this.respuestas[
             Number(id)
           ]
 
+
       }));
 
 
 
-    if (detalles.length === 0) {
+
+    if(detalles.length===0){
 
 
       alert(
-        'Debe seleccionar al menos una respuesta'
+        "Debe seleccionar al menos una respuesta"
       );
 
 
@@ -221,21 +270,27 @@ export class FormularioEvaluacionPage implements OnInit {
 
 
 
-    const payload = {
+
+    const payload={
+
 
       observacion:
         this.observacion,
 
+
       detalles
+
 
     };
 
 
 
+
     console.log(
-      '📤 ENVIANDO EVALUACIÓN:',
+      "📤 ENVIANDO",
       payload
     );
+
 
 
 
@@ -247,44 +302,29 @@ export class FormularioEvaluacionPage implements OnInit {
       .subscribe({
 
 
-        next: (res) => {
+        next:(res)=>{
 
 
           console.log(
-            '✅ Guardado:',
+            "✅ GUARDADO",
             res
           );
 
 
           alert(
-            'Evaluación guardada correctamente'
-          );
-
-
+            "Evaluación guardada correctamente"
+          )
         },
-
-
-        error: (err) => {
-
-
+        error:(err)=>{
           console.error(
-            '❌ Error guardando:',
+            "❌ ERROR GUARDANDO",
             err
           );
-
-
           alert(
-            'Error al guardar evaluación'
+            "Error al guardar evaluación"
           );
-
-
         }
-
-
       });
-
-
   }
-
 
 }
