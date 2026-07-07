@@ -23,8 +23,12 @@ export class UsuarioService {
     return this.http.put<Usuario>(`${this.base}/${id}`, payload);
   }
 
+  /**
+   * Cambiar estado de un usuario (activar/desactivar)
+   * Usar PATCH en lugar de PUT para coincidir con el backend
+   */
   cambiarEstado(id: number): Observable<any> {
-    return this.http.put(`${this.base}/${id}/estado`, {});
+    return this.http.patch(`${this.base}/${id}/estado`, {});
   }
 
   resetPassword(id: number): Observable<{ mensaje: string }> {
