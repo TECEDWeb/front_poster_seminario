@@ -53,6 +53,7 @@
             [class.chip-active]="filtroEstado === 'todos'"
             (click)="cambiarFiltro('todos')">
             <ion-label>Todos</ion-label>
+            <ion-badge>{{ totalEvaluaciones }}</ion-badge>
           </ion-chip>
           <ion-chip 
             [class.chip-active]="filtroEstado === 'alto'"
@@ -104,7 +105,7 @@
 
     <!-- LISTA DE RESULTADOS -->
     <div class="resultados-list" *ngIf="!loading && !error">
-      <div class="resultado-card" *ngFor="let e of evaluacionesFiltradas || []">
+      <div class="resultado-card" *ngFor="let e of evaluacionesFiltradas || []; trackBy: trackByEvaluacionId">
         <!-- Card Header -->
         <div class="card-header">
           <div class="card-icon" [class]="getEstadoClase(e.porcentaje || 0)">

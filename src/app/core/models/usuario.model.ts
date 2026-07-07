@@ -4,19 +4,31 @@ export interface Usuario {
   id: number;
   cedula: string;
   nombre: string;
-  email?: string;
+  email?: string | null;
   rol: Rol;
   activo: boolean;
-  telefono?: string;
-  ultimoAcceso?: string;
+  telefono?: string | null;
+  ultimoAcceso?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CrearUsuarioPayload {
   cedula: string;
   nombre: string;
-  email?: string;
-  telefono?: string;
-  password: string;
+  email?: string | null;
   rol: Rol;
-  departamento?: string;
+  activo: boolean;
+  telefono?: string | null;
+  password: string;
+}
+
+export interface ActualizarUsuarioPayload {
+  cedula?: string;
+  nombre?: string;
+  email?: string | null;
+  rol?: Rol;
+  activo?: boolean;
+  telefono?: string | null;
+  password?: string;
 }

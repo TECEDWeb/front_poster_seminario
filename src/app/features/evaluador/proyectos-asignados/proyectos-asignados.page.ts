@@ -33,7 +33,9 @@ import {
   folderOpenOutline,
   trophyOutline,
   starOutline,
-  calendarOutline
+  calendarOutline,
+  closeOutline,
+  filterOutline
 } from 'ionicons/icons';
 
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
@@ -76,7 +78,7 @@ export class ProyectosAsignadosPage implements OnInit {
 
   // Filtros
   filtroEstado: string = 'todos';
-
+  filtroBusqueda: string = '';
   constructor(
     private evaluacionService: EvaluacionService,
     private router: Router
@@ -92,7 +94,9 @@ export class ProyectosAsignadosPage implements OnInit {
       folderOpenOutline,
       trophyOutline,
       starOutline,
-      calendarOutline
+      calendarOutline,
+      closeOutline,
+      filterOutline
     });
   }
 
@@ -108,7 +112,7 @@ export class ProyectosAsignadosPage implements OnInit {
       next: (res: any) => {
         console.log('🟢 RESPUESTA ASIGNADOS:', res);
 
-        // Normalizar respuesta
+        // Normalizar respuesta - soportar diferentes formatos
         let data = res?.data ?? res ?? [];
 
         // Asegurar que sea un array
@@ -138,16 +142,32 @@ export class ProyectosAsignadosPage implements OnInit {
     this.evaluados = this.proyectos.filter(p => p.yaEvaluado).length;
   }
 
+  buscarProyectos(event: any): void {
+    this.filtroBusqueda = event?.target?.value || '';
+    this.aplicarFiltros();
+  }
+
+  // Modificar aplicarFiltros para incluir búsqueda
   aplicarFiltros(): void {
     let filtered = [...this.proyectos];
 
+    // Filtro por búsqueda
+    if (this.filtroBusqueda.trim()) {
+      const texto = this.filtroBusqueda.toLowerCase().trim();
+      filtered = filtered.filter(p =>
+        p.proyecto?.nombre?.toLowerCase().includes(texto) ||
+        p.proyecto?.tipo?.toLowerCase().includes(texto)
+      );
+    }
+
+    // Filtro por estado
     if (this.filtroEstado === 'pendientes') {
       filtered = filtered.filter(p => !p.yaEvaluado);
     } else if (this.filtroEstado === 'evaluados') {
       filtered = filtered.filter(p => p.yaEvaluado);
     }
 
-    // Ordenar: pendientes primero, luego evaluados
+    // Ordenar
     filtered.sort((a, b) => {
       if (a.yaEvaluado && !b.yaEvaluado) return 1;
       if (!a.yaEvaluado && b.yaEvaluado) return -1;
@@ -156,7 +176,6 @@ export class ProyectosAsignadosPage implements OnInit {
 
     this.proyectosFiltrados = filtered;
   }
-
   cambiarFiltro(estado: string): void {
     this.filtroEstado = estado;
     this.aplicarFiltros();
@@ -164,6 +183,11 @@ export class ProyectosAsignadosPage implements OnInit {
 
   evaluar(evaluacionId: number): void {
     console.log('➡️ ENTRANDO A FORMULARIO ID:', evaluacionId);
+
+    if (!evaluacionId) {
+      console.error('❌ ID de evaluación no válido');
+      return;
+    }
 
     this.router.navigate([
       '/evaluador/formulario-evaluacion',
@@ -183,4 +207,22 @@ export class ProyectosAsignadosPage implements OnInit {
   tieneProyectosPendientes(): boolean {
     return this.pendientes > 0;
   }
+
+  getStatusIcon(yaEvaluado: boolean): string {
+    return yaEvaluado ? 'checkmark-circle-outline' : 'time-outline';
+  }
+
+  getStatusText(yaEvaluado: boolean): string {
+    return yaEvaluado ? 'Evaluado' : 'Pendiente';
+  }
+
+  getStatusClass(yaEvaluado: boolean): string {
+    return yaEvaluado ? 'status-completed' : 'status-pending';
+  }
+
+  trackByEvaluacionId(index: number, item: ProyectoAsignado): number {
+    return item?.evaluacionId ?? index;
+  }
+
+  
 }

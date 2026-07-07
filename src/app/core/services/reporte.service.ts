@@ -59,4 +59,12 @@ export class ReporteService {
       responseType: 'blob'
     });
   }
+  // reporte.service.ts - Añadir este método
+
+/**
+ * Obtener detalle de un proyecto específico
+ */
+  getDetalleProyecto(proyectoId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/proyecto/${proyectoId}`);
+  }
 }

@@ -12,7 +12,8 @@ import {
   IonIcon,
   IonButton,
   IonChip,
-  IonLabel
+  IonLabel,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -24,7 +25,13 @@ import {
   trophyOutline,
   documentTextOutline,
   timeOutline,
-  eyeOutline
+  eyeOutline,
+  alertCircleOutline,
+  closeOutline,
+  filterOutline,
+  refreshOutline,
+  clipboardOutline,
+  arrowForwardOutline
 } from 'ionicons/icons';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
@@ -45,7 +52,8 @@ import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
     IonIcon,
     IonButton,
     IonChip,
-    IonLabel
+    IonLabel,
+    IonSpinner
   ],
   templateUrl: './mis-resultados.page.html',
   styleUrls: ['./mis-resultados.page.scss']
@@ -75,7 +83,13 @@ export class MisResultadosPage implements OnInit {
       trophyOutline,
       documentTextOutline,
       timeOutline,
-      eyeOutline
+      eyeOutline,
+      alertCircleOutline,
+      closeOutline,
+      filterOutline,
+      refreshOutline,
+      clipboardOutline,
+      arrowForwardOutline
     });
   }
 
@@ -91,7 +105,7 @@ export class MisResultadosPage implements OnInit {
       next: (res: any) => {
         console.log('RESUMEN API:', res);
 
-        // Normalizar respuesta
+        // Normalizar respuesta - soportar diferentes formatos
         let data = res?.data ?? res ?? [];
 
         // Asegurar que sea un array
@@ -195,11 +209,21 @@ export class MisResultadosPage implements OnInit {
   }
 
   verDetalle(id: number): void {
-    // Navegar al detalle de la evaluación
     console.log('Ver detalle de evaluación:', id);
+    // Aquí puedes navegar al detalle
+    // this.router.navigate(['/evaluador/resultado', id]);
+    alert(`Ver detalle de la evaluación #${id}`);
   }
 
   recargar(): void {
     this.cargar();
+  }
+
+  getStatusIcon(porcentaje: number): string {
+    return this.getEstadoIcono(porcentaje);
+  }
+
+  trackByEvaluacionId(index: number, item: ResumenEvaluacion): number {
+    return item?.id ?? index;
   }
 }

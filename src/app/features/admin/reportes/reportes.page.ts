@@ -10,7 +10,10 @@ import {
   IonButton,
   IonIcon,
   IonContent,
-  IonSkeletonText
+  IonSkeletonText,
+  IonChip,
+  IonLabel,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -25,7 +28,11 @@ import {
   arrowUpOutline,
   arrowDownOutline,
   peopleOutline,
-  eyeOutline
+  eyeOutline,
+  refreshOutline,
+  closeOutline,
+  filterOutline,
+  searchOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 
@@ -51,7 +58,10 @@ interface StatCard {
     IonButton,
     IonIcon,
     IonContent,
-    IonSkeletonText
+    IonSkeletonText,
+    IonChip,
+    IonLabel,
+    IonSpinner
   ],
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss']
@@ -68,8 +78,13 @@ export class ReportesPage implements OnInit {
   proyectos: any[] = [];
   proyectosFiltrados: any[] = [];
   cargando: boolean = false;
+  error: string | null = null;
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
+
+  // Filtros
+  filtroBusqueda: string = '';
+  filtroStatus: string = 'todos';
 
   constructor(private reporteService: ReporteService) {
     addIcons({
@@ -84,7 +99,11 @@ export class ReportesPage implements OnInit {
       arrowUpOutline,
       arrowDownOutline,
       peopleOutline,
-      eyeOutline
+      eyeOutline,
+      refreshOutline,
+      closeOutline,
+      filterOutline,
+      searchOutline
     });
   }
 
@@ -94,6 +113,7 @@ export class ReportesPage implements OnInit {
 
   cargarDatos(): void {
     this.cargando = true;
+    this.error = null;
 
     this.reporteService.getStats().subscribe({
       next: (res: any) => {
@@ -104,6 +124,7 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error stats:', err);
+        this.error = err.error?.mensaje || 'Error al cargar estadísticas';
         this.actualizarStatsCards();
       }
     });
@@ -112,11 +133,12 @@ export class ReportesPage implements OnInit {
       next: (res: any) => {
         console.log('PROYECTOS:', res);
         this.proyectos = res?.data ?? res ?? [];
-        this.proyectosFiltrados = [...this.proyectos];
+        this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
         console.error('Error proyectos:', err);
+        this.error = err.error?.mensaje || 'Error al cargar proyectos';
         this.proyectos = [];
         this.proyectosFiltrados = [];
         this.cargando = false;
@@ -153,6 +175,36 @@ export class ReportesPage implements OnInit {
     ];
   }
 
+  aplicarFiltros(): void {
+    let filtered = [...this.proyectos];
+
+    // Filtro por búsqueda
+    if (this.filtroBusqueda.trim()) {
+      const texto = this.filtroBusqueda.toLowerCase().trim();
+      filtered = filtered.filter(p =>
+        p.proyecto?.toLowerCase().includes(texto) ||
+        p.nombre?.toLowerCase().includes(texto)
+      );
+    }
+
+    // Filtro por estado (según promedio)
+    if (this.filtroStatus === 'excelente') {
+      filtered = filtered.filter(p => (p.promedio || 0) >= 8);
+    } else if (this.filtroStatus === 'bueno') {
+      filtered = filtered.filter(p => (p.promedio || 0) >= 6 && (p.promedio || 0) < 8);
+    } else if (this.filtroStatus === 'regular') {
+      filtered = filtered.filter(p => (p.promedio || 0) >= 4 && (p.promedio || 0) < 6);
+    } else if (this.filtroStatus === 'bajo') {
+      filtered = filtered.filter(p => (p.promedio || 0) < 4);
+    }
+
+    this.proyectosFiltrados = filtered;
+  }
+
+  recargar(): void {
+    this.cargarDatos();
+  }
+
   exportar(): void {
     this.reporteService.exportar().subscribe({
       next: (archivo: Blob) => {
@@ -165,30 +217,54 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error exportando:', err);
-        alert('Error al exportar el reporte');
+        alert('Error al exportar el reporte general');
       }
     });
   }
 
   exportarProyecto(proyecto: any): void {
-    this.reporteService.exportarProyecto(proyecto.id).subscribe({
+    const id = proyecto.id || proyecto.proyecto_id;
+    if (!id) {
+      alert('No se puede exportar: ID del proyecto no encontrado');
+      return;
+    }
+
+    this.reporteService.exportarProyecto(id).subscribe({
       next: (archivo: Blob) => {
         const url = window.URL.createObjectURL(archivo);
         const enlace = document.createElement('a');
         enlace.href = url;
-        enlace.download = `reporte-${proyecto.proyecto}-${new Date().toISOString().split('T')[0]}.xlsx`;
+        enlace.download = `reporte-${proyecto.proyecto || 'proyecto'}-${new Date().toISOString().split('T')[0]}.xlsx`;
         enlace.click();
         window.URL.revokeObjectURL(url);
       },
       error: (err) => {
         console.error('Error exportando proyecto:', err);
-        this.exportar();
+        alert('Error al exportar el reporte del proyecto');
       }
     });
   }
 
+  verDetalle(proyecto: any): void {
+    const id = proyecto.id || proyecto.proyecto_id;
+    if (id) {
+      console.log('Ver detalle del proyecto:', id);
+      // Aquí puedes navegar a la página de detalle
+      // this.router.navigate(['/admin/reportes/detalle', id]);
+      alert(`Ver detalle del proyecto: ${proyecto.proyecto}`);
+    }
+  }
+
   toggleFilter(): void {
-    alert('Función de filtro en desarrollo');
+    // Mostrar/ocultar panel de filtros
+    // Por ahora solo aplica el filtro
+    this.aplicarFiltros();
+  }
+
+  limpiarFiltros(): void {
+    this.filtroBusqueda = '';
+    this.filtroStatus = 'todos';
+    this.aplicarFiltros();
   }
 
   getRandomColor(proyecto: string): string {
@@ -218,11 +294,15 @@ export class ReportesPage implements OnInit {
     return Math.min(Math.round((promedio / maximo) * 100), 100);
   }
 
-  trackById(index: number, item: any): number {
-    return item?.id ?? index;
+  getStatusIcon(promedio: number): string {
+    if (!promedio) return 'alert-circle-outline';
+    if (promedio >= 8) return 'checkmark-circle-outline';
+    if (promedio >= 6) return 'time-outline';
+    if (promedio >= 4) return 'alert-circle-outline';
+    return 'close-circle-outline';
   }
 
-  verDetalle(proyecto: any): void {
-    console.log('Ver detalle de:', proyecto);
+  trackById(index: number, item: any): number {
+    return item?.id ?? item?.proyecto_id ?? index;
   }
 }

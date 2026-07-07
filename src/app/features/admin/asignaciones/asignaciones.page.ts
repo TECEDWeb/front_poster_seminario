@@ -1,7 +1,7 @@
-// asignaciones.page.ts - Corregir el error de listar
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -21,12 +21,32 @@ import {
   IonIcon,
   IonChip,
   IonDatetime,
-  IonLabel
+  IonLabel,
+  IonSkeletonText
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  addOutline,
+  swapHorizontalOutline,
+  checkmarkCircleOutline,
+  folderOutline,
+  folderOpenOutline,
+  peopleOutline,
+  personOutline,
+  calendarOutline,
+  timeOutline,
+  checkmarkDoneOutline,
+  refreshOutline,
+  arrowForwardOutline,
+  personAddOutline,
+  closeCircleOutline,
+  alertCircleOutline,
+  eyeOutline
+} from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
-import { EvaluadorService } from '../../../core/services/evaluador.service'; // Usar EvaluadorService
 import { AsignacionService } from '../../../core/services/asignacion.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-asignaciones',
@@ -52,7 +72,8 @@ import { AsignacionService } from '../../../core/services/asignacion.service';
     IonIcon,
     IonChip,
     IonDatetime,
-    IonLabel
+    IonLabel,
+    IonSkeletonText
   ],
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss']
@@ -69,18 +90,40 @@ export class AsignacionesPage implements OnInit {
   fechaLimite: string | null = null;
 
   submitting: boolean = false;
+  cargando: boolean = false;
 
   constructor(
     private proyectoService: ProyectoService,
-    private evaluadorService: EvaluadorService, // Usar EvaluadorService
-    private asignacionService: AsignacionService
-  ) {}
+    private asignacionService: AsignacionService,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    addIcons({
+      addOutline,
+      swapHorizontalOutline,
+      checkmarkCircleOutline,
+      folderOutline,
+      folderOpenOutline,
+      peopleOutline,
+      personOutline,
+      calendarOutline,
+      timeOutline,
+      checkmarkDoneOutline,
+      refreshOutline,
+      arrowForwardOutline,
+      personAddOutline,
+      closeCircleOutline,
+      alertCircleOutline,
+      eyeOutline
+    });
+  }
 
   ngOnInit(): void {
     this.cargarDatos();
   }
 
   cargarDatos(): void {
+    this.cargando = true;
     this.cargarProyectos();
     this.cargarEvaluadores();
     this.cargarAsignacionesRecientes();
@@ -89,7 +132,9 @@ export class AsignacionesPage implements OnInit {
   cargarProyectos(): void {
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
-        this.proyectos = res?.data ?? res ?? [];
+        // Normalizar respuesta
+        this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
+        console.log('Proyectos cargados:', this.proyectos.length);
       },
       error: (err: any) => {
         console.error('Error cargando proyectos:', err);
@@ -99,34 +144,54 @@ export class AsignacionesPage implements OnInit {
   }
 
   cargarEvaluadores(): void {
-    // Usar el método listar del EvaluadorService
-    this.evaluadorService.listar().subscribe({
+    // Usar el endpoint de usuarios con rol evaluador
+    this.asignacionService.obtenerEvaluadores().subscribe({
       next: (res: any) => {
-        this.evaluadores = res?.data ?? res ?? [];
+        // Normalizar respuesta
+        this.evaluadores = res?.data ?? res?.usuarios ?? res ?? [];
+        console.log('Evaluadores cargados:', this.evaluadores.length);
+        this.verificarCargaCompleta();
       },
       error: (err: any) => {
         console.error('Error cargando evaluadores:', err);
         this.evaluadores = [];
+        this.verificarCargaCompleta();
       }
     });
   }
 
   cargarAsignacionesRecientes(): void {
-    this.asignacionService.listarRecientes().subscribe({
+    this.asignacionService.listar().subscribe({
       next: (res: any) => {
+        // Normalizar respuesta
         const data = res?.data ?? res ?? [];
-        this.asignacionesRecientes = data.slice(0, 5);
-        this.asignacionesCount = data.length;
+        this.asignacionesRecientes = Array.isArray(data) ? data.slice(0, 5) : [];
+        this.asignacionesCount = Array.isArray(data) ? data.length : 0;
+        this.verificarCargaCompleta();
       },
-      error: () => {
+      error: (err: any) => {
+        console.error('Error cargando asignaciones:', err);
         this.asignacionesRecientes = [];
         this.asignacionesCount = 0;
+        this.verificarCargaCompleta();
       }
     });
   }
 
+  verificarCargaCompleta(): void {
+    // Si ya tenemos proyectos, evaluadores y asignaciones, terminar loading
+    if (this.proyectos.length > 0 && this.evaluadores.length > 0) {
+      this.cargando = false;
+    }
+    // Timeout de seguridad
+    setTimeout(() => {
+      this.cargando = false;
+    }, 5000);
+  }
+
   guardar(): void {
     if (!this.proyectoId || !this.evaluadorId) {
+      this.showError('Selecciona un proyecto y un evaluador');
       return;
     }
 
@@ -142,8 +207,9 @@ export class AsignacionesPage implements OnInit {
     }
 
     this.asignacionService.asignar(payload).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.submitting = false;
+        console.log('Asignación exitosa:', res);
         this.showSuccess('Proyecto asignado correctamente');
         this.resetForm();
         this.cargarDatos();
@@ -162,39 +228,48 @@ export class AsignacionesPage implements OnInit {
     this.fechaLimite = null;
   }
 
+  openNewProject(): void {
+    this.router.navigate(['/admin/proyectos/nuevo']);
+  }
+
+  verTodasAsignaciones(): void {
+    this.router.navigate(['/admin/asignaciones/todas']);
+  }
+
+  getStatusIcon(status: string): string {
+    const icons: Record<string, string> = {
+      'pending': 'time-outline',
+      'in-progress': 'refresh-outline',
+      'completed': 'checkmark-circle-outline',
+      'rejected': 'close-circle-outline',
+      'pendiente': 'time-outline',
+      'en_progreso': 'refresh-outline',
+      'completado': 'checkmark-circle-outline',
+      'rechazado': 'close-circle-outline'
+    };
+    return icons[status] || 'time-outline';
+  }
+
+  getStatusText(status: string): string {
+    const texts: Record<string, string> = {
+      'pending': 'Pendiente',
+      'in-progress': 'En progreso',
+      'completed': 'Completado',
+      'rejected': 'Rechazado',
+      'pendiente': 'Pendiente',
+      'en_progreso': 'En progreso',
+      'completado': 'Completado',
+      'rechazado': 'Rechazado'
+    };
+    return texts[status] || 'Pendiente';
+  }
+
   private showSuccess(message: string): void {
+    // Usar ToastController o AlertController según prefieras
     alert('✅ ' + message);
   }
 
   private showError(message: string): void {
     alert('❌ ' + message);
   }
-
-  // asignaciones.page.ts - Añadir estos métodos
-
-openNewProject(): void {
-  // Navegar a creación de proyecto
-  // this.router.navigate(['/admin/proyectos/nuevo']);
-  alert('Abrir formulario de nuevo proyecto');
-}
-
-getStatusIcon(status: string): string {
-  const icons: Record<string, string> = {
-    'pending': 'time-outline',
-    'in-progress': 'refresh-outline',
-    'completed': 'checkmark-circle-outline',
-    'rejected': 'close-circle-outline'
-  };
-  return icons[status] || 'time-outline';
-}
-
-getStatusText(status: string): string {
-  const texts: Record<string, string> = {
-    'pending': 'Pendiente',
-    'in-progress': 'En progreso',
-    'completed': 'Completado',
-    'rejected': 'Rechazado'
-  };
-  return texts[status] || 'Pendiente';
-}
 }

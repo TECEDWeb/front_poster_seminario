@@ -20,7 +20,8 @@ import {
   IonInput,
   IonToggle,
   IonItem,
-  IonSkeletonText
+  IonSkeletonText,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -41,10 +42,11 @@ import {
   timeOutline,
   callOutline,
   trashOutline,
-  eyeOutline
+  eyeOutline,
+  shieldOutline
 } from 'ionicons/icons';
 import { UsuarioService } from '../../../core/services/usuario.service';
-import { Usuario } from '../../../core/models/usuario.model';
+import { Usuario, Rol } from '../../../core/models/usuario.model';
 
 @Component({
   selector: 'app-usuarios',
@@ -70,7 +72,8 @@ import { Usuario } from '../../../core/models/usuario.model';
     IonInput,
     IonToggle,
     IonItem,
-    IonSkeletonText
+    IonSkeletonText,
+    IonSpinner
   ],
   templateUrl: './usuarios.page.html',
   styleUrls: ['./usuarios.page.scss']
@@ -92,7 +95,7 @@ export class UsuariosPage implements OnInit {
     cedula: '',
     nombre: '',
     email: '',
-    rol: 'evaluador',
+    rol: 'evaluador' as Rol,
     password: '',
     activo: true,
     telefono: ''
@@ -117,7 +120,8 @@ export class UsuariosPage implements OnInit {
       timeOutline,
       callOutline,
       trashOutline,
-      eyeOutline
+      eyeOutline,
+      shieldOutline
     });
   }
 
@@ -130,11 +134,14 @@ export class UsuariosPage implements OnInit {
 
     this.usuarioService.listar().subscribe({
       next: (res: any) => {
+        console.log('Usuarios cargados:', res);
+        // Normalizar respuesta
         this.usuarios = res?.usuarios ?? res?.data ?? res ?? [];
         this.filtrarUsuarios();
         this.cargando = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error cargando usuarios:', err);
         this.usuarios = [];
         this.usuariosFiltrados = [];
         this.cargando = false;
@@ -145,6 +152,7 @@ export class UsuariosPage implements OnInit {
   filtrarUsuarios(): void {
     let filtered = [...this.usuarios];
 
+    // Filtro por búsqueda
     if (this.busqueda.trim()) {
       const texto = this.busqueda.toLowerCase().trim();
       filtered = filtered.filter(u =>
@@ -154,10 +162,12 @@ export class UsuariosPage implements OnInit {
       );
     }
 
+    // Filtro por rol
     if (this.filtroRol !== 'todos') {
       filtered = filtered.filter(u => u.rol === this.filtroRol);
     }
 
+    // Filtro por estado
     if (this.filtroEstado === 'activo') {
       filtered = filtered.filter(u => u.activo);
     } else if (this.filtroEstado === 'inactivo') {
@@ -174,7 +184,7 @@ export class UsuariosPage implements OnInit {
       cedula: '',
       nombre: '',
       email: '',
-      rol: 'evaluador',
+      rol: 'evaluador' as Rol,
       password: '',
       activo: true,
       telefono: ''
@@ -193,39 +203,74 @@ export class UsuariosPage implements OnInit {
   }
 
   guardar(): void {
+    // Validaciones
     if (!this.form.cedula || !this.form.nombre || !this.form.rol) {
       alert('Por favor complete los campos requeridos');
       return;
     }
 
+    if (this.form.cedula.length < 10) {
+      alert('La cédula debe tener al menos 10 dígitos');
+      return;
+    }
+
+    if (!this.editando && !this.form.password) {
+      alert('Debe ingresar una contraseña');
+      return;
+    }
+
+    if (!this.editando && this.form.password.length < 6) {
+      alert('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
     this.guardando = true;
 
+    const payload = {
+      cedula: this.form.cedula.trim(),
+      nombre: this.form.nombre.trim(),
+      email: this.form.email?.trim() || null,
+      rol: this.form.rol,
+      activo: this.form.activo,
+      telefono: this.form.telefono?.trim() || null,
+      password: this.form.password || undefined
+    };
+
     const req = this.editando
-      ? this.usuarioService.actualizar(this.form.id, this.form)
-      : this.usuarioService.crear(this.form);
+      ? this.usuarioService.actualizar(this.form.id, payload)
+      : this.usuarioService.crear(payload);
 
     req.subscribe({
       next: () => {
         this.guardando = false;
         this.modalAbierto = false;
         this.cargar();
+        alert(this.editando ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente');
       },
       error: (err) => {
         this.guardando = false;
         console.error('Error guardando usuario:', err);
-        alert('Error al guardar el usuario');
+        alert(err.error?.mensaje || 'Error al guardar el usuario');
       }
     });
   }
 
   cambiarEstado(u: Usuario): void {
-    this.usuarioService.cambiarEstado(u.id).subscribe({
-      next: () => this.cargar(),
-      error: (err: any) => {
-        console.error('Error cambiando estado:', err);
-        alert('Error al cambiar el estado');
-      }
-    });
+    const nuevoEstado = !u.activo;
+    const mensaje = nuevoEstado ? 'activar' : 'desactivar';
+    
+    if (confirm(`¿Estás seguro de ${mensaje} al usuario "${u.nombre}"?`)) {
+      this.usuarioService.cambiarEstado(u.id).subscribe({
+        next: () => {
+          this.cargar();
+          alert(`Usuario ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`);
+        },
+        error: (err: any) => {
+          console.error('Error cambiando estado:', err);
+          alert(err.error?.mensaje || 'Error al cambiar el estado');
+        }
+      });
+    }
   }
 
   resetPass(u: Usuario): void {
@@ -236,7 +281,7 @@ export class UsuariosPage implements OnInit {
         },
         error: (err) => {
           console.error('Error resetando password:', err);
-          alert('Error al resetear la contraseña');
+          alert(err.error?.mensaje || 'Error al resetear la contraseña');
         }
       });
     }
@@ -250,10 +295,13 @@ export class UsuariosPage implements OnInit {
 
   eliminarUsuario(id: number): void {
     this.usuarioService.eliminar(id).subscribe({
-      next: () => this.cargar(),
+      next: () => {
+        this.cargar();
+        alert('Usuario eliminado correctamente');
+      },
       error: (err) => {
         console.error('Error eliminando usuario:', err);
-        alert('Error al eliminar el usuario');
+        alert(err.error?.mensaje || 'Error al eliminar el usuario');
       }
     });
   }
@@ -314,6 +362,10 @@ export class UsuariosPage implements OnInit {
 
   get totalAdministradores(): number {
     return this.usuarios.filter(u => u.rol === 'admin').length;
+  }
+
+  get totalCoordinadores(): number {
+    return this.usuarios.filter(u => u.rol === 'coordinador').length;
   }
 
   trackById(index: number, item: any): number {

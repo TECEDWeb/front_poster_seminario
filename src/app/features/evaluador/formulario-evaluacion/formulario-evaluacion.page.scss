@@ -50,6 +50,10 @@ $radius: 16px;
     ion-icon {
       font-size: 22px;
     }
+
+    &:hover {
+      --color: #4f46e5;
+    }
   }
 
   ion-title {
@@ -71,6 +75,27 @@ $radius: 16px;
       border-radius: 20px;
       font-weight: 600;
       letter-spacing: 0.3px;
+    }
+  }
+
+  .btn-refresh {
+    --color: #64748b;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --border-radius: 10px;
+    height: 38px;
+    width: 38px;
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    &:hover {
+      --color: #6366f1;
+    }
+
+    &:disabled {
+      opacity: 0.5;
     }
   }
 }
@@ -495,21 +520,19 @@ $radius: 16px;
     }
 
     .observaciones-textarea {
-      width: 100%;
-      border-radius: 10px;
-      border: 1px solid #e2e8f0;
-      padding: 12px 14px;
+      --background: white;
+      --border-radius: 10px;
+      --border-color: #e2e8f0;
+      --padding-start: 14px;
+      --padding-end: 14px;
+      --padding-top: 12px;
+      --padding-bottom: 12px;
       font-size: 14px;
-      font-family: inherit;
-      resize: vertical;
-      min-height: 80px;
-      transition: border-color 0.2s ease;
-      background: white;
+      min-height: 100px;
 
-      &:focus {
-        outline: none;
-        border-color: #6366f1;
-        box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+      &:focus-within {
+        --border-color: #6366f1;
+        --box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
       }
 
       &::placeholder {
@@ -548,15 +571,24 @@ $radius: 16px;
     height: 48px;
     --box-shadow: 0 4px 16px rgba(99,102,241,0.35);
 
+    &:hover:not(:disabled) {
+      --box-shadow: 0 6px 24px rgba(99,102,241,0.45);
+      transform: translateY(-1px);
+    }
+
     &:disabled {
       opacity: 0.5;
       --box-shadow: none;
-    }
-
-    .spinning {
-      animation: spin 1s linear infinite;
+      transform: none;
     }
   }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+.spinning {
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

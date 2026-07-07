@@ -11,6 +11,12 @@
       <span class="title-text">Evaluación</span>
       <span class="title-badge">Formulario</span>
     </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="cargarFormulario()" [disabled]="cargando" class="btn-refresh">
+        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -45,6 +51,10 @@
           <p class="form-subtitle" *ngIf="proyectoNombre">
             <ion-icon name="folder-outline"></ion-icon>
             {{ proyectoNombre }}
+          </p>
+          <p class="form-subtitle" *ngIf="concursoNombre">
+            <ion-icon name="trophy-outline"></ion-icon>
+            {{ concursoNombre }}
           </p>
         </div>
         <div class="form-stats">
@@ -123,12 +133,12 @@
         </div>
         <ion-item class="observaciones-input" lines="none">
           <ion-label position="stacked">Comentarios sobre la evaluación</ion-label>
-          <textarea
+          <ion-textarea
             [(ngModel)]="observacion"
             rows="5"
             placeholder="Ingrese observaciones adicionales sobre el proyecto evaluado..."
             class="observaciones-textarea">
-          </textarea>
+          </ion-textarea>
         </ion-item>
       </div>
 

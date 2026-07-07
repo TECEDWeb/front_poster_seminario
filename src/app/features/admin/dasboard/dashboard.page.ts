@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {
@@ -33,7 +33,10 @@ import {
   refreshOutline,
   calendarOutline,
   chevronForwardOutline,
-  arrowForwardOutline
+  arrowForwardOutline,
+  timeOutline,
+  checkmarkCircleOutline,
+  createOutline
 } from 'ionicons/icons';
 
 interface Activity {
@@ -66,7 +69,7 @@ interface Activity {
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit {
 
   private dashboardService = inject(DashboardService);
 
@@ -79,39 +82,7 @@ export class DashboardPage {
   error = false;
 
   today: Date = new Date();
-
-  recentActivities: Activity[] = [
-    {
-      icon: 'person-add-outline',
-      color: 'indigo',
-      text: 'Nuevo usuario registrado: María González',
-      time: 'Hace 5 minutos'
-    },
-    {
-      icon: 'trophy-outline',
-      color: 'amber',
-      text: 'Concurso "Innovación 2026" publicado',
-      time: 'Hace 1 hora'
-    },
-    {
-      icon: 'folder-open-outline',
-      color: 'emerald',
-      text: 'Proyecto "Sistema IoT" actualizado',
-      time: 'Hace 3 horas'
-    },
-    {
-      icon: 'document-text-outline',
-      color: 'violet',
-      text: 'Nueva evaluación completada',
-      time: 'Hace 5 horas'
-    },
-    {
-      icon: 'people-outline',
-      color: 'rose',
-      text: 'Equipo de desarrollo asignado al proyecto',
-      time: 'Hace 1 día'
-    }
-  ];
+  recentActivities: Activity[] = [];
 
   constructor() {
     addIcons({
@@ -129,8 +100,15 @@ export class DashboardPage {
       refreshOutline,
       calendarOutline,
       chevronForwardOutline,
-      arrowForwardOutline
+      arrowForwardOutline,
+      timeOutline,
+      checkmarkCircleOutline,
+      createOutline
     });
+  }
+
+  ngOnInit(): void {
+    this.cargarResumen();
   }
 
   ionViewWillEnter() {
@@ -147,6 +125,7 @@ export class DashboardPage {
         this.concursos = data.concursos ?? 0;
         this.proyectos = data.proyectos ?? 0;
         this.reportes = data.reportes ?? 0;
+        this.cargarActividadesRecientes();
         this.cargando = false;
       },
       error: () => {
@@ -154,5 +133,23 @@ export class DashboardPage {
         this.cargando = false;
       }
     });
+  }
+
+  cargarActividadesRecientes() {
+    // Cargar actividades reales desde el servicio
+    this.dashboardService.obtenerActividadesRecientes().subscribe({
+      next: (actividades: Activity[]) => {
+        this.recentActivities = actividades;
+      },
+      error: () => {
+        // Si falla, usar datos vacíos o de ejemplo
+        this.recentActivities = [];
+      }
+    });
+  }
+
+  // Método para recargar manualmente
+  recargar() {
+    this.cargarResumen();
   }
 }

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
 import {
   IonContent,
   IonButton,
@@ -16,7 +15,8 @@ import {
   IonMenuButton,
   IonTitle,
   IonIcon,
-  IonSpinner
+  IonSpinner,
+  IonTextarea
 } from '@ionic/angular/standalone';
 
 import { HeaderComponent } from '../../../shared/components/header/header.component';
@@ -26,7 +26,15 @@ import {
   arrowBackOutline,
   checkmarkCircleOutline,
   timeOutline,
-  alertCircleOutline
+  alertCircleOutline,
+  refreshOutline,
+  closeOutline,
+  checkmarkOutline,
+  chatbubbleOutline,
+  documentOutline,
+  folderOutline,
+  checkboxOutline,
+  trophyOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -48,6 +56,7 @@ import {
     IonTitle,
     IonIcon,
     IonSpinner,
+    IonTextarea,
     HeaderComponent
   ],
   templateUrl: './formulario-evaluacion.page.html',
@@ -63,7 +72,7 @@ export class FormularioEvaluacionPage implements OnInit {
   guardando: boolean = false;
   error: string | null = null;
   proyectoNombre: string = '';
-  evaluadorNombre: string = '';
+  concursoNombre: string = '';
 
   // Estadísticas de progreso
   totalCriterios: number = 0;
@@ -78,7 +87,15 @@ export class FormularioEvaluacionPage implements OnInit {
       arrowBackOutline,
       checkmarkCircleOutline,
       timeOutline,
-      alertCircleOutline
+      alertCircleOutline,
+      refreshOutline,
+      closeOutline,
+      checkmarkOutline,
+      chatbubbleOutline,
+      documentOutline,
+      folderOutline,
+      checkboxOutline,
+      trophyOutline
     });
   }
 
@@ -111,9 +128,12 @@ export class FormularioEvaluacionPage implements OnInit {
           // Normalizar respuesta
           this.formulario = res?.data?.data ?? res?.data ?? res;
           
-          // Extraer información del proyecto
+          // Extraer información del proyecto y concurso
           if (this.formulario?.proyecto) {
             this.proyectoNombre = this.formulario.proyecto.nombre || 'Proyecto sin nombre';
+          }
+          if (this.formulario?.concurso) {
+            this.concursoNombre = this.formulario.concurso.nombre || '';
           }
 
           // Contar criterios totales
@@ -167,10 +187,8 @@ export class FormularioEvaluacionPage implements OnInit {
 
   getPuntajeTotal(): number {
     let total = 0;
-    // Recorrer todas las respuestas y sumar los puntajes
     Object.keys(this.respuestas).forEach(criterioId => {
       const nivelId = this.respuestas[Number(criterioId)];
-      // Buscar el nivel en el formulario
       this.formulario?.secciones?.forEach((seccion: any) => {
         seccion.criterios?.forEach((criterio: any) => {
           if (criterio.id === Number(criterioId)) {
@@ -200,6 +218,29 @@ export class FormularioEvaluacionPage implements OnInit {
     return maximo;
   }
 
+  getPorcentajeSeccion(seccion: any): number {
+    if (!seccion?.criterios?.length) return 0;
+    
+    let respondidos = 0;
+    let total = seccion.criterios.length;
+    
+    seccion.criterios.forEach((criterio: any) => {
+      if (this.respuestas[criterio.id] !== undefined) {
+        respondidos++;
+      }
+    });
+    
+    return Math.round((respondidos / total) * 100);
+  }
+
+  estaRespondido(criterioId: number): boolean {
+    return this.respuestas[criterioId] !== undefined;
+  }
+
+  getNivelSeleccionado(criterioId: number): number | undefined {
+    return this.respuestas[criterioId];
+  }
+
   guardar(): void {
     const detalles = Object.keys(this.respuestas).map(id => ({
       criterio_id: Number(id),
@@ -211,7 +252,6 @@ export class FormularioEvaluacionPage implements OnInit {
       return;
     }
 
-    // Confirmar antes de guardar
     if (!confirm('¿Estás seguro de guardar la evaluación?')) {
       return;
     }
@@ -228,13 +268,13 @@ export class FormularioEvaluacionPage implements OnInit {
       next: (res) => {
         console.log('✅ GUARDADO', res);
         this.guardando = false;
-        alert('✅ Evaluación guardada correctamente');
+        this.mostrarMensaje('Evaluación guardada correctamente', 'success');
         this.router.navigate(['/evaluador/proyectos-asignados']);
       },
       error: (err) => {
         console.error('❌ ERROR GUARDANDO', err);
         this.guardando = false;
-        alert('❌ Error al guardar la evaluación: ' + (err.error?.mensaje || 'Error desconocido'));
+        this.mostrarMensaje(err.error?.mensaje || 'Error al guardar la evaluación', 'error');
       }
     });
   }
@@ -248,28 +288,8 @@ export class FormularioEvaluacionPage implements OnInit {
     this.router.navigate(['/evaluador/proyectos-asignados']);
   }
 
-  estaRespondido(criterioId: number): boolean {
-    return this.respuestas[criterioId] !== undefined;
+  private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
+    const icono = tipo === 'success' ? '✅' : '❌';
+    alert(`${icono} ${mensaje}`);
   }
-
-  getNivelSeleccionado(criterioId: number): number | undefined {
-    return this.respuestas[criterioId];
-  }
-  // formulario-evaluacion.page.ts
-// Añadir este método
-
-getPorcentajeSeccion(seccion: any): number {
-  if (!seccion?.criterios?.length) return 0;
-  
-  let respondidos = 0;
-  let total = seccion.criterios.length;
-  
-  seccion.criterios.forEach((criterio: any) => {
-    if (this.respuestas[criterio.id] !== undefined) {
-      respondidos++;
-    }
-  });
-  
-  return Math.round((respondidos / total) * 100);
-}
 }

@@ -10,6 +10,9 @@
     </ion-title>
 
     <ion-buttons slot="end">
+      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
       <ion-button class="btn-add" routerLink="/admin/rubricas/nuevo">
         <ion-icon name="add-outline" slot="start"></ion-icon>
         Nueva rúbrica
@@ -40,7 +43,44 @@
           <span class="stat-count">{{ totalNiveles }}</span>
           <span class="stat-label">Niveles</span>
         </div>
+        <div class="stats-mini">
+          <span class="stat-count">{{ totalCriteriosGlobal }}</span>
+          <span class="stat-label">Criterios</span>
+        </div>
       </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filter-bar" *ngIf="!cargando && rubricas.length > 0">
+      <div class="filter-group search-group">
+        <ion-icon name="search-outline" class="search-icon"></ion-icon>
+        <ion-input
+          [(ngModel)]="filtroBusqueda"
+          (ionInput)="aplicarFiltros()"
+          placeholder="Buscar por ID de concurso..."
+          class="filter-input"
+          clear-input="true">
+        </ion-input>
+      </div>
+
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroSecciones"
+          (ionChange)="aplicarFiltros()"
+          placeholder="Filtrar por secciones"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todas las secciones</ion-select-option>
+          <ion-select-option value="1">1 o más secciones</ion-select-option>
+          <ion-select-option value="2">2 o más secciones</ion-select-option>
+          <ion-select-option value="3">3 o más secciones</ion-select-option>
+        </ion-select>
+      </div>
+
+      <ion-button fill="clear" size="small" class="btn-clear-filters" (click)="limpiarFiltros()" *ngIf="filtroBusqueda || filtroSecciones !== 'todos'">
+        <ion-icon name="close-outline"></ion-icon>
+        Limpiar
+      </ion-button>
     </div>
 
     <!-- LOADING -->
@@ -57,9 +97,20 @@
       </div>
     </div>
 
+    <!-- ERROR -->
+    <div class="error-container" *ngIf="!cargando && error">
+      <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+      <h3>Error al cargar los datos</h3>
+      <p>{{ error }}</p>
+      <ion-button (click)="recargar()" class="btn-retry">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
+
     <!-- LISTA DE RÚBRICAS -->
-    <div class="rubricas-grid" *ngIf="!cargando">
-      <div class="rubrica-card" *ngFor="let r of rubricas; trackBy: trackById">
+    <div class="rubricas-grid" *ngIf="!cargando && !error">
+      <div class="rubrica-card" *ngFor="let r of rubricasFiltradas || []; trackBy: trackById">
         <!-- Card Header -->
         <div class="card-header">
           <div class="card-icon">
@@ -69,7 +120,15 @@
             <h3 class="card-title">Rúbrica #{{ r.concursoId }}</h3>
             <span class="card-subtitle">Concurso ID: {{ r.concursoId }}</span>
           </div>
+          <div class="card-status">
+            <span class="status-badge" [class]="getStatusClass(r.secciones?.length || 0)">
+              {{ getStatusText(r.secciones?.length || 0) }}
+            </span>
+          </div>
           <div class="card-actions-header">
+            <ion-button fill="clear" size="small" class="action-icon-btn" (click)="verDetalle(r)">
+              <ion-icon name="eye-outline"></ion-icon>
+            </ion-button>
             <ion-button fill="clear" size="small" class="action-icon-btn" routerLink="/admin/rubricas/editar/{{ r.concursoId }}">
               <ion-icon name="create-outline"></ion-icon>
             </ion-button>
@@ -138,9 +197,9 @@
           </div>
         </div>
 
-        <!-- Actions -->
+        <!-- Actions - TODOS HABILITADOS -->
         <div class="card-actions">
-          <ion-button fill="outline" size="small" class="action-btn" routerLink="/admin/rubricas/{{ r.concursoId }}">
+          <ion-button fill="outline" size="small" class="action-btn" (click)="verDetalle(r)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
             Ver detalle
           </ion-button>
@@ -156,6 +215,18 @@
       </div>
 
       <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="rubricasFiltradas?.length === 0 && rubricas.length > 0">
+        <div class="empty-icon">
+          <ion-icon name="filter-outline"></ion-icon>
+        </div>
+        <h3>No hay coincidencias</h3>
+        <p>No se encontraron rúbricas con los filtros aplicados</p>
+        <ion-button fill="outline" class="btn-clear-filter" (click)="limpiarFiltros()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Limpiar filtros
+        </ion-button>
+      </div>
+
       <div class="empty-state" *ngIf="rubricas.length === 0">
         <div class="empty-icon">
           <ion-icon name="checkbox-outline"></ion-icon>

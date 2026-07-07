@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -20,20 +21,18 @@ export class AsignacionService {
   }
 
   /**
-   * Listar asignaciones con filtros opcionales
+   * Listar asignaciones con filtros
    */
   listarConFiltros(filtros?: {
     proyecto_id?: number;
     evaluador_id?: number;
     status?: string;
-    fecha_desde?: string;
-    fecha_hasta?: string;
   }): Observable<any> {
     let params = new HttpParams();
     
     if (filtros) {
       Object.entries(filtros).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
+        if (value !== undefined && value !== null) {
           params = params.set(key, value.toString());
         }
       });
@@ -43,14 +42,17 @@ export class AsignacionService {
   }
 
   /**
-   * Listar asignaciones recientes (últimas 10 o según límite)
+   * Obtener evaluadores disponibles
+   * Usa el endpoint de usuarios con filtro de rol
    */
-  listarRecientes(limite: number = 10): Observable<any> {
-    const params = new HttpParams()
-      .set('recientes', 'true')
-      .set('limite', limite.toString());
-
-    return this.http.get(`${this.apiUrl}/recientes`, { params });
+  obtenerEvaluadores(): Observable<any> {
+    // Intentar con el endpoint correcto
+    return this.http.get(`${environment.apiUrl}/usuarios?rol=evaluador`).pipe(
+      map((res: any) => {
+        // Normalizar respuesta
+        return res?.data ?? res?.usuarios ?? res ?? [];
+      })
+    );
   }
 
   /**
@@ -68,7 +70,7 @@ export class AsignacionService {
   }
 
   /**
-   * Actualizar una asignación existente
+   * Actualizar una asignación
    */
   actualizar(id: number, data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, data);
@@ -82,7 +84,7 @@ export class AsignacionService {
   }
 
   /**
-   * Cambiar el estado de una asignación
+   * Cambiar estado de una asignación
    */
   cambiarEstado(id: number, status: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/estado`, { status });
@@ -100,57 +102,5 @@ export class AsignacionService {
    */
   listarPorEvaluador(evaluadorId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/evaluador/${evaluadorId}`);
-  }
-
-  /**
-   * Obtener estadísticas de asignaciones
-   */
-  obtenerEstadisticas(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/estadisticas`);
-  }
-
-  /**
-   * Asignación masiva (múltiples proyectos a un evaluador)
-   */
-  asignarMasiva(data: {
-    evaluador_id: number;
-    proyecto_ids: number[];
-  }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/masiva`, data);
-  }
-
-  /**
-   * Verificar disponibilidad de evaluador
-   */
-  verificarDisponibilidad(evaluadorId: number, fechaInicio: string, fechaFin: string): Observable<any> {
-    const params = new HttpParams()
-      .set('evaluador_id', evaluadorId.toString())
-      .set('fecha_inicio', fechaInicio)
-      .set('fecha_fin', fechaFin);
-
-    return this.http.get(`${this.apiUrl}/disponibilidad`, { params });
-  }
-
-  /**
-   * Obtener historial de asignaciones de un evaluador
-   */
-  historialEvaluador(evaluadorId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/historial/evaluador/${evaluadorId}`);
-  }
-
-  /**
-   * Obtener historial de asignaciones de un proyecto
-   */
-  historialProyecto(proyectoId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/historial/proyecto/${proyectoId}`);
-  }
-
-  /**
-   * Reasignar proyecto a otro evaluador
-   */
-  reasignar(asignacionId: number, nuevoEvaluadorId: number): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${asignacionId}/reasignar`, {
-      evaluador_id: nuevoEvaluadorId
-    });
   }
 }

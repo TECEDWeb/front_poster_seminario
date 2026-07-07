@@ -10,7 +10,10 @@
     </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button class="btn-export" (click)="exportar()">
+      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+      <ion-button class="btn-export" (click)="exportar()" [disabled]="cargando">
         <ion-icon name="download-outline" slot="start"></ion-icon>
         Exportar Excel
       </ion-button>
@@ -44,12 +47,42 @@
         <div class="stat-content">
           <span class="stat-label">{{ stat.label }}</span>
           <span class="stat-value">{{ stat.value }}</span>
-          <span class="stat-change" *ngIf="stat.change !== undefined" [class]="stat.change >= 0 ? 'change-up' : 'change-down'">
-            <ion-icon [name]="stat.change >= 0 ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
-            {{ stat.change >= 0 ? '+' : '' }}{{ stat.change }}%
-          </span>
         </div>
       </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0">
+      <div class="filter-group search-group">
+        <ion-icon name="search-outline" class="search-icon"></ion-icon>
+        <ion-input
+          [(ngModel)]="filtroBusqueda"
+          (ionInput)="aplicarFiltros()"
+          placeholder="Buscar proyecto..."
+          class="filter-input"
+          clear-input="true">
+        </ion-input>
+      </div>
+
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroStatus"
+          (ionChange)="aplicarFiltros()"
+          placeholder="Filtrar por estado"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los estados</ion-select-option>
+          <ion-select-option value="excelente">Excelente (≥8)</ion-select-option>
+          <ion-select-option value="bueno">Bueno (6-7.9)</ion-select-option>
+          <ion-select-option value="regular">Regular (4-5.9)</ion-select-option>
+          <ion-select-option value="bajo">Bajo (&lt;4)</ion-select-option>
+        </ion-select>
+      </div>
+
+      <ion-button fill="clear" size="small" class="btn-clear-filters" (click)="limpiarFiltros()" *ngIf="filtroBusqueda || filtroStatus !== 'todos'">
+        <ion-icon name="close-outline"></ion-icon>
+        Limpiar
+      </ion-button>
     </div>
 
     <!-- LOADING -->
@@ -61,12 +94,23 @@
       </div>
     </div>
 
+    <!-- ERROR -->
+    <div class="error-container" *ngIf="!cargando && error">
+      <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+      <h3>Error al cargar los datos</h3>
+      <p>{{ error }}</p>
+      <ion-button (click)="recargar()" class="btn-retry">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
+
     <!-- REPORTES POR PROYECTO -->
-    <div class="proyectos-section" *ngIf="!cargando">
+    <div class="proyectos-section" *ngIf="!cargando && !error">
       <div class="section-header">
         <div class="section-header-left">
           <h2>Reportes por proyecto</h2>
-          <span class="section-count">{{ proyectos.length }} proyectos</span>
+          <span class="section-count">{{ proyectosFiltrados.length }} de {{ proyectos.length }} proyectos</span>
         </div>
         <div class="section-header-right">
           <ion-button fill="outline" size="small" class="filter-btn" (click)="toggleFilter()">
@@ -84,10 +128,11 @@
               <div class="card-icon" [class]="getRandomColor(p.proyecto)">
                 <span class="icon-letter">{{ p.proyecto?.charAt(0) || 'P' }}</span>
               </div>
-              <h3 class="card-title">{{ p.proyecto }}</h3>
+              <h3 class="card-title">{{ p.proyecto || p.nombre }}</h3>
             </div>
             <div class="card-status">
               <span class="status-badge" [class]="getStatusClass(p.promedio)">
+                <ion-icon [name]="getStatusIcon(p.promedio)"></ion-icon>
                 {{ getStatusText(p.promedio) }}
               </span>
             </div>
@@ -97,7 +142,7 @@
           <div class="card-stats">
             <div class="stat-item">
               <span class="stat-item-label">Evaluaciones</span>
-              <span class="stat-item-value">{{ p.evaluaciones }}</span>
+              <span class="stat-item-value">{{ p.evaluaciones || 0 }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-item-label">Promedio</span>
@@ -141,13 +186,13 @@
             </div>
           </div>
 
-          <!-- Actions -->
+          <!-- Actions - TODOS HABILITADOS -->
           <div class="card-actions">
             <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyecto(p)">
               <ion-icon name="download-outline" slot="start"></ion-icon>
               Excel
             </ion-button>
-            <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(p)" disabled>
+            <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(p)">
               <ion-icon name="eye-outline" slot="start"></ion-icon>
               Ver detalle
             </ion-button>
@@ -156,7 +201,19 @@
       </div>
 
       <!-- EMPTY STATE -->
-      <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0">
+      <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0 && proyectos.length > 0">
+        <div class="empty-icon">
+          <ion-icon name="filter-outline"></ion-icon>
+        </div>
+        <h3>No hay coincidencias</h3>
+        <p>No se encontraron proyectos con los filtros aplicados</p>
+        <ion-button fill="outline" class="btn-clear-filter" (click)="limpiarFiltros()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Limpiar filtros
+        </ion-button>
+      </div>
+
+      <div class="empty-state" *ngIf="proyectos.length === 0">
         <div class="empty-icon">
           <ion-icon name="stats-chart-outline"></ion-icon>
         </div>
