@@ -8,11 +8,8 @@ import {
   IonTitle,
   IonButton,
   IonIcon,
-  IonContent,
-  IonItem,
-  IonLabel
+  IonContent
 } from '@ionic/angular/standalone';
-
 import { addIcons } from 'ionicons';
 import {
   downloadOutline,
@@ -22,15 +19,14 @@ import {
   trophyOutline,
   barChartOutline
 } from 'ionicons/icons';
-
 import { ReporteService } from '../../../core/services/reporte.service';
 
-
 @Component({
-  selector:'app-reportes',
-  standalone:true,
+  selector: 'app-reportes',
 
-  imports:[
+  standalone: true,
+
+  imports: [
     CommonModule,
     IonHeader,
     IonToolbar,
@@ -39,211 +35,146 @@ import { ReporteService } from '../../../core/services/reporte.service';
     IonTitle,
     IonButton,
     IonIcon,
-    IonContent,
-    IonItem,
-    IonLabel
+    IonContent
   ],
-
-  templateUrl:'./reportes.page.html',
-  styleUrls:['./reportes.page.scss']
-
+  templateUrl: './reportes.page.html',
+  styleUrls: ['./reportes.page.scss']
 })
 export class ReportesPage implements OnInit {
 
+  reportes = {
+    proyectos: 0,
+    evaluaciones: 0,
+    completadas: 0,
+    promedio: 0
 
-reportes:any={
- proyectos:0,
- evaluaciones:0,
- completadas:0,
- promedio:0
-};
+  };
 
+  proyectos: any[] = [];
 
+  constructor(
+    private reporteService: ReporteService
+  ) {
 
-proyectos:any[]=[];
+    addIcons({
+      downloadOutline,
+      statsChartOutline,
+      folderOutline,
+      checkmarkDoneOutline,
+      trophyOutline,
+      barChartOutline
 
+    });
 
+  }
 
-constructor(
- private reporteService:ReporteService
-){
 
+  ngOnInit(): void {
 
-addIcons({
+    this.cargarDatos();
 
-downloadOutline,
-statsChartOutline,
-folderOutline,
-checkmarkDoneOutline,
-trophyOutline,
-barChartOutline
+  }
 
-});
+  cargarDatos(): void {
 
+    this.reporteService
+      .getStats()
+      .subscribe({
 
-}
+        next: (res: any) => {
 
+          console.log(
+            'STATS:',
+            res
+          );
 
+          this.reportes =
+            res.data;
 
+        },
 
+        error: (err) => {
 
-ngOnInit(){
+          console.error(
+            'Error cargando estadísticas:',
+            err
+          );
 
-this.cargarDatos();
+        }
+      });
 
-}
+    this.reporteService
+      .getReporteProyectos()
+      .subscribe({
+        next: (res: any) => {
+          console.log(
+            'REPORTES POR PROYECTO:',
+            res
+          );
+          this.proyectos =
+            res.data ?? [];
 
+        },
 
+        error: (err) => {
+          console.error(
+            'Error cargando proyectos:',
+            err
+          );
+          this.proyectos = [];
 
+        }
+      });
+  }
 
-cargarDatos(){
+  exportar(): void {
 
 
+    console.log(
+      'Exportando reporte...'
+    );
 
-this.reporteService.getStats()
-.subscribe({
+    this.reporteService
+      .exportar()
+      .subscribe({
 
-next:(res:any)=>{
+        next: (archivo: Blob) => {
 
+          const url =
+            window.URL
+              .createObjectURL(
+                archivo
+              );
 
-console.log(
-"STATS",
-res
-);
+          const enlace =
+            document.createElement(
+              'a'
+            );
 
 
-this.reportes=res;
+          enlace.href = url;
 
+          enlace.download =
+            'reporte-evaluaciones.xlsx';
 
-},
+          enlace.click();
 
+          window.URL
+            .revokeObjectURL(
+              url
+            );
 
-error:(err)=>{
+        },
 
-console.error(
-"Error stats",
-err
-)
+        error: (err) => {
+          console.error(
+            'Error exportando reporte:',
+            err
+          );
+        }
 
-}
+      });
 
-
-});
-
-
-
-
-
-this.reporteService
-.getReporteProyectos()
-.subscribe({
-
-next:(res:any)=>{
-
-
-console.log(
-"REPORTES POR PROYECTO",
-res
-);
-
-
-
-this.proyectos =
-res.data ?? [];
-
-
-
-},
-
-
-error:(err)=>{
-
-
-console.error(
-"Error proyectos",
-err
-);
-
-
-this.proyectos=[];
-
-
-}
-
-
-
-});
-
-
-}
-
-
-
-
-exportar(){
-
-
-console.log(
-"Exportando reporte..."
-);
-
-
-
-this.reporteService
-.exportar()
-.subscribe({
-
-next:(blob:any)=>{
-
-
-const url =
-window.URL.createObjectURL(blob);
-
-
-
-const a =
-document.createElement('a');
-
-
-a.href=url;
-
-a.download=
-'reporte-evaluaciones.xlsx';
-
-
-a.click();
-
-
-
-window.URL.revokeObjectURL(url);
-
-
-
-},
-
-
-error:(err)=>{
-
-
-console.error(
-"Error exportando",
-err
-);
-
-
-
-}
-
-
-
-});
-
-
-
-}
-
-
-
-
+  }
 
 }
