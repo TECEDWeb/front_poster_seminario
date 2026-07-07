@@ -4,186 +4,173 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>
-      Dashboard
+      <span class="title-text">Dashboard</span>
+      <span class="title-badge">Administración</span>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear">
-        <ion-icon 
-          name="notifications-outline"
-          slot="icon-only">
-        </ion-icon>
+      <ion-button fill="clear" class="notification-btn">
+        <ion-badge class="notification-badge">3</ion-badge>
+        <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content class="dashboard-content">
-
   <div class="page-container">
 
-    <div 
-      class="error-banner"
-      *ngIf="error && !cargando">
-
-      <div class="error-icon">
-        <ion-icon name="alert-circle-outline"></ion-icon>
+    <!-- Error Banner -->
+    <div class="error-banner" *ngIf="error && !cargando">
+      <div class="error-content">
+        <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+        <div class="error-message">
+          <strong>Error de conexión</strong>
+          <span>No se pudo cargar el resumen del sistema</span>
+        </div>
       </div>
-
-      <div class="error-text">
-        <strong>Error de conexión</strong>
-        <span>No se pudo cargar el resumen del sistema.</span>
-      </div>
-
-      <ion-button
-        fill="clear"
-        size="small"
-        color="danger"
-        (click)="cargarResumen()">
-
+      <ion-button fill="outline" size="small" color="danger" (click)="cargarResumen()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
         Reintentar
-
       </ion-button>
-
     </div>
 
-    <section
-      class="welcome-card"
-      *ngIf="!error">
-
-      <div>
-
-        <h1>
-          Bienvenido de vuelta 👋
-        </h1>
-
-        <p>
-          Administra concursos, proyectos y evaluaciones desde este panel.
-        </p>
-
+    <!-- Welcome Section -->
+    <section class="welcome-section" *ngIf="!error">
+      <div class="welcome-content">
+        <div class="welcome-text">
+          <h1>Bienvenido de vuelta</h1>
+          <p>Gestiona concursos, proyectos y evaluaciones desde este panel central</p>
+        </div>
+        <div class="welcome-actions">
+          <ion-chip class="date-chip">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <ion-label>{{ today | date:'EEEE, d MMMM' }}</ion-label>
+          </ion-chip>
+        </div>
       </div>
-
-      <div class="welcome-icon">
-
-        <ion-icon name="analytics-outline"></ion-icon>
-
-      </div>
-
     </section>
 
-    <div 
-      class="stats-grid"
-      *ngIf="cargando">
-
-      <div 
-        class="stat-skeleton"
-        *ngFor="let i of [1,2,3,4]">
-
-        <ion-skeleton-text
-          animated
-          class="skeleton-icon">
-        </ion-skeleton-text>
-
-
-        <div class="skeleton-text">
-
-          <ion-skeleton-text
-            animated>
-          </ion-skeleton-text>
-
-          <ion-skeleton-text
-            animated>
-          </ion-skeleton-text>
-
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <!-- Skeletons -->
+      <div *ngIf="cargando">
+        <div class="stat-skeleton" *ngFor="let i of [1,2,3,4]">
+          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+          <div class="skeleton-text">
+            <ion-skeleton-text animated></ion-skeleton-text>
+            <ion-skeleton-text animated></ion-skeleton-text>
+          </div>
         </div>
-
       </div>
 
+      <!-- Stats Cards -->
+      <div class="stats-grid-container" *ngIf="!cargando && !error">
+        <app-stats-card
+          titulo="Usuarios"
+          [valor]="usuarios"
+          icono="people-outline"
+          color="indigo"
+          [trend]="+12">
+        </app-stats-card>
+        <app-stats-card
+          titulo="Concursos"
+          [valor]="concursos"
+          icono="trophy-outline"
+          color="amber"
+          [trend]="+5">
+        </app-stats-card>
+        <app-stats-card
+          titulo="Proyectos"
+          [valor]="proyectos"
+          icono="folder-outline"
+          color="emerald"
+          [trend]="-2">
+        </app-stats-card>
+        <app-stats-card
+          titulo="Evaluaciones"
+          [valor]="reportes"
+          icono="document-text-outline"
+          color="violet"
+          [trend]="+8">
+        </app-stats-card>
+      </div>
     </div>
 
-    <div
-      class="stats-grid"
-      *ngIf="!cargando && !error">
-      <app-stats-card
-        titulo="Usuarios"
-        [valor]="usuarios"
-        icono="people-outline"
-        color="indigo">
-      </app-stats-card>
-      <app-stats-card
-        titulo="Concursos"
-        [valor]="concursos"
-        icono="trophy-outline"
-        color="amber">
-      </app-stats-card>
-      <app-stats-card
-        titulo="Proyectos"
-        [valor]="proyectos"
-        icono="folder-outline"
-        color="emerald">
-      </app-stats-card>
-      <app-stats-card
-        titulo="Evaluaciones"
-        [valor]="reportes"
-        icono="document-text-outline"
-        color="violet">
-      </app-stats-card>
-
-    </div>
-    <section class="section">
-
+    <!-- Quick Actions -->
+    <section class="quick-actions-section">
       <div class="section-header">
-
-        <h2>
-          Acciones rápidas
-        </h2>
-
+        <h2>Acciones rápidas</h2>
+        <span class="section-subtitle">Herramientas principales</span>
       </div>
-      <div class="acciones-grid">
-        <button
-          class="accion-btn"
-          routerLink="/admin/usuarios">
 
-          <div class="accion-icon indigo">
+      <div class="actions-grid">
+        <button class="action-card" routerLink="/admin/usuarios">
+          <div class="action-icon indigo">
             <ion-icon name="person-add-outline"></ion-icon>
           </div>
-
-          <span>
-            Nuevo usuario
-          </span>
+          <div class="action-info">
+            <span class="action-title">Nuevo usuario</span>
+            <span class="action-desc">Registrar colaborador</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
         </button>
-        <button
-          class="accion-btn"
-          routerLink="/admin/concursos">
-          <div class="accion-icon amber">
+
+        <button class="action-card" routerLink="/admin/concursos">
+          <div class="action-icon amber">
             <ion-icon name="add-circle-outline"></ion-icon>
           </div>
-          <span>
-            Nuevo concurso
-          </span>
+          <div class="action-info">
+            <span class="action-title">Nuevo concurso</span>
+            <span class="action-desc">Crear convocatoria</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
         </button>
-        <button
-          class="accion-btn"
-          routerLink="/admin/proyectos">
-          <div class="accion-icon emerald">
+
+        <button class="action-card" routerLink="/admin/proyectos">
+          <div class="action-icon emerald">
             <ion-icon name="folder-open-outline"></ion-icon>
           </div>
-          <span>
-            Ver proyectos
-          </span>
+          <div class="action-info">
+            <span class="action-title">Ver proyectos</span>
+            <span class="action-desc">Lista de proyectos activos</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
         </button>
-        <button
-          class="accion-btn"
-          routerLink="/admin/reportes">
-          <div class="accion-icon violet">
+
+        <button class="action-card" routerLink="/admin/reportes">
+          <div class="action-icon violet">
             <ion-icon name="bar-chart-outline"></ion-icon>
           </div>
-          <span>
-            Reportes
-          </span>
+          <div class="action-info">
+            <span class="action-title">Reportes</span>
+            <span class="action-desc">Análisis y estadísticas</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
         </button>
       </div>
     </section>
-  </div>
 
+    <!-- Recent Activity (Optional) -->
+    <section class="recent-activity" *ngIf="!cargando && !error">
+      <div class="section-header">
+        <h2>Actividad reciente</h2>
+        <ion-button fill="clear" size="small" class="view-all-btn">
+          Ver todas <ion-icon name="arrow-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let activity of recentActivities">
+          <div class="activity-avatar" [class]="activity.color">
+            <ion-icon [name]="activity.icon"></ion-icon>
+          </div>
+          <div class="activity-content">
+            <p class="activity-text">{{ activity.text }}</p>
+            <span class="activity-time">{{ activity.time }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
 </ion-content>
