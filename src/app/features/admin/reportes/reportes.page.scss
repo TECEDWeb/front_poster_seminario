@@ -1,214 +1,71 @@
-.section-title {
-
-  margin: 25px 0 15px;
-
-  h2 {
-
-    font-size: 22px;
-
-    font-weight: 700;
-
-    color: #1f2937;
-
-    margin: 0;
-
-  }
-
+ion-content {
+  --background: #f6f7fb;
 }
 
+.page-container {
+  padding: 20px;
+}
 
+.section-title {
+  margin-bottom: 20px;
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+}
 
 
 .pro-card {
-
-  background: #ffffff;
-
+  background: white;
   border-radius: 16px;
-
   padding: 20px;
-
   margin-bottom: 20px;
-
   box-shadow:
-    0 4px 12px rgba(0,0,0,0.08);
+    0 4px 15px rgba(0,0,0,0.08);
 
-  border: 1px solid #e5e7eb;
-
+  h2 {
+    margin-top: 0;
+    color: #111827;
+    font-size: 20px;
+  }
 }
-
-
-
-
-.pro-card > h2 {
-
-  margin: 0 0 15px;
-
-  font-size: 20px;
-
-  font-weight: 700;
-
-  color: #2563eb;
-
-}
-
-
-
 
 .detalle {
-
   display: flex;
-
-  gap: 20px;
-
-  flex-wrap: wrap;
-
-  background: #f8fafc;
-
-  padding: 15px;
-
-  border-radius: 12px;
-
-  margin-bottom: 15px;
-
-
+  gap: 30px;
+  margin-bottom: 20px;
+  color: #475569;
 }
-
-
-
-.detalle p {
-
-  margin: 0;
-
-  font-size: 15px;
-
-  color: #374151;
-
-}
-
-
-
-.detalle b {
-
-  color: #111827;
-
-}
-
-
-
-
 
 .ranking-row {
-
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
-  padding: 12px 15px;
-
+  padding: 12px;
+  border-radius: 10px;
+  background: #f8fafc;
   margin-top: 10px;
-
-  background: #f9fafb;
-
-  border-radius: 12px;
-
-  border-left: 4px solid #2563eb;
-
 }
-
-
 
 .rank-info {
-
   display: flex;
-
   flex-direction: column;
-
 }
-
-
 
 .rank-nombre {
-
-  font-size: 15px;
-
-  font-weight: 600;
-
-  color: #111827;
-
+  font-weight: 700;
+  color: #1e293b;
 }
-
-
 
 .rank-meta {
-
   font-size: 13px;
-
-  color: #6b7280;
-
-  margin-top: 3px;
+  color: #64748b;
 
 }
-
-
 
 .rank-puntaje {
-
-  font-size: 18px;
-
-  font-weight: 700;
-
-  color: #059669;
-
-}
-
-
-
-
-.empty-state {
-
-  text-align: center;
-
-  padding: 40px;
-
-  color: #6b7280;
-
-}
-
-
-
-
-@media(max-width:600px){
-
-
-  .detalle {
-
-    flex-direction: column;
-
-    gap: 8px;
-
-  }
-
-
-
-  .ranking-row {
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    gap: 10px;
-
-  }
-
-
-
-  .rank-puntaje {
-
-    align-self: flex-end;
-
-  }
-
-
+  font-size: 20px;
+  font-weight: bold;
+  color: #2563eb;
 }

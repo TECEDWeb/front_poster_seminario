@@ -1,44 +1,69 @@
-<div class="section-title">
-  <h2>
-  Reportes por proyecto
-  </h2>
-</div>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Reportes
+    </ion-title>
 
-<div
-  class="pro-card"
-  *ngFor="let p of proyectos">
-    <h2>
-    {{p.proyecto}}
-    </h2>
-    <div class="detalle">
-      <p>
-        <b>Evaluaciones:</b>
-        {{p.evaluaciones}}
-      </p>
+    <ion-buttons slot="end">
+      <ion-button
+        fill="clear"
+        (click)="exportar()">
+        <ion-icon
+          name="download-outline"
+          slot="start">
+        </ion-icon>
+        Exportar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-      <p>
-        <b>Promedio:</b>
-        {{p.promedio | number:'1.1-2'}}
-        pts
-      </p>
+<ion-content>
+  <div class="page-container">
+    <div class="section-title">
+      <h2>
+        Reportes por proyecto
+      </h2>
     </div>
-
     <div
-      class="ranking-row"
-      *ngFor="let e of p.evaluadores">
-      <div class="rank-info">
-      <div class="rank-nombre">
-        {{e.nombre}}
+      class="pro-card"
+      *ngFor="let p of proyectos">
+      <h2>
+        {{ p.proyecto }}
+      </h2>
+      <div class="detalle">
+        <p>
+          <b>
+            Evaluaciones:
+          </b>
+          {{ p.evaluaciones }}
+        </p>
+        <p>
+          <b>
+            Promedio:
+          </b>
+          {{ p.promedio | number:'1.1-2' }}
+          pts
+        </p>
       </div>
-      
-        <div class="rank-meta">
-          {{e.rol}}
+      <div
+        class="ranking-row"
+        *ngFor="let e of p.evaluadores">
+        <div class="rank-info">
+          <div class="rank-nombre">
+            {{ e.nombre }}
+          </div>
+          <div class="rank-meta">
+            {{ e.rol }}
+          </div>
+        </div>
+        <div class="rank-puntaje">
+          {{ e.puntaje }}
         </div>
       </div>
-
-      <div class="rank-puntaje">
-        {{e.puntaje}}
-      </div>
     </div>
-
-</div>
+  </div>
+</ion-content>
