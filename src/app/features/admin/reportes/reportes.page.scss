@@ -1,33 +1,247 @@
 .page-container {
-
   padding: 20px;
-
+  background: #f4f7fb;
+  min-height: 100%;
 }
 
 
-.pro-card {
-
-  background: white;
-
-  border-radius: 20px;
-
-  padding: 25px;
+// Título de sección
+.section-title {
 
   margin-bottom: 20px;
 
-  box-shadow: 0 5px 20px rgba(0,0,0,.2);
+  h2 {
+
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+
+  }
 
 }
 
 
+// Tarjetas de proyectos
+.pro-card {
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 24px;
+
+  margin-bottom: 22px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.08);
+
+  border: 1px solid #e2e8f0;
+
+  transition: transform .2s ease,
+              box-shadow .2s ease;
+
+
+  &:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+      0 12px 30px rgba(15,23,42,.15);
+
+  }
+
+
+  h2 {
+
+    margin-top:0;
+
+    margin-bottom:15px;
+
+    color:#0f172a;
+
+    font-size:21px;
+
+    font-weight:700;
+
+  }
+
+}
+
+
+// Detalle del proyecto
+.detalle {
+
+  display:flex;
+
+  gap:25px;
+
+  flex-wrap:wrap;
+
+  background:#f8fafc;
+
+  padding:15px;
+
+  border-radius:12px;
+
+  margin-bottom:20px;
+
+
+  p {
+
+    margin:0;
+
+    color:#475569;
+
+    font-size:15px;
+
+  }
+
+
+  b {
+
+    color:#1e293b;
+
+  }
+
+}
+
+
+
+// Evaluadores
 .ranking-row {
 
-  display: flex;
+  display:flex;
 
-  justify-content: space-between;
+  justify-content:space-between;
 
-  padding: 15px;
+  align-items:center;
 
-  border-bottom: 1px solid #ddd;
+  padding:14px 16px;
+
+  margin-bottom:10px;
+
+  background:#ffffff;
+
+  border-radius:12px;
+
+  border:1px solid #e5e7eb;
+
+
+  &:last-child {
+
+    margin-bottom:0;
+
+  }
+
+}
+
+
+.rank-info {
+
+  display:flex;
+
+  flex-direction:column;
+
+}
+
+
+.rank-nombre {
+
+  font-weight:600;
+
+  color:#1e293b;
+
+  font-size:16px;
+
+}
+
+
+.rank-meta {
+
+  color:#64748b;
+
+  font-size:13px;
+
+  margin-top:3px;
+
+}
+
+
+.rank-puntaje {
+
+  background:#2563eb;
+
+  color:white;
+
+  font-weight:700;
+
+  padding:8px 15px;
+
+  border-radius:20px;
+
+  min-width:70px;
+
+  text-align:center;
+
+}
+
+
+
+// Botones futuros PDF / Excel
+.download-buttons {
+
+  display:flex;
+
+  gap:10px;
+
+  margin-top:20px;
+
+  flex-wrap:wrap;
+
+
+  ion-button {
+
+    --border-radius:12px;
+
+  }
+
+}
+
+
+
+// Responsive celular
+@media(max-width:600px){
+
+
+  .page-container {
+
+    padding:12px;
+
+  }
+
+
+  .pro-card {
+
+    padding:18px;
+
+  }
+
+
+  .detalle {
+
+    flex-direction:column;
+
+    gap:8px;
+
+  }
+
+
+  .ranking-row {
+
+    padding:12px;
+
+  }
+
 
 }
