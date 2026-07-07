@@ -1,3 +1,4 @@
+// asignaciones.page.ts - Corregir el error de listar
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,34 +15,18 @@ import {
   IonCardSubtitle,
   IonCardContent,
   IonItem,
-  IonLabel,
   IonSelect,
   IonSelectOption,
   IonButton,
   IonIcon,
   IonChip,
-  IonDatetime
+  IonDatetime,
+  IonLabel
 } from '@ionic/angular/standalone';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
-import { EvaluadorService } from '../../../core/services/evaluador.service';
+import { EvaluadorService } from '../../../core/services/evaluador.service'; // Usar EvaluadorService
 import { AsignacionService } from '../../../core/services/asignacion.service';
-import { addIcons } from 'ionicons';
-import {
-  addOutline,
-  swapHorizontalOutline,
-  checkmarkCircleOutline,
-  folderOutline,
-  folderOpenOutline,
-  peopleOutline,
-  personOutline,
-  calendarOutline,
-  timeOutline,
-  checkmarkDoneOutline,
-  refreshOutline,
-  arrowForwardOutline,
-  personAddOutline
-} from 'ionicons/icons';
 
 @Component({
   selector: 'app-asignaciones',
@@ -61,13 +46,13 @@ import {
     IonCardSubtitle,
     IonCardContent,
     IonItem,
-    IonLabel,
     IonSelect,
     IonSelectOption,
     IonButton,
     IonIcon,
     IonChip,
-    IonDatetime
+    IonDatetime,
+    IonLabel
   ],
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss']
@@ -87,25 +72,9 @@ export class AsignacionesPage implements OnInit {
 
   constructor(
     private proyectoService: ProyectoService,
-    private evaluadorService: EvaluadorService,
+    private evaluadorService: EvaluadorService, // Usar EvaluadorService
     private asignacionService: AsignacionService
-  ) {
-    addIcons({
-      addOutline,
-      swapHorizontalOutline,
-      checkmarkCircleOutline,
-      folderOutline,
-      folderOpenOutline,
-      peopleOutline,
-      personOutline,
-      calendarOutline,
-      timeOutline,
-      checkmarkDoneOutline,
-      refreshOutline,
-      arrowForwardOutline,
-      personAddOutline
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -122,7 +91,7 @@ export class AsignacionesPage implements OnInit {
       next: (res: any) => {
         this.proyectos = res?.data ?? res ?? [];
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error cargando proyectos:', err);
         this.proyectos = [];
       }
@@ -130,11 +99,12 @@ export class AsignacionesPage implements OnInit {
   }
 
   cargarEvaluadores(): void {
+    // Usar el método listar del EvaluadorService
     this.evaluadorService.listar().subscribe({
       next: (res: any) => {
         this.evaluadores = res?.data ?? res ?? [];
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error cargando evaluadores:', err);
         this.evaluadores = [];
       }
@@ -149,37 +119,10 @@ export class AsignacionesPage implements OnInit {
         this.asignacionesCount = data.length;
       },
       error: () => {
-        // Si el endpoint no existe, usamos datos mock
-        this.asignacionesRecientes = this.getMockAssignments();
-        this.asignacionesCount = this.asignacionesRecientes.length;
+        this.asignacionesRecientes = [];
+        this.asignacionesCount = 0;
       }
     });
-  }
-
-  getMockAssignments(): any[] {
-    return [
-      {
-        id: 1,
-        proyecto_nombre: 'Sistema de Gestión IoT',
-        evaluador_nombre: 'María González',
-        fecha_asignacion: new Date(Date.now() - 3600000 * 2),
-        status: 'in-progress'
-      },
-      {
-        id: 2,
-        proyecto_nombre: 'App de Evaluación Docente',
-        evaluador_nombre: 'Carlos Ruiz',
-        fecha_asignacion: new Date(Date.now() - 3600000 * 5),
-        status: 'pending'
-      },
-      {
-        id: 3,
-        proyecto_nombre: 'Plataforma de Cursos Online',
-        evaluador_nombre: 'Ana Martínez',
-        fecha_asignacion: new Date(Date.now() - 86400000),
-        status: 'completed'
-      }
-    ];
   }
 
   guardar(): void {
@@ -205,7 +148,7 @@ export class AsignacionesPage implements OnInit {
         this.resetForm();
         this.cargarDatos();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.submitting = false;
         console.error('Error asignando:', err);
         this.showError(err.error?.mensaje || 'Error al asignar el proyecto');
@@ -219,39 +162,39 @@ export class AsignacionesPage implements OnInit {
     this.fechaLimite = null;
   }
 
-  openNewProject(): void {
-    // Navegar a creación de proyecto
-    // this.router.navigate(['/admin/proyectos/nuevo']);
-    alert('Abrir formulario de nuevo proyecto');
-  }
-
-  getStatusIcon(status: string): string {
-    const icons: Record<string, string> = {
-      'pending': 'time-outline',
-      'in-progress': 'refresh-outline',
-      'completed': 'checkmark-circle-outline',
-      'rejected': 'close-circle-outline'
-    };
-    return icons[status] || 'time-outline';
-  }
-
-  getStatusText(status: string): string {
-    const texts: Record<string, string> = {
-      'pending': 'Pendiente',
-      'in-progress': 'En progreso',
-      'completed': 'Completado',
-      'rejected': 'Rechazado'
-    };
-    return texts[status] || 'Pendiente';
-  }
-
-  // Toast/Alert helpers (implementa según tu preferencia)
   private showSuccess(message: string): void {
-    // Usa ToastController o AlertController
     alert('✅ ' + message);
   }
 
   private showError(message: string): void {
     alert('❌ ' + message);
   }
+
+  // asignaciones.page.ts - Añadir estos métodos
+
+openNewProject(): void {
+  // Navegar a creación de proyecto
+  // this.router.navigate(['/admin/proyectos/nuevo']);
+  alert('Abrir formulario de nuevo proyecto');
+}
+
+getStatusIcon(status: string): string {
+  const icons: Record<string, string> = {
+    'pending': 'time-outline',
+    'in-progress': 'refresh-outline',
+    'completed': 'checkmark-circle-outline',
+    'rejected': 'close-circle-outline'
+  };
+  return icons[status] || 'time-outline';
+}
+
+getStatusText(status: string): string {
+  const texts: Record<string, string> = {
+    'pending': 'Pendiente',
+    'in-progress': 'En progreso',
+    'completed': 'Completado',
+    'rejected': 'Rechazado'
+  };
+  return texts[status] || 'Pendiente';
+}
 }

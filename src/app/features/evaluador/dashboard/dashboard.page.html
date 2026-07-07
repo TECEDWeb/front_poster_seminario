@@ -1,77 +1,142 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
-    <ion-title>Mi panel</ion-title>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title>
+      <span class="title-text">Mi panel</span>
+      <span class="title-badge">Evaluador</span>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button class="btn-logout" (click)="cerrarSesion()">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="dashboard-content">
   <div class="page-container">
 
-    <!-- Saludo -->
-    <div class="saludo-card">
-      <div class="saludo-avatar">
-        <ion-icon name="person-outline"></ion-icon>
-      </div>
-      <div>
-        <div class="saludo-texto">Bienvenido de vuelta</div>
-        <div class="saludo-sub">Tienes proyectos pendientes de evaluar</div>
+    <!-- LOADING -->
+    <div class="loading-container" *ngIf="isLoading">
+      <div class="loading-spinner">
+        <ion-icon name="refresh-outline" class="spinning"></ion-icon>
+        <span>Cargando tu información...</span>
       </div>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-grid-3">
-      <app-stats-card
-        titulo="Asignados"
-        [valor]="asignados"
-        icono="folder-outline"
-        color="indigo">
-      </app-stats-card>
-      <app-stats-card
-        titulo="Pendientes"
-        [valor]="pendientes"
-        icono="time-outline"
-        color="amber">
-      </app-stats-card>
-      <app-stats-card
-        titulo="Completados"
-        [valor]="completados"
-        icono="checkmark-done-outline"
-        color="emerald">
-      </app-stats-card>
-    </div>
+    <!-- CONTENIDO -->
+    <ng-container *ngIf="!isLoading">
 
-    <!-- Progreso -->
-    <div class="progreso-card" *ngIf="asignados > 0">
-      <div class="progreso-header">
-        <span class="progreso-label">Progreso general</span>
-        <span class="progreso-pct">{{ porcentaje }}%</span>
+      <!-- Saludo -->
+      <div class="saludo-card">
+        <div class="saludo-avatar">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <div class="saludo-info">
+          <div class="saludo-texto">Bienvenido de vuelta</div>
+          <div class="saludo-nombre">{{ nombreUsuario }}</div>
+          <div class="saludo-sub">{{ mensajeBienvenida }}</div>
+        </div>
+        <div class="saludo-badge" *ngIf="tieneProyectosPendientes">
+          <span class="badge-count">{{ pendientes }}</span>
+          <span class="badge-label">Pendientes</span>
+        </div>
       </div>
-      <div class="progreso-bar">
-        <div class="progreso-fill" [style.width.%]="porcentaje"></div>
+
+      <!-- Stats -->
+      <div class="stats-grid-3">
+        <app-stats-card
+          titulo="Asignados"
+          [valor]="asignados"
+          icono="folder-outline"
+          color="indigo">
+        </app-stats-card>
+        <app-stats-card
+          titulo="Pendientes"
+          [valor]="pendientes"
+          icono="time-outline"
+          color="amber">
+        </app-stats-card>
+        <app-stats-card
+          titulo="Completados"
+          [valor]="completados"
+          icono="checkmark-done-outline"
+          color="emerald">
+        </app-stats-card>
       </div>
-      <div class="progreso-sub">{{ completados }} de {{ asignados }} proyectos evaluados</div>
-    </div>
 
-    <!-- Acceso rápido -->
-    <div class="section-title">
-      <h2>Acceso rápido</h2>
-    </div>
+      <!-- Progreso -->
+      <div class="progreso-card" *ngIf="asignados > 0">
+        <div class="progreso-header">
+          <span class="progreso-label">Progreso general</span>
+          <span class="progreso-pct">{{ porcentaje }}%</span>
+        </div>
+        <div class="progreso-bar">
+          <div class="progreso-fill" [style.width.%]="porcentaje"></div>
+        </div>
+        <div class="progreso-sub">{{ completados }} de {{ asignados }} proyectos evaluados</div>
+        <div class="progreso-estado" *ngIf="porcentaje === 100">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>¡Completaste todas tus evaluaciones!</span>
+        </div>
+      </div>
 
-    <div class="quick-grid">
-      <button class="quick-btn" routerLink="/evaluador/proyectos-asignados">
-        <div class="quick-icon indigo"><ion-icon name="clipboard-outline"></ion-icon></div>
-        <div class="quick-label">Proyectos asignados</div>
-        <div class="quick-sub">Ver y evaluar</div>
-        <ion-icon name="chevron-forward-outline" class="quick-arrow"></ion-icon>
-      </button>
-      <button class="quick-btn" routerLink="/evaluador/mis-resultados">
-        <div class="quick-icon emerald"><ion-icon name="stats-chart-outline"></ion-icon></div>
-        <div class="quick-label">Mis resultados</div>
-        <div class="quick-sub">Ver evaluaciones realizadas</div>
-        <ion-icon name="chevron-forward-outline" class="quick-arrow"></ion-icon>
-      </button>
-    </div>
+      <!-- Acceso rápido -->
+      <div class="section-title">
+        <h2>Acceso rápido</h2>
+        <span class="section-subtitle">Herramientas principales</span>
+      </div>
+
+      <div class="quick-grid">
+        <button class="quick-btn" routerLink="/evaluador/proyectos-asignados">
+          <div class="quick-icon indigo">
+            <ion-icon name="clipboard-outline"></ion-icon>
+          </div>
+          <div class="quick-content">
+            <div class="quick-label">Proyectos asignados</div>
+            <div class="quick-sub">Ver y evaluar proyectos</div>
+          </div>
+          <div class="quick-badge" *ngIf="pendientes > 0">
+            {{ pendientes }}
+          </div>
+          <ion-icon name="chevron-forward-outline" class="quick-arrow"></ion-icon>
+        </button>
+
+        <button class="quick-btn" routerLink="/evaluador/mis-resultados">
+          <div class="quick-icon emerald">
+            <ion-icon name="stats-chart-outline"></ion-icon>
+          </div>
+          <div class="quick-content">
+            <div class="quick-label">Mis resultados</div>
+            <div class="quick-sub">Ver evaluaciones realizadas</div>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="quick-arrow"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Actividad reciente (opcional) -->
+      <div class="recent-section" *ngIf="actividadesRecientes?.length">
+        <div class="section-title">
+          <h2>Actividad reciente</h2>
+        </div>
+        <div class="recent-list">
+          <div class="recent-item" *ngFor="let act of actividadesRecientes">
+            <div class="recent-icon" [class]="act.color">
+              <ion-icon [name]="act.icon"></ion-icon>
+            </div>
+            <div class="recent-content">
+              <span class="recent-text">{{ act.texto }}</span>
+              <span class="recent-time">{{ act.tiempo }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
 
   </div>
 </ion-content>

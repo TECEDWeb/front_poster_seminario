@@ -9,18 +9,33 @@ export class StorageService {
 
   private tokenCache: string | null = null;
   private userCache: any = null;
+  private initialized: boolean = false;
+
+  constructor() {
+    this.init();
+  }
 
   // =========================
   // INIT (OBLIGATORIO)
   // =========================
   async init(): Promise<void> {
-    this.tokenCache = await this.get(TOKEN_KEY);
+    if (this.initialized) return;
 
-    const userRaw = await this.get(USER_KEY);
     try {
-      this.userCache = userRaw ? JSON.parse(userRaw) : null;
-    } catch {
-      this.userCache = null;
+      this.tokenCache = await this.get(TOKEN_KEY);
+
+      const userRaw = await this.get(USER_KEY);
+      try {
+        this.userCache = userRaw ? JSON.parse(userRaw) : null;
+      } catch {
+        this.userCache = null;
+      }
+
+      this.initialized = true;
+      console.log('✅ StorageService inicializado');
+    } catch (error) {
+      console.error('❌ Error init StorageService:', error);
+      this.initialized = false;
     }
   }
 
@@ -33,7 +48,7 @@ export class StorageService {
 
   async get(key: string): Promise<string | null> {
     const { value } = await Preferences.get({ key });
-    return value;
+    return value || null;
   }
 
   async remove(key: string): Promise<void> {
@@ -44,6 +59,8 @@ export class StorageService {
     await Preferences.clear();
     this.tokenCache = null;
     this.userCache = null;
+    this.initialized = false;
+    console.log('🧹 Storage limpiado');
   }
 
   // =========================
@@ -52,6 +69,7 @@ export class StorageService {
   async setToken(token: string): Promise<void> {
     this.tokenCache = token;
     await this.set(TOKEN_KEY, token);
+    console.log('🔑 Token guardado en storage');
   }
 
   async getToken(): Promise<string | null> {
@@ -63,6 +81,7 @@ export class StorageService {
   async removeToken(): Promise<void> {
     this.tokenCache = null;
     await this.remove(TOKEN_KEY);
+    console.log('🔑 Token removido del storage');
   }
 
   // =========================
@@ -71,6 +90,7 @@ export class StorageService {
   async setUsuario(usuario: any): Promise<void> {
     this.userCache = usuario;
     await this.set(USER_KEY, JSON.stringify(usuario));
+    console.log('👤 Usuario guardado en storage');
   }
 
   async getUsuario<T = any>(): Promise<T | null> {
@@ -90,5 +110,29 @@ export class StorageService {
   async removeUsuario(): Promise<void> {
     this.userCache = null;
     await this.remove(USER_KEY);
+    console.log('👤 Usuario removido del storage');
+  }
+
+  // =========================
+  // UTILITY
+  // =========================
+  async getSession(): Promise<{ token: string | null; usuario: any | null }> {
+    const token = await this.getToken();
+    const usuario = await this.getUsuario();
+    return { token, usuario };
+  }
+
+  async setSession(token: string, usuario: any): Promise<void> {
+    await this.setToken(token);
+    await this.setUsuario(usuario);
+  }
+
+  async removeSession(): Promise<void> {
+    await this.removeToken();
+    await this.removeUsuario();
+  }
+
+  isInitialized(): boolean {
+    return this.initialized;
   }
 }

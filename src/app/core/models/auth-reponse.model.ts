@@ -1,18 +1,19 @@
 import { Usuario } from './usuario.model';
 
+// auth-reponse.model.ts
+// auth-reponse.model.ts
 export interface LoginPayload {
   cedula: string;
   password: string;
 }
 
 export interface LoginResponse {
-  token(arg0: string, token: any): unknown;
   ok: boolean;
-  data: {
-    token: string;
-    usuario: Usuario;
-  };
   mensaje?: string;
+  data: {
+    usuario: Usuario;
+    token: string;
+  };
 }
 
 export interface ApiErrorResponse {

@@ -1,106 +1,217 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Mis resultados</ion-title>
+
+    <ion-title>
+      <span class="title-text">Mis resultados</span>
+      <span class="title-badge">Evaluador</span>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="loading">
+        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="loading"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="resultados-content">
   <div class="page-container">
 
+    <!-- HEADER -->
     <div class="page-header">
-      <div>
+      <div class="header-left">
         <h1>Mis evaluaciones</h1>
         <p>Historial de proyectos que has evaluado</p>
       </div>
-    </div>
-
-    <!-- Skeleton -->
-    <div *ngIf="loading">
-      <div class="resultado-skeleton" *ngFor="let i of [1,2,3]">
-        <ion-skeleton-text animated
-          style="width:100%;height:14px;border-radius:4px;margin-bottom:8px">
-        </ion-skeleton-text>
-
-        <ion-skeleton-text animated
-          style="width:60%;height:12px;border-radius:4px;margin-bottom:6px">
-        </ion-skeleton-text>
-
-        <ion-skeleton-text animated
-          style="width:40%;height:12px;border-radius:4px">
-        </ion-skeleton-text>
+      <div class="header-right">
+        <div class="stats-mini" *ngIf="!loading">
+          <span class="stat-count">{{ totalEvaluaciones }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stats-mini" *ngIf="!loading">
+          <span class="stat-count" [class.text-success]="promedioGeneral >= 70" [class.text-warning]="promedioGeneral >= 50 && promedioGeneral < 70" [class.text-danger]="promedioGeneral < 50">
+            {{ promedioGeneral }}%
+          </span>
+          <span class="stat-label">Promedio</span>
+        </div>
+        <div class="stats-mini" *ngIf="!loading">
+          <span class="stat-count">{{ evaluacionesRecientes }}</span>
+          <span class="stat-label">Últimos 7 días</span>
+        </div>
       </div>
     </div>
 
-    <!-- Lista -->
-    <div *ngIf="!loading">
+    <!-- FILTROS -->
+    <div class="filter-bar" *ngIf="!loading && evaluaciones.length > 0">
+      <div class="filter-group">
+        <span class="filter-label">Filtrar por:</span>
+        <div class="filter-chips">
+          <ion-chip 
+            [class.chip-active]="filtroEstado === 'todos'"
+            (click)="cambiarFiltro('todos')">
+            <ion-label>Todos</ion-label>
+          </ion-chip>
+          <ion-chip 
+            [class.chip-active]="filtroEstado === 'alto'"
+            (click)="cambiarFiltro('alto')">
+            <ion-label>Alto (≥70%)</ion-label>
+          </ion-chip>
+          <ion-chip 
+            [class.chip-active]="filtroEstado === 'medio'"
+            (click)="cambiarFiltro('medio')">
+            <ion-label>Medio (50-69%)</ion-label>
+          </ion-chip>
+          <ion-chip 
+            [class.chip-active]="filtroEstado === 'bajo'"
+            (click)="cambiarFiltro('bajo')">
+            <ion-label>Bajo (&lt;50%)</ion-label>
+          </ion-chip>
+        </div>
+      </div>
+    </div>
 
-      <div class="resultado-card"
-        *ngFor="let e of evaluaciones || []">
+    <!-- LOADING -->
+    <div class="loading-grid" *ngIf="loading">
+      <div class="resultado-skeleton" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton-header">
+          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+          <div class="skeleton-text-group">
+            <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+          </div>
+        </div>
+        <div class="skeleton-meta">
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
 
-        <div class="resultado-header">
-          <div class="resultado-icon">
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
+    <!-- ERROR -->
+    <div class="error-container" *ngIf="!loading && error">
+      <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+      <h3>Error al cargar los resultados</h3>
+      <p>{{ error }}</p>
+      <ion-button (click)="recargar()" class="btn-retry">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
+
+    <!-- LISTA DE RESULTADOS -->
+    <div class="resultados-list" *ngIf="!loading && !error">
+      <div class="resultado-card" *ngFor="let e of evaluacionesFiltradas || []">
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="card-icon" [class]="getEstadoClase(e.porcentaje || 0)">
+            <ion-icon [name]="getEstadoIcono(e.porcentaje || 0)"></ion-icon>
           </div>
 
-          <div class="resultado-head">
-            <div class="resultado-nombre">{{ e.proyectoNombre }}</div>
-            <div class="resultado-concurso">{{ e.concursoNombre }}</div>
-          </div>
-
-          <div class="resultado-score">
-            <div class="score-val"
-              [ngClass]="{
-                'score-high': (e.porcentaje ?? 0) >= 70,
-                'score-mid':  (e.porcentaje ?? 0) >= 50 && (e.porcentaje ?? 0) < 70,
-                'score-low':  (e.porcentaje ?? 0) < 50
-              }">
-              {{ e.porcentaje ?? 0 }}%
+          <div class="card-info">
+            <div class="card-title">{{ e.proyectoNombre || 'Proyecto sin nombre' }}</div>
+            <div class="card-subtitle">
+              <span class="subtitle-item" *ngIf="e.concursoNombre">
+                <ion-icon name="trophy-outline"></ion-icon>
+                {{ e.concursoNombre }}
+              </span>
+              <span class="subtitle-item">
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{ e.fecha | date:'dd/MM/yyyy' }}
+              </span>
             </div>
+          </div>
 
-            <div class="score-lbl">
-              {{ e.puntajeTotal }} pts
+          <div class="card-score">
+            <div class="score-value" [class]="getColorClase(e.porcentaje || 0)">
+              {{ e.porcentaje || 0 }}%
+            </div>
+            <div class="score-detail">
+              {{ e.puntajeTotal || 0 }} pts
+              <span *ngIf="e.puntajeMaximo">/ {{ e.puntajeMaximo }}</span>
             </div>
           </div>
         </div>
 
-        <div class="resultado-meta">
-          <div class="meta-item">
-            <ion-icon name="person-outline"></ion-icon>
-            {{ e.evaluadorNombre }}
-          </div>
-
-          <div class="meta-item">
-            <ion-icon name="calendar-outline"></ion-icon>
-            {{ e.fecha | date:'dd/MM/yyyy' }}
-          </div>
-
-          <div class="meta-item" *ngIf="e.puntajeMaximo">
-            <ion-icon name="bar-chart-outline"></ion-icon>
-            {{ e.puntajeTotal }} / {{ e.puntajeMaximo }}
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" 
+                 [style.width.%]="e.porcentaje || 0"
+                 [style.background]="getProgressColor(e.porcentaje || 0)"></div>
           </div>
         </div>
 
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="meta-item">
+              <ion-icon name="person-outline"></ion-icon>
+              <span>{{ e.evaluadorNombre || 'Evaluador' }}</span>
+            </div>
+            <div class="meta-item" *ngIf="e.fecha">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>Evaluado: {{ e.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="meta-item" *ngIf="e.puntajeMaximo">
+              <ion-icon name="bar-chart-outline"></ion-icon>
+              <span>{{ e.puntajeTotal || 0 }} / {{ e.puntajeMaximo }} pts</span>
+            </div>
+          </div>
+
+          <div class="card-status">
+            <span class="status-badge" [class]="getEstadoClase(e.porcentaje || 0)">
+              {{ getEstadoTexto(e.porcentaje || 0) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions" *ngIf="e.id">
+          <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(e.id)">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver detalle
+          </ion-button>
+        </div>
       </div>
 
-      <!-- Empty state -->
-      <div class="empty-state"
-        *ngIf="!loading && (evaluaciones?.length === 0)">
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="evaluacionesFiltradas?.length === 0 && !loading">
+        <div class="empty-icon" *ngIf="evaluaciones.length === 0">
+          <ion-icon name="stats-chart-outline"></ion-icon>
+        </div>
+        <div class="empty-icon" *ngIf="evaluaciones.length > 0 && evaluacionesFiltradas.length === 0">
+          <ion-icon name="filter-outline"></ion-icon>
+        </div>
 
-        <ion-icon name="stats-chart-outline"></ion-icon>
-        <h3>Sin evaluaciones</h3>
-        <p>Aún no has evaluado ningún proyecto</p>
+        <h3 *ngIf="evaluaciones.length === 0">Sin evaluaciones realizadas</h3>
+        <h3 *ngIf="evaluaciones.length > 0 && evaluacionesFiltradas.length === 0">No hay resultados con este filtro</h3>
 
-        <ion-button size="small"
-          routerLink="/evaluador/proyectos-asignados"
-          class="btn-primary">
+        <p *ngIf="evaluaciones.length === 0">
+          Aún no has evaluado ningún proyecto. Comienza tu primera evaluación.
+        </p>
+        <p *ngIf="evaluaciones.length > 0 && evaluacionesFiltradas.length === 0">
+          Prueba cambiando los filtros para ver más resultados.
+        </p>
+
+        <ion-button *ngIf="evaluaciones.length === 0" 
+                    routerLink="/evaluador/proyectos-asignados"
+                    class="btn-primary">
+          <ion-icon name="clipboard-outline" slot="start"></ion-icon>
           Ver proyectos asignados
         </ion-button>
 
+        <ion-button *ngIf="evaluaciones.length > 0 && evaluacionesFiltradas.length === 0"
+                    fill="outline"
+                    class="btn-clear-filter"
+                    (click)="cambiarFiltro('todos')">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Limpiar filtros
+        </ion-button>
       </div>
-
     </div>
 
   </div>

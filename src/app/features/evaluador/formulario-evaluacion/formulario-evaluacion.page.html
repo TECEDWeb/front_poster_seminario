@@ -1,235 +1,168 @@
-<app-header 
-  titulo="Formulario de Evaluación">
-</app-header>
-
-
-<ion-content class="ion-padding">
-
-
-<div 
-  *ngIf="cargando"
-  class="loading">
-
-  <h3>
-    Cargando formulario...
-  </h3>
-
-</div>
-
-
-
-
-<ng-container
- *ngIf="!cargando && formulario">
-
-
-
-<div class="titulo">
-
-<h1>
-{{formulario.rubrica?.nombre}}
-</h1>
-
-
-<p>
-Puntaje máximo:
-{{formulario.rubrica?.puntaje_maximo}}
-</p>
-
-</div>
-
-
-
-
-
-<div
-class="seccion"
-*ngFor="
-let seccion of formulario.secciones
-">
-
-
-<h2 class="seccion-titulo">
-
-{{seccion.nombre}}
-
-</h2>
-
-
-
-<p class="descripcion">
-
-{{seccion.descripcion}}
-
-</p>
-
-
-
-
-
-<div
-class="criterio-card"
-*ngFor="
-let criterio of seccion.criterios
-">
-
-
-
-<p class="criterio">
-
-{{criterio.texto}}
-
-</p>
-
-
-
-
-
-<ion-radio-group
-[(ngModel)]="respuestas[criterio.id]"
->
-
-
-<ion-item
-*ngFor="
-let nivel of criterio.niveles
-">
-
-
-<ion-radio
-
-slot="start"
-
-[value]="nivel.id"
-
-(ionChange)="
-seleccionar(
-criterio.id,
-nivel.id
-)"
-
->
-
-
-</ion-radio>
-
-
-
-<ion-label>
-
-
-{{nivel.nombre}}
-
-<br>
-
-
-<span>
-{{nivel.descripcion}}
--
-{{nivel.puntaje}}
-puntos
-</span>
-
-
-</ion-label>
-
-
-</ion-item>
-
-
-
-</ion-radio-group>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<div class="observacion">
-
-
-<ion-item>
-
-<ion-label
-position="stacked">
-
-Observaciones
-
-</ion-label>
-
-
-
-<textarea
-
-[(ngModel)]="observacion"
-
-rows="5"
-
-placeholder="Ingrese observaciones adicionales">
-
-</textarea>
-
-
-</ion-item>
-
-
-</div>
-
-
-
-
-
-
-<ion-button
-
-expand="block"
-
-class="guardar"
-
-(click)="guardar()"
-
->
-
-Guardar Evaluación
-
-</ion-button>
-
-
-
-
-</ng-container>
-
-
-
-
-
-<div
-
-*ngIf="!cargando && !formulario"
-
-class="empty">
-
-
-<h3>
-No existe formulario disponible
-</h3>
-
-
-<p>
-Verifique la asignación del proyecto.
-</p>
-
-
-</div>
-
-
-
-
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+      <ion-button (click)="volver()" class="btn-back">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>
+      <span class="title-text">Evaluación</span>
+      <span class="title-badge">Formulario</span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="formulario-content">
+  <div class="page-container">
+
+    <!-- LOADING -->
+    <div class="loading-container" *ngIf="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <h3>Cargando formulario...</h3>
+      <p>Preparando la evaluación del proyecto</p>
+    </div>
+
+    <!-- ERROR -->
+    <div class="error-container" *ngIf="!cargando && error">
+      <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+      <h3>Error al cargar el formulario</h3>
+      <p>{{ error }}</p>
+      <ion-button (click)="cargarFormulario()" class="btn-retry">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
+
+    <!-- FORMULARIO -->
+    <ng-container *ngIf="!cargando && !error && formulario">
+
+      <!-- Header del formulario -->
+      <div class="form-header">
+        <div class="form-title-group">
+          <h1>{{ formulario.rubrica?.nombre || 'Formulario de Evaluación' }}</h1>
+          <p class="form-subtitle" *ngIf="proyectoNombre">
+            <ion-icon name="folder-outline"></ion-icon>
+            {{ proyectoNombre }}
+          </p>
+        </div>
+        <div class="form-stats">
+          <div class="stat-item">
+            <span class="stat-label">Progreso</span>
+            <span class="stat-value">{{ getPorcentajeProgreso() }}%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Puntaje</span>
+            <span class="stat-value">{{ getPuntajeTotal() }}/{{ getPuntajeMaximo() }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Criterios</span>
+            <span class="stat-value">{{ criteriosRespondidos }}/{{ totalCriterios }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getPorcentajeProgreso()"></div>
+        </div>
+      </div>
+
+      <!-- Secciones -->
+      <div class="secciones-container">
+        <div class="seccion-card" *ngFor="let seccion of formulario.secciones; let i = index">
+          <div class="seccion-header">
+            <div class="seccion-number">{{ i + 1 }}</div>
+            <div class="seccion-info">
+              <h2 class="seccion-titulo">{{ seccion.nombre }}</h2>
+              <p class="seccion-descripcion" *ngIf="seccion.descripcion">
+                {{ seccion.descripcion }}
+              </p>
+            </div>
+            <div class="seccion-progreso">
+              <span class="seccion-pct">
+                {{ getPorcentajeSeccion(seccion) }}%
+              </span>
+            </div>
+          </div>
+
+          <div class="criterios-container">
+            <div class="criterio-card" *ngFor="let criterio of seccion.criterios">
+              <div class="criterio-header">
+                <div class="criterio-text">
+                  <span class="criterio-label">{{ criterio.texto }}</span>
+                  <span class="criterio-estado" [class.respondido]="estaRespondido(criterio.id)">
+                    <ion-icon [name]="estaRespondido(criterio.id) ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
+                    {{ estaRespondido(criterio.id) ? 'Respondido' : 'Pendiente' }}
+                  </span>
+                </div>
+              </div>
+
+              <ion-radio-group [(ngModel)]="respuestas[criterio.id]" (ionChange)="seleccionar(criterio.id, $event.detail.value)">
+                <ion-item class="nivel-item" *ngFor="let nivel of criterio.niveles" lines="none">
+                  <ion-radio slot="start" [value]="nivel.id" color="primary"></ion-radio>
+                  <ion-label class="nivel-label">
+                    <span class="nivel-nombre">{{ nivel.nombre }}</span>
+                    <span class="nivel-descripcion">{{ nivel.descripcion }}</span>
+                    <span class="nivel-puntaje">{{ nivel.puntaje }} pts</span>
+                  </ion-label>
+                </ion-item>
+              </ion-radio-group>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      <div class="observaciones-container">
+        <div class="observaciones-header">
+          <ion-icon name="chatbubble-outline"></ion-icon>
+          <span>Observaciones adicionales</span>
+        </div>
+        <ion-item class="observaciones-input" lines="none">
+          <ion-label position="stacked">Comentarios sobre la evaluación</ion-label>
+          <textarea
+            [(ngModel)]="observacion"
+            rows="5"
+            placeholder="Ingrese observaciones adicionales sobre el proyecto evaluado..."
+            class="observaciones-textarea">
+          </textarea>
+        </ion-item>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <ion-button
+          fill="outline"
+          class="btn-cancelar"
+          (click)="volver()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Cancelar
+        </ion-button>
+
+        <ion-button
+          class="btn-guardar"
+          (click)="guardar()"
+          [disabled]="criteriosRespondidos === 0 || guardando">
+          <ion-icon [name]="guardando ? 'refresh-outline' : 'checkmark-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
+          {{ guardando ? 'Guardando...' : 'Guardar evaluación' }}
+        </ion-button>
+      </div>
+
+    </ng-container>
+
+    <!-- EMPTY -->
+    <div class="empty-container" *ngIf="!cargando && !error && !formulario">
+      <ion-icon name="document-outline" class="empty-icon"></ion-icon>
+      <h3>No hay formulario disponible</h3>
+      <p>Verifica la asignación del proyecto o contacta al administrador.</p>
+      <ion-button routerLink="/evaluador/proyectos-asignados" class="btn-primary">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Volver a proyectos
+      </ion-button>
+    </div>
+
+  </div>
 </ion-content>

@@ -7,7 +7,7 @@
         <p class="login-subtitle">Ingresa con tu cuenta institucional</p>
       </div>
 
-      <form (ngSubmit)="onSubmit()" class="login-form">
+      <form (ngSubmit)="onSubmit()" class="login-form" #loginForm="ngForm">
 
         <ion-item class="login-input" lines="none">
           <ion-icon name="person-outline" slot="start"></ion-icon>
@@ -36,14 +36,17 @@
             slot="end"
             fill="clear"
             type="button"
-            (click)="mostrarPassword = !mostrarPassword">
-            {{ mostrarPassword ? 'Ocultar' : 'Ver' }}
+            class="toggle-password"
+            (click)="mostrarPassword = !mostrarPassword"
+            aria-label="Mostrar u ocultar contraseña">
+            <ion-icon [name]="mostrarPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
           </ion-button>
         </ion-item>
 
-        <p class="login-error" *ngIf="errorMensaje()">
-          {{ errorMensaje() }}
-        </p>
+        <div class="login-error" *ngIf="errorMensaje()">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ errorMensaje() }}</span>
+        </div>
 
         <ion-button
           type="submit"
@@ -53,13 +56,15 @@
           <ion-icon name="log-in-outline" slot="start" *ngIf="!cargando()"></ion-icon>
           <ion-spinner name="crescent" *ngIf="cargando()"></ion-spinner>
           <span *ngIf="!cargando()">Iniciar sesión</span>
+          <span *ngIf="cargando()">Iniciando sesión...</span>
         </ion-button>
 
       </form>
 
-      <p class="login-footer">
-        ¿Problemas para ingresar? Contacta al administrador del sistema.
-      </p>
+      <div class="login-footer">
+        <p>¿Problemas para ingresar? Contacta al administrador del sistema.</p>
+        <p class="login-version">v1.0.0</p>
+      </div>
     </div>
   </div>
 </ion-content>

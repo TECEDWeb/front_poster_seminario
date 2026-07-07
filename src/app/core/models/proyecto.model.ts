@@ -22,13 +22,12 @@ export interface Proyecto {
 
 
 
+// proyecto.model.ts
 export interface ProyectoAsignado {
-  // ID DE LA EVALUACIÓN
-  // ESTE ES EL QUE VA AL FORMULARIO
   evaluacionId: number;
-  // Estado de la evaluación
   yaEvaluado: boolean;
   puedeEditar: boolean;
+  fechaAsignacion?: string;
   proyecto: {
     id: number;
     nombre: string;
@@ -36,6 +35,7 @@ export interface ProyectoAsignado {
     participantes: Participante[];
     tipo?: string | null;
     puntajeMaximo?: number | null;
-
+    concursoNombre?: string | null;
+    concursoId?: number | null;
   };
 }

@@ -1,17 +1,14 @@
-export type Rol = 'admin' | 'evaluador';
+export type Rol = 'admin' | 'evaluador' | 'coordinador';
 
 export interface Usuario {
   id: number;
   cedula: string;
   nombre: string;
-  email: string | null;
-  telefono?: string | null;
+  email?: string;
   rol: Rol;
-  departamento?: string | null;
-  activo?: boolean;
-  createdAt?: string;
-  ultimoAcceso?: string; 
-  
+  activo: boolean;
+  telefono?: string;
+  ultimoAcceso?: string;
 }
 
 export interface CrearUsuarioPayload {

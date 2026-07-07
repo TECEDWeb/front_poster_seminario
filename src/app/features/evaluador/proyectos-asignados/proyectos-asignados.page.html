@@ -1,171 +1,232 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>
-      Proyectos asignados
-    </ion-title>
-  </ion-toolbar>
 
+    <ion-title>
+      <span class="title-text">Proyectos asignados</span>
+      <span class="title-badge">Evaluador</span>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="loading">
+        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="loading"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
+<ion-content class="asignados-content">
+  <div class="page-container">
 
-<ion-content>
-
-<div class="page-container">
-
-
-  <div class="page-header">
-
-    <div>
-
-      <h1>
-        Proyectos asignados
-      </h1>
-
-
-      <p>
-        {{ proyectos.length }} proyectos para evaluar
-      </p>
-
-
-    </div>
-  </div>
-
-  <div
-    class="proyecto-card"
-    *ngFor="let p of proyectos"
-  >
-
-    <div class="proyecto-header">
-
-
-      <div class="proyecto-icon">
-
-        <ion-icon
-          name="document-text-outline">
-        </ion-icon>
-
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="header-left">
+        <h1>Proyectos asignados</h1>
+        <p>{{ totalAsignados }} proyectos para evaluar</p>
       </div>
-      <div class="proyecto-head">
-
-
-        <div class="proyecto-nombre">
-
-          {{ p.proyecto?.nombre }}
-
+      <div class="header-right">
+        <div class="stats-mini">
+          <span class="stat-count">{{ totalAsignados }}</span>
+          <span class="stat-label">Total</span>
         </div>
-
-        <div class="proyecto-area">
-
-          {{ p.proyecto.tipo || 'Proyecto' }}
-
+        <div class="stats-mini">
+          <span class="stat-count warning">{{ pendientes }}</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+        <div class="stats-mini">
+          <span class="stat-count success">{{ evaluados }}</span>
+          <span class="stat-label">Evaluados</span>
         </div>
       </div>
-
-      <span
-        class="badge badge-amber"
-        *ngIf="!p.yaEvaluado">
-
-        Pendiente
-
-      </span>
-
-      <span
-        class="badge badge-emerald"
-        *ngIf="p.yaEvaluado">
-
-        Evaluado
-
-      </span>
-
-
-
     </div>
 
-    <p
-      class="proyecto-desc"
-      *ngIf="p.proyecto.descripcion">
-
-      {{ p.proyecto?.descripcion }}
-
-    </p>
-
-    <div
-      class="participantes"
-      *ngIf="p.proyecto.participantes?.length"
-    >
-
-
-      <ion-icon
-        name="people-outline">
-      </ion-icon>
-
-
-      {{ p.proyecto?.participantes?.length }}
-
-      participante{{ 
-        p.proyecto.participantes.length !== 1 
-        ? 's' 
-        : '' 
-      }}
-
-
+    <!-- PROGRESS -->
+    <div class="progress-card" *ngIf="totalAsignados > 0">
+      <div class="progress-header">
+        <span class="progress-label">Progreso de evaluaciones</span>
+        <span class="progress-pct">{{ getPorcentajeProgreso() }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getPorcentajeProgreso()"></div>
+      </div>
+      <div class="progress-sub">
+        {{ evaluados }} de {{ totalAsignados }} proyectos evaluados
+        <span *ngIf="tieneProyectosPendientes()" class="progress-action">
+          <ion-icon name="time-outline"></ion-icon>
+          {{ pendientes }} pendiente{{ pendientes > 1 ? 's' : '' }}
+        </span>
+      </div>
     </div>
 
-    <!-- BOTON -->
+    <!-- FILTROS -->
+    <div class="filter-bar" *ngIf="!loading && totalAsignados > 0">
+      <div class="filter-group">
+        <span class="filter-label">Filtrar:</span>
+        <div class="filter-chips">
+          <ion-chip 
+            [class.chip-active]="filtroEstado === 'todos'"
+            (click)="cambiarFiltro('todos')">
+            <ion-label>Todos</ion-label>
+            <ion-badge>{{ totalAsignados }}</ion-badge>
+          </ion-chip>
+          <ion-chip 
+            [class.chip-active]="filtroEstado === 'pendientes'"
+            (click)="cambiarFiltro('pendientes')">
+            <ion-label>Pendientes</ion-label>
+            <ion-badge color="warning">{{ pendientes }}</ion-badge>
+          </ion-chip>
+          <ion-chip 
+            [class.chip-active]="filtroEstado === 'evaluados'"
+            (click)="cambiarFiltro('evaluados')">
+            <ion-label>Evaluados</ion-label>
+            <ion-badge color="success">{{ evaluados }}</ion-badge>
+          </ion-chip>
+        </div>
+      </div>
+    </div>
 
-    <ion-button
-      expand="block"
-      class="btn-evaluar"
-      [disabled]="p.yaEvaluado"
-      (click)="evaluar(p.evaluacionId)">
+    <!-- LOADING -->
+    <div class="loading-grid" *ngIf="loading">
+      <div class="proyecto-skeleton" *ngFor="let i of [1,2,3]">
+        <div class="skeleton-header">
+          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+          <div class="skeleton-text-group">
+            <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+          </div>
+        </div>
+        <ion-skeleton-text animated class="skeleton-desc"></ion-skeleton-text>
+        <div class="skeleton-meta">
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
+        </div>
+        <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+      </div>
+    </div>
 
-      <ion-icon
-        [name]="p.yaEvaluado 
-          ? 'checkmark-circle-outline' 
-          : 'clipboard-outline'"
-        slot="start">
-      </ion-icon>
+    <!-- ERROR -->
+    <div class="error-container" *ngIf="!loading && error">
+      <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+      <h3>Error al cargar los proyectos</h3>
+      <p>{{ error }}</p>
+      <ion-button (click)="recargar()" class="btn-retry">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
 
+    <!-- LISTA DE PROYECTOS -->
+    <div class="proyectos-list" *ngIf="!loading && !error">
+      <div class="proyecto-card" 
+           *ngFor="let p of proyectosFiltrados || []"
+           [class.card-pending]="!p.yaEvaluado"
+           [class.card-completed]="p.yaEvaluado">
 
-      {{
-        p.yaEvaluado
-        ? 'Ya evaluado'
-        : 'Evaluar proyecto'
-      }}
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="card-icon" [class]="p.yaEvaluado ? 'icon-completed' : 'icon-pending'">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
 
-    </ion-button>
+          <div class="card-info">
+            <div class="card-title">{{ p.proyecto?.nombre || 'Proyecto sin nombre' }}</div>
+            <div class="card-subtitle">
+              <span class="subtitle-item">
+                <ion-icon name="folder-outline"></ion-icon>
+                {{ p.proyecto?.tipo || 'Proyecto' }}
+              </span>
+              <span class="subtitle-item" *ngIf="p.proyecto?.concursoNombre">
+                <ion-icon name="trophy-outline"></ion-icon>
+                {{ p.proyecto?.concursoNombre }}
+              </span>
+            </div>
+          </div>
+
+          <div class="card-status">
+            <span class="status-badge" [class]="p.yaEvaluado ? 'status-completed' : 'status-pending'">
+              <span class="status-dot"></span>
+              {{ p.yaEvaluado ? 'Evaluado' : 'Pendiente' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <p class="card-description" *ngIf="p.proyecto?.descripcion">
+            {{ (p.proyecto?.descripcion?.length || 0) > 150 ? ((p.proyecto?.descripcion || '') | slice:0:150) + '...' : p.proyecto?.descripcion }}
+          </p>
+
+          <div class="card-meta">
+            <div class="meta-item" *ngIf="p.proyecto?.participantes?.length">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>{{ p.proyecto?.participantes?.length }} participante{{ p.proyecto?.participantes?.length !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="meta-item" *ngIf="p.proyecto?.puntajeMaximo">
+              <ion-icon name="star-outline"></ion-icon>
+              <span>Puntaje máx: {{ p.proyecto?.puntajeMaximo }} pts</span>
+            </div>
+            <div class="meta-item" *ngIf="p.fechaAsignacion">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>Asignado: {{ p.fechaAsignacion | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <ion-button 
+            expand="block"
+            class="btn-evaluar"
+            [class.btn-completed]="p.yaEvaluado"
+            [disabled]="p.yaEvaluado"
+            (click)="evaluar(p.evaluacionId)">
+
+            <ion-icon 
+              [name]="p.yaEvaluado ? 'checkmark-circle-outline' : 'clipboard-outline'"
+              slot="start">
+            </ion-icon>
+
+            {{ p.yaEvaluado ? 'Evaluación completada' : 'Evaluar proyecto' }}
+
+          </ion-button>
+        </div>
+
+        <!-- Badge de completado -->
+        <div class="completed-overlay" *ngIf="p.yaEvaluado">
+          <ion-icon name="checkmark-circle"></ion-icon>
+          <span>Completado</span>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0 && !loading">
+        <div class="empty-icon" *ngIf="proyectos.length === 0">
+          <ion-icon name="folder-open-outline"></ion-icon>
+        </div>
+        <div class="empty-icon" *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0">
+          <ion-icon name="filter-outline"></ion-icon>
+        </div>
+
+        <h3 *ngIf="proyectos.length === 0">Sin proyectos asignados</h3>
+        <h3 *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0">No hay proyectos con este filtro</h3>
+
+        <p *ngIf="proyectos.length === 0">
+          El administrador aún no te ha asignado proyectos para evaluar.
+        </p>
+        <p *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0">
+          Prueba cambiando los filtros para ver más proyectos.
+        </p>
+
+        <ion-button *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0"
+                    fill="outline"
+                    class="btn-clear-filter"
+                    (click)="cambiarFiltro('todos')">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Mostrar todos
+        </ion-button>
+      </div>
+    </div>
+
   </div>
-
-  <!-- SIN DATOS -->
-
-
-  <div
-
-    class="empty-state"
-
-    *ngIf="proyectos.length === 0"
-
-  >
-    <ion-icon
-      name="clipboard-outline">
-    </ion-icon>
-
-
-    <h3>
-      Sin proyectos asignados
-    </h3>
-
-
-    <p>
-      El administrador aún no te ha asignado proyectos
-    </p>
-
-  </div>
-
-</div>
-
-
 </ion-content>
