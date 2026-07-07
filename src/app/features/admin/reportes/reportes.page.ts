@@ -8,8 +8,11 @@ import {
   IonTitle,
   IonButton,
   IonIcon,
-  IonContent
+  IonContent,
+  IonItem,
+  IonLabel
 } from '@ionic/angular/standalone';
+
 import { addIcons } from 'ionicons';
 import {
   downloadOutline,
@@ -19,16 +22,16 @@ import {
   trophyOutline,
   barChartOutline
 } from 'ionicons/icons';
+
 import { ReporteService } from '../../../core/services/reporte.service';
-import { ReporteStats, Ranking } from 'src/app/core/models/reporte.model';
+
 
 @Component({
-  selector: 'app-reportes',
-  standalone: true,
-  imports: [
-    CommonModule,
+  selector:'app-reportes',
+  standalone:true,
 
-    // Ionic Standalone
+  imports:[
+    CommonModule,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -36,84 +39,211 @@ import { ReporteStats, Ranking } from 'src/app/core/models/reporte.model';
     IonTitle,
     IonButton,
     IonIcon,
-    IonContent
+    IonContent,
+    IonItem,
+    IonLabel
   ],
-  templateUrl: './reportes.page.html',
-  styleUrls: ['./reportes.page.scss']
+
+  templateUrl:'./reportes.page.html',
+  styleUrls:['./reportes.page.scss']
+
 })
 export class ReportesPage implements OnInit {
 
-  reportes: ReporteStats = {
-    proyectos: 0,
-    evaluaciones: 0
-  };
 
-  ranking: Ranking[] = [];
+reportes:any={
+ proyectos:0,
+ evaluaciones:0,
+ completadas:0,
+ promedio:0
+};
 
-  constructor(
-    private reporteService: ReporteService
-  ) {
 
-    addIcons({
-      downloadOutline,
-      statsChartOutline,
-      folderOutline,
-      checkmarkDoneOutline,
-      trophyOutline,
-      barChartOutline
-    });
 
-  }
+proyectos:any[]=[];
 
-  ngOnInit(): void {
-    this.cargarDatos();
-  }
 
-  cargarDatos(): void {
 
-    this.reporteService.getStats().subscribe({
+constructor(
+ private reporteService:ReporteService
+){
 
-      next: (res: any) => {
 
-        this.reportes = {
-          proyectos: res.proyectos ?? 0,
-          evaluaciones: res.evaluaciones ?? 0,
-          completadas: res.completadas ?? 0,
-          promedio: res.promedio ?? 0
-        } as ReporteStats;
+addIcons({
 
-      },
+downloadOutline,
+statsChartOutline,
+folderOutline,
+checkmarkDoneOutline,
+trophyOutline,
+barChartOutline
 
-      error: (err) => {
+});
 
-        console.error('Error stats:', err);
 
-      }
+}
 
-    });
 
-    this.reporteService.getRanking().subscribe({
 
-      next: (res: any) => {
 
-        const lista = res.data ?? [];
 
-        this.ranking = lista.map((r: any) => ({
-          nombre: r.nombre,
-          promedio: Number(r.promedio),
-          evaluadorNombre: r.calificacion
-        }));
+ngOnInit(){
 
-      },
-      error: (err) => {
+this.cargarDatos();
 
-        console.error('Error ranking:', err);
-        this.ranking = [];
+}
 
-      }
 
-    });
 
-  }
+
+cargarDatos(){
+
+
+
+this.reporteService.getStats()
+.subscribe({
+
+next:(res:any)=>{
+
+
+console.log(
+"STATS",
+res
+);
+
+
+this.reportes=res;
+
+
+},
+
+
+error:(err)=>{
+
+console.error(
+"Error stats",
+err
+)
+
+}
+
+
+});
+
+
+
+
+
+this.reporteService
+.getReporteProyectos()
+.subscribe({
+
+next:(res:any)=>{
+
+
+console.log(
+"REPORTES POR PROYECTO",
+res
+);
+
+
+
+this.proyectos =
+res.data ?? [];
+
+
+
+},
+
+
+error:(err)=>{
+
+
+console.error(
+"Error proyectos",
+err
+);
+
+
+this.proyectos=[];
+
+
+}
+
+
+
+});
+
+
+}
+
+
+
+
+exportar(){
+
+
+console.log(
+"Exportando reporte..."
+);
+
+
+
+this.reporteService
+.exportar()
+.subscribe({
+
+next:(blob:any)=>{
+
+
+const url =
+window.URL.createObjectURL(blob);
+
+
+
+const a =
+document.createElement('a');
+
+
+a.href=url;
+
+a.download=
+'reporte-evaluaciones.xlsx';
+
+
+a.click();
+
+
+
+window.URL.revokeObjectURL(url);
+
+
+
+},
+
+
+error:(err)=>{
+
+
+console.error(
+"Error exportando",
+err
+);
+
+
+
+}
+
+
+
+});
+
+
+
+}
+
+
+
+
 
 }

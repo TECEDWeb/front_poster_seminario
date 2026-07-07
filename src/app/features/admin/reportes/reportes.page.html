@@ -1,76 +1,83 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
-    <ion-title>Reportes</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" size="small">
-        <ion-icon name="download-outline" slot="start"></ion-icon>
-        Exportar
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="section-title">
 
-<ion-content>
-  <div class="page-container">
+<h2>
+Reportes por proyecto
+</h2>
 
-    <div class="page-header">
-      <div>
-        <h1>Reportes y estadísticas</h1>
-        <p>Resultados globales del concurso</p>
-      </div>
-    </div>
+</div>
 
-    <!-- Stats resumen -->
-    <div class="stats-grid">
-      <div class="stat-mini">
-        <div class="stat-mini-icon violet"><ion-icon name="stats-chart-outline"></ion-icon></div>
-        <div class="stat-mini-val">{{ reportes.evaluaciones }}</div>
-        <div class="stat-mini-lbl">Evaluaciones</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-icon indigo"><ion-icon name="folder-outline"></ion-icon></div>
-        <div class="stat-mini-val">{{ reportes.proyectos }}</div>
-        <div class="stat-mini-lbl">Proyectos</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-icon emerald"><ion-icon name="checkmark-done-outline"></ion-icon></div>
-        <div class="stat-mini-val">{{ reportes.completadas ?? 0 }}</div>
-        <div class="stat-mini-lbl">Completadas</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-icon amber"><ion-icon name="trophy-outline"></ion-icon></div>
-        <div class="stat-mini-val">{{ reportes.promedio ?? '—' }}</div>
-        <div class="stat-mini-lbl">Promedio</div>
-      </div>
-    </div>
 
-    <!-- Ranking -->
-    <div class="section-title">
-      <h2>Ranking de proyectos</h2>
-    </div>
 
-    <div class="pro-card">
-      <div class="ranking-row" *ngFor="let r of ranking; let i = index">
-        <div class="rank-pos" [ngClass]="'pos-' + (i+1 <= 3 ? i+1 : 'rest')">
-          {{ i + 1 }}
-        </div>
-        <div class="rank-info">
-          <div class="rank-nombre">{{ r.nombre }}</div>
-          <div class="rank-meta">{{ r.evaluadorNombre || 'Sin evaluador' }}</div>
-        </div>
-        <div class="rank-puntaje">
-          <div class="puntaje-val">{{ r.promedio | number:'1.1-1' }}</div>
-          <div class="puntaje-lbl">pts promedio</div>
-        </div>
-      </div>
+<div
+class="pro-card"
+*ngFor="let p of proyectos">
 
-      <div class="empty-state" *ngIf="ranking.length === 0">
-        <ion-icon name="bar-chart-outline"></ion-icon>
-        <h3>Sin datos</h3>
-        <p>Los resultados aparecerán cuando haya evaluaciones completadas</p>
-      </div>
-    </div>
 
-  </div>
-</ion-content>
+<h2>
+{{p.proyecto}}
+</h2>
+
+
+<div class="detalle">
+
+
+<p>
+<b>Evaluaciones:</b>
+
+{{p.evaluaciones}}
+
+</p>
+
+
+<p>
+<b>Promedio:</b>
+
+{{p.promedio | number:'1.1-2'}}
+
+pts
+
+</p>
+
+
+</div>
+
+
+
+<div
+class="ranking-row"
+*ngFor="let e of p.evaluadores">
+
+
+<div class="rank-info">
+
+
+<div class="rank-nombre">
+
+{{e.nombre}}
+
+</div>
+
+
+<div class="rank-meta">
+
+{{e.rol}}
+
+</div>
+
+
+</div>
+
+
+
+<div class="rank-puntaje">
+
+{{e.puntaje}}
+
+</div>
+
+
+</div>
+
+
+
+</div>
