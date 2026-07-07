@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -13,7 +13,8 @@ import {
   IonButton,
   IonChip,
   IonLabel,
-  IonSpinner
+  IonSpinner,
+  IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -31,7 +32,9 @@ import {
   filterOutline,
   refreshOutline,
   clipboardOutline,
-  arrowForwardOutline
+  arrowForwardOutline,
+  downloadOutline,
+  printOutline
 } from 'ionicons/icons';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
@@ -53,7 +56,8 @@ import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
     IonButton,
     IonChip,
     IonLabel,
-    IonSpinner
+    IonSpinner,
+    IonBadge
   ],
   templateUrl: './mis-resultados.page.html',
   styleUrls: ['./mis-resultados.page.scss']
@@ -73,7 +77,10 @@ export class MisResultadosPage implements OnInit {
   // Filtros
   filtroEstado: string = 'todos';
 
-  constructor(private evaluacionService: EvaluacionService) {
+  constructor(
+    private evaluacionService: EvaluacionService,
+    private router: Router
+  ) {
     addIcons({
       checkmarkCircleOutline,
       personOutline,
@@ -89,7 +96,9 @@ export class MisResultadosPage implements OnInit {
       filterOutline,
       refreshOutline,
       clipboardOutline,
-      arrowForwardOutline
+      arrowForwardOutline,
+      downloadOutline,
+      printOutline
     });
   }
 
@@ -208,11 +217,32 @@ export class MisResultadosPage implements OnInit {
     return '#ef4444';
   }
 
+  /**
+   * Navegar al detalle de la evaluación
+   * Usa el formulario de evaluación en modo solo lectura
+   */
   verDetalle(id: number): void {
-    console.log('Ver detalle de evaluación:', id);
-    // Aquí puedes navegar al detalle
-    // this.router.navigate(['/evaluador/resultado', id]);
-    alert(`Ver detalle de la evaluación #${id}`);
+    console.log('Ver detalle de evaluación ID:', id);
+    
+    // Buscar la evaluación en la lista para obtener información adicional
+    const evaluacion = this.evaluaciones.find(e => e.id === id);
+    
+    if (evaluacion) {
+      // Navegar al formulario de evaluación con el ID
+      // El formulario mostrará los datos en modo solo lectura
+      this.router.navigate(['/evaluador/formulario-evaluacion', id]);
+    } else {
+      // Si no se encuentra, intentar navegar de todas formas
+      this.router.navigate(['/evaluador/formulario-evaluacion', id]);
+    }
+  }
+
+  /**
+   * Exportar resultado como PDF (opcional)
+   */
+  exportarResultado(id: number): void {
+    console.log('Exportar resultado ID:', id);
+    alert('Función de exportación en desarrollo');
   }
 
   recargar(): void {

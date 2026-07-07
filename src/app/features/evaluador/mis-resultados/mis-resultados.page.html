@@ -170,11 +170,15 @@
           </div>
         </div>
 
-        <!-- Actions -->
+        <!-- Actions - BOTÓN VER DETALLE FUNCIONANDO -->
         <div class="card-actions" *ngIf="e.id">
           <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(e.id)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
             Ver detalle
+          </ion-button>
+          <ion-button fill="clear" size="small" class="action-btn" (click)="exportarResultado(e.id)">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Exportar
           </ion-button>
         </div>
       </div>
