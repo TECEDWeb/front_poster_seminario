@@ -1,6 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import {
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonMenuButton,
+  IonTitle,
+  IonButton,
+  IonIcon,
+  IonContent
+} from '@ionic/angular/standalone';
+
+import { addIcons } from 'ionicons';
+
+import {
+  downloadOutline
+} from 'ionicons/icons';
+
 import { ReporteService } from '../../../core/services/reporte.service';
 
 
@@ -11,7 +28,16 @@ import { ReporteService } from '../../../core/services/reporte.service';
   standalone: true,
 
   imports: [
-    CommonModule
+    CommonModule,
+
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonTitle,
+    IonButton,
+    IonIcon,
+    IonContent
   ],
 
   templateUrl: './reportes.page.html',
@@ -42,10 +68,18 @@ export class ReportesPage implements OnInit {
 
 
   constructor(
-
     private reporteService: ReporteService
+  ) {
 
-  ) {}
+
+    addIcons({
+
+      downloadOutline
+
+    });
+
+
+  }
 
 
 
@@ -57,13 +91,13 @@ export class ReportesPage implements OnInit {
 
 
 
-
   cargarDatos(): void {
 
 
     this.reporteService
       .getStats()
       .subscribe({
+
 
         next: (res: any) => {
 
@@ -91,6 +125,7 @@ export class ReportesPage implements OnInit {
 
 
         }
+
 
       });
 
@@ -148,7 +183,6 @@ export class ReportesPage implements OnInit {
     );
 
 
-
     this.reporteService
       .exportar()
       .subscribe({
@@ -164,7 +198,6 @@ export class ReportesPage implements OnInit {
               );
 
 
-
           const enlace =
             document.createElement(
               'a'
@@ -178,9 +211,7 @@ export class ReportesPage implements OnInit {
             'reporte-evaluaciones.xlsx';
 
 
-
           enlace.click();
-
 
 
           window.URL
