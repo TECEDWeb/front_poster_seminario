@@ -1,72 +1,52 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonMenuButton,
-  IonTitle,
-  IonButton,
-  IonIcon,
-  IonContent
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  downloadOutline,
-  statsChartOutline,
-  folderOutline,
-  checkmarkDoneOutline,
-  trophyOutline,
-  barChartOutline
-} from 'ionicons/icons';
+
 import { ReporteService } from '../../../core/services/reporte.service';
 
+
 @Component({
+
   selector: 'app-reportes',
 
   standalone: true,
 
   imports: [
-    CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonMenuButton,
-    IonTitle,
-    IonButton,
-    IonIcon,
-    IonContent
+    CommonModule
   ],
+
   templateUrl: './reportes.page.html',
-  styleUrls: ['./reportes.page.scss']
+
+  styleUrls: [
+    './reportes.page.scss'
+  ]
+
 })
 export class ReportesPage implements OnInit {
 
+
   reportes = {
+
     proyectos: 0,
+
     evaluaciones: 0,
+
     completadas: 0,
+
     promedio: 0
 
   };
 
+
   proyectos: any[] = [];
 
+
+
   constructor(
+
     private reporteService: ReporteService
-  ) {
 
-    addIcons({
-      downloadOutline,
-      statsChartOutline,
-      folderOutline,
-      checkmarkDoneOutline,
-      trophyOutline,
-      barChartOutline
+  ) {}
 
-    });
-
-  }
 
 
   ngOnInit(): void {
@@ -75,7 +55,11 @@ export class ReportesPage implements OnInit {
 
   }
 
+
+
+
   cargarDatos(): void {
+
 
     this.reporteService
       .getStats()
@@ -83,49 +67,78 @@ export class ReportesPage implements OnInit {
 
         next: (res: any) => {
 
+
           console.log(
             'STATS:',
             res
           );
 
+
           this.reportes =
             res.data;
 
+
         },
 
+
         error: (err) => {
+
 
           console.error(
             'Error cargando estadísticas:',
             err
           );
 
+
         }
+
       });
+
+
 
     this.reporteService
       .getReporteProyectos()
       .subscribe({
+
+
         next: (res: any) => {
+
+
           console.log(
             'REPORTES POR PROYECTO:',
             res
           );
+
+
           this.proyectos =
             res.data ?? [];
 
+
         },
 
+
         error: (err) => {
+
+
           console.error(
             'Error cargando proyectos:',
             err
           );
+
+
           this.proyectos = [];
 
+
         }
+
+
       });
+
+
   }
+
+
+
 
   exportar(): void {
 
@@ -134,17 +147,23 @@ export class ReportesPage implements OnInit {
       'Exportando reporte...'
     );
 
+
+
     this.reporteService
       .exportar()
       .subscribe({
 
+
         next: (archivo: Blob) => {
+
 
           const url =
             window.URL
               .createObjectURL(
                 archivo
               );
+
+
 
           const enlace =
             document.createElement(
@@ -154,27 +173,41 @@ export class ReportesPage implements OnInit {
 
           enlace.href = url;
 
+
           enlace.download =
             'reporte-evaluaciones.xlsx';
 
+
+
           enlace.click();
+
+
 
           window.URL
             .revokeObjectURL(
               url
             );
 
+
         },
 
+
         error: (err) => {
+
+
           console.error(
             'Error exportando reporte:',
             err
           );
+
+
         }
+
 
       });
 
+
   }
+
 
 }

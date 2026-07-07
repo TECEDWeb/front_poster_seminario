@@ -1,71 +1,87 @@
-ion-content {
-  --background: #f6f7fb;
-}
-
-.page-container {
-  padding: 20px;
-}
-
 .section-title {
+
   margin-bottom: 20px;
-  h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1e293b;
-  }
+
 }
+
+
+.section-title h2 {
+
+  font-size: 28px;
+
+  font-weight: bold;
+
+}
+
 
 
 .pro-card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow:
-    0 4px 15px rgba(0,0,0,0.08);
 
-  h2 {
-    margin-top: 0;
-    color: #111827;
-    font-size: 20px;
-  }
+  background: white;
+
+  border-radius: 15px;
+
+  padding: 20px;
+
+  margin-bottom: 20px;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,.15);
+
 }
+
+
 
 .detalle {
+
   display: flex;
+
   gap: 30px;
+
   margin-bottom: 20px;
-  color: #475569;
+
 }
+
+
 
 .ranking-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  border-radius: 10px;
-  background: #f8fafc;
-  margin-top: 10px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  padding:15px;
+
+  border-bottom:1px solid #ddd;
+
 }
 
-.rank-info {
-  display: flex;
-  flex-direction: column;
-}
+
 
 .rank-nombre {
-  font-weight: 700;
-  color: #1e293b;
+
+  font-weight:bold;
+
 }
+
+
 
 .rank-meta {
-  font-size: 13px;
-  color: #64748b;
+
+  font-size:14px;
+
+  opacity:.7;
 
 }
 
+
+
 .rank-puntaje {
-  font-size: 20px;
-  font-weight: bold;
-  color: #2563eb;
+
+  font-size:22px;
+
+  font-weight:bold;
+
 }
