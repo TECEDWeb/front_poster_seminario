@@ -100,11 +100,9 @@ export class FormularioEvaluacionPage implements OnInit {
 
 
 
-  cargarFormulario(): void {
-
+ cargarFormulario(): void {
 
     this.cargando = true;
-
 
     this.evaluacionService
       .getFormulario(this.evaluacionId)
@@ -112,54 +110,56 @@ export class FormularioEvaluacionPage implements OnInit {
 
         next: (res: any) => {
 
+          console.log("=======================================");
+          console.log("🟢 RESPUESTA COMPLETA DEL BACKEND");
+          console.log(res);
 
-          console.log(
-            '🟢 FORMULARIO RECIBIDO:',
-            res
-          );
+          console.log("🟢 res.ok");
+          console.log(res?.ok);
 
+          console.log("🟢 res.data");
+          console.log(res?.data);
+
+          console.log("🟢 res.data.rubrica");
+          console.log(res?.data?.rubrica);
+
+          console.log("🟢 res.data.secciones");
+          console.log(res?.data?.secciones);
+
+          console.log("=======================================");
 
           if (res?.ok === false) {
 
-            console.error(
-              '❌ Backend respondió error:',
-              res.mensaje
-            );
+            console.error("❌ Backend respondió:");
+            console.error(res.mensaje);
 
             this.formulario = null;
 
           } else {
 
+            this.formulario = res.data;
 
-            this.formulario =
-              res?.data ?? null;
+            console.log("🟢 FORMULARIO GUARDADO");
+            console.log(this.formulario);
 
+            console.log("🟢 TOTAL SECCIONES:");
+            console.log(this.formulario?.secciones?.length);
 
           }
 
-
           this.cargando = false;
-
 
         },
 
-
         error: (err) => {
 
-
-          console.error(
-            '❌ Error HTTP formulario:',
-            err
-          );
-
+          console.error("❌ ERROR HTTP");
+          console.error(err);
 
           this.formulario = null;
-
           this.cargando = false;
 
-
         }
-
 
       });
 
