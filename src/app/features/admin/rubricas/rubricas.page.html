@@ -13,7 +13,7 @@
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
-      <ion-button class="btn-add" routerLink="/admin/rubricas/nuevo">
+      <ion-button class="btn-add" (click)="abrirCrear()">
         <ion-icon name="add-outline" slot="start"></ion-icon>
         Nueva rúbrica
       </ion-button>
@@ -128,7 +128,7 @@
             <ion-button fill="clear" size="small" class="action-icon-btn" (click)="verDetalle(r)">
               <ion-icon name="eye-outline"></ion-icon>
             </ion-button>
-            <ion-button fill="clear" size="small" class="action-icon-btn" routerLink="/admin/rubricas/editar/{{ r.concursoId }}">
+            <ion-button fill="clear" size="small" class="action-icon-btn" (click)="editar(r)">
               <ion-icon name="create-outline"></ion-icon>
             </ion-button>
             <ion-button fill="clear" size="small" class="action-icon-btn danger" (click)="confirmarEliminar(r)">
@@ -196,13 +196,13 @@
           </div>
         </div>
 
-        <!-- Actions - TODOS HABILITADOS -->
+        <!-- Actions -->
         <div class="card-actions">
           <ion-button fill="outline" size="small" class="action-btn" (click)="verDetalle(r)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
             Ver detalle
           </ion-button>
-          <ion-button fill="outline" size="small" class="action-btn" routerLink="/admin/rubricas/editar/{{ r.concursoId }}">
+          <ion-button fill="outline" size="small" class="action-btn" (click)="editar(r)">
             <ion-icon name="create-outline" slot="start"></ion-icon>
             Editar
           </ion-button>
@@ -232,7 +232,7 @@
         </div>
         <h3>No hay rúbricas</h3>
         <p>Crea la primera rúbrica para un concurso</p>
-        <ion-button class="btn-primary" routerLink="/admin/rubricas/nuevo">
+        <ion-button class="btn-primary" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           Crear rúbrica
         </ion-button>
@@ -243,8 +243,122 @@
 
   <!-- FAB -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary" routerLink="/admin/rubricas/nuevo">
+    <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
+  <!-- ============================================ -->
+  <!-- MODAL DE RÚBRICA -->
+  <!-- ============================================ -->
+  <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ editando ? 'Editar rúbrica' : 'Nueva rúbrica' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="modal-container">
+          <form (ngSubmit)="guardar()" #rubricaForm="ngForm">
+            <!-- Concurso -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="trophy-outline"></ion-icon>
+                Concurso
+                <span class="required">*</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-select
+                  [(ngModel)]="form.concursoId"
+                  name="concursoId"
+                  placeholder="Seleccione un concurso"
+                  required>
+                  <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
+                    {{ c.nombre }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <!-- Nombre -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="pricetag-outline"></ion-icon>
+                Nombre de la rúbrica
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.nombre"
+                  name="nombre"
+                  placeholder="Ingrese el nombre de la rúbrica">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Descripción -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="document-text-outline"></ion-icon>
+                Descripción
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-textarea
+                  [(ngModel)]="form.descripcion"
+                  name="descripcion"
+                  placeholder="Ingrese una descripción de la rúbrica"
+                  rows="3">
+                </ion-textarea>
+              </ion-item>
+            </div>
+
+            <!-- Puntaje Máximo -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="star-outline"></ion-icon>
+                Puntaje máximo
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.puntajeMaximo"
+                  name="puntajeMaximo"
+                  type="number"
+                  placeholder="Ej: 100">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Botones -->
+            <div class="form-actions">
+              <ion-button
+                type="button"
+                fill="outline"
+                class="cancel-btn"
+                (click)="cerrarModal()">
+                Cancelar
+              </ion-button>
+
+              <ion-button
+                type="submit"
+                class="submit-btn"
+                [disabled]="!rubricaForm.form.valid || guardando">
+                <ion-icon
+                  [name]="guardando ? 'refresh-outline' : 'checkmark-outline'"
+                  slot="start"
+                  [class.spinning]="guardando">
+                </ion-icon>
+                {{ guardando ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear rúbrica') }}
+              </ion-button>
+            </div>
+          </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

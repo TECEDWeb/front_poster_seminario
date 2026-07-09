@@ -22,9 +22,14 @@ import {
   IonLabel,
   IonSpinner,
   IonSearchbar,
-  IonInput,        // ← AÑADIR
-  IonSelect,       // ← AÑADIR
-  IonSelectOption
+  IonSelect,
+  IonSelectOption,
+  IonModal,
+  IonItem,
+  IonInput,
+  IonTextarea,
+  IonToggle,
+  IonDatetime
 } from '@ionic/angular/standalone';
 import { RubricaService } from '../../../core/services/rubrica.service';
 import { RubricaConcurso } from '../../../core/models/rubrica.model';
@@ -43,7 +48,13 @@ import {
   searchOutline,
   funnelOutline,
   closeOutline,
-  alertCircleOutline
+  alertCircleOutline,
+  checkmarkOutline,
+  documentTextOutline,
+  folderOutline,
+  pricetagOutline,
+  starOutline,
+  trophyOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -71,10 +82,15 @@ import {
     IonChip,
     IonLabel,
     IonSpinner,
-    IonInput,
     IonSearchbar,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonModal,
+    IonItem,
+    IonInput,
+    IonTextarea,
+    IonToggle,
+    IonDatetime
   ],
   templateUrl: './rubricas.page.html',
   styleUrls: ['./rubricas.page.scss']
@@ -93,6 +109,20 @@ export class RubricasPage implements OnInit {
   filtroBusqueda: string = '';
   filtroSecciones: string = 'todos';
 
+  // Modal
+  modalAbierto = false;
+  editando = false;
+  guardando = false;
+  concursosDisponibles: any[] = [];
+
+  form: any = {
+    id: null,
+    concursoId: null,
+    nombre: '',
+    descripcion: '',
+    puntajeMaximo: 100
+  };
+
   constructor(private rubricaService: RubricaService) {
     addIcons({
       addOutline,
@@ -108,12 +138,19 @@ export class RubricasPage implements OnInit {
       searchOutline,
       funnelOutline,
       closeOutline,
-      alertCircleOutline
+      alertCircleOutline,
+      checkmarkOutline,
+      documentTextOutline,
+      folderOutline,
+      pricetagOutline,
+      starOutline,
+      trophyOutline
     });
   }
 
   ngOnInit(): void {
     this.cargarRubricas();
+    this.cargarConcursos();
   }
 
   cargarRubricas(): void {
@@ -138,6 +175,19 @@ export class RubricasPage implements OnInit {
     });
   }
 
+  cargarConcursos(): void {
+    this.rubricaService.obtenerConcursos().subscribe({
+      next: (res) => {
+        this.concursosDisponibles = res || [];
+        console.log('Concursos disponibles:', this.concursosDisponibles);
+      },
+      error: (err) => {
+        console.error('Error cargando concursos:', err);
+        this.concursosDisponibles = [];
+      }
+    });
+  }
+
   calcularEstadisticas(): void {
     this.totalSecciones = this.rubricas.reduce(
       (total, r) => total + (r.secciones?.length || 0), 0
@@ -153,7 +203,6 @@ export class RubricasPage implements OnInit {
   aplicarFiltros(): void {
     let filtered = [...this.rubricas];
 
-    // Filtro por búsqueda (concursoId)
     if (this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
       filtered = filtered.filter(r =>
@@ -161,7 +210,6 @@ export class RubricasPage implements OnInit {
       );
     }
 
-    // Filtro por número de secciones
     if (this.filtroSecciones !== 'todos') {
       const minSecciones = parseInt(this.filtroSecciones);
       filtered = filtered.filter(r => (r.secciones?.length || 0) >= minSecciones);
@@ -190,6 +238,71 @@ export class RubricasPage implements OnInit {
     this.aplicarFiltros();
   }
 
+  // =========================
+  // MODAL
+  // =========================
+  abrirCrear(): void {
+    this.editando = false;
+    this.form = {
+      id: null,
+      concursoId: null,
+      nombre: '',
+      descripcion: '',
+      puntajeMaximo: 100
+    };
+    this.modalAbierto = true;
+  }
+
+  cerrarModal(): void {
+    this.modalAbierto = false;
+  }
+
+  editar(rubrica: RubricaConcurso): void {
+    this.editando = true;
+    this.form = {
+      id: rubrica.concursoId,
+      concursoId: rubrica.concursoId,
+      nombre: `Rúbrica del concurso #${rubrica.concursoId}`,
+      descripcion: '',
+      puntajeMaximo: 100
+    };
+    this.modalAbierto = true;
+  }
+
+  guardar(): void {
+    if (!this.form.concursoId) {
+      alert('Por favor seleccione un concurso');
+      return;
+    }
+
+    this.guardando = true;
+
+    const payload = {
+      concursoId: this.form.concursoId,
+      nombre: this.form.nombre || `Rúbrica del concurso #${this.form.concursoId}`,
+      descripcion: this.form.descripcion || null,
+      puntajeMaximo: this.form.puntajeMaximo || 100
+    };
+
+    const req = this.editando
+      ? this.rubricaService.actualizar(this.form.id, payload)
+      : this.rubricaService.crear(payload);
+
+    req.subscribe({
+      next: () => {
+        this.guardando = false;
+        this.modalAbierto = false;
+        this.cargarRubricas();
+        alert(this.editando ? 'Rúbrica actualizada correctamente' : 'Rúbrica creada correctamente');
+      },
+      error: (err) => {
+        this.guardando = false;
+        console.error('Error guardando rúbrica:', err);
+        alert(err.error?.mensaje || 'Error al guardar la rúbrica');
+      }
+    });
+  }
+
   confirmarEliminar(rubrica: RubricaConcurso): void {
     if (confirm(`¿Estás seguro de eliminar la rúbrica del concurso #${rubrica.concursoId}?`)) {
       this.eliminarRubrica(rubrica.concursoId);
@@ -211,14 +324,11 @@ export class RubricasPage implements OnInit {
 
   exportarRubrica(rubrica: RubricaConcurso): void {
     console.log('Exportando rúbrica:', rubrica);
-    // Aquí implementar la exportación real
     alert(`Exportando rúbrica del concurso #${rubrica.concursoId}`);
   }
 
   verDetalle(rubrica: RubricaConcurso): void {
     console.log('Ver detalle:', rubrica);
-    // Aquí navegar a la página de detalle
-    // this.router.navigate(['/admin/rubricas', rubrica.concursoId]);
     alert(`Ver detalle de la rúbrica #${rubrica.concursoId}`);
   }
 
