@@ -264,29 +264,39 @@ export class RubricasPage implements OnInit {
   // MODAL - EDITAR
   // =========================
   editar(rubrica: RubricaConcurso): void {
+    console.log('📝 Editando rúbrica:', rubrica);
+    
     this.editando = true;
+    
     // Buscar el concurso correspondiente
     const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
+    
+    // IMPORTANTE: Asignar el nombre correctamente
+    // Si el concurso tiene nombre, usarlo; si no, usar un nombre por defecto
+    const nombreRubrica = concurso?.nombre 
+      ? `Rúbrica: ${concurso.nombre}` 
+      : `Rúbrica del concurso #${rubrica.concursoId}`;
     
     this.form = {
       id: rubrica.concursoId,
       concursoId: rubrica.concursoId,
-      nombre: concurso?.nombre || `Rúbrica del concurso #${rubrica.concursoId}`,
+      nombre: nombreRubrica,  // ← Asegurar que el nombre se asigna
       descripcion: concurso?.descripcion || '',
       puntajeMaximo: 100
     };
+    
+    console.log('📝 Formulario después de editar:', this.form);
+    
     this.modalAbierto = true;
   }
 
   // =========================
   // MODAL - GUARDAR
   // =========================
-  // =========================
-  // MODAL - GUARDAR
-  // =========================
   guardar(): void {
     console.log('🔍 Iniciando guardar()');
     console.log('🔍 Form actual:', this.form);
+    console.log('🔍 editando:', this.editando);
 
     // Validar que tenga concurso seleccionado
     if (!this.form.concursoId) {
@@ -298,6 +308,7 @@ export class RubricasPage implements OnInit {
     // Validar que tenga nombre
     if (!this.form.nombre || this.form.nombre.trim() === '') {
       console.log('❌ Error: Nombre vacío');
+      console.log('❌ Valor actual de form.nombre:', this.form.nombre);
       alert('Por favor ingrese el nombre de la rúbrica');
       return;
     }
