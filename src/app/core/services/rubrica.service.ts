@@ -91,12 +91,26 @@ export class RubricaService {
   }
 
   /**
-   * Actualizar una rúbrica existente
+   * Actualizar una rúbrica existente - CORREGIDO
    */
   actualizar(id: number, data: any): Observable<RubricaConcurso> {
-    const payload = this.mapearParaBackend(data);
+    console.log('📤 rubricaService.actualizar() - Datos recibidos:', JSON.stringify(data, null, 2));
+    
+    // Construir payload directamente sin usar mapearParaBackend
+    const payload = {
+      concurso_id: data.concurso_id || data.concursoId,
+      nombre: data.nombre || '',
+      descripcion: data.descripcion || null,
+      puntaje_maximo: data.puntaje_maximo || data.puntajeMaximo || 100,
+      secciones: data.secciones || [],
+      niveles: data.niveles || []
+    };
+
+    console.log('📤 rubricaService.actualizar() - Payload final:', JSON.stringify(payload, null, 2));
+    
     return this.http.put<any>(`${this.apiUrl}/${id}`, payload).pipe(
       map((res: any) => {
+        console.log('📥 rubricaService.actualizar() - Respuesta:', res);
         const result = res?.data ?? res ?? {};
         return this.mapearRubrica(result);
       })
@@ -149,11 +163,16 @@ export class RubricaService {
   }
 
   /**
-   * Mapear del modelo al backend
+   * Mapear del modelo al backend - OBSOLETO, no usar
    */
   private mapearParaBackend(data: any): any {
+    // Este método estaba removiendo nombre y descripcion
+    // Ya no se usa, se reemplazó por la construcción directa en actualizar()
     return {
       concurso_id: data.concursoId || data.concurso_id,
+      nombre: data.nombre || '',
+      descripcion: data.descripcion || null,
+      puntaje_maximo: data.puntaje_maximo || data.puntajeMaximo || 100,
       secciones: data.secciones?.map((s: any) => ({
         nombre: s.nombre,
         orden: s.orden || 0,
