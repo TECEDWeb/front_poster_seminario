@@ -5,236 +5,197 @@
     </ion-buttons>
 
     <ion-title>
-      <span class="title-text">Rúbricas</span>
-      <span class="title-badge">Evaluación</span>
+      <span class="title-text">Concursos</span>
+      <span class="title-badge">Científicos</span>
     </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
-        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
-      </ion-button>
       <ion-button class="btn-add" (click)="abrirCrear()">
         <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nueva rúbrica
+        Nuevo concurso
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="rubricas-content">
+<ion-content class="concursos-content">
   <div class="page-container">
 
     <!-- HEADER -->
     <div class="page-header">
       <div class="header-left">
-        <h1>Gestión de rúbricas</h1>
-        <p>Administra las rúbricas de evaluación para concursos</p>
+        <h1>Gestión de concursos</h1>
+        <p>Administra los concursos científicos y sus convocatorias</p>
       </div>
       <div class="header-right">
         <div class="stats-mini">
-          <span class="stat-count">{{ rubricas.length }}</span>
-          <span class="stat-label">Rúbricas</span>
+          <span class="stat-count">{{ concursos.length }}</span>
+          <span class="stat-label">Total concursos</span>
         </div>
-        <div class="stats-mini">
-          <span class="stat-count">{{ totalSecciones }}</span>
-          <span class="stat-label">Secciones</span>
-        </div>
-        <div class="stats-mini">
-          <span class="stat-count">{{ totalNiveles }}</span>
-          <span class="stat-label">Niveles</span>
-        </div>
-        <div class="stats-mini">
-          <span class="stat-count">{{ totalCriteriosGlobal }}</span>
-          <span class="stat-label">Criterios</span>
+        <div class="stats-mini active">
+          <span class="stat-count">{{ concursosActivos }}</span>
+          <span class="stat-label">Activos</span>
         </div>
       </div>
     </div>
 
     <!-- FILTROS -->
-    <div class="filter-bar" *ngIf="!cargando && rubricas.length > 0">
-      <div class="filter-group search-group">
+    <div class="filter-bar" *ngIf="!cargando && concursos.length > 0">
+      <div class="filter-group">
         <ion-searchbar
-          [(ngModel)]="filtroBusqueda"
-          (ionInput)="aplicarFiltros()"
-          placeholder="Buscar por ID de concurso..."
+          [(ngModel)]="filtroTexto"
+          (ionInput)="filtrarConcursos()"
+          placeholder="Buscar concurso..."
           class="filter-search"
           animated>
         </ion-searchbar>
       </div>
-
       <div class="filter-group">
         <ion-select
-          [(ngModel)]="filtroSecciones"
-          (ionChange)="aplicarFiltros()"
-          placeholder="Filtrar por secciones"
+          [(ngModel)]="filtroEstado"
+          (ionChange)="filtrarConcursos()"
+          placeholder="Todos los estados"
           interface="popover"
           class="filter-select">
-          <ion-select-option value="todos">Todas las secciones</ion-select-option>
-          <ion-select-option value="1">1 o más secciones</ion-select-option>
-          <ion-select-option value="2">2 o más secciones</ion-select-option>
-          <ion-select-option value="3">3 o más secciones</ion-select-option>
+          <ion-select-option value="todos">Todos los estados</ion-select-option>
+          <ion-select-option value="activo">Activos</ion-select-option>
+          <ion-select-option value="inactivo">Inactivos</ion-select-option>
+          <ion-select-option value="finalizado">Finalizados</ion-select-option>
         </ion-select>
       </div>
-
-      <ion-button fill="clear" size="small" class="btn-clear-filters" (click)="limpiarFiltros()" *ngIf="filtroBusqueda || filtroSecciones !== 'todos'">
-        <ion-icon name="close-outline"></ion-icon>
-        Limpiar
-      </ion-button>
     </div>
 
     <!-- LOADING -->
     <div class="loading-grid" *ngIf="cargando">
-      <div class="rubrica-skeleton" *ngFor="let i of [1,2,3,4]">
-        <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
-        <div class="skeleton-stats">
-          <ion-skeleton-text animated class="skeleton-stat"></ion-skeleton-text>
-          <ion-skeleton-text animated class="skeleton-stat"></ion-skeleton-text>
+      <div class="concurso-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+        <div class="skeleton-header">
+          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+          <div class="skeleton-text-group">
+            <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+          </div>
         </div>
-        <div class="skeleton-criterios">
-          <ion-skeleton-text animated class="skeleton-criterio" *ngFor="let j of [1,2,3]"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-desc"></ion-skeleton-text>
+        <div class="skeleton-meta">
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-meta-item"></ion-skeleton-text>
         </div>
       </div>
     </div>
 
-    <!-- ERROR -->
-    <div class="error-container" *ngIf="!cargando && error">
-      <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
-      <h3>Error al cargar los datos</h3>
-      <p>{{ error }}</p>
-      <ion-button (click)="recargar()" class="btn-retry">
-        <ion-icon name="refresh-outline" slot="start"></ion-icon>
-        Reintentar
-      </ion-button>
-    </div>
+    <!-- LISTA -->
+    <div class="concursos-grid" *ngIf="!cargando">
+      <div class="concurso-card" 
+           *ngFor="let c of concursosFiltrados || []; trackBy: trackById"
+           [class.card-active]="c.activo"
+           [class.card-inactive]="!c.activo">
 
-    <!-- LISTA DE RÚBRICAS -->
-    <div class="rubricas-grid" *ngIf="!cargando && !error">
-      <div class="rubrica-card" *ngFor="let r of rubricasFiltradas || []; trackBy: trackById">
-        <!-- Card Header -->
+        <!-- Header Card -->
         <div class="card-header">
-          <div class="card-icon">
-            <ion-icon name="checkbox-outline"></ion-icon>
+          <div class="card-icon" [class]="c.activo ? 'icon-amber' : 'icon-slate'">
+            <ion-icon name="trophy-outline"></ion-icon>
           </div>
+
           <div class="card-info">
-            <h3 class="card-title">Rúbrica #{{ r.concursoId }}</h3>
-            <span class="card-subtitle">Concurso ID: {{ r.concursoId }}</span>
+            <h3 class="card-title">{{ c.nombre }}</h3>
+            <span class="card-type" *ngIf="c.tipo">{{ c.tipo }}</span>
           </div>
+
           <div class="card-status">
-            <span class="status-badge" [class]="getStatusClass(r.secciones?.length || 0)">
-              {{ getStatusText(r.secciones?.length || 0) }}
+            <span class="status-badge" [class]="c.activo ? 'status-active' : 'status-inactive'">
+              <span class="status-dot"></span>
+              {{ c.activo ? 'Activo' : 'Inactivo' }}
             </span>
           </div>
-          <div class="card-actions-header">
-            <ion-button fill="clear" size="small" class="action-icon-btn" (click)="verDetalle(r)">
-              <ion-icon name="eye-outline"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" size="small" class="action-icon-btn" (click)="editar(r)">
-              <ion-icon name="create-outline"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" size="small" class="action-icon-btn danger" (click)="confirmarEliminar(r)">
-              <ion-icon name="trash-outline"></ion-icon>
-            </ion-button>
-          </div>
         </div>
 
-        <!-- Card Stats -->
-        <div class="card-stats">
-          <div class="stat-item">
-            <ion-icon name="layers-outline"></ion-icon>
-            <div class="stat-content">
-              <span class="stat-label">Secciones</span>
-              <span class="stat-value">{{ r.secciones?.length || 0 }}</span>
-            </div>
-          </div>
-          <div class="stat-item">
-            <ion-icon name="list-outline"></ion-icon>
-            <div class="stat-content">
-              <span class="stat-label">Niveles</span>
-              <span class="stat-value">{{ r.niveles?.length || 0 }}</span>
-            </div>
-          </div>
-          <div class="stat-item">
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
-            <div class="stat-content">
-              <span class="stat-label">Criterios</span>
-              <span class="stat-value">{{ totalCriterios(r) }}</span>
-            </div>
-          </div>
-        </div>
+        <!-- Body Card -->
+        <div class="card-body">
+          <p class="card-description" *ngIf="c.descripcion">
+            {{ c.descripcion | slice:0:120 }}{{ c.descripcion.length > 120 ? '...' : '' }}
+          </p>
 
-        <!-- Secciones -->
-        <div class="secciones-section" *ngIf="r.secciones?.length">
-          <div class="secciones-header">
-            <ion-icon name="layers-outline"></ion-icon>
-            <span>Secciones</span>
-          </div>
-          <div class="secciones-list">
-            <div class="seccion-item" *ngFor="let s of r.secciones.slice(0, 3)">
-              <span class="seccion-nombre">{{ s.nombre }}</span>
-              <span class="seccion-criterios">{{ s.criterios?.length || 0 }} criterios</span>
+          <div class="card-meta">
+            <div class="meta-item" *ngIf="c.fechaInicio">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>
+                <strong>Inicio:</strong> {{ c.fechaInicio | date:'dd/MM/yyyy' }}
+              </span>
             </div>
-            <div class="seccion-more" *ngIf="r.secciones.length > 3">
-              +{{ r.secciones.length - 3 }} secciones más
-            </div>
-          </div>
-        </div>
 
-        <!-- Niveles -->
-        <div class="niveles-section" *ngIf="r.niveles?.length">
-          <div class="niveles-header">
-            <ion-icon name="list-outline"></ion-icon>
-            <span>Niveles de desempeño</span>
-          </div>
-          <div class="niveles-list">
-            <div class="nivel-item" *ngFor="let n of r.niveles.slice(0, 4)">
-              <span class="nivel-nombre">{{ n.nombre }}</span>
-              <span class="nivel-puntaje">{{ n.puntaje }} pts</span>
+            <div class="meta-item" *ngIf="c.fechaFin">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>
+                <strong>Fin:</strong> {{ c.fechaFin | date:'dd/MM/yyyy' }}
+                <span class="days-remaining" *ngIf="c.activo && calcularDiasRestantes(c.fechaFin) >= 0">
+                  ({{ calcularDiasRestantes(c.fechaFin) }} días restantes)
+                </span>
+              </span>
             </div>
-            <div class="nivel-more" *ngIf="r.niveles.length > 4">
-              +{{ r.niveles.length - 4 }} niveles más
+
+            <div class="meta-item" *ngIf="c.puntajeMaximo">
+              <ion-icon name="star-outline"></ion-icon>
+              <span>
+                <strong>Puntaje máx:</strong> {{ c.puntajeMaximo }}
+              </span>
+            </div>
+
+            <div class="meta-item" *ngIf="c.participantes !== undefined">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>
+                <strong>Participantes:</strong> {{ c.participantes }}
+              </span>
             </div>
           </div>
         </div>
 
         <!-- Actions -->
         <div class="card-actions">
-          <ion-button fill="outline" size="small" class="action-btn" (click)="verDetalle(r)">
-            <ion-icon name="eye-outline" slot="start"></ion-icon>
-            Ver detalle
-          </ion-button>
-          <ion-button fill="outline" size="small" class="action-btn" (click)="editar(r)">
-            <ion-icon name="create-outline" slot="start"></ion-icon>
-            Editar
-          </ion-button>
-          <ion-button fill="outline" size="small" class="action-btn" (click)="exportarRubrica(r)">
-            <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
-          </ion-button>
+          <div class="actions-left">
+            <ion-chip class="chip-category" *ngIf="c.categoria">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              <ion-label>{{ c.categoria }}</ion-label>
+            </ion-chip>
+          </div>
+
+          <div class="actions-right">
+            <ion-button fill="clear" size="small" class="action-btn" (click)="verConcurso(c.id)">
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              Ver
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn" (click)="editar(c)">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn" routerLink="/admin/rubricas">
+              <ion-icon name="list-outline" slot="start"></ion-icon>
+              Rúbrica
+            </ion-button>
+
+            <ion-button fill="clear" size="small" class="action-btn danger" (click)="confirmarEliminar(c)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
         </div>
       </div>
 
       <!-- EMPTY STATE -->
-      <div class="empty-state" *ngIf="rubricasFiltradas?.length === 0 && rubricas.length > 0">
+      <div class="empty-state" *ngIf="concursosFiltrados?.length === 0">
         <div class="empty-icon">
-          <ion-icon name="filter-outline"></ion-icon>
+          <ion-icon name="trophy-outline"></ion-icon>
         </div>
-        <h3>No hay coincidencias</h3>
-        <p>No se encontraron rúbricas con los filtros aplicados</p>
-        <ion-button fill="outline" class="btn-clear-filter" (click)="limpiarFiltros()">
-          <ion-icon name="close-outline" slot="start"></ion-icon>
-          Limpiar filtros
-        </ion-button>
-      </div>
-
-      <div class="empty-state" *ngIf="rubricas.length === 0">
-        <div class="empty-icon">
-          <ion-icon name="checkbox-outline"></ion-icon>
-        </div>
-        <h3>No hay rúbricas</h3>
-        <p>Crea la primera rúbrica para un concurso</p>
+        <h3>No hay concursos</h3>
+        <p *ngIf="!filtroTexto && filtroEstado === 'todos'">
+          Comienza creando el primer concurso científico
+        </p>
+        <p *ngIf="filtroTexto || filtroEstado !== 'todos'">
+          No se encontraron concursos con los filtros aplicados
+        </p>
         <ion-button class="btn-primary" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
-          Crear rúbrica
+          Crear concurso
         </ion-button>
       </div>
     </div>
@@ -248,14 +209,12 @@
     </ion-fab-button>
   </ion-fab>
 
-  <!-- ============================================ -->
-  <!-- MODAL DE RÚBRICA -->
-  <!-- ============================================ -->
+  <!-- MODAL DE CONCURSO -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>{{ editando ? 'Editar rúbrica' : 'Nueva rúbrica' }}</ion-title>
+          <ion-title>{{ editando ? 'Editar concurso' : 'Nuevo concurso' }}</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="cerrarModal()">
               <ion-icon name="close-outline"></ion-icon>
@@ -266,38 +225,20 @@
 
       <ion-content class="modal-content">
         <div class="modal-container">
-          <form (ngSubmit)="guardar()" #rubricaForm="ngForm">
-            <!-- Concurso -->
-            <div class="form-field">
-              <label class="field-label">
-                <ion-icon name="trophy-outline"></ion-icon>
-                Concurso
-                <span class="required">*</span>
-              </label>
-              <ion-item class="field-input" lines="none">
-                <ion-select
-                  [(ngModel)]="form.concursoId"
-                  name="concursoId"
-                  placeholder="Seleccione un concurso"
-                  required>
-                  <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
-                    {{ c.nombre }}
-                  </ion-select-option>
-                </ion-select>
-              </ion-item>
-            </div>
-
+          <form (ngSubmit)="guardar()" #concursoForm="ngForm">
             <!-- Nombre -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>
-                Nombre de la rúbrica
+                Nombre del concurso
+                <span class="required">*</span>
               </label>
               <ion-item class="field-input" lines="none">
                 <ion-input
                   [(ngModel)]="form.nombre"
                   name="nombre"
-                  placeholder="Ingrese el nombre de la rúbrica">
+                  placeholder="Ingrese el nombre del concurso"
+                  required>
                 </ion-input>
               </ion-item>
             </div>
@@ -312,9 +253,56 @@
                 <ion-textarea
                   [(ngModel)]="form.descripcion"
                   name="descripcion"
-                  placeholder="Ingrese una descripción de la rúbrica"
+                  placeholder="Ingrese una descripción del concurso"
                   rows="3">
                 </ion-textarea>
+              </ion-item>
+            </div>
+
+            <!-- Tipo -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="folder-outline"></ion-icon>
+                Tipo
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.tipo"
+                  name="tipo"
+                  placeholder="Ej: Científico, Tecnológico, etc.">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Fecha Inicio -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="calendar-outline"></ion-icon>
+                Fecha de inicio
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-datetime
+                  [(ngModel)]="form.fechaInicio"
+                  name="fechaInicio"
+                  presentation="date"
+                  placeholder="Seleccione fecha de inicio">
+                </ion-datetime>
+              </ion-item>
+            </div>
+
+            <!-- Fecha Fin -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="calendar-outline"></ion-icon>
+                Fecha de fin
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-datetime
+                  [(ngModel)]="form.fechaFin"
+                  name="fechaFin"
+                  presentation="date"
+                  placeholder="Seleccione fecha de fin">
+                </ion-datetime>
               </ion-item>
             </div>
 
@@ -334,29 +322,19 @@
               </ion-item>
             </div>
 
-            <!-- Secciones (información) -->
-            <div class="form-field" *ngIf="editando">
+            <!-- Estado -->
+            <div class="form-field">
               <label class="field-label">
-                <ion-icon name="layers-outline"></ion-icon>
-                Secciones
+                <ion-icon name="toggle-outline"></ion-icon>
+                Estado
               </label>
               <ion-item class="field-input" lines="none">
-                <span class="info-text">
-                  {{ form.secciones?.length || 0 }} secciones configuradas
-                </span>
-              </ion-item>
-            </div>
-
-            <!-- Niveles (información) -->
-            <div class="form-field" *ngIf="editando">
-              <label class="field-label">
-                <ion-icon name="list-outline"></ion-icon>
-                Niveles
-              </label>
-              <ion-item class="field-input" lines="none">
-                <span class="info-text">
-                  {{ form.niveles?.length || 0 }} niveles configurados
-                </span>
+                <ion-toggle
+                  [(ngModel)]="form.activo"
+                  name="activo"
+                  color="primary">
+                  {{ form.activo ? 'Activo' : 'Inactivo' }}
+                </ion-toggle>
               </ion-item>
             </div>
 
@@ -373,13 +351,13 @@
               <ion-button
                 type="submit"
                 class="submit-btn"
-                [disabled]="!rubricaForm.form.valid || guardando">
+                [disabled]="!concursoForm.form.valid || guardando">
                 <ion-icon
                   [name]="guardando ? 'refresh-outline' : 'checkmark-outline'"
                   slot="start"
                   [class.spinning]="guardando">
                 </ion-icon>
-                {{ guardando ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear rúbrica') }}
+                {{ guardando ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear concurso') }}
               </ion-button>
             </div>
           </form>
