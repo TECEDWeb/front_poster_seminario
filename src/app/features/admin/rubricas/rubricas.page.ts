@@ -302,9 +302,20 @@ export class RubricasPage implements OnInit {
       nombre: this.form.nombre.trim(),
       descripcion: this.form.descripcion || null,
       puntaje_maximo: this.form.puntajeMaximo || 100,
-      secciones: [], // Se enviarán vacíos por ahora
-      niveles: []    // Se enviarán vacíos por ahora
+      secciones: [],
+      niveles: []
     };
+
+    console.log('📤 PAYLOAD COMPLETO:', JSON.stringify(payload, null, 2));
+    console.log('📤 TIPO DE DATOS:', {
+      concurso_id: typeof payload.concurso_id,
+      nombre: typeof payload.nombre,
+      descripcion: typeof payload.descripcion,
+      puntaje_maximo: typeof payload.puntaje_maximo,
+      secciones: Array.isArray(payload.secciones),
+      niveles: Array.isArray(payload.niveles)
+    });
+
 
     console.log('📤 Enviando payload:', payload);
 
