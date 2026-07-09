@@ -223,6 +223,7 @@ export class ProyectosPage implements OnInit {
       nombre: '',
       descripcion: '',
       concursoId: null,
+      estudianteNombre: '', // ← AÑADIR
       nivel: '',
       area: '',
       activo: true,
@@ -243,18 +244,24 @@ export class ProyectosPage implements OnInit {
   // =========================
   editar(proyecto: Proyecto): void {
     this.editando = true;
+    // Buscar el estudiante (si existe en participantes)
+    const estudiante = proyecto.participantes && proyecto.participantes.length > 0 
+      ? proyecto.participantes[0].nombre 
+      : '';
+
     this.form = {
       id: proyecto.id,
       nombre: proyecto.nombre || '',
       descripcion: proyecto.descripcion || '',
       concursoId: proyecto.concursoId || null,
+      estudianteNombre: estudiante, // ← AÑADIR
       nivel: proyecto.nivel || '',
       area: proyecto.area || '',
       activo: proyecto.activo ?? true,
       participantes: proyecto.participantes || []
     };
     this.modalAbierto = true;
-  }
+}
 
   // =========================
   // MODAL - GUARDAR
@@ -266,12 +273,18 @@ export class ProyectosPage implements OnInit {
       return;
     }
 
+    if (!this.form.estudianteNombre || this.form.estudianteNombre.trim() === '') {
+      alert('Por favor ingrese el nombre del estudiante');
+      return;
+    }
+
     this.guardando = true;
 
     const payload = {
       nombre: this.form.nombre.trim(),
       descripcion: this.form.descripcion || null,
       concursoId: this.form.concursoId || null,
+      estudiante_nombre: this.form.estudianteNombre.trim(), 
       nivel: this.form.nivel || null,
       area: this.form.area || null,
       activo: this.form.activo ?? true
@@ -297,6 +310,8 @@ export class ProyectosPage implements OnInit {
       }
     });
   }
+
+  
 
   // =========================
   // VER DETALLE
