@@ -251,6 +251,22 @@
                 </ion-input>
               </ion-item>
             </div>
+            <!-- Nombre del Estudiante -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="person-outline"></ion-icon>
+                Nombre del estudiante
+                <span class="required">*</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.estudianteNombre"
+                  name="estudianteNombre"
+                  placeholder="Ingrese el nombre del estudiante"
+                  required>
+                </ion-input>
+              </ion-item>
+            </div>
 
             <!-- Descripción -->
             <div class="form-field">
