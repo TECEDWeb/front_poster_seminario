@@ -67,9 +67,23 @@ export class RubricaService {
    * Crear una nueva rúbrica
    */
   crear(data: any): Observable<RubricaConcurso> {
-    const payload = this.mapearParaBackend(data);
+    console.log('📤 rubricaService.crear() - Datos recibidos:', JSON.stringify(data, null, 2));
+    
+    // Asegurar que el payload tenga todos los campos necesarios
+    const payload = {
+      concurso_id: data.concurso_id || data.concursoId,
+      nombre: data.nombre || '',
+      descripcion: data.descripcion || null,
+      puntaje_maximo: data.puntaje_maximo || data.puntajeMaximo || 100,
+      secciones: data.secciones || [],
+      niveles: data.niveles || []
+    };
+
+    console.log('📤 rubricaService.crear() - Payload final:', JSON.stringify(payload, null, 2));
+    
     return this.http.post<any>(this.apiUrl, payload).pipe(
       map((res: any) => {
+        console.log('📥 rubricaService.crear() - Respuesta:', res);
         const result = res?.data ?? res ?? {};
         return this.mapearRubrica(result);
       })

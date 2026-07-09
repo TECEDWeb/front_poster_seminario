@@ -281,26 +281,34 @@ export class RubricasPage implements OnInit {
   // =========================
   // MODAL - GUARDAR
   // =========================
+  // =========================
+  // MODAL - GUARDAR
+  // =========================
   guardar(): void {
+    console.log('🔍 Iniciando guardar()');
+    console.log('🔍 Form actual:', this.form);
+
     // Validar que tenga concurso seleccionado
     if (!this.form.concursoId) {
+      console.log('❌ Error: No hay concurso seleccionado');
       alert('Por favor seleccione un concurso');
       return;
     }
 
     // Validar que tenga nombre
     if (!this.form.nombre || this.form.nombre.trim() === '') {
+      console.log('❌ Error: Nombre vacío');
       alert('Por favor ingrese el nombre de la rúbrica');
       return;
     }
 
     this.guardando = true;
 
-    // Construir payload - IMPORTANTE: enviar los campos correctos
+    // Construir payload - Asegurar que todos los campos estén presentes
     const payload = {
       concurso_id: this.form.concursoId,
       nombre: this.form.nombre.trim(),
-      descripcion: this.form.descripcion || null,
+      descripcion: this.form.descripcion ? this.form.descripcion.trim() : null,
       puntaje_maximo: this.form.puntajeMaximo || 100,
       secciones: [],
       niveles: []
@@ -316,28 +324,32 @@ export class RubricasPage implements OnInit {
       niveles: Array.isArray(payload.niveles)
     });
 
-
-    console.log('📤 Enviando payload:', payload);
-
+    // Determinar si es crear o actualizar
     const req = this.editando
       ? this.rubricaService.actualizar(this.form.id, payload)
       : this.rubricaService.crear(payload);
 
+    console.log(`📤 ${this.editando ? 'Actualizando' : 'Creando'} rúbrica...`);
+
     req.subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('✅ Respuesta exitosa:', response);
         this.guardando = false;
         this.modalAbierto = false;
         this.cargarRubricas();
         alert(this.editando ? 'Rúbrica actualizada correctamente' : 'Rúbrica creada correctamente');
       },
       error: (err) => {
+        console.error('❌ Error guardando rúbrica:', err);
+        console.error('❌ Detalles del error:', err.error);
         this.guardando = false;
-        console.error('Error guardando rúbrica:', err);
-        alert(err.error?.mensaje || 'Error al guardar la rúbrica');
+        
+        // Mostrar mensaje de error más descriptivo
+        const mensaje = err.error?.mensaje || 'Error al guardar la rúbrica';
+        alert(mensaje);
       }
     });
   }
-
   // =========================
   // ELIMINAR RÚBRICA
   // =========================

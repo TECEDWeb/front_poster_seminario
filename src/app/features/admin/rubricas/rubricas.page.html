@@ -248,9 +248,7 @@
     </ion-fab-button>
   </ion-fab>
 
-  <!-- ============================================ -->
   <!-- MODAL DE RÚBRICA -->
-  <!-- ============================================ -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -292,12 +290,14 @@
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>
                 Nombre de la rúbrica
+                <span class="required">*</span>
               </label>
               <ion-item class="field-input" lines="none">
                 <ion-input
                   [(ngModel)]="form.nombre"
                   name="nombre"
-                  placeholder="Ingrese el nombre de la rúbrica">
+                  placeholder="Ingrese el nombre de la rúbrica"
+                  required>
                 </ion-input>
               </ion-item>
             </div>
