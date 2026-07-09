@@ -239,7 +239,7 @@ export class RubricasPage implements OnInit {
   }
 
   // =========================
-  // MODAL
+  // MODAL - ABRIR CREAR
   // =========================
   abrirCrear(): void {
     this.editando = false;
@@ -253,36 +253,60 @@ export class RubricasPage implements OnInit {
     this.modalAbierto = true;
   }
 
+  // =========================
+  // MODAL - CERRAR
+  // =========================
   cerrarModal(): void {
     this.modalAbierto = false;
   }
 
+  // =========================
+  // MODAL - EDITAR
+  // =========================
   editar(rubrica: RubricaConcurso): void {
     this.editando = true;
+    // Buscar el concurso correspondiente
+    const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
+    
     this.form = {
       id: rubrica.concursoId,
       concursoId: rubrica.concursoId,
-      nombre: `Rúbrica del concurso #${rubrica.concursoId}`,
-      descripcion: '',
+      nombre: concurso?.nombre || `Rúbrica del concurso #${rubrica.concursoId}`,
+      descripcion: concurso?.descripcion || '',
       puntajeMaximo: 100
     };
     this.modalAbierto = true;
   }
 
+  // =========================
+  // MODAL - GUARDAR
+  // =========================
   guardar(): void {
+    // Validar que tenga concurso seleccionado
     if (!this.form.concursoId) {
       alert('Por favor seleccione un concurso');
       return;
     }
 
+    // Validar que tenga nombre
+    if (!this.form.nombre || this.form.nombre.trim() === '') {
+      alert('Por favor ingrese el nombre de la rúbrica');
+      return;
+    }
+
     this.guardando = true;
 
+    // Construir payload - IMPORTANTE: enviar los campos correctos
     const payload = {
-      concursoId: this.form.concursoId,
-      nombre: this.form.nombre || `Rúbrica del concurso #${this.form.concursoId}`,
+      concurso_id: this.form.concursoId,
+      nombre: this.form.nombre.trim(),
       descripcion: this.form.descripcion || null,
-      puntajeMaximo: this.form.puntajeMaximo || 100
+      puntaje_maximo: this.form.puntajeMaximo || 100,
+      secciones: [], // Se enviarán vacíos por ahora
+      niveles: []    // Se enviarán vacíos por ahora
     };
+
+    console.log('📤 Enviando payload:', payload);
 
     const req = this.editando
       ? this.rubricaService.actualizar(this.form.id, payload)
@@ -303,6 +327,9 @@ export class RubricasPage implements OnInit {
     });
   }
 
+  // =========================
+  // ELIMINAR RÚBRICA
+  // =========================
   confirmarEliminar(rubrica: RubricaConcurso): void {
     if (confirm(`¿Estás seguro de eliminar la rúbrica del concurso #${rubrica.concursoId}?`)) {
       this.eliminarRubrica(rubrica.concursoId);
@@ -322,16 +349,25 @@ export class RubricasPage implements OnInit {
     });
   }
 
+  // =========================
+  // EXPORTAR RÚBRICA
+  // =========================
   exportarRubrica(rubrica: RubricaConcurso): void {
     console.log('Exportando rúbrica:', rubrica);
     alert(`Exportando rúbrica del concurso #${rubrica.concursoId}`);
   }
 
+  // =========================
+  // VER DETALLE
+  // =========================
   verDetalle(rubrica: RubricaConcurso): void {
     console.log('Ver detalle:', rubrica);
     alert(`Ver detalle de la rúbrica #${rubrica.concursoId}`);
   }
 
+  // =========================
+  // UTILITIES
+  // =========================
   getStatusClass(seccionesCount: number): string {
     if (seccionesCount >= 3) return 'status-excellent';
     if (seccionesCount >= 2) return 'status-good';
