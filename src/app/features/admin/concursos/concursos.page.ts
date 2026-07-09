@@ -1,8 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import {
+  IonContent,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
   IonHeader,
   IonToolbar,
   IonButtons,
@@ -10,41 +15,57 @@ import {
   IonTitle,
   IonButton,
   IonIcon,
-  IonContent,
   IonSkeletonText,
   IonFab,
   IonFabButton,
+  IonChip,
+  IonLabel,
+  IonSpinner,
   IonSearchbar,
   IonSelect,
   IonSelectOption,
-  IonChip,
-  IonLabel
+  IonModal,
+  IonItem,
+  IonInput,
+  IonTextarea,
+  IonToggle,
+  IonDatetime
 } from '@ionic/angular/standalone';
-import { ConcursoService } from '../../../core/services/concurso.service';
-import { Concurso } from '../../../core/models/concurso.model';
+import { RubricaService } from '../../../core/services/rubrica.service';
+import { RubricaConcurso, Seccion, Criterio, Nivel } from '../../../core/models/rubrica.model';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
-  trophyOutline,
-  calendarOutline,
-  starOutline,
+  checkboxOutline,
   createOutline,
-  listOutline,
   trashOutline,
   eyeOutline,
-  peopleOutline,
-  pricetagOutline,
+  layersOutline,
+  listOutline,
+  checkmarkCircleOutline,
+  downloadOutline,
+  refreshOutline,
   searchOutline,
-  funnelOutline
+  funnelOutline,
+  closeOutline,
+  alertCircleOutline,
+  checkmarkOutline,
+  documentTextOutline,
+  folderOutline
 } from 'ionicons/icons';
 
 @Component({
-  selector: 'app-concursos',
+  selector: 'app-rubricas',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     RouterModule,
+    FormsModule,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -52,123 +73,288 @@ import {
     IonTitle,
     IonButton,
     IonIcon,
-    IonContent,
     IonSkeletonText,
     IonFab,
     IonFabButton,
+    IonChip,
+    IonLabel,
+    IonSpinner,
     IonSearchbar,
     IonSelect,
     IonSelectOption,
-    IonChip,
-    IonLabel
+    IonModal,
+    IonItem,
+    IonInput,
+    IonTextarea,
+    IonToggle,
+    IonDatetime
   ],
-  templateUrl: './concursos.page.html',
-  styleUrls: ['./concursos.page.scss']
+  templateUrl: './rubricas.page.html',
+  styleUrls: ['./rubricas.page.scss']
 })
-export class ConcursosPage implements OnInit {
+export class RubricasPage implements OnInit {
 
-  concursos: Concurso[] = [];
-  concursosFiltrados: Concurso[] = [];
-  concursosActivos: number = 0;
-  cargando = false;
+  rubricas: RubricaConcurso[] = [];
+  rubricasFiltradas: RubricaConcurso[] = [];
+  cargando: boolean = false;
+  error: string | null = null;
+  totalSecciones: number = 0;
+  totalNiveles: number = 0;
+  totalCriteriosGlobal: number = 0;
 
-  filtroTexto: string = '';
-  filtroEstado: string = 'todos';
+  // Filtros
+  filtroBusqueda: string = '';
+  filtroSecciones: string = 'todos';
 
-  constructor(private concursoService: ConcursoService) {
+  // Modal
+  modalAbierto = false;
+  editando = false;
+  guardando = false;
+  concursosDisponibles: any[] = [];
+
+  form: any = {
+    id: null,
+    concursoId: null,
+    nombre: '',
+    descripcion: '',
+    puntajeMaximo: 100,
+    estado: 'ACTIVA',
+    secciones: [],
+    niveles: []
+  };
+
+  constructor(private rubricaService: RubricaService) {
     addIcons({
       addOutline,
-      trophyOutline,
-      calendarOutline,
-      starOutline,
+      checkboxOutline,
       createOutline,
-      listOutline,
       trashOutline,
       eyeOutline,
-      peopleOutline,
-      pricetagOutline,
+      layersOutline,
+      listOutline,
+      checkmarkCircleOutline,
+      downloadOutline,
+      refreshOutline,
       searchOutline,
-      funnelOutline
+      funnelOutline,
+      closeOutline,
+      alertCircleOutline,
+      checkmarkOutline,
+      documentTextOutline,
+      folderOutline
     });
   }
 
   ngOnInit(): void {
-    this.cargar();
+    this.cargarRubricas();
+    this.cargarConcursos();
   }
 
-  cargar(): void {
+  cargarRubricas(): void {
     this.cargando = true;
+    this.error = null;
 
-    this.concursoService.listar().subscribe({
-      next: (res: any) => {
-        const data = res?.data ?? res?.concursos ?? res ?? [];
-        this.concursos = Array.isArray(data) ? data : [];
-        this.concursosActivos = this.concursos.filter(c => c.activo).length;
-        this.filtrarConcursos();
+    this.rubricaService.listar().subscribe({
+      next: (res) => {
+        console.log('Rúbricas cargadas:', res);
+        this.rubricas = res || [];
+        this.calcularEstadisticas();
+        this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
-        console.error('❌ Error cargando concursos:', err);
-        this.concursos = [];
-        this.concursosFiltrados = [];
+        console.error('Error cargando rúbricas:', err);
+        this.error = err.error?.mensaje || 'Error al cargar las rúbricas';
+        this.rubricas = [];
+        this.rubricasFiltradas = [];
         this.cargando = false;
       }
     });
   }
 
-  filtrarConcursos(): void {
-    let filtered = [...this.concursos];
+  cargarConcursos(): void {
+    this.rubricaService.obtenerConcursos().subscribe({
+      next: (res) => {
+        this.concursosDisponibles = res || [];
+        console.log('Concursos disponibles:', this.concursosDisponibles);
+      },
+      error: (err) => {
+        console.error('Error cargando concursos:', err);
+        this.concursosDisponibles = [];
+      }
+    });
+  }
 
-    if (this.filtroTexto.trim()) {
-      const texto = this.filtroTexto.toLowerCase().trim();
-      filtered = filtered.filter(c =>
-        c.nombre?.toLowerCase().includes(texto) ||
-        c.descripcion?.toLowerCase().includes(texto) ||
-        c.tipo?.toLowerCase().includes(texto) ||
-        c.categoria?.toLowerCase().includes(texto)
+  calcularEstadisticas(): void {
+    this.totalSecciones = this.rubricas.reduce(
+      (total, r) => total + (r.secciones?.length || 0), 0
+    );
+    this.totalNiveles = this.rubricas.reduce(
+      (total, r) => total + (r.niveles?.length || 0), 0
+    );
+    this.totalCriteriosGlobal = this.rubricas.reduce(
+      (total, r) => total + this.totalCriterios(r), 0
+    );
+  }
+
+  aplicarFiltros(): void {
+    let filtered = [...this.rubricas];
+
+    if (this.filtroBusqueda.trim()) {
+      const texto = this.filtroBusqueda.toLowerCase().trim();
+      filtered = filtered.filter(r =>
+        r.concursoId.toString().includes(texto)
       );
     }
 
-    if (this.filtroEstado === 'activo') {
-      filtered = filtered.filter(c => c.activo);
-    } else if (this.filtroEstado === 'inactivo') {
-      filtered = filtered.filter(c => !c.activo);
-    } else if (this.filtroEstado === 'finalizado') {
-      filtered = filtered.filter(c => {
-        if (!c.fechaFin) return false;
-        return new Date(c.fechaFin) < new Date();
+    if (this.filtroSecciones !== 'todos') {
+      const minSecciones = parseInt(this.filtroSecciones);
+      filtered = filtered.filter(r => (r.secciones?.length || 0) >= minSecciones);
+    }
+
+    this.rubricasFiltradas = filtered;
+  }
+
+  totalCriterios(rubrica: RubricaConcurso): number {
+    let total = 0;
+    if (rubrica.secciones) {
+      rubrica.secciones.forEach(s => {
+        total += (s.criterios?.length || 0);
       });
     }
-
-    this.concursosFiltrados = filtered;
+    return total;
   }
 
-  calcularDiasRestantes(fechaFin: string): number {
-    const fin = new Date(fechaFin);
-    const hoy = new Date();
-    const diff = Math.ceil((fin.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
-    return diff;
+  recargar(): void {
+    this.cargarRubricas();
   }
 
-  confirmarEliminar(concurso: Concurso): void {
-    if (confirm(`¿Estás seguro de eliminar el concurso "${concurso.nombre}"?`)) {
-      this.eliminarConcurso(concurso.id!);
+  limpiarFiltros(): void {
+    this.filtroBusqueda = '';
+    this.filtroSecciones = 'todos';
+    this.aplicarFiltros();
+  }
+
+  // =========================
+  // MODAL
+  // =========================
+  abrirCrear(): void {
+    this.editando = false;
+    this.form = {
+      id: null,
+      concursoId: null,
+      nombre: '',
+      descripcion: '',
+      puntajeMaximo: 100,
+      estado: 'ACTIVA',
+      secciones: [],
+      niveles: []
+    };
+    this.modalAbierto = true;
+  }
+
+  cerrarModal(): void {
+    this.modalAbierto = false;
+  }
+
+  editar(rubrica: RubricaConcurso): void {
+    this.editando = true;
+    // Buscar el concurso correspondiente
+    const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
+    
+    this.form = {
+      id: rubrica.concursoId,
+      concursoId: rubrica.concursoId,
+      nombre: concurso?.nombre || `Rúbrica #${rubrica.concursoId}`,
+      descripcion: concurso?.descripcion || '',
+      puntajeMaximo: 100,
+      estado: 'ACTIVA',
+      secciones: rubrica.secciones || [],
+      niveles: rubrica.niveles || []
+    };
+    this.modalAbierto = true;
+  }
+
+  guardar(): void {
+    if (!this.form.concursoId) {
+      alert('Por favor seleccione un concurso');
+      return;
     }
-  }
 
-  eliminarConcurso(id: number): void {
-    this.concursoService.eliminar(id).subscribe({
+    this.guardando = true;
+
+    const payload = {
+      concursoId: this.form.concursoId,
+      nombre: this.form.nombre || `Rúbrica del concurso #${this.form.concursoId}`,
+      descripcion: this.form.descripcion || null,
+      puntajeMaximo: this.form.puntajeMaximo || 100,
+      secciones: this.form.secciones || [],
+      niveles: this.form.niveles || []
+    };
+
+    const req = this.editando
+      ? this.rubricaService.actualizar(this.form.id, payload)
+      : this.rubricaService.crear(payload);
+
+    req.subscribe({
       next: () => {
-        this.cargar();
+        this.guardando = false;
+        this.modalAbierto = false;
+        this.cargarRubricas();
+        alert(this.editando ? 'Rúbrica actualizada correctamente' : 'Rúbrica creada correctamente');
       },
       error: (err) => {
-        console.error('Error eliminando concurso:', err);
-        alert('Error al eliminar el concurso');
+        this.guardando = false;
+        console.error('Error guardando rúbrica:', err);
+        alert(err.error?.mensaje || 'Error al guardar la rúbrica');
       }
     });
   }
 
-  trackById(index: number, item: any): number {
-    return item?.id ?? index;
+  confirmarEliminar(rubrica: RubricaConcurso): void {
+    if (confirm(`¿Estás seguro de eliminar la rúbrica del concurso #${rubrica.concursoId}?`)) {
+      this.eliminarRubrica(rubrica.concursoId);
+    }
+  }
+
+  eliminarRubrica(concursoId: number): void {
+    this.rubricaService.eliminar(concursoId).subscribe({
+      next: () => {
+        this.cargarRubricas();
+        alert('Rúbrica eliminada correctamente');
+      },
+      error: (err) => {
+        console.error('Error eliminando rúbrica:', err);
+        alert(err.error?.mensaje || 'Error al eliminar la rúbrica');
+      }
+    });
+  }
+
+  exportarRubrica(rubrica: RubricaConcurso): void {
+    console.log('Exportando rúbrica:', rubrica);
+    alert(`Exportando rúbrica del concurso #${rubrica.concursoId}`);
+  }
+
+  verDetalle(rubrica: RubricaConcurso): void {
+    console.log('Ver detalle:', rubrica);
+    alert(`Ver detalle de la rúbrica #${rubrica.concursoId}`);
+  }
+
+  getStatusClass(seccionesCount: number): string {
+    if (seccionesCount >= 3) return 'status-excellent';
+    if (seccionesCount >= 2) return 'status-good';
+    if (seccionesCount >= 1) return 'status-regular';
+    return 'status-low';
+  }
+
+  getStatusText(seccionesCount: number): string {
+    if (seccionesCount >= 3) return 'Completa';
+    if (seccionesCount >= 2) return 'Adecuada';
+    if (seccionesCount >= 1) return 'Básica';
+    return 'Sin secciones';
+  }
+
+  trackById(index: number, item: RubricaConcurso): number {
+    return item?.concursoId ?? index;
   }
 }

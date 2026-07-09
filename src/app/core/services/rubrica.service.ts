@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { RubricaConcurso } from '../models/rubrica.model';
+import { RubricaConcurso, Seccion, Criterio, Nivel } from '../models/rubrica.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,34 +11,149 @@ import { RubricaConcurso } from '../models/rubrica.model';
 export class RubricaService {
 
   private apiUrl = `${environment.apiUrl}/rubricas`;
+  private concursoApiUrl = `${environment.apiUrl}/concursos`;
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * Listar todas las rúbricas
+   */
   listar(): Observable<RubricaConcurso[]> {
-    return this.http.get<RubricaConcurso[]>(this.apiUrl).pipe(
-      map((res: any) => res?.data ?? res ?? [])
+    return this.http.get<any>(this.apiUrl).pipe(
+      map((res: any) => {
+        const data = res?.data ?? res ?? [];
+        return Array.isArray(data) ? data.map((item: any) => this.mapearRubrica(item)) : [];
+      })
     );
   }
 
+  /**
+   * Obtener rúbrica por ID de concurso
+   */
   obtener(id: number): Observable<RubricaConcurso> {
-    return this.http.get<RubricaConcurso>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map((res: any) => {
+        const data = res?.data ?? res ?? {};
+        return this.mapearRubrica(data);
+      })
+    );
   }
 
-  crear(data: RubricaConcurso): Observable<RubricaConcurso> {
-    return this.http.post<RubricaConcurso>(this.apiUrl, data);
+  /**
+   * Obtener rúbrica por concurso ID
+   */
+  obtenerPorConcurso(concursoId: number): Observable<RubricaConcurso> {
+    return this.http.get<any>(`${this.apiUrl}/concurso/${concursoId}`).pipe(
+      map((res: any) => {
+        const data = res?.data ?? res ?? {};
+        return this.mapearRubrica(data);
+      })
+    );
   }
 
-  actualizar(id: number, data: RubricaConcurso): Observable<RubricaConcurso> {
-    return this.http.put<RubricaConcurso>(`${this.apiUrl}/${id}`, data);
+  /**
+   * Obtener concursos disponibles para rúbricas
+   */
+  obtenerConcursos(): Observable<any[]> {
+    return this.http.get<any>(this.concursoApiUrl).pipe(
+      map((res: any) => {
+        const data = res?.data ?? res?.concursos ?? res ?? [];
+        return Array.isArray(data) ? data : [];
+      })
+    );
   }
 
+  /**
+   * Crear una nueva rúbrica
+   */
+  crear(data: any): Observable<RubricaConcurso> {
+    const payload = this.mapearParaBackend(data);
+    return this.http.post<any>(this.apiUrl, payload).pipe(
+      map((res: any) => {
+        const result = res?.data ?? res ?? {};
+        return this.mapearRubrica(result);
+      })
+    );
+  }
+
+  /**
+   * Actualizar una rúbrica existente
+   */
+  actualizar(id: number, data: any): Observable<RubricaConcurso> {
+    const payload = this.mapearParaBackend(data);
+    return this.http.put<any>(`${this.apiUrl}/${id}`, payload).pipe(
+      map((res: any) => {
+        const result = res?.data ?? res ?? {};
+        return this.mapearRubrica(result);
+      })
+    );
+  }
+
+  /**
+   * Eliminar una rúbrica
+   */
   eliminar(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  /**
+   * Exportar rúbrica a Excel
+   */
   exportar(id: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/${id}/exportar`, {
       responseType: 'blob'
     });
+  }
+
+  /**
+   * Mapear datos del backend al modelo RubricaConcurso
+   */
+  private mapearRubrica(data: any): RubricaConcurso {
+    return {
+      concursoId: data.concursoId || data.concurso_id || 0,
+      secciones: data.secciones?.map((s: any) => ({
+        id: s.id || 0,
+        concursoId: s.concursoId || s.concurso_id || data.concursoId || data.concurso_id || 0,
+        nombre: s.nombre || '',
+        orden: s.orden || 0,
+        descripcion: s.descripcion || null,
+        criterios: s.criterios?.map((c: any) => ({
+          id: c.id || 0,
+          seccionId: c.seccionId || c.seccion_id || s.id || 0,
+          texto: c.texto || '',
+          orden: c.orden || 0
+        })) || []
+      })) || [],
+      niveles: data.niveles?.map((n: any) => ({
+        id: n.id || 0,
+        concursoId: n.concursoId || n.concurso_id || data.concursoId || data.concurso_id || 0,
+        nombre: n.nombre || '',
+        puntaje: n.puntaje || 0,
+        descripcion: n.descripcion || null
+      })) || []
+    };
+  }
+
+  /**
+   * Mapear del modelo al backend
+   */
+  private mapearParaBackend(data: any): any {
+    return {
+      concurso_id: data.concursoId || data.concurso_id,
+      secciones: data.secciones?.map((s: any) => ({
+        nombre: s.nombre,
+        orden: s.orden || 0,
+        descripcion: s.descripcion || null,
+        criterios: s.criterios?.map((c: any) => ({
+          texto: c.texto,
+          orden: c.orden || 0
+        })) || []
+      })) || [],
+      niveles: data.niveles?.map((n: any) => ({
+        nombre: n.nombre,
+        puntaje: n.puntaje || 0,
+        descripcion: n.descripcion || null
+      })) || []
+    };
   }
 }
