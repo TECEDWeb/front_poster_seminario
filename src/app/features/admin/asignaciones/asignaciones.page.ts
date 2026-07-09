@@ -191,6 +191,7 @@ export class AsignacionesPage implements OnInit {
     }, 5000);
   }
 
+  // En el método guardar() - CORREGIDO
   guardar(): void {
     if (!this.proyectoId || !this.evaluadorId) {
       this.showError('Selecciona un proyecto y un evaluador');
@@ -199,27 +200,32 @@ export class AsignacionesPage implements OnInit {
 
     this.submitting = true;
 
-    const payload: any = {
+    // IMPORTANTE: El backend espera proyecto_id y evaluador_id
+    const payload = {
       proyecto_id: this.proyectoId,
       evaluador_id: this.evaluadorId
     };
 
-    if (this.fechaLimite) {
-      payload.fecha_limite = this.fechaLimite;
-    }
+    console.log('📤 Enviando payload de asignación:', payload);
 
     this.asignacionService.asignar(payload).subscribe({
       next: (res: any) => {
         this.submitting = false;
-        console.log('Asignación exitosa:', res);
+        console.log('✅ Asignación exitosa:', res);
         this.showSuccess('Proyecto asignado correctamente');
         this.resetForm();
         this.cargarDatos();
       },
       error: (err: any) => {
         this.submitting = false;
-        console.error('Error asignando:', err);
-        this.showError(err.error?.mensaje || 'Error al asignar el proyecto');
+        console.error('❌ Error asignando:', err);
+        
+        // Mostrar mensaje de error más amigable
+        let mensaje = err.error?.mensaje || 'Error al asignar el proyecto';
+        if (mensaje === 'El proyecto no tiene rúbrica') {
+          mensaje = 'El proyecto no tiene una rúbrica asociada. Por favor, crea una rúbrica primero.';
+        }
+        this.showError(mensaje);
       }
     });
   }
