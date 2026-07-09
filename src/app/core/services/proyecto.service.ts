@@ -26,7 +26,11 @@ export class ProyectoService {
   }
 
   crear(data: any): Observable<Proyecto> {
-    console.log('📤 crear proyecto - Datos:', data);
+    console.log('📤 crear proyecto - Datos recibidos:', data);
+    // Asegurar que estudiante_nombre está presente
+    if (!data.estudiante_nombre) {
+      console.error('❌ Error: estudiante_nombre es obligatorio');
+    }
     return this.http.post<Proyecto>(this.apiUrl, data);
   }
 
