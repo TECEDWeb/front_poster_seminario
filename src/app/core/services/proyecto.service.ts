@@ -14,27 +14,29 @@ export class ProyectoService {
   constructor(private http: HttpClient) {}
 
   listar(): Observable<Proyecto[]> {
-  return this.http
-    .get<{ ok: boolean; data: Proyecto[] }>(this.apiUrl)
-    .pipe(
-      map(res => res.data ?? [])
-    );
-}
+    return this.http
+      .get<{ ok: boolean; data: Proyecto[] }>(this.apiUrl)
+      .pipe(
+        map(res => res.data ?? [])
+      );
+  }
 
   obtener(id: number): Observable<Proyecto> {
     return this.http.get<Proyecto>(`${this.apiUrl}/${id}`);
   }
 
-  crear(data: Proyecto): Observable<Proyecto> {
+  crear(data: any): Observable<Proyecto> {
+    console.log('📤 crear proyecto - Datos:', data);
     return this.http.post<Proyecto>(this.apiUrl, data);
   }
 
-  actualizar(id: number, data: Proyecto): Observable<Proyecto> {
+  actualizar(id: number, data: any): Observable<Proyecto> {
+    console.log('📤 actualizar proyecto - ID:', id, 'Datos:', data);
     return this.http.put<Proyecto>(`${this.apiUrl}/${id}`, data);
   }
 
   eliminar(id: number): Observable<any> {
+    console.log('🗑️ eliminar proyecto - ID:', id);
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
-
 }

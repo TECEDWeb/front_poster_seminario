@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router'; // ← IMPORTANTE: Debe estar importado
+import { RouterModule } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -18,10 +18,18 @@ import {
   IonFabButton,
   IonChip,
   IonLabel,
-  IonSkeletonText
+  IonSkeletonText,
+  IonModal,
+  IonItem,
+  IonInput,
+  IonTextarea,
+  IonToggle,
+  IonSpinner,
+  IonDatetime
 } from '@ionic/angular/standalone';
 import { ProyectoService } from '../../../core/services/proyecto.service';
-import { Proyecto } from '../../../core/models/proyecto.model';
+import { Proyecto, Participante } from '../../../core/models/proyecto.model';
+import { ConcursoService } from '../../../core/services/concurso.service';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -34,7 +42,14 @@ import {
   businessOutline,
   barChartOutline,
   searchOutline,
-  trophyOutline
+  trophyOutline,
+  closeOutline,
+  checkmarkOutline,
+  refreshOutline,
+  pricetagOutline,
+  calendarOutline,
+  starOutline,
+  folderOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -43,7 +58,7 @@ import {
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule, // ← IMPORTANTE: Debe estar en imports
+    RouterModule,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -59,7 +74,14 @@ import {
     IonFabButton,
     IonChip,
     IonLabel,
-    IonSkeletonText
+    IonSkeletonText,
+    IonModal,
+    IonItem,
+    IonInput,
+    IonTextarea,
+    IonToggle,
+    IonSpinner,
+    IonDatetime
   ],
   templateUrl: './proyectos.page.html',
   styleUrls: ['./proyectos.page.scss']
@@ -76,7 +98,27 @@ export class ProyectosPage implements OnInit {
   filtroNivel: string = 'todos';
   filtroEstado: string = 'todos';
 
-  constructor(private proyectoService: ProyectoService) {
+  // Modal
+  modalAbierto = false;
+  editando = false;
+  guardando = false;
+  concursosDisponibles: any[] = [];
+
+  form: any = {
+    id: null,
+    nombre: '',
+    descripcion: '',
+    concursoId: null,
+    nivel: '',
+    area: '',
+    activo: true,
+    participantes: []
+  };
+
+  constructor(
+    private proyectoService: ProyectoService,
+    private concursoService: ConcursoService
+  ) {
     addIcons({
       addOutline,
       documentTextOutline,
@@ -88,12 +130,20 @@ export class ProyectosPage implements OnInit {
       businessOutline,
       barChartOutline,
       searchOutline,
-      trophyOutline
+      trophyOutline,
+      closeOutline,
+      checkmarkOutline,
+      refreshOutline,
+      pricetagOutline,
+      calendarOutline,
+      starOutline,
+      folderOutline
     });
   }
 
   ngOnInit(): void {
     this.cargar();
+    this.cargarConcursos();
   }
 
   cargar(): void {
@@ -112,6 +162,19 @@ export class ProyectosPage implements OnInit {
         this.proyectos = [];
         this.proyectosFiltrados = [];
         this.cargando = false;
+      }
+    });
+  }
+
+  cargarConcursos(): void {
+    this.concursoService.listar().subscribe({
+      next: (res: any) => {
+        this.concursosDisponibles = res?.data ?? res ?? [];
+        console.log('Concursos disponibles:', this.concursosDisponibles);
+      },
+      error: (err) => {
+        console.error('Error cargando concursos:', err);
+        this.concursosDisponibles = [];
       }
     });
   }
@@ -150,6 +213,99 @@ export class ProyectosPage implements OnInit {
     this.proyectosFiltrados = filtered;
   }
 
+  // =========================
+  // MODAL - ABRIR CREAR
+  // =========================
+  abrirCrear(): void {
+    this.editando = false;
+    this.form = {
+      id: null,
+      nombre: '',
+      descripcion: '',
+      concursoId: null,
+      nivel: '',
+      area: '',
+      activo: true,
+      participantes: []
+    };
+    this.modalAbierto = true;
+  }
+
+  // =========================
+  // MODAL - CERRAR
+  // =========================
+  cerrarModal(): void {
+    this.modalAbierto = false;
+  }
+
+  // =========================
+  // MODAL - EDITAR
+  // =========================
+  editar(proyecto: Proyecto): void {
+    this.editando = true;
+    this.form = {
+      id: proyecto.id,
+      nombre: proyecto.nombre || '',
+      descripcion: proyecto.descripcion || '',
+      concursoId: proyecto.concursoId || null,
+      nivel: proyecto.nivel || '',
+      area: proyecto.area || '',
+      activo: proyecto.activo ?? true,
+      participantes: proyecto.participantes || []
+    };
+    this.modalAbierto = true;
+  }
+
+  // =========================
+  // MODAL - GUARDAR
+  // =========================
+  guardar(): void {
+    // Validar que tenga nombre
+    if (!this.form.nombre || this.form.nombre.trim() === '') {
+      alert('Por favor ingrese el nombre del proyecto');
+      return;
+    }
+
+    this.guardando = true;
+
+    const payload = {
+      nombre: this.form.nombre.trim(),
+      descripcion: this.form.descripcion || null,
+      concursoId: this.form.concursoId || null,
+      nivel: this.form.nivel || null,
+      area: this.form.area || null,
+      activo: this.form.activo ?? true
+    };
+
+    console.log('📤 Enviando payload:', payload);
+
+    const req = this.editando
+      ? this.proyectoService.actualizar(this.form.id, payload)
+      : this.proyectoService.crear(payload);
+
+    req.subscribe({
+      next: () => {
+        this.guardando = false;
+        this.modalAbierto = false;
+        this.cargar();
+        alert(this.editando ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
+      },
+      error: (err) => {
+        this.guardando = false;
+        console.error('Error guardando proyecto:', err);
+        alert(err.error?.mensaje || 'Error al guardar el proyecto');
+      }
+    });
+  }
+
+  // =========================
+  // VER DETALLE
+  // =========================
+  verDetalle(id: number): void {
+    console.log('Ver detalle del proyecto:', id);
+    alert(`Ver detalle del proyecto #${id}`);
+  }
+
   confirmarEliminar(proyecto: Proyecto): void {
     if (confirm(`¿Estás seguro de eliminar el proyecto "${proyecto.nombre}"?`)) {
       this.eliminarProyecto(proyecto.id);
@@ -160,12 +316,17 @@ export class ProyectosPage implements OnInit {
     this.proyectoService.eliminar(id).subscribe({
       next: () => {
         this.cargar();
+        alert('Proyecto eliminado correctamente');
       },
       error: (err) => {
         console.error('Error eliminando proyecto:', err);
-        alert('Error al eliminar el proyecto');
+        alert(err.error?.mensaje || 'Error al eliminar el proyecto');
       }
     });
+  }
+
+  recargar(): void {
+    this.cargar();
   }
 
   trackById(index: number, item: any): number {
