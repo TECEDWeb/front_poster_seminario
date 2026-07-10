@@ -6,12 +6,7 @@ import {
   IonApp,
   IonMenu,
   IonContent,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonRouterOutlet,
-  IonButtons,
-  IonMenuButton
+  IonRouterOutlet
 } from '@ionic/angular/standalone';
 
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
@@ -25,12 +20,7 @@ import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.com
     IonApp,
     IonMenu,
     IonContent,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonRouterOutlet,
-    IonButtons,
-    IonMenuButton,
     SidebarComponent
   ],
   templateUrl: './admin-layout.page.html',
