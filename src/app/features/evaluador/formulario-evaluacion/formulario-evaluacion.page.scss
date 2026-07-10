@@ -976,3 +976,76 @@ $radius: 16px;
     }
   }
 }
+
+// Agregar al final del archivo
+
+// ============================================
+// PROGRESS BAR CON TEXTO
+// ============================================
+.progress-bar-container {
+  background: white;
+  border-radius: $radius;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #eef2f7;
+
+  .progress-bar {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+
+    span:last-child {
+      font-weight: 700;
+      color: #6366f1;
+    }
+  }
+}
+
+// ============================================
+// ESTADO COMPLETO
+// ============================================
+.estado-completo {
+  color: #10b981 !important;
+}
+
+// ============================================
+// SECCIÓN PROGRESO
+// ============================================
+.seccion-progreso {
+  .seccion-pct {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6366f1;
+  }
+
+  .seccion-estado {
+    font-size: 10px;
+    font-weight: 500;
+    color: #f59e0b;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #fffbeb;
+
+    &.completa {
+      color: #10b981;
+      background: #ecfdf5;
+    }
+  }
+}

@@ -73,6 +73,7 @@ export class FormularioEvaluacionPage implements OnInit {
   error: string | null = null;
   proyectoNombre: string = '';
   concursoNombre: string = '';
+  today: Date = new Date();
 
   // Estadísticas de progreso
   totalCriterios: number = 0;
@@ -118,7 +119,7 @@ export class FormularioEvaluacionPage implements OnInit {
     this.evaluacionService.getFormulario(this.evaluacionId).subscribe({
       next: (res: any) => {
         console.log('================================');
-        console.log('🟢 RESPUESTA BACKEND', res);
+        console.log('🟢 RESPUESTA BACKEND COMPLETA', JSON.stringify(res, null, 2));
         console.log('================================');
 
         // Si la respuesta tiene ok: false
@@ -130,11 +131,13 @@ export class FormularioEvaluacionPage implements OnInit {
           return;
         }
 
-        // Extraer los datos correctamente
-        // El backend devuelve: { ok: true, data: { rubrica, secciones, proyecto, concurso } }
-        let data = res?.data || res || {};
+        // Extraer los datos - probar diferentes estructuras
+        let data = res?.data?.data || res?.data || res || {};
 
         console.log('📦 DATA extraída:', data);
+        console.log('📦 DATA keys:', Object.keys(data));
+        console.log('📦 DATA secciones:', data.secciones);
+        console.log('📦 DATA rubrica:', data.rubrica);
 
         // Si la data tiene la estructura esperada
         if (data && data.secciones && data.rubrica) {
@@ -158,11 +161,27 @@ export class FormularioEvaluacionPage implements OnInit {
           console.log('🟢 SECCIONES:', data.secciones?.length);
           console.log('🟢 TOTAL CRITERIOS:', this.totalCriterios);
           console.log('🟢 RÚBRICA:', data.rubrica);
+
+          // Verificar que los criterios tienen niveles
+          this.verificarNiveles();
+
         } else {
-          // Si no tiene la estructura esperada
+          // Si no tiene la estructura esperada, intentar otra forma
           console.error('❌ Estructura de datos incorrecta', data);
-          this.error = 'El formulario no tiene la estructura esperada';
-          this.formulario = null;
+          
+          // Si los datos están en otro lugar
+          if (data.data && data.data.secciones) {
+            this.formulario = data.data;
+            this.totalCriterios = data.data.secciones?.reduce(
+              (total: number, seccion: any) => total + (seccion.criterios?.length || 0),
+              0
+            ) || 0;
+            console.log('🟢 Usando data.data como formulario');
+            this.verificarNiveles();
+          } else {
+            this.error = 'El formulario no tiene la estructura esperada';
+            this.formulario = null;
+          }
         }
 
         this.cargando = false;
@@ -176,6 +195,28 @@ export class FormularioEvaluacionPage implements OnInit {
     });
   }
 
+  verificarNiveles(): void {
+    if (this.formulario && this.formulario.secciones) {
+      let criteriosSinNiveles = 0;
+      this.formulario.secciones.forEach((seccion: any, idx: number) => {
+        console.log(`📋 Sección ${idx + 1}: ${seccion.nombre}`);
+        if (seccion.criterios) {
+          seccion.criterios.forEach((criterio: any, cIdx: number) => {
+            console.log(`  ✏️ Criterio ${cIdx + 1}: ${criterio.texto}`);
+            console.log(`    📊 Niveles:`, criterio.niveles);
+            if (!criterio.niveles || criterio.niveles.length === 0) {
+              console.warn(`⚠️ El criterio ${cIdx + 1} no tiene niveles`);
+              criteriosSinNiveles++;
+            }
+          });
+        }
+      });
+      if (criteriosSinNiveles > 0) {
+        console.warn(`⚠️ Total de criterios sin niveles: ${criteriosSinNiveles}`);
+      }
+    }
+  }
+
   seleccionar(criterioId: number, nivelId: number): void {
     console.log('Respuesta seleccionada', { criterioId, nivelId });
     
@@ -184,24 +225,32 @@ export class FormularioEvaluacionPage implements OnInit {
       // Si es el mismo nivel, deseleccionar (toggle)
       if (this.respuestas[criterioId] === nivelId) {
         delete this.respuestas[criterioId];
+        console.log('🗑️ Respuesta removida para criterio:', criterioId);
       } else {
         this.respuestas[criterioId] = nivelId;
+        console.log('🔄 Respuesta cambiada para criterio:', criterioId);
       }
     } else {
       this.respuestas[criterioId] = nivelId;
+      console.log('✅ Nueva respuesta para criterio:', criterioId);
     }
 
     // Actualizar contador
     this.actualizarProgreso();
+    console.log('📊 Criterios respondidos:', this.criteriosRespondidos);
+    console.log('📊 Total criterios:', this.totalCriterios);
+    console.log('📊 Porcentaje:', this.getPorcentajeProgreso());
   }
 
   actualizarProgreso(): void {
     this.criteriosRespondidos = Object.keys(this.respuestas).length;
+    console.log('🔄 Progreso actualizado:', this.criteriosRespondidos);
   }
 
   getPorcentajeProgreso(): number {
     if (this.totalCriterios === 0) return 0;
-    return Math.round((this.criteriosRespondidos / this.totalCriterios) * 100);
+    const porcentaje = Math.round((this.criteriosRespondidos / this.totalCriterios) * 100);
+    return Math.min(porcentaje, 100);
   }
 
   getPuntajeTotal(): number {
@@ -261,13 +310,14 @@ export class FormularioEvaluacionPage implements OnInit {
   }
 
   guardar(): void {
+    // Verificar que hay respuestas seleccionadas
     const detalles = Object.keys(this.respuestas).map(id => ({
       criterio_id: Number(id),
       nivel_id: this.respuestas[Number(id)]
     }));
 
     if (detalles.length === 0) {
-      alert('Debe seleccionar al menos una respuesta');
+      this.mostrarMensaje('Debe seleccionar al menos una respuesta', 'error');
       return;
     }
 
@@ -277,29 +327,42 @@ export class FormularioEvaluacionPage implements OnInit {
 
     this.guardando = true;
     const payload = {
-      observacion: this.observacion,
-      detalles
+      observacion: this.observacion || '',
+      detalles: detalles
     };
 
-    console.log('📤 ENVIANDO', payload);
+    console.log('📤 ENVIANDO PAYLOAD:', JSON.stringify(payload, null, 2));
 
     this.evaluacionService.guardar(this.evaluacionId, payload).subscribe({
       next: (res) => {
-        console.log('✅ GUARDADO', res);
+        console.log('✅ GUARDADO EXITOSO:', res);
         this.guardando = false;
         this.mostrarMensaje('Evaluación guardada correctamente', 'success');
         this.router.navigate(['/evaluador/proyectos-asignados']);
       },
       error: (err) => {
-        console.error('❌ ERROR GUARDANDO', err);
+        console.error('❌ ERROR GUARDANDO:', err);
+        console.error('❌ Detalles del error:', err.error);
         this.guardando = false;
-        this.mostrarMensaje(err.error?.mensaje || 'Error al guardar la evaluación', 'error');
+        
+        let mensaje = err.error?.mensaje || 'Error al guardar la evaluación';
+        if (err.status === 0) {
+          mensaje = 'Error de conexión. Verifica tu conexión a internet.';
+        } else if (err.status === 401) {
+          mensaje = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+        } else if (err.status === 403) {
+          mensaje = 'No tienes permisos para realizar esta acción.';
+        } else if (err.status === 404) {
+          mensaje = 'La evaluación no existe o ya fue completada.';
+        }
+        this.mostrarMensaje(mensaje, 'error');
       }
     });
   }
 
   volver(): void {
-    if (Object.keys(this.respuestas).length > 0) {
+    const respuestasCount = Object.keys(this.respuestas).length;
+    if (respuestasCount > 0) {
       if (!confirm('¿Estás seguro de salir? Los cambios no guardados se perderán.')) {
         return;
       }
@@ -310,5 +373,40 @@ export class FormularioEvaluacionPage implements OnInit {
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
     const icono = tipo === 'success' ? '✅' : '❌';
     alert(`${icono} ${mensaje}`);
+  }
+
+  // Método para depuración - muestra el estado actual
+  debugEstado(): void {
+    console.log('🔍 DEBUG ESTADO:');
+    console.log('  - Evaluación ID:', this.evaluacionId);
+    console.log('  - Total criterios:', this.totalCriterios);
+    console.log('  - Criterios respondidos:', this.criteriosRespondidos);
+    console.log('  - Respuestas:', this.respuestas);
+    console.log('  - Formulario:', this.formulario);
+    console.log('  - Proyecto:', this.proyectoNombre);
+    console.log('  - Concurso:', this.concursoNombre);
+  }
+
+  // Método para verificar si hay respuestas incompletas
+  tieneRespuestasIncompletas(): boolean {
+    if (!this.formulario) return false;
+    let total = 0;
+    let respondidas = 0;
+    this.formulario.secciones?.forEach((seccion: any) => {
+      seccion.criterios?.forEach((criterio: any) => {
+        total++;
+        if (this.respuestas[criterio.id] !== undefined) {
+          respondidas++;
+        }
+      });
+    });
+    return respondidas > 0 && respondidas < total;
+  }
+
+  // Método para obtener el resumen de respuestas
+  getResumenRespuestas(): string {
+    if (this.criteriosRespondidos === 0) return 'Sin respuestas';
+    if (this.criteriosRespondidos === this.totalCriterios) return 'Completo';
+    return `${this.criteriosRespondidos} de ${this.totalCriterios}`;
   }
 }

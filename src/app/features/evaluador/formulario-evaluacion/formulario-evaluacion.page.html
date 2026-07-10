@@ -44,7 +44,7 @@
     <!-- FORMULARIO -->
     <ng-container *ngIf="!cargando && !error && formulario">
 
-      <!-- Cabecera de evaluación -->
+      <!-- Cabecera de evaluación tipo examen -->
       <div class="evaluacion-header">
         <div class="evaluacion-titulo">
           <h1>{{ formulario.rubrica?.nombre || 'Formulario de Evaluación' }}</h1>
@@ -56,6 +56,10 @@
             <span class="info-item" *ngIf="concursoNombre">
               <ion-icon name="trophy-outline"></ion-icon>
               {{ concursoNombre }}
+            </span>
+            <span class="info-item">
+              <ion-icon name="time-outline"></ion-icon>
+              {{ today | date:'dd/MM/yyyy HH:mm' }}
             </span>
           </div>
         </div>
@@ -76,6 +80,12 @@
               <span class="detalle-label">Criterios</span>
               <span class="detalle-valor">{{ criteriosRespondidos }} / {{ totalCriterios }}</span>
             </div>
+            <div class="detalle-item">
+              <span class="detalle-label">Estado</span>
+              <span class="detalle-valor" [class.estado-completo]="getPorcentajeProgreso() === 100">
+                {{ getPorcentajeProgreso() === 100 ? '✅ Completo' : '⏳ En progreso' }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -84,6 +94,10 @@
       <div class="progress-bar-container">
         <div class="progress-bar">
           <div class="progress-fill" [style.width.%]="getPorcentajeProgreso()"></div>
+        </div>
+        <div class="progress-text">
+          <span>Progreso general</span>
+          <span>{{ getPorcentajeProgreso() }}%</span>
         </div>
       </div>
 
@@ -121,7 +135,11 @@
                 </div>
               </div>
 
-              <ion-radio-group [(ngModel)]="respuestas[criterio.id]" (ionChange)="seleccionar(criterio.id, $event.detail.value)" class="niveles-group">
+              <ion-radio-group 
+                [(ngModel)]="respuestas[criterio.id]" 
+                (ionChange)="seleccionar(criterio.id, $event.detail.value)" 
+                class="niveles-group">
+                
                 <ion-item class="nivel-item" *ngFor="let nivel of criterio.niveles" lines="none">
                   <ion-radio slot="start" [value]="nivel.id" color="primary" mode="md"></ion-radio>
                   <ion-label class="nivel-label">
@@ -146,7 +164,7 @@
           <ion-label position="stacked">Comentarios sobre la evaluación</ion-label>
           <ion-textarea
             [(ngModel)]="observacion"
-            rows="5"
+            rows="4"
             placeholder="Ingrese observaciones adicionales sobre el proyecto evaluado..."
             class="observaciones-textarea">
           </ion-textarea>
