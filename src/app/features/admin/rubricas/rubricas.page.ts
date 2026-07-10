@@ -390,12 +390,20 @@ export class RubricasPage implements OnInit {
     // Usar el servicio de exportación
     this.rubricaService.exportar(rubrica.concursoId).subscribe({
       next: (blob: Blob) => {
+        // Verificar que el blob no esté vacío
+        if (!blob || blob.size === 0) {
+          alert('Error: El archivo exportado está vacío');
+          return;
+        }
+        
         // Crear URL para descargar el archivo
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
         link.download = `rubrica-concurso-${rubrica.concursoId}.xlsx`;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
         
         console.log('✅ Rúbrica exportada correctamente');
@@ -403,17 +411,21 @@ export class RubricasPage implements OnInit {
       error: (err) => {
         console.error('❌ Error exportando rúbrica:', err);
         
-        // Si el backend no tiene implementada la exportación, mostrar mensaje
+        // Mensaje de error más amigable
+        let mensaje = 'Error al exportar la rúbrica';
         if (err.status === 404) {
-          alert('La funcionalidad de exportación está en desarrollo.\n\n' +
-                'Por ahora, puedes ver el detalle de la rúbrica con el botón "Ver detalle".');
-        } else {
-          alert('Error al exportar la rúbrica: ' + (err.error?.mensaje || err.message));
+          mensaje = 'La funcionalidad de exportación está en desarrollo.\n\n' +
+                    'Por ahora, puedes ver el detalle de la rúbrica con el botón "Ver detalle".';
+        } else if (err.error?.mensaje) {
+          mensaje = err.error.mensaje;
+        } else if (err.message) {
+          mensaje = err.message;
         }
+        
+        alert(mensaje);
       }
     });
   }
-
   // VER DETALLE
   verDetalle(rubrica: RubricaConcurso): void {
     console.log('📋 Ver detalle de rúbrica:', rubrica);
