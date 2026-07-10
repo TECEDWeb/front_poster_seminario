@@ -15,7 +15,11 @@
       </ion-button>
       <ion-button class="btn-export" (click)="exportar()" [disabled]="cargando">
         <ion-icon name="download-outline" slot="start"></ion-icon>
-        Exportar Excel
+        Excel
+      </ion-button>
+      <ion-button class="btn-export-pdf" (click)="exportarPDF()" [disabled]="cargando">
+        <ion-icon name="document-outline" slot="start"></ion-icon>
+        PDF
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -192,12 +196,12 @@
 
           <!-- Actions -->
           <div class="card-actions">
-            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyecto(p, 'excel')">
+            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyectoExcel(p)">
               <ion-icon name="download-outline" slot="start"></ion-icon>
               Excel
             </ion-button>
             
-            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyecto(p, 'pdf')">
+            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyectoPDF(p)">
               <ion-icon name="document-outline" slot="start"></ion-icon>
               PDF
             </ion-button>
@@ -289,11 +293,11 @@
 
           <!-- Acciones -->
           <div class="detalle-actions">
-            <ion-button fill="outline" size="small" (click)="exportarProyecto(proyectoSeleccionado, 'excel')">
+            <ion-button fill="outline" size="small" (click)="exportarProyectoExcel(proyectoSeleccionado)">
               <ion-icon name="download-outline" slot="start"></ion-icon>
               Excel
             </ion-button>
-            <ion-button fill="outline" size="small" (click)="exportarProyecto(proyectoSeleccionado, 'pdf')">
+            <ion-button fill="outline" size="small" (click)="exportarProyectoPDF(proyectoSeleccionado)">
               <ion-icon name="document-outline" slot="start"></ion-icon>
               PDF
             </ion-button>

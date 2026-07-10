@@ -59,12 +59,29 @@ export class ReporteService {
       responseType: 'blob'
     });
   }
-  // reporte.service.ts - Añadir este método
 
-/**
- * Obtener detalle de un proyecto específico
- */
+  /**
+   * Obtener detalle de un proyecto específico
+   */
   getDetalleProyecto(proyectoId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/proyecto/${proyectoId}`);
+  }
+
+  /**
+   * Exportar PDF general
+   */
+  exportarPDF(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/exportar-pdf`, {
+      responseType: 'blob'
+    });
+  }
+
+  /**
+   * Exportar PDF de un proyecto específico
+   */
+  exportarPDFProyecto(proyectoId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/exportar-pdf/proyecto/${proyectoId}`, {
+      responseType: 'blob'
+    });
   }
 }

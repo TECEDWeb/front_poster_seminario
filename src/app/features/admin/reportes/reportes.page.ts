@@ -47,7 +47,9 @@ import {
   calendarOutline,
   closeCircleOutline,
   checkmarkCircleOutline,
-  alertCircleOutline
+  alertCircleOutline,
+  // pdfOutline NO existe en ionicons, usar documentOutline
+  addOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 
@@ -148,7 +150,8 @@ export class ReportesPage implements OnInit {
       calendarOutline,
       closeCircleOutline,
       checkmarkCircleOutline,
-      alertCircleOutline
+      alertCircleOutline,
+      addOutline
     });
   }
 
@@ -178,15 +181,11 @@ export class ReportesPage implements OnInit {
       next: (res: any) => {
         console.log('PROYECTOS:', res);
         
-        // Normalizar la respuesta
         let data = res?.data ?? res ?? [];
         
-        // Si es un array de proyectos, asignar un ID temporal basado en el nombre
         this.proyectos = data.map((item: any, index: number) => ({
           ...item,
-          // Crear un ID basado en el nombre o usar el índice
           id: item.id || item.proyecto_id || index + 1,
-          // Asegurar que el nombre esté disponible
           nombre: item.proyecto || item.nombre || 'Proyecto sin nombre'
         }));
         
@@ -266,12 +265,7 @@ export class ReportesPage implements OnInit {
   exportar(): void {
     this.reporteService.exportar().subscribe({
       next: (archivo: Blob) => {
-        const url = window.URL.createObjectURL(archivo);
-        const enlace = document.createElement('a');
-        enlace.href = url;
-        enlace.download = `reporte-evaluaciones-${new Date().toISOString().split('T')[0]}.xlsx`;
-        enlace.click();
-        window.URL.revokeObjectURL(url);
+        this.descargarArchivo(archivo, `reporte-evaluaciones-${new Date().toISOString().split('T')[0]}.xlsx`);
       },
       error: (err) => {
         console.error('Error exportando:', err);
@@ -280,59 +274,69 @@ export class ReportesPage implements OnInit {
     });
   }
 
-  exportarProyecto(proyecto: any, formato: 'excel' | 'pdf' = 'excel'): void {
-    // Obtener el ID del proyecto
-    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
-    
-    if (!id) {
-      console.error('❌ No se encontró ID del proyecto:', proyecto);
-      alert('No se puede exportar: ID del proyecto no encontrado');
-      return;
-    }
-
-    const nombreProyecto = proyecto.proyecto || proyecto.nombre || 'proyecto';
-    const extension = formato === 'excel' ? 'xlsx' : 'pdf';
-    const nombreArchivo = `reporte-${nombreProyecto}-${new Date().toISOString().split('T')[0]}.${extension}`;
-
-    console.log(`📤 Exportando ${formato.toUpperCase()} para proyecto:`, nombreProyecto, 'ID:', id);
-
-    if (formato === 'excel') {
-      this.reporteService.exportarProyecto(id).subscribe({
-        next: (archivo: Blob) => {
-          const url = window.URL.createObjectURL(archivo);
-          const enlace = document.createElement('a');
-          enlace.href = url;
-          enlace.download = nombreArchivo;
-          enlace.click();
-          window.URL.revokeObjectURL(url);
-        },
-        error: (err) => {
-          console.error('Error exportando proyecto:', err);
-          alert('Error al exportar el reporte del proyecto');
-        }
-      });
-    } else {
-      // Exportar a PDF
-      this.exportarProyectoPDF(id, nombreArchivo);
-    }
-  }
-
-  exportarProyectoPDF(proyectoId: number, nombreArchivo: string): void {
-    this.reporteService.getDetalleProyecto(proyectoId).subscribe({
-      next: (data: any) => {
-        const detalle = data?.data ?? data;
-        this.generarPDF(detalle, nombreArchivo);
+  exportarPDF(): void {
+    this.reporteService.exportarPDF().subscribe({
+      next: (archivo: Blob) => {
+        this.descargarArchivo(archivo, `reporte-evaluaciones-${new Date().toISOString().split('T')[0]}.pdf`);
       },
       error: (err) => {
-        console.error('Error generando PDF:', err);
-        alert('Error al generar el PDF del proyecto');
+        console.error('Error exportando PDF:', err);
+        alert('Error al exportar el PDF general');
       }
     });
   }
 
-  generarPDF(detalle: any, nombreArchivo: string): void {
-    alert('📄 Funcionalidad de PDF en desarrollo. Se generará un PDF con el detalle completo del proyecto.');
-    console.log('Generando PDF para:', detalle);
+  exportarProyectoExcel(proyecto: any): void {
+    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
+    if (!id) {
+      alert('No se puede exportar: ID del proyecto no encontrado');
+      return;
+    }
+
+    const nombre = proyecto.proyecto || proyecto.nombre || 'proyecto';
+    this.reporteService.exportarProyecto(id).subscribe({
+      next: (archivo: Blob) => {
+        this.descargarArchivo(archivo, `reporte-${nombre}-${new Date().toISOString().split('T')[0]}.xlsx`);
+      },
+      error: (err) => {
+        console.error('Error exportando proyecto:', err);
+        alert('Error al exportar el reporte del proyecto');
+      }
+    });
+  }
+
+  exportarProyectoPDF(proyecto: any): void {
+    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
+    if (!id) {
+      alert('No se puede exportar: ID del proyecto no encontrado');
+      return;
+    }
+
+    const nombre = proyecto.proyecto || proyecto.nombre || 'proyecto';
+    this.reporteService.exportarPDFProyecto(id).subscribe({
+      next: (archivo: Blob) => {
+        this.descargarArchivo(archivo, `reporte-${nombre}-${new Date().toISOString().split('T')[0]}.pdf`);
+      },
+      error: (err) => {
+        console.error('Error exportando PDF proyecto:', err);
+        alert('Error al exportar el PDF del proyecto');
+      }
+    });
+  }
+
+  // =========================
+  // DESCARGA DE ARCHIVOS
+  // =========================
+
+  private descargarArchivo(archivo: Blob, nombreArchivo: string): void {
+    const url = window.URL.createObjectURL(archivo);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = nombreArchivo;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    window.URL.revokeObjectURL(url);
   }
 
   // =========================
@@ -340,16 +344,12 @@ export class ReportesPage implements OnInit {
   // =========================
 
   async verDetalle(proyecto: any): Promise<void> {
-    // Obtener el ID del proyecto
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
     
     if (!id) {
-      console.error('❌ No se encontró ID del proyecto:', proyecto);
       alert('No se puede ver detalle: ID del proyecto no encontrado');
       return;
     }
-
-    console.log('📋 Ver detalle del proyecto:', proyecto.proyecto || proyecto.nombre, 'ID:', id);
 
     this.cargandoDetalle = true;
     this.modalAbierto = true;
@@ -374,7 +374,6 @@ export class ReportesPage implements OnInit {
         console.error('Error cargando detalle:', err);
         this.cargandoDetalle = false;
         
-        // Si falla, mostrar el detalle básico con la información que tenemos
         this.proyectoSeleccionado = {
           id: id,
           nombre: proyecto.proyecto || proyecto.nombre || 'Proyecto',

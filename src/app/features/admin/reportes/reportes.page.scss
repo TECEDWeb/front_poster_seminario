@@ -10,6 +10,8 @@ $upse-orange: #f57c00;
 $upse-orange-bg: #fff3e0;
 $upse-cyan: #00838f;
 $upse-cyan-bg: #e0f7fa;
+$upse-red: #dc2626;
+$upse-red-bg: #fef2f2;
 $text-dark: #0f172a;
 $text-gray: #64748b;
 $text-light: #94a3b8;
@@ -133,6 +135,38 @@ $radius: 16px;
 
     &:hover {
       --box-shadow: 0 4px 16px rgba(0, 166, 81, 0.4);
+    }
+  }
+
+  // ============================================
+  // BOTÓN PDF
+  // ============================================
+  .btn-export-pdf {
+    --background: $upse-red;
+    --color: #ffffff;
+    --border-radius: 8px;
+    font-weight: 600;
+    height: 32px;
+    font-size: 11px;
+    --box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+
+    @media (min-width: 768px) {
+      height: 38px;
+      font-size: 13px;
+      --padding-start: 14px;
+      --padding-end: 14px;
+    }
+
+    ion-icon {
+      font-size: 15px;
+
+      @media (min-width: 768px) {
+        font-size: 18px;
+      }
+    }
+
+    &:hover {
+      --box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
     }
   }
 }
@@ -997,6 +1031,9 @@ $radius: 16px;
     }
   }
 
+  // ============================================
+  // CARD ACTIONS - 3 BOTONES
+  // ============================================
   .card-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
