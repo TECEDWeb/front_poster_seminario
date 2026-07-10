@@ -150,7 +150,6 @@ export class ConcursosPage implements OnInit {
             this.abrirCrear();
           }, 300);
         } else {
-          // Si está cargando, esperar y luego abrir
           const checkLoading = setInterval(() => {
             if (!this.cargando) {
               clearInterval(checkLoading);

@@ -827,4 +827,30 @@ ion-fab-button {
       }
     }
   }
+} 
+// Añadir al final del archivo
+
+// ============================================
+// FAB - SOLO VISIBLE EN MÓVIL
+// ============================================
+.fab-mobile {
+  display: block;
+
+  @media (min-width: 992px) {
+    display: none !important;
+  }
+}
+
+// Asegurar que el FAB no se superponga en móvil
+@media (max-width: 991px) {
+  .fab-mobile {
+    ion-fab-button {
+      --background: #2563eb;
+      --box-shadow: 0 8px 24px rgba(37,99,235,0.4);
+      
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+  }
 }
