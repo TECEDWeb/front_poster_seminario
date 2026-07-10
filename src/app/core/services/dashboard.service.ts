@@ -23,17 +23,21 @@ export class DashboardService {
   }
 
   /**
-   * Obtener actividades recientes
+   * Obtener actividades recientes REALES desde el backend
    */
   obtenerActividadesRecientes(): Observable<any[]> {
     return this.http.get(`${this.apiUrl}/actividades-recientes`).pipe(
       map((res: any) => {
         const data = res?.data ?? res ?? [];
+        // Si no hay datos, devolver array vacío (sin mocks)
+        if (!data || data.length === 0) {
+          return [];
+        }
         return data.map((item: any) => ({
-          icon: this.getIconForActivity(item.tipo),
-          color: this.getColorForActivity(item.tipo),
-          text: item.descripcion || item.texto,
-          time: this.formatTimeAgo(item.fecha)
+          icon: this.getIconForActivity(item.tipo || item.type),
+          color: this.getColorForActivity(item.tipo || item.type),
+          text: item.descripcion || item.texto || item.text || '',
+          time: this.formatTimeAgo(item.fecha || item.created_at || item.date)
         }));
       })
     );
@@ -49,6 +53,22 @@ export class DashboardService {
   }
 
   /**
+   * Contar notificaciones no leídas
+   */
+  contarNotificaciones(): Observable<number> {
+    return this.http.get(`${this.apiUrl}/notificaciones/contar`).pipe(
+      map((res: any) => res?.data?.count ?? res?.count ?? 0)
+    );
+  }
+
+  /**
+   * Marcar notificaciones como leídas
+   */
+  marcarNotificacionesComoLeidas(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notificaciones/leer`, {});
+  }
+
+  /**
    * Mapear icono según tipo de actividad
    */
   private getIconForActivity(tipo: string): string {
@@ -58,6 +78,7 @@ export class DashboardService {
       'proyecto': 'folder-open-outline',
       'evaluacion': 'document-text-outline',
       'asignacion': 'people-outline',
+      'certificado': 'ribbon-outline',
       'default': 'time-outline'
     };
     return icons[tipo] || icons['default'];
@@ -68,11 +89,12 @@ export class DashboardService {
    */
   private getColorForActivity(tipo: string): string {
     const colors: Record<string, string> = {
-      'usuario': 'indigo',
-      'concurso': 'amber',
-      'proyecto': 'emerald',
-      'evaluacion': 'violet',
-      'asignacion': 'rose',
+      'usuario': 'blue-upse',
+      'concurso': 'green-upse',
+      'proyecto': 'cyan-upse',
+      'evaluacion': 'orange-upse',
+      'asignacion': 'violet',
+      'certificado': 'emerald',
       'default': 'slate'
     };
     return colors[tipo] || colors['default'];
@@ -84,37 +106,21 @@ export class DashboardService {
   private formatTimeAgo(fecha: string): string {
     if (!fecha) return 'Recientemente';
     
-    const now = new Date();
-    const date = new Date(fecha);
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+    try {
+      const now = new Date();
+      const date = new Date(fecha);
+      const diffMs = now.getTime() - date.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Hace unos segundos';
-    if (diffMins < 60) return `Hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
-    if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
-    if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
-    return date.toLocaleDateString('es-ES');
+      if (diffMins < 1) return 'Hace unos segundos';
+      if (diffMins < 60) return `Hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
+      if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+      if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+      return date.toLocaleDateString('es-ES');
+    } catch {
+      return 'Recientemente';
+    }
   }
-
-  contarNotificacionesNoLeidas(): Observable<number> {
-    return this.http.get(`${this.apiUrl}/notificaciones/contar`).pipe(
-      map((res: any) => res?.data?.count ?? 0)
-    );
-  }
-
-  /**
-   * Marcar notificaciones como leídas
-   */
-  marcarNotificacionesComoLeidas(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/notificaciones/leer`, {});
-  }
-
-  contarNotificaciones(): Observable<number> {
-    return this.http.get(`${this.apiUrl}/notificaciones/contar`).pipe(
-      map((res: any) => res?.data?.count ?? res?.count ?? 0)
-    );
-  }
-
 }

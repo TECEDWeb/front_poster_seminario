@@ -86,6 +86,9 @@ export class DashboardPage implements OnInit {
   recentActivities: Activity[] = [];
   notificacionesPendientes: number = 0;
 
+  // Servicio para comunicación entre componentes (opcional)
+  // private modalService = inject(ModalService);
+
   constructor() {
     addIcons({
       peopleOutline,
@@ -141,9 +144,11 @@ export class DashboardPage implements OnInit {
   cargarActividadesRecientes() {
     this.dashboardService.obtenerActividadesRecientes().subscribe({
       next: (actividades: Activity[]) => {
-        this.recentActivities = actividades;
+        this.recentActivities = actividades || [];
+        console.log('📋 Actividades recientes cargadas:', this.recentActivities.length);
       },
-      error: () => {
+      error: (err) => {
+        console.error('❌ Error cargando actividades:', err);
         this.recentActivities = [];
       }
     });
@@ -152,7 +157,7 @@ export class DashboardPage implements OnInit {
   cargarNotificaciones(): void {
     this.dashboardService.contarNotificaciones().subscribe({
       next: (count) => {
-        this.notificacionesPendientes = count;
+        this.notificacionesPendientes = count || 0;
       },
       error: () => {
         this.notificacionesPendientes = 0;
@@ -183,15 +188,20 @@ export class DashboardPage implements OnInit {
   }
 
   verTodasActividades(): void {
-    alert('📋 Mostrando todas las actividades');
+    // Navegar a la página de actividades o reportes
+    this.router.navigate(['/admin/reportes']);
   }
 
-  // Método para abrir nuevo concurso desde el dashboard
+  /**
+   * Abrir el modal de creación de concurso directamente
+   * Usa un evento global o servicio para comunicarse con la página de concursos
+   */
   abrirNuevoConcurso(): void {
-    // Navegar a la página de concursos y abrir el modal
-    this.router.navigate(['/admin/concursos']);
-    // El modal se abrirá automáticamente si usas un servicio o evento
-    // Alternativa: abrir directamente el modal con un servicio compartido
-    alert('Para crear un nuevo concurso, ve a la página de Concursos y usa el botón "Nuevo concurso"');
+    // Opción 1: Navegar a concursos y abrir modal con parámetro
+    this.router.navigate(['/admin/concursos'], { 
+      queryParams: { 
+        openModal: 'true' 
+      } 
+    });
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -111,7 +111,11 @@ export class ConcursosPage implements OnInit {
     activo: true
   };
 
-  constructor(private concursoService: ConcursoService) {
+  constructor(
+    private concursoService: ConcursoService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     addIcons({
       addOutline,
       trophyOutline,
@@ -136,6 +140,28 @@ export class ConcursosPage implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
+    
+    // Escuchar parámetros de la URL para abrir el modal desde el dashboard
+    this.route.queryParams.subscribe(params => {
+      if (params['openModal'] === 'true') {
+        // Esperar a que los datos se carguen antes de abrir el modal
+        if (!this.cargando) {
+          setTimeout(() => {
+            this.abrirCrear();
+          }, 300);
+        } else {
+          // Si está cargando, esperar y luego abrir
+          const checkLoading = setInterval(() => {
+            if (!this.cargando) {
+              clearInterval(checkLoading);
+              setTimeout(() => {
+                this.abrirCrear();
+              }, 300);
+            }
+          }, 200);
+        }
+      }
+    });
   }
 
   cargar(): void {
@@ -212,6 +238,12 @@ export class ConcursosPage implements OnInit {
 
   cerrarModal(): void {
     this.modalAbierto = false;
+    // Limpiar parámetros de la URL
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+      replaceUrl: true
+    });
   }
 
   editar(concurso: Concurso): void {
@@ -257,6 +289,12 @@ export class ConcursosPage implements OnInit {
         this.modalAbierto = false;
         this.cargar();
         alert(this.editando ? 'Concurso actualizado correctamente' : 'Concurso creado correctamente');
+        // Limpiar parámetros de la URL
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
       },
       error: (err) => {
         this.guardando = false;
@@ -267,8 +305,8 @@ export class ConcursosPage implements OnInit {
   }
 
   verConcurso(id: number): void {
-    // Navegar a detalle del concurso
     console.log('Ver concurso ID:', id);
+    // Navegar a detalle del concurso
     // this.router.navigate(['/admin/concursos', id]);
     alert(`Ver detalle del concurso #${id}`);
   }
