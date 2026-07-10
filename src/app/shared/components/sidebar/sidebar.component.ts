@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
@@ -10,7 +10,11 @@ import {
   IonContent,
   IonList,
   IonItem,
-  IonButton
+  IonButton,
+  IonIcon,
+  IonButtons,
+  IonMenuButton,
+  IonRouterOutlet
 } from '@ionic/angular/standalone';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -28,7 +32,11 @@ import { AuthService } from '../../../core/services/auth.service';
     IonContent,
     IonList,
     IonItem,
-    IonButton
+    IonButton,
+    IonIcon,
+    IonButtons,
+    IonMenuButton,
+    IonRouterOutlet
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
@@ -39,20 +47,28 @@ export class SidebarComponent {
   private router = inject(Router);
 
   usuario = this.authService.usuario;
-  
+  isMobile: boolean = window.innerWidth < 992;
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.isMobile = event.target.innerWidth < 992;
+  }
+
   iniciales = computed(() => {
     const u = this.usuario();
     if (!u?.nombre) return '';
-  console.log('usuario sidebar:', this.usuario());
     return u.nombre
       .split(' ')
       .map(p => p[0])
       .join('')
-      .toUpperCase();
+      .toUpperCase()
+      .slice(0, 2);
   });
 
   async cerrarSesion() {
-    await this.authService.logout();
-    this.router.navigateByUrl('/login', { replaceUrl: true });
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+      await this.authService.logout();
+      this.router.navigateByUrl('/login', { replaceUrl: true });
+    }
   }
 }
