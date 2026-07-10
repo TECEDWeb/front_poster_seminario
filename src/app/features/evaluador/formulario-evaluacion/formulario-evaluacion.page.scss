@@ -651,3 +651,328 @@ $radius: 16px;
     padding: 14px 16px;
   }
 }
+
+// Agregar al final del archivo
+
+// ============================================
+// EVALUACION HEADER - ESTILO EXAMEN
+// ============================================
+.evaluacion-header {
+  background: white;
+  border-radius: $radius;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .evaluacion-titulo {
+    flex: 1;
+    min-width: 200px;
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .evaluacion-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+
+      .info-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: #64748b;
+
+        ion-icon {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .evaluacion-progreso {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .progreso-circular {
+      width: 60px;
+      height: 60px;
+
+      .circular-chart {
+        display: block;
+        margin: 0 auto;
+        max-width: 80%;
+        max-height: 250px;
+
+        .circle-bg {
+          fill: none;
+          stroke: #f1f5f9;
+          stroke-width: 3.8;
+        }
+
+        .circle {
+          fill: none;
+          stroke-width: 3.8;
+          stroke-linecap: round;
+          stroke: #6366f1;
+          transform: rotate(-90deg);
+          transform-origin: center;
+          transition: stroke-dasharray 0.6s ease;
+        }
+
+        .percentage {
+          fill: #0f172a;
+          font-size: 8px;
+          font-weight: 700;
+          text-anchor: middle;
+          dominant-baseline: central;
+        }
+      }
+    }
+
+    .progreso-detalles {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .detalle-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 13px;
+
+        .detalle-label {
+          color: #94a3b8;
+          font-weight: 500;
+        }
+
+        .detalle-valor {
+          font-weight: 600;
+          color: #0f172a;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// SECCION - ESTILO MEJORADO
+// ============================================
+.seccion-card {
+  .seccion-header {
+    .seccion-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .seccion-progreso {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+
+      .seccion-pct {
+        font-size: 14px;
+        font-weight: 700;
+        color: #6366f1;
+      }
+
+      .seccion-estado {
+        font-size: 10px;
+        font-weight: 500;
+        color: #f59e0b;
+
+        &.completa {
+          color: #10b981;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// CRITERIO - ESTILO EXAMEN
+// ============================================
+.criterio-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .criterio-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+
+    .criterio-numero {
+      font-weight: 700;
+      color: #6366f1;
+      font-size: 14px;
+      min-width: 24px;
+      padding-top: 2px;
+    }
+
+    .criterio-text {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .criterio-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #0f172a;
+        line-height: 1.5;
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .criterio-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 2px 12px;
+        border-radius: 20px;
+        flex-shrink: 0;
+
+        ion-icon {
+          font-size: 14px;
+        }
+
+        &.respondido {
+          background: #d1fae5;
+          color: #059669;
+        }
+
+        &:not(.respondido) {
+          background: #fef3c7;
+          color: #d97706;
+        }
+      }
+    }
+  }
+
+  .niveles-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .nivel-item {
+      --background: transparent;
+      --padding-start: 4px;
+      --padding-end: 4px;
+      --min-height: 36px;
+      border-radius: 8px;
+      padding: 2px 10px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      margin-top: 2px;
+
+      &:hover {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+
+      ion-radio {
+        --border-radius: 50%;
+        --border-width: 2px;
+        --border-color: #94a3b8;
+        --color: #6366f1;
+        margin-right: 10px;
+        width: 18px;
+        height: 18px;
+      }
+
+      .nivel-label {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        padding: 4px 0;
+
+        .nivel-nombre {
+          font-size: 13px;
+          font-weight: 500;
+          color: #0f172a;
+        }
+
+        .nivel-descripcion {
+          font-size: 11px;
+          color: #64748b;
+        }
+
+        .nivel-puntaje {
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 600;
+          color: #6366f1;
+          background: #eef2ff;
+          padding: 1px 10px;
+          border-radius: 12px;
+          margin-top: 2px;
+          align-self: flex-start;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE PARA EVALUACION
+// ============================================
+@media (max-width: 480px) {
+  .evaluacion-header {
+    flex-direction: column;
+    padding: 16px 18px;
+
+    .evaluacion-progreso {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .criterio-card {
+    padding: 12px 14px;
+
+    .criterio-header .criterio-text .criterio-label {
+      font-size: 13px;
+    }
+  }
+}
