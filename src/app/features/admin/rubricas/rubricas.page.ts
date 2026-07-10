@@ -383,20 +383,79 @@ export class RubricasPage implements OnInit {
     });
   }
 
-  // =========================
   // EXPORTAR RÚBRICA
-  // =========================
   exportarRubrica(rubrica: RubricaConcurso): void {
-    console.log('Exportando rúbrica:', rubrica);
-    alert(`Exportando rúbrica del concurso #${rubrica.concursoId}`);
+    console.log('📤 Exportando rúbrica:', rubrica);
+    
+    // Usar el servicio de exportación
+    this.rubricaService.exportar(rubrica.concursoId).subscribe({
+      next: (blob: Blob) => {
+        // Crear URL para descargar el archivo
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `rubrica-concurso-${rubrica.concursoId}.xlsx`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        
+        console.log('✅ Rúbrica exportada correctamente');
+      },
+      error: (err) => {
+        console.error('❌ Error exportando rúbrica:', err);
+        
+        // Si el backend no tiene implementada la exportación, mostrar mensaje
+        if (err.status === 404) {
+          alert('La funcionalidad de exportación está en desarrollo.\n\n' +
+                'Por ahora, puedes ver el detalle de la rúbrica con el botón "Ver detalle".');
+        } else {
+          alert('Error al exportar la rúbrica: ' + (err.error?.mensaje || err.message));
+        }
+      }
+    });
   }
 
-  // =========================
   // VER DETALLE
-  // =========================
   verDetalle(rubrica: RubricaConcurso): void {
-    console.log('Ver detalle:', rubrica);
-    alert(`Ver detalle de la rúbrica #${rubrica.concursoId}`);
+    console.log('📋 Ver detalle de rúbrica:', rubrica);
+    
+    // Crear un mensaje con la estructura completa
+    let mensaje = `📋 RÚBRICA DEL CONCURSO #${rubrica.concursoId}\n\n`;
+    mensaje += `📌 SECCIONES (${rubrica.secciones?.length || 0}):\n`;
+    
+    if (rubrica.secciones && rubrica.secciones.length > 0) {
+      rubrica.secciones.forEach((seccion, idx) => {
+        mensaje += `\n  ${idx + 1}. ${seccion.nombre}`;
+        if (seccion.descripcion) {
+          mensaje += `\n     📝 ${seccion.descripcion}`;
+        }
+        mensaje += `\n     📋 Criterios (${seccion.criterios?.length || 0}):`;
+        
+        if (seccion.criterios && seccion.criterios.length > 0) {
+          seccion.criterios.forEach((criterio, cIdx) => {
+            mensaje += `\n       ${cIdx + 1}. ${criterio.texto}`;
+          });
+        } else {
+          mensaje += `\n       (Sin criterios)`;
+        }
+      });
+    } else {
+      mensaje += `\n  (Sin secciones)`;
+    }
+    
+    mensaje += `\n\n📊 NIVELES (${rubrica.niveles?.length || 0}):`;
+    if (rubrica.niveles && rubrica.niveles.length > 0) {
+      rubrica.niveles.forEach((nivel) => {
+        mensaje += `\n  • ${nivel.nombre}: ${nivel.puntaje} pts`;
+        if (nivel.descripcion) {
+          mensaje += ` (${nivel.descripcion})`;
+        }
+      });
+    } else {
+      mensaje += `\n  (Sin niveles)`;
+    }
+    
+    // Mostrar en una alerta
+    alert(mensaje);
   }
 
   // =========================
