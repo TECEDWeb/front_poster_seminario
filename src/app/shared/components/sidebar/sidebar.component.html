@@ -1,5 +1,5 @@
-<!-- MENÚ HORIZONTAL (Desktop) -->
-<nav class="menu-horizontal desktop-menu" *ngIf="!isMobile">
+<!-- MENÚ HORIZONTAL (Desktop) - Se muestra en la parte superior -->
+<nav class="menu-horizontal desktop-menu">
   <div class="menu-container-horizontal">
     <div class="menu-brand">
       <div class="logo-container">
@@ -70,8 +70,7 @@
   </div>
 </nav>
 
-<!-- CONTENIDO DEL MENÚ LATERAL (Móvil) - Se mostrará dentro del ion-menu -->
-<!-- Este es el contenido que se renderiza dentro del ion-menu en móvil -->
+<!-- CONTENIDO DEL MENÚ LATERAL (Móvil) - Se muestra dentro del ion-menu -->
 <div class="menu-container-mobile" *ngIf="isMobile">
   <div class="user-info" *ngIf="usuario() as u">
     <div class="avatar">

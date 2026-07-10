@@ -1,5 +1,5 @@
 // ============================================
-// MENÚ HORIZONTAL (DESKTOP)
+// MENÚ HORIZONTAL (DESKTOP) - SIEMPRE VISIBLE EN DESKTOP
 // ============================================
 .menu-horizontal {
   background: #ffffff;
@@ -8,6 +8,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  display: block; // Asegurar que siempre se muestre en desktop
 
   .menu-container-horizontal {
     max-width: 1400px;
@@ -260,27 +261,26 @@
 }
 
 // ============================================
-// RESPONSIVE
+// RESPONSIVE - El menú horizontal se oculta en móvil
 // ============================================
 @media (max-width: 991px) {
-  .desktop-menu {
+  .menu-horizontal {
     display: none !important;
   }
 }
 
 @media (min-width: 992px) {
-  .desktop-menu {
+  .menu-horizontal {
     display: block !important;
   }
 
-  // El menú lateral se oculta (ion-menu lo maneja)
   .menu-container-mobile {
     display: none !important;
   }
 }
 
 // ============================================
-// RESPONSIVE DEL MENÚ HORIZONTAL
+// RESPONSIVE DEL MENÚ HORIZONTAL - Pantallas medianas
 // ============================================
 @media (max-width: 1200px) {
   .menu-horizontal {
