@@ -1,175 +1,76 @@
 // ============================================
-// COLORES INSTITUCIONALES UPSE
+// STATS CARD - ESTILO UPSE
 // ============================================
-$upse-blue: #003366;
-$upse-blue-light: #004d99;
-$upse-blue-bg: #e8f0fe;
-$upse-green: #00a651;
-$upse-green-bg: #e8f5e9;
-$upse-orange: #f57c00;
-$upse-orange-bg: #fff3e0;
-$upse-cyan: #00838f;
-$upse-cyan-bg: #e0f7fa;
-$text-dark: #0f172a;
-$text-gray: #64748b;
-$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-$shadow-md: 0 8px 25px rgba(0,0,0,0.08);
-
 .stats-card {
   margin: 0;
   border-radius: 14px;
-  box-shadow: $shadow-sm;
-  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 27, 76, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: default;
   overflow: hidden;
+  border: 1px solid #eef2f7;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: $shadow-md;
+    box-shadow: 0 8px 32px rgba(0, 27, 76, 0.12);
+    border-color: #e2e8f0;
   }
 
   ion-card-content {
     padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
 
     @media (min-width: 768px) {
       padding: 18px 20px;
-    }
-  }
-
-  .stats-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-
-    @media (min-width: 768px) {
-      margin-bottom: 12px;
+      gap: 16px;
     }
   }
 
   .stats-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
     flex-shrink: 0;
+    transition: all 0.3s ease;
 
     ion-icon {
-      font-size: 20px;
-    }
-
-    @media (min-width: 768px) {
-      width: 42px;
-      height: 42px;
-      font-size: 20px;
-      border-radius: 12px;
-
-      ion-icon {
-        font-size: 22px;
-      }
-    }
-
-    // Colores UPSE
-    &.bg-blue-upse {
-      background: $upse-blue-bg;
-      color: $upse-blue;
-    }
-    &.bg-green-upse {
-      background: $upse-green-bg;
-      color: $upse-green;
-    }
-    &.bg-cyan-upse {
-      background: $upse-cyan-bg;
-      color: $upse-cyan;
-    }
-    &.bg-orange-upse {
-      background: $upse-orange-bg;
-      color: $upse-orange;
-    }
-    // Colores originales (backward compatibility)
-    &.bg-indigo {
-      background: #eef2ff;
-      color: #4f46e5;
-    }
-    &.bg-amber {
-      background: #fffbeb;
-      color: #f59e0b;
-    }
-    &.bg-emerald {
-      background: #ecfdf5;
-      color: #10b981;
-    }
-    &.bg-violet {
-      background: #f5f3ff;
-      color: #8b5cf6;
-    }
-  }
-
-  .stats-trend {
-    font-size: 11px;
-    font-weight: 600;
-    flex-shrink: 0;
-
-    @media (min-width: 768px) {
-      font-size: 12px;
-    }
-
-    .trend-up {
-      color: #10b981;
-      background: #ecfdf5;
-      padding: 2px 8px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-
-      ion-icon {
-        font-size: 13px;
-
-        @media (min-width: 768px) {
-          font-size: 14px;
-        }
-      }
-    }
-
-    .trend-down {
-      color: #ef4444;
-      background: #fef2f2;
-      padding: 2px 8px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-
-      ion-icon {
-        font-size: 13px;
-
-        @media (min-width: 768px) {
-          font-size: 14px;
-        }
-      }
-    }
-  }
-
-  .stats-content {
-    display: flex;
-    flex-direction: column;
-
-    .stats-value {
       font-size: 22px;
-      font-weight: 700;
-      color: #0f172a;
-      line-height: 1.2;
+      transition: all 0.3s ease;
+    }
 
-      @media (min-width: 768px) {
+    @media (min-width: 768px) {
+      width: 50px;
+      height: 50px;
+      
+      ion-icon {
         font-size: 26px;
       }
     }
+  }
 
-    .stats-title {
+  .stats-info {
+    flex: 1;
+    min-width: 0;
+
+    .stats-value {
+      display: block;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+      transition: all 0.3s ease;
+
+      @media (min-width: 768px) {
+        font-size: 28px;
+      }
+    }
+
+    .stats-label {
+      display: block;
       font-size: 12px;
       color: #64748b;
       font-weight: 500;
@@ -181,91 +82,76 @@ $shadow-md: 0 8px 25px rgba(0,0,0,0.08);
     }
   }
 
-  // ============================================
-  // COLORES INSTITUCIONALES UPSE
-  // ============================================
-  // Azul UPSE
+  // Colores UPSE
   &.stats-blue-upse {
-    border-left: 4px solid $upse-blue;
+    border-left: 4px solid #001b4c;
     
-    .stats-value {
-      color: $upse-blue;
-    }
-  }
-
-  // Verde UPSE
-  &.stats-green-upse {
-    border-left: 4px solid $upse-green;
-    
-    .stats-value {
-      color: $upse-green;
-    }
-  }
-
-  // Cyan UPSE
-  &.stats-cyan-upse {
-    border-left: 4px solid $upse-cyan;
-    
-    .stats-value {
-      color: $upse-cyan;
-    }
-  }
-
-  // Naranja UPSE
-  &.stats-orange-upse {
-    border-left: 4px solid $upse-orange;
-    
-    .stats-value {
-      color: $upse-orange;
-    }
-  }
-
-  // ============================================
-  // COLORES ORIGINALES (backward compatibility)
-  // ============================================
-  &.stats-indigo {
-    border-left: 4px solid #4f46e5;
-    .stats-value { color: #4f46e5; }
-  }
-  &.stats-amber {
-    border-left: 4px solid #f59e0b;
-    .stats-value { color: #f59e0b; }
-  }
-  &.stats-emerald {
-    border-left: 4px solid #10b981;
-    .stats-value { color: #10b981; }
-  }
-  &.stats-violet {
-    border-left: 4px solid #8b5cf6;
-    .stats-value { color: #8b5cf6; }
-  }
-}
-
-// ============================================
-// RESPONSIVE ADICIONAL
-// ============================================
-@media (max-width: 480px) {
-  .stats-card {
-    ion-card-content {
-      padding: 12px 14px;
-    }
-
     .stats-icon {
-      width: 32px;
-      height: 32px;
-      font-size: 14px;
-
-      ion-icon {
-        font-size: 16px;
-      }
+      background: #e8f0fe;
+      color: #001b4c;
+    }
+    
+    .stats-value {
+      color: #001b4c;
     }
 
-    .stats-content .stats-value {
-      font-size: 18px;
+    &:hover .stats-icon {
+      background: #001b4c;
+      color: white;
+    }
+  }
+
+  &.stats-green-upse {
+    border-left: 4px solid #00a651;
+    
+    .stats-icon {
+      background: #e8f5e9;
+      color: #00a651;
+    }
+    
+    .stats-value {
+      color: #00a651;
     }
 
-    .stats-content .stats-title {
-      font-size: 10px;
+    &:hover .stats-icon {
+      background: #00a651;
+      color: white;
+    }
+  }
+
+  &.stats-cyan-upse {
+    border-left: 4px solid #00838f;
+    
+    .stats-icon {
+      background: #e0f7fa;
+      color: #00838f;
+    }
+    
+    .stats-value {
+      color: #00838f;
+    }
+
+    &:hover .stats-icon {
+      background: #00838f;
+      color: white;
+    }
+  }
+
+  &.stats-orange-upse {
+    border-left: 4px solid #f57c00;
+    
+    .stats-icon {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+    
+    .stats-value {
+      color: #f57c00;
+    }
+
+    &:hover .stats-icon {
+      background: #f57c00;
+      color: white;
     }
   }
 }
