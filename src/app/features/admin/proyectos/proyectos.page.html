@@ -9,14 +9,12 @@
       <span class="title-badge">Investigación</span>
     </ion-title>
 
+    <!-- ⚠️ ELIMINADO: Botón de "Nuevo proyecto" del toolbar -->
     <ion-buttons slot="end">
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
-      <ion-button class="btn-add" (click)="abrirCrear()">
-        <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nuevo proyecto
-      </ion-button>
+      <!-- ❌ ELIMINADO: btn-add -->
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -24,13 +22,19 @@
 <ion-content class="proyectos-content">
   <div class="page-container">
 
-    <!-- HEADER -->
+    <!-- HEADER CON BOTÓN ÚNICO PARA ESCRITORIO -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de proyectos</h1>
         <p>{{ proyectos.length }} proyectos registrados en el sistema</p>
       </div>
       <div class="header-right">
+        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO -->
+        <ion-button class="btn-add-desktop" (click)="abrirCrear()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          <span>Nuevo proyecto</span>
+        </ion-button>
+
         <div class="stats-mini">
           <span class="stat-count">{{ proyectosActivos }}</span>
           <span class="stat-label">Activos</span>
@@ -209,8 +213,8 @@
 
   </div>
 
-  <!-- FAB -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
@@ -251,6 +255,7 @@
                 </ion-input>
               </ion-item>
             </div>
+
             <!-- Nombre del Estudiante -->
             <div class="form-field">
               <label class="field-label">

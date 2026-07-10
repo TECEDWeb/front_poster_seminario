@@ -34,12 +34,13 @@ $radius: 16px;
 }
 
 // ============================================
-// TOOLBAR
+// TOOLBAR - SIN BOTÓN DUPLICADO
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
   --border-color: #e9edf5;
   --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  --min-height: 56px;
 
   ion-title {
     display: flex;
@@ -63,23 +64,27 @@ $radius: 16px;
     }
   }
 
-  .btn-add {
-    --background: #6366f1;
-    --color: #ffffff;
-    --border-radius: 10px;
-    font-weight: 600;
-    height: 38px;
-    font-size: 13px;
-    --box-shadow: 0 2px 8px rgba(99,102,241,0.25);
+  .btn-refresh {
+    --color: #64748b;
+    --border-radius: 8px;
+    height: 36px;
+    width: 36px;
+    --padding-start: 0;
+    --padding-end: 0;
+    margin-right: 4px;
 
     ion-icon {
-      font-size: 18px;
+      font-size: 20px;
+    }
+
+    .spinning {
+      animation: spin 1s linear infinite;
     }
   }
 }
 
 // ============================================
-// PAGE HEADER
+// PAGE HEADER - CON BOTÓN ÚNICO PARA ESCRITORIO
 // ============================================
 .page-header {
   display: flex;
@@ -90,6 +95,9 @@ $radius: 16px;
   gap: 16px;
 
   .header-left {
+    flex: 1;
+    min-width: 200px;
+
     h1 {
       margin: 0;
       font-size: 28px;
@@ -107,7 +115,38 @@ $radius: 16px;
 
   .header-right {
     display: flex;
+    align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
+
+    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO
+    .btn-add-desktop {
+      --background: #6366f1;
+      --color: #ffffff;
+      --border-radius: 12px;
+      font-weight: 600;
+      --box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+      --padding-start: 20px;
+      --padding-end: 20px;
+      height: 44px;
+      font-size: 14px;
+      
+      ion-icon {
+        font-size: 20px;
+        margin-right: 8px;
+      }
+
+      // ❌ OCULTO EN MÓVIL (el FAB toma el control)
+      @media (max-width: 768px) {
+        display: none !important;
+      }
+
+      &:hover {
+        --box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+      }
+    }
 
     .stats-mini {
       display: flex;
@@ -566,8 +605,16 @@ $radius: 16px;
 }
 
 // ============================================
-// FAB
+// ✅ FAB - SOLO VISIBLE EN MÓVIL
 // ============================================
+.fab-mobile {
+  display: block;
+
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
 ion-fab-button {
   --background: #6366f1;
   --box-shadow: 0 8px 24px rgba(99,102,241,0.4);
@@ -591,10 +638,19 @@ ion-fab-button {
   }
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 // ============================================
 // RESPONSIVE
 // ============================================
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .page-header {
     .header-right {
       width: 100%;
@@ -634,8 +690,6 @@ ion-fab-button {
     }
   }
 }
-
-// Añadir al final del archivo
 
 // ============================================
 // MODAL
