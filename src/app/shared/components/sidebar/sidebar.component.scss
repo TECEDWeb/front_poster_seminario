@@ -165,210 +165,6 @@
 // ============================================
 // MENÚ LATERAL (MÓVIL)
 // ============================================
-.menu-lateral {
-  --background: #ffffff;
-
-  .menu-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: #ffffff;
-    color: #1e293b;
-  }
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 24px 18px;
-    background: linear-gradient(135deg, #001b4c, #002d7a);
-    color: white;
-
-    .avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: white;
-      color: #001b4c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .user-data {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      strong {
-        font-size: 15px;
-        font-weight: 700;
-      }
-
-      span {
-        font-size: 13px;
-        opacity: 0.85;
-        text-transform: capitalize;
-      }
-    }
-  }
-
-  ion-list {
-    flex: 1;
-    padding: 18px 12px;
-    background: white;
-
-    ion-item {
-      --background: #ffffff;
-      --color: #334155;
-      --border-radius: 14px;
-      margin-bottom: 4px;
-      font-weight: 600;
-      font-size: 15px;
-      min-height: 48px;
-      transition: 0.25s;
-
-      ion-icon {
-        font-size: 20px;
-        color: #64748b;
-        margin-right: 12px;
-      }
-
-      &:hover {
-        --background: #f0f4fb;
-        --color: #001b4c;
-      }
-
-      &.active {
-        --background: #e8f0fe;
-        --color: #001b4c;
-        font-weight: 700;
-      }
-    }
-  }
-
-  .logout {
-    padding: 16px;
-    background: #ffffff;
-    border-top: 1px solid #e2e8f0;
-
-    ion-button {
-      --background: #ef4444;
-      --border-radius: 14px;
-      font-weight: 700;
-      height: 46px;
-    }
-  }
-}
-
-// ============================================
-// HEADER MÓVIL
-// ============================================
-.mobile-header {
-  ion-toolbar {
-    --background: #ffffff;
-    --border-color: #e2e8f0;
-    --box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-
-    ion-title {
-      font-weight: 600;
-      color: #001b4c;
-      font-size: 18px;
-    }
-
-    ion-menu-button {
-      --color: #001b4c;
-    }
-  }
-}
-
-// ============================================
-// RESPONSIVE
-// ============================================
-@media (max-width: 991px) {
-  .desktop-menu {
-    display: none !important;
-  }
-
-  .mobile-header {
-    display: block !important;
-  }
-}
-
-@media (min-width: 992px) {
-  .desktop-menu {
-    display: block !important;
-  }
-
-  .mobile-header {
-    display: none !important;
-  }
-
-  .menu-lateral {
-    display: none !important;
-  }
-}
-
-// ============================================
-// RESPONSIVE DEL MENÚ HORIZONTAL
-// ============================================
-@media (max-width: 1200px) {
-  .menu-horizontal {
-    .menu-items .menu-link {
-      padding: 6px 12px;
-      font-size: 13px;
-
-      span {
-        display: none;
-      }
-
-      ion-icon {
-        font-size: 20px;
-      }
-
-      &.active::after {
-        display: none;
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .menu-horizontal {
-    .menu-container-horizontal {
-      padding: 0 16px;
-      height: 56px;
-    }
-
-    .menu-brand .logo-container .logo-text {
-      font-size: 16px;
-    }
-
-    .menu-items .menu-link {
-      padding: 4px 10px;
-    }
-
-    .menu-actions {
-      gap: 8px;
-
-      .user-info-horizontal {
-        padding: 2px 8px 2px 6px;
-
-        .user-name {
-          font-size: 12px;
-        }
-      }
-
-      .btn-logout ion-icon {
-        font-size: 18px;
-      }
-    }
-  }
-}
-// Añadir al final del archivo
-
 .menu-container-mobile {
   height: 100%;
   display: flex;
@@ -459,6 +255,83 @@
       --border-radius: 14px;
       font-weight: 700;
       height: 46px;
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 991px) {
+  .desktop-menu {
+    display: none !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .desktop-menu {
+    display: block !important;
+  }
+
+  // El menú lateral se oculta (ion-menu lo maneja)
+  .menu-container-mobile {
+    display: none !important;
+  }
+}
+
+// ============================================
+// RESPONSIVE DEL MENÚ HORIZONTAL
+// ============================================
+@media (max-width: 1200px) {
+  .menu-horizontal {
+    .menu-items .menu-link {
+      padding: 6px 12px;
+      font-size: 13px;
+
+      span {
+        display: none;
+      }
+
+      ion-icon {
+        font-size: 20px;
+      }
+
+      &.active::after {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-horizontal {
+    .menu-container-horizontal {
+      padding: 0 16px;
+      height: 56px;
+    }
+
+    .menu-brand .logo-container .logo-text {
+      font-size: 16px;
+    }
+
+    .menu-items .menu-link {
+      padding: 4px 10px;
+    }
+
+    .menu-actions {
+      gap: 8px;
+
+      .user-info-horizontal {
+        padding: 2px 8px 2px 6px;
+
+        .user-name {
+          font-size: 12px;
+        }
+      }
+
+      .btn-logout ion-icon {
+        font-size: 18px;
+      }
     }
   }
 }

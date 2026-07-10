@@ -16,3 +16,9 @@ ion-router-outlet {
   height: 100%;
   display: block;
 }
+
+// El ion-menu solo se muestra en móvil (el sidebar maneja la visibilidad)
+.menu-lateral {
+  --width: 280px;
+  --max-width: 280px;
+}
