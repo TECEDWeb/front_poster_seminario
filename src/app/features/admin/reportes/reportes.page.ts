@@ -177,7 +177,19 @@ export class ReportesPage implements OnInit {
     this.reporteService.getReporteProyectos().subscribe({
       next: (res: any) => {
         console.log('PROYECTOS:', res);
-        this.proyectos = res?.data ?? res ?? [];
+        
+        // Normalizar la respuesta
+        let data = res?.data ?? res ?? [];
+        
+        // Si es un array de proyectos, asignar un ID temporal basado en el nombre
+        this.proyectos = data.map((item: any, index: number) => ({
+          ...item,
+          // Crear un ID basado en el nombre o usar el índice
+          id: item.id || item.proyecto_id || index + 1,
+          // Asegurar que el nombre esté disponible
+          nombre: item.proyecto || item.nombre || 'Proyecto sin nombre'
+        }));
+        
         this.aplicarFiltros();
         this.cargando = false;
       },
@@ -226,8 +238,7 @@ export class ReportesPage implements OnInit {
     if (this.filtroBusqueda && this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
       filtered = filtered.filter(p =>
-        p.proyecto?.toLowerCase().includes(texto) ||
-        p.nombre?.toLowerCase().includes(texto)
+        (p.proyecto || p.nombre || '').toLowerCase().includes(texto)
       );
     }
 
@@ -270,14 +281,20 @@ export class ReportesPage implements OnInit {
   }
 
   exportarProyecto(proyecto: any, formato: 'excel' | 'pdf' = 'excel'): void {
-    const id = proyecto.id || proyecto.proyecto_id;
+    // Obtener el ID del proyecto
+    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
+    
     if (!id) {
+      console.error('❌ No se encontró ID del proyecto:', proyecto);
       alert('No se puede exportar: ID del proyecto no encontrado');
       return;
     }
 
+    const nombreProyecto = proyecto.proyecto || proyecto.nombre || 'proyecto';
     const extension = formato === 'excel' ? 'xlsx' : 'pdf';
-    const nombreArchivo = `reporte-${proyecto.proyecto || 'proyecto'}-${new Date().toISOString().split('T')[0]}.${extension}`;
+    const nombreArchivo = `reporte-${nombreProyecto}-${new Date().toISOString().split('T')[0]}.${extension}`;
+
+    console.log(`📤 Exportando ${formato.toUpperCase()} para proyecto:`, nombreProyecto, 'ID:', id);
 
     if (formato === 'excel') {
       this.reporteService.exportarProyecto(id).subscribe({
@@ -301,7 +318,6 @@ export class ReportesPage implements OnInit {
   }
 
   exportarProyectoPDF(proyectoId: number, nombreArchivo: string): void {
-    // Usar el detalle para generar PDF
     this.reporteService.getDetalleProyecto(proyectoId).subscribe({
       next: (data: any) => {
         const detalle = data?.data ?? data;
@@ -315,8 +331,6 @@ export class ReportesPage implements OnInit {
   }
 
   generarPDF(detalle: any, nombreArchivo: string): void {
-    // Aquí iría la lógica para generar PDF
-    // Por ahora, mostramos un mensaje
     alert('📄 Funcionalidad de PDF en desarrollo. Se generará un PDF con el detalle completo del proyecto.');
     console.log('Generando PDF para:', detalle);
   }
@@ -326,11 +340,16 @@ export class ReportesPage implements OnInit {
   // =========================
 
   async verDetalle(proyecto: any): Promise<void> {
-    const id = proyecto.id || proyecto.proyecto_id;
+    // Obtener el ID del proyecto
+    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
+    
     if (!id) {
+      console.error('❌ No se encontró ID del proyecto:', proyecto);
       alert('No se puede ver detalle: ID del proyecto no encontrado');
       return;
     }
+
+    console.log('📋 Ver detalle del proyecto:', proyecto.proyecto || proyecto.nombre, 'ID:', id);
 
     this.cargandoDetalle = true;
     this.modalAbierto = true;
@@ -339,13 +358,14 @@ export class ReportesPage implements OnInit {
     this.reporteService.getDetalleProyecto(id).subscribe({
       next: (res: any) => {
         const data = res?.data ?? res;
+        
         this.proyectoSeleccionado = {
           id: data.id || id,
-          nombre: data.nombre || data.proyecto || 'Proyecto',
+          nombre: data.nombre || data.proyecto || proyecto.proyecto || proyecto.nombre || 'Proyecto',
           descripcion: data.descripcion || '',
           evaluaciones: data.evaluaciones || [],
-          promedio: data.promedio || 0,
-          evaluadores: data.evaluadores || [],
+          promedio: data.promedio || proyecto.promedio || 0,
+          evaluadores: data.evaluadores || proyecto.evaluadores || [],
           puntajeMaximo: data.puntajeMaximo || 100
         };
         this.cargandoDetalle = false;
@@ -353,7 +373,17 @@ export class ReportesPage implements OnInit {
       error: (err) => {
         console.error('Error cargando detalle:', err);
         this.cargandoDetalle = false;
-        alert('Error al cargar el detalle del proyecto');
+        
+        // Si falla, mostrar el detalle básico con la información que tenemos
+        this.proyectoSeleccionado = {
+          id: id,
+          nombre: proyecto.proyecto || proyecto.nombre || 'Proyecto',
+          descripcion: '',
+          evaluaciones: [],
+          promedio: proyecto.promedio || 0,
+          evaluadores: proyecto.evaluadores || [],
+          puntajeMaximo: 100
+        };
       }
     });
   }
