@@ -15,9 +15,12 @@ import {
   IonChip,
   IonLabel,
   IonSpinner,
-  IonSearchbar,   // ← CAMBIAR: Usar IonSearchbar en lugar de IonInput
+  IonSearchbar,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
+  IonModal,
+  IonItem,
+  IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -36,7 +39,15 @@ import {
   refreshOutline,
   closeOutline,
   filterOutline,
-  searchOutline
+  searchOutline,
+  printOutline,
+  documentTextOutline,
+  personOutline,
+  barChartOutline,
+  calendarOutline,
+  closeCircleOutline,
+  checkmarkCircleOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 
@@ -46,6 +57,16 @@ interface StatCard {
   value: number | string;
   color: string;
   change?: number;
+}
+
+interface DetalleProyecto {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  evaluaciones: any[];
+  promedio: number;
+  evaluadores: any[];
+  puntajeMaximo: number;
 }
 
 @Component({
@@ -67,9 +88,12 @@ interface StatCard {
     IonChip,
     IonLabel,
     IonSpinner,
-    IonSearchbar,   // ← CAMBIAR
+    IonSearchbar,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonModal,
+    IonItem,
+    IonBadge
   ],
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss']
@@ -90,9 +114,14 @@ export class ReportesPage implements OnInit {
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
 
-  // Filtros - Inicializar con valor por defecto
+  // Filtros
   filtroBusqueda: string = '';
   filtroStatus: string = 'todos';
+
+  // Modal de detalle
+  modalAbierto = false;
+  proyectoSeleccionado: DetalleProyecto | null = null;
+  cargandoDetalle: boolean = false;
 
   constructor(private reporteService: ReporteService) {
     addIcons({
@@ -111,7 +140,15 @@ export class ReportesPage implements OnInit {
       refreshOutline,
       closeOutline,
       filterOutline,
-      searchOutline
+      searchOutline,
+      printOutline,
+      documentTextOutline,
+      personOutline,
+      barChartOutline,
+      calendarOutline,
+      closeCircleOutline,
+      checkmarkCircleOutline,
+      alertCircleOutline
     });
   }
 
@@ -186,7 +223,6 @@ export class ReportesPage implements OnInit {
   aplicarFiltros(): void {
     let filtered = [...this.proyectos];
 
-    // Filtro por búsqueda
     if (this.filtroBusqueda && this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
       filtered = filtered.filter(p =>
@@ -195,7 +231,6 @@ export class ReportesPage implements OnInit {
       );
     }
 
-    // Filtro por estado (según promedio)
     if (this.filtroStatus === 'excelente') {
       filtered = filtered.filter(p => (p.promedio || 0) >= 8);
     } else if (this.filtroStatus === 'bueno') {
@@ -212,6 +247,10 @@ export class ReportesPage implements OnInit {
   recargar(): void {
     this.cargarDatos();
   }
+
+  // =========================
+  // EXPORTAR FUNCIONES
+  // =========================
 
   exportar(): void {
     this.reporteService.exportar().subscribe({
@@ -230,36 +269,103 @@ export class ReportesPage implements OnInit {
     });
   }
 
-  exportarProyecto(proyecto: any): void {
+  exportarProyecto(proyecto: any, formato: 'excel' | 'pdf' = 'excel'): void {
     const id = proyecto.id || proyecto.proyecto_id;
     if (!id) {
       alert('No se puede exportar: ID del proyecto no encontrado');
       return;
     }
 
-    this.reporteService.exportarProyecto(id).subscribe({
-      next: (archivo: Blob) => {
-        const url = window.URL.createObjectURL(archivo);
-        const enlace = document.createElement('a');
-        enlace.href = url;
-        enlace.download = `reporte-${proyecto.proyecto || 'proyecto'}-${new Date().toISOString().split('T')[0]}.xlsx`;
-        enlace.click();
-        window.URL.revokeObjectURL(url);
+    const extension = formato === 'excel' ? 'xlsx' : 'pdf';
+    const nombreArchivo = `reporte-${proyecto.proyecto || 'proyecto'}-${new Date().toISOString().split('T')[0]}.${extension}`;
+
+    if (formato === 'excel') {
+      this.reporteService.exportarProyecto(id).subscribe({
+        next: (archivo: Blob) => {
+          const url = window.URL.createObjectURL(archivo);
+          const enlace = document.createElement('a');
+          enlace.href = url;
+          enlace.download = nombreArchivo;
+          enlace.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('Error exportando proyecto:', err);
+          alert('Error al exportar el reporte del proyecto');
+        }
+      });
+    } else {
+      // Exportar a PDF
+      this.exportarProyectoPDF(id, nombreArchivo);
+    }
+  }
+
+  exportarProyectoPDF(proyectoId: number, nombreArchivo: string): void {
+    // Usar el detalle para generar PDF
+    this.reporteService.getDetalleProyecto(proyectoId).subscribe({
+      next: (data: any) => {
+        const detalle = data?.data ?? data;
+        this.generarPDF(detalle, nombreArchivo);
       },
       error: (err) => {
-        console.error('Error exportando proyecto:', err);
-        alert('Error al exportar el reporte del proyecto');
+        console.error('Error generando PDF:', err);
+        alert('Error al generar el PDF del proyecto');
       }
     });
   }
 
-  verDetalle(proyecto: any): void {
-    const id = proyecto.id || proyecto.proyecto_id;
-    if (id) {
-      console.log('Ver detalle del proyecto:', id);
-      alert(`Ver detalle del proyecto: ${proyecto.proyecto}`);
-    }
+  generarPDF(detalle: any, nombreArchivo: string): void {
+    // Aquí iría la lógica para generar PDF
+    // Por ahora, mostramos un mensaje
+    alert('📄 Funcionalidad de PDF en desarrollo. Se generará un PDF con el detalle completo del proyecto.');
+    console.log('Generando PDF para:', detalle);
   }
+
+  // =========================
+  // VER DETALLE
+  // =========================
+
+  async verDetalle(proyecto: any): Promise<void> {
+    const id = proyecto.id || proyecto.proyecto_id;
+    if (!id) {
+      alert('No se puede ver detalle: ID del proyecto no encontrado');
+      return;
+    }
+
+    this.cargandoDetalle = true;
+    this.modalAbierto = true;
+    this.proyectoSeleccionado = null;
+
+    this.reporteService.getDetalleProyecto(id).subscribe({
+      next: (res: any) => {
+        const data = res?.data ?? res;
+        this.proyectoSeleccionado = {
+          id: data.id || id,
+          nombre: data.nombre || data.proyecto || 'Proyecto',
+          descripcion: data.descripcion || '',
+          evaluaciones: data.evaluaciones || [],
+          promedio: data.promedio || 0,
+          evaluadores: data.evaluadores || [],
+          puntajeMaximo: data.puntajeMaximo || 100
+        };
+        this.cargandoDetalle = false;
+      },
+      error: (err) => {
+        console.error('Error cargando detalle:', err);
+        this.cargandoDetalle = false;
+        alert('Error al cargar el detalle del proyecto');
+      }
+    });
+  }
+
+  cerrarModal(): void {
+    this.modalAbierto = false;
+    this.proyectoSeleccionado = null;
+  }
+
+  // =========================
+  // UTILITIES
+  // =========================
 
   toggleFilter(): void {
     this.aplicarFiltros();
@@ -304,6 +410,14 @@ export class ReportesPage implements OnInit {
     if (promedio >= 6) return 'time-outline';
     if (promedio >= 4) return 'alert-circle-outline';
     return 'close-circle-outline';
+  }
+
+  getColorClass(promedio: number): string {
+    if (!promedio) return 'color-gray';
+    if (promedio >= 8) return 'color-green';
+    if (promedio >= 6) return 'color-blue';
+    if (promedio >= 4) return 'color-orange';
+    return 'color-red';
   }
 
   trackById(index: number, item: any): number {

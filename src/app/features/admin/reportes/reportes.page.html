@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <!-- FILTROS - CORREGIDO -->
+    <!-- FILTROS -->
     <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0">
       <div class="filter-group search-group">
         <ion-searchbar
@@ -190,12 +190,21 @@
             </div>
           </div>
 
-          <!-- Actions - TODOS HABILITADOS -->
+          <!-- Actions -->
           <div class="card-actions">
-            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyecto(p)">
+            <!-- Botón Exportar Excel -->
+            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyecto(p, 'excel')">
               <ion-icon name="download-outline" slot="start"></ion-icon>
               Excel
             </ion-button>
+            
+            <!-- Botón Exportar PDF -->
+            <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyecto(p, 'pdf')">
+              <ion-icon name="document-outline" slot="start"></ion-icon>
+              PDF
+            </ion-button>
+            
+            <!-- Botón Ver Detalle -->
             <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(p)">
               <ion-icon name="eye-outline" slot="start"></ion-icon>
               Ver detalle
@@ -227,4 +236,83 @@
     </div>
 
   </div>
+
+  <!-- MODAL DE DETALLE -->
+  <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Detalle del proyecto</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="modal-container" *ngIf="!cargandoDetalle && proyectoSeleccionado">
+          <!-- Cabecera -->
+          <div class="detalle-header">
+            <div class="detalle-titulo">
+              <h2>{{ proyectoSeleccionado.nombre }}</h2>
+              <p>{{ proyectoSeleccionado.descripcion || 'Sin descripción' }}</p>
+            </div>
+            <div class="detalle-stats">
+              <div class="detalle-stat">
+                <span class="stat-label">Promedio</span>
+                <span class="stat-value" [class]="getColorClass(proyectoSeleccionado.promedio)">
+                  {{ proyectoSeleccionado.promedio | number:'1.1-2' }}
+                </span>
+              </div>
+              <div class="detalle-stat">
+                <span class="stat-label">Evaluaciones</span>
+                <span class="stat-value">{{ proyectoSeleccionado.evaluaciones?.length || 0 }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evaluadores -->
+          <div class="detalle-evaluadores">
+            <h3>Evaluadores</h3>
+            <div class="evaluadores-grid">
+              <div class="evaluador-card" *ngFor="let e of proyectoSeleccionado.evaluadores || []">
+                <div class="evaluador-avatar">
+                  <span>{{ e.nombre?.charAt(0) || 'E' }}</span>
+                </div>
+                <div class="evaluador-info">
+                  <span class="evaluador-nombre">{{ e.nombre }}</span>
+                  <span class="evaluador-rol">{{ e.rol || 'Evaluador' }}</span>
+                  <span class="evaluador-puntaje">Puntaje: {{ e.puntaje || 0 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="detalle-actions">
+            <ion-button fill="outline" size="small" (click)="exportarProyecto(proyectoSeleccionado, 'excel')">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Excel
+            </ion-button>
+            <ion-button fill="outline" size="small" (click)="exportarProyecto(proyectoSeleccionado, 'pdf')">
+              <ion-icon name="document-outline" slot="start"></ion-icon>
+              PDF
+            </ion-button>
+            <ion-button fill="outline" size="small" (click)="cerrarModal()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Cerrar
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- Loading del modal -->
+        <div class="modal-loading" *ngIf="cargandoDetalle">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Cargando detalle del proyecto...</p>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
