@@ -9,7 +9,9 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonRouterOutlet
+  IonRouterOutlet,
+  IonButtons,
+  IonMenuButton
 } from '@ionic/angular/standalone';
 
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
@@ -27,6 +29,8 @@ import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.com
     IonToolbar,
     IonTitle,
     IonRouterOutlet,
+    IonButtons,
+    IonMenuButton,
     SidebarComponent
   ],
   templateUrl: './admin-layout.page.html',

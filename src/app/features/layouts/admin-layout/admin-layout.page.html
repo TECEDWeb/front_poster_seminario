@@ -1,11 +1,76 @@
 <ion-app>
   <!-- Menú Lateral (Móvil) -->
-  <ion-menu contentId="admin-content" side="start" class="menu-lateral">
+  <ion-menu contentId="main-content" side="start" class="menu-lateral">
     <ion-content>
-      <app-sidebar></app-sidebar>
+      <div class="menu-container">
+        <div class="user-info" *ngIf="usuario() as u">
+          <div class="avatar">
+            {{ iniciales() }}
+          </div>
+          <div class="user-data">
+            <strong>{{ u.nombre }}</strong>
+            <span>{{ u.rol }}</span>
+          </div>
+        </div>
+
+        <ion-list lines="none">
+          <ng-container *ngIf="usuario()?.rol === 'admin'">
+            <ion-item routerLink="/admin/dashboard" routerLinkActive="active">
+              <ion-icon name="grid-outline" slot="start"></ion-icon>
+              Dashboard
+            </ion-item>
+            <ion-item routerLink="/admin/usuarios" routerLinkActive="active">
+              <ion-icon name="people-outline" slot="start"></ion-icon>
+              Usuarios
+            </ion-item>
+            <ion-item routerLink="/admin/concursos" routerLinkActive="active">
+              <ion-icon name="trophy-outline" slot="start"></ion-icon>
+              Concursos
+            </ion-item>
+            <ion-item routerLink="/admin/proyectos" routerLinkActive="active">
+              <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+              Proyectos
+            </ion-item>
+            <ion-item routerLink="/admin/reportes" routerLinkActive="active">
+              <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
+              Reportes
+            </ion-item>
+            <ion-item routerLink="/admin/rubricas" routerLinkActive="active">
+              <ion-icon name="checkbox-outline" slot="start"></ion-icon>
+              Rúbricas
+            </ion-item>
+            <ion-item routerLink="/admin/asignaciones" routerLinkActive="active">
+              <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
+              Asignaciones
+            </ion-item>
+          </ng-container>
+
+          <ng-container *ngIf="usuario()?.rol === 'evaluador'">
+            <ion-item routerLink="/evaluador/dashboard" routerLinkActive="active">
+              <ion-icon name="grid-outline" slot="start"></ion-icon>
+              Dashboard
+            </ion-item>
+            <ion-item routerLink="/evaluador/proyectos-asignados" routerLinkActive="active">
+              <ion-icon name="clipboard-outline" slot="start"></ion-icon>
+              Proyectos
+            </ion-item>
+            <ion-item routerLink="/evaluador/mis-resultados" routerLinkActive="active">
+              <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
+              Resultados
+            </ion-item>
+          </ng-container>
+        </ion-list>
+
+        <div class="logout">
+          <ion-button expand="block" (click)="cerrarSesion()">
+            <ion-icon name="log-out-outline" slot="start"></ion-icon>
+            Cerrar sesión
+          </ion-button>
+        </div>
+      </div>
     </ion-content>
   </ion-menu>
 
   <!-- Contenido Principal -->
-  <ion-router-outlet id="admin-content"></ion-router-outlet>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

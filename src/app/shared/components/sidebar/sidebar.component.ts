@@ -1,4 +1,5 @@
-import { Component, inject, computed, HostListener, signal } from '@angular/core';
+// sidebar.component.ts
+import { Component, inject, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
