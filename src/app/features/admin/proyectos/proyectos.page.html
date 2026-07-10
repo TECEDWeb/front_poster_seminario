@@ -14,7 +14,6 @@
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
-      <!-- ❌ ELIMINADO: btn-add -->
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -29,7 +28,7 @@
         <p>{{ proyectos.length }} proyectos registrados en el sistema</p>
       </div>
       <div class="header-right">
-        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO -->
+        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE) -->
         <ion-button class="btn-add-desktop" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           <span>Nuevo proyecto</span>
@@ -117,7 +116,7 @@
 
         <!-- Header -->
         <div class="card-header">
-          <div class="card-icon" [class]="p.activo ? 'icon-indigo' : 'icon-slate'">
+          <div class="card-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
             <ion-icon name="document-text-outline"></ion-icon>
           </div>
 
@@ -213,7 +212,7 @@
 
   </div>
 
-  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL -->
+  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE) -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>

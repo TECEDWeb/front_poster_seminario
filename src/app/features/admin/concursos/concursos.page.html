@@ -16,14 +16,14 @@
 <ion-content class="concursos-content">
   <div class="page-container">
 
-    <!-- HEADER -->
+    <!-- HEADER CON ESTILO UPSE -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de concursos</h1>
         <p>Administra los concursos científicos y sus convocatorias</p>
       </div>
       <div class="header-right">
-        <!-- ✅ BOTÓN ÚNICO - SOLO EN ESCRITORIO -->
+        <!-- ✅ BOTÓN ÚNICO - SOLO EN ESCRITORIO (ESTILO UPSE) -->
         <ion-button class="btn-add-desktop" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           <span>Nuevo concurso</span>
@@ -93,7 +93,7 @@
 
         <!-- Header Card -->
         <div class="card-header">
-          <div class="card-icon" [class]="c.activo ? 'icon-amber' : 'icon-slate'">
+          <div class="card-icon" [class]="c.activo ? 'icon-upse' : 'icon-slate'">
             <ion-icon name="trophy-outline"></ion-icon>
           </div>
 
@@ -203,7 +203,7 @@
 
   </div>
 
-  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL -->
+  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE) -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>

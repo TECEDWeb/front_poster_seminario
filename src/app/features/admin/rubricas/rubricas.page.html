@@ -9,13 +9,10 @@
       <span class="title-badge">Evaluación</span>
     </ion-title>
 
+    <!-- ⚠️ ELIMINADO: Botón "Nueva rúbrica" del toolbar -->
     <ion-buttons slot="end">
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
-      </ion-button>
-      <ion-button class="btn-add" (click)="abrirCrear()">
-        <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nueva rúbrica
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -24,13 +21,19 @@
 <ion-content class="rubricas-content">
   <div class="page-container">
 
-    <!-- HEADER -->
+    <!-- HEADER CON ESTILO UPSE -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de rúbricas</h1>
         <p>Administra las rúbricas de evaluación para concursos</p>
       </div>
       <div class="header-right">
+        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE) -->
+        <ion-button class="btn-add-desktop" (click)="abrirCrear()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          <span>Nueva rúbrica</span>
+        </ion-button>
+
         <div class="stats-mini">
           <span class="stat-count">{{ rubricas.length }}</span>
           <span class="stat-label">Rúbricas</span>
@@ -241,8 +244,8 @@
 
   </div>
 
-  <!-- FAB -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE) -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
@@ -285,7 +288,7 @@
               </ion-item>
             </div>
 
-            <!-- Nombre - Asegurar que el binding es correcto -->
+            <!-- Nombre -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>

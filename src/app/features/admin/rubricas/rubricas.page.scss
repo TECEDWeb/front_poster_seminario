@@ -1,26 +1,34 @@
 // ============================================
-// VARIABLES
+// COLORES INSTITUCIONALES UPSE
 // ============================================
-$primary: #2563eb;
-$primary-dark: #1d4ed8;
-$success: #10b981;
-$danger: #ef4444;
-$warning: #f59e0b;
-$text-dark: #0f172a;
-$text-gray: #64748b;
-$text-light: #94a3b8;
-$border: #e2e8f0;
-$bg-light: #f1f5f9;
-$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-$shadow-md: 0 4px 20px rgba(0,0,0,0.08);
-$shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+$upse-blue: #001b4c;
+$upse-blue-dark: #001433;
+$upse-blue-light: #e8f0fe;
+$upse-gold: #c9a84c;
+$upse-gold-light: #f8f0e0;
+$upse-green: #00a651;
+$upse-green-light: #e8f5e9;
+$upse-orange: #f57c00;
+$upse-orange-light: #fff3e0;
+$upse-cyan: #00838f;
+$upse-cyan-light: #e0f7fa;
+$upse-gray: #f5f5f5;
+$upse-gray-dark: #757575;
+$text-dark: #1a1a1a;
+$text-gray: #4a4a4a;
+$text-light: #9e9e9e;
+$shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 27, 76, 0.08);
+$shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.12);
+$shadow-xl: 0 12px 48px rgba(0, 27, 76, 0.16);
 $radius: 16px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================
 // CONTENT
 // ============================================
 .rubricas-content {
-  --background: #f1f5f9;
+  --background: #f0f4fb;
 }
 
 .page-container {
@@ -33,104 +41,90 @@ $radius: 16px;
   }
 
   @media (min-width: 768px) {
-    padding: 24px 20px 80px;
+    padding: 24px 24px 80px;
   }
 
   @media (min-width: 1024px) {
-    padding: 32px 32px 80px;
+    padding: 28px 32px 80px;
   }
 }
 
 // ============================================
-// TOOLBAR
+// TOOLBAR - ESTILO INSTITUCIONAL UPSE
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
-  --border-color: #e9edf5;
-  --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  --color: #0f172a;
+  --border-color: #e2e8f0;
+  --box-shadow: 0 1px 0 rgba(0, 27, 76, 0.05);
+  padding: 0 8px;
 
   ion-title {
     display: flex;
     align-items: center;
-    gap: 8px;
-
+    gap: 10px;
+    font-weight: 600;
+    
     .title-text {
-      font-weight: 700;
       font-size: 16px;
       color: #0f172a;
+      letter-spacing: -0.5px;
 
       @media (min-width: 768px) {
         font-size: 20px;
       }
     }
-
+    
     .title-badge {
       font-size: 9px;
-      background: #dbeafe;
-      color: #2563eb;
-      padding: 2px 10px;
+      background: $upse-blue-light;
+      color: $upse-blue;
+      padding: 2px 12px;
       border-radius: 20px;
       font-weight: 600;
-      letter-spacing: 0.3px;
       display: none;
+      letter-spacing: 0.3px;
 
       @media (min-width: 480px) {
         display: inline-block;
         font-size: 10px;
-        padding: 2px 12px;
+        padding: 2px 14px;
       }
 
       @media (min-width: 768px) {
         font-size: 11px;
-        padding: 2px 14px;
-      }
-    }
-  }
-
-  .btn-add {
-    --background: #2563eb;
-    --color: #ffffff;
-    --border-radius: 8px;
-    font-weight: 600;
-    height: 32px;
-    font-size: 11px;
-    --box-shadow: 0 2px 8px rgba(37,99,235,0.25);
-    --padding-start: 10px;
-    --padding-end: 10px;
-
-    ion-icon {
-      font-size: 15px;
-    }
-
-    @media (min-width: 768px) {
-      height: 38px;
-      font-size: 13px;
-      --padding-start: 14px;
-      --padding-end: 14px;
-      
-      ion-icon {
-        font-size: 18px;
+        padding: 3px 16px;
       }
     }
   }
 
   .btn-refresh {
-    --padding-start: 6px;
-    --padding-end: 6px;
+    --padding-start: 8px;
+    --padding-end: 8px;
     --color: #64748b;
-
+    --border-radius: 50%;
+    
     ion-icon {
       font-size: 18px;
+      transition: $transition;
 
       @media (min-width: 768px) {
         font-size: 20px;
+      }
+    }
+    
+    &:hover {
+      --color: $upse-blue;
+      
+      ion-icon {
+        transform: rotate(45deg);
       }
     }
   }
 }
 
 // ============================================
-// PAGE HEADER
+// PAGE HEADER - CON BOTÓN ÚNICO PARA ESCRITORIO
 // ============================================
 .page-header {
   display: flex;
@@ -147,11 +141,13 @@ $radius: 16px;
   }
 
   .header-left {
+    flex: 1;
+
     h1 {
       margin: 0;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
-      color: #0f172a;
+      color: $upse-blue;
       letter-spacing: -0.5px;
 
       @media (min-width: 768px) {
@@ -160,72 +156,83 @@ $radius: 16px;
     }
 
     p {
-      margin: 4px 0 0;
+      margin: 6px 0 0;
       color: #64748b;
-      font-size: 13px;
+      font-size: 14px;
 
       @media (min-width: 768px) {
         font-size: 15px;
-        margin: 6px 0 0;
       }
     }
   }
 
   .header-right {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
     flex-wrap: wrap;
 
-    @media (min-width: 768px) {
-      gap: 12px;
+    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE)
+    .btn-add-desktop {
+      --background: $upse-blue;
+      --color: #ffffff;
+      --border-radius: 12px;
+      font-weight: 600;
+      --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
+      --padding-start: 20px;
+      --padding-end: 20px;
+      height: 44px;
+      font-size: 14px;
+      
+      ion-icon {
+        font-size: 20px;
+        margin-right: 8px;
+      }
+
+      // ❌ OCULTO EN MÓVIL (el FAB toma el control)
+      @media (max-width: 768px) {
+        display: none !important;
+      }
+
+      &:hover {
+        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+        transform: translateY(-2px);
+        transition: $transition;
+        --background: $upse-blue-dark;
+      }
     }
 
     .stats-mini {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 4px 10px;
+      padding: 6px 16px;
       background: white;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #eef2f7;
-      min-width: 45px;
-      flex: 1;
-
-      @media (min-width: 480px) {
-        padding: 6px 14px;
-        min-width: 55px;
-        flex: none;
-      }
-
-      @media (min-width: 768px) {
-        padding: 6px 16px;
-        min-width: 60px;
-      }
+      min-width: 60px;
+      box-shadow: $shadow-sm;
 
       .stat-count {
-        font-size: 16px;
+        font-size: 20px;
         font-weight: 700;
-        color: #0f172a;
+        color: $upse-blue;
         line-height: 1.2;
 
         @media (min-width: 768px) {
-          font-size: 20px;
+          font-size: 22px;
         }
       }
 
       .stat-label {
-        font-size: 8px;
+        font-size: 10px;
         color: #94a3b8;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.3px;
 
-        @media (min-width: 480px) {
-          font-size: 9px;
-        }
-
         @media (min-width: 768px) {
-          font-size: 10px;
+          font-size: 11px;
         }
       }
     }
@@ -233,7 +240,7 @@ $radius: 16px;
 }
 
 // ============================================
-// FILTER BAR - RESPONSIVE
+// FILTER BAR - ESTILO UPSE
 // ============================================
 .filter-bar {
   display: flex;
@@ -298,9 +305,9 @@ $radius: 16px;
         }
 
         &:focus-within {
-          --border-color: #2563eb;
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+          --border-color: $upse-blue;
+          border-color: $upse-blue;
+          box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
         }
       }
     }
@@ -328,6 +335,11 @@ $radius: 16px;
         --padding-start: 12px;
         --padding-end: 12px;
       }
+
+      &:focus-within {
+        border-color: $upse-blue;
+        --box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
+      }
     }
   }
 
@@ -338,6 +350,7 @@ $radius: 16px;
     font-size: 11px;
     font-weight: 500;
     height: 32px;
+    transition: $transition;
 
     @media (min-width: 768px) {
       --padding-start: 8px;
@@ -377,6 +390,7 @@ $radius: 16px;
   padding: 16px 18px;
   border-radius: $radius;
   border: 1px solid #f1f5f9;
+  box-shadow: $shadow-sm;
 
   @media (min-width: 768px) {
     padding: 24px;
@@ -415,7 +429,7 @@ $radius: 16px;
 }
 
 // ============================================
-// RÚBRICAS GRID - RESPONSIVE
+// RÚBRICAS GRID
 // ============================================
 .rubricas-grid {
   display: grid;
@@ -434,26 +448,22 @@ $radius: 16px;
 }
 
 // ============================================
-// RÚBRICA CARD - RESPONSIVE
+// RÚBRICA CARD - ESTILO UPSE
 // ============================================
 .rubrica-card {
   background: white;
   border-radius: $radius;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
-  transition: all 0.25s ease;
+  transition: $transition;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
-
-    @media (min-width: 768px) {
-      transform: translateY(-4px);
-      box-shadow: $shadow-lg;
-    }
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    border-color: $upse-blue;
   }
 
   .card-header {
@@ -472,8 +482,8 @@ $radius: 16px;
       width: 36px;
       height: 36px;
       border-radius: 10px;
-      background: #dbeafe;
-      color: #2563eb;
+      background: $upse-blue-light;
+      color: $upse-blue;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -530,6 +540,23 @@ $radius: 16px;
           font-size: 11px;
           padding: 4px 12px;
         }
+
+        &.status-excellent {
+          background: $upse-green-light;
+          color: $upse-green;
+        }
+        &.status-good {
+          background: $upse-blue-light;
+          color: $upse-blue;
+        }
+        &.status-regular {
+          background: $upse-gold-light;
+          color: $upse-gold;
+        }
+        &.status-low {
+          background: #fef2f2;
+          color: #ef4444;
+        }
       }
     }
 
@@ -552,6 +579,7 @@ $radius: 16px;
         --padding-end: 3px;
         height: 28px;
         --color: #94a3b8;
+        transition: $transition;
 
         @media (min-width: 768px) {
           --padding-start: 4px;
@@ -565,6 +593,14 @@ $radius: 16px;
           @media (min-width: 768px) {
             font-size: 18px;
           }
+        }
+
+        &:hover {
+          --color: $upse-blue;
+        }
+
+        &.danger:hover {
+          --color: #ef4444;
         }
       }
     }
@@ -598,7 +634,7 @@ $radius: 16px;
 
       ion-icon {
         font-size: 14px;
-        color: #94a3b8;
+        color: $upse-blue;
 
         @media (min-width: 768px) {
           font-size: 18px;
@@ -645,7 +681,7 @@ $radius: 16px;
       gap: 4px;
       font-size: 11px;
       font-weight: 600;
-      color: #64748b;
+      color: $upse-blue;
       margin-bottom: 6px;
 
       @media (min-width: 768px) {
@@ -718,7 +754,7 @@ $radius: 16px;
       gap: 4px;
       font-size: 11px;
       font-weight: 600;
-      color: #64748b;
+      color: $upse-blue;
       margin-bottom: 6px;
 
       @media (min-width: 768px) {
@@ -764,9 +800,9 @@ $radius: 16px;
         }
 
         .nivel-puntaje {
-          color: #2563eb;
+          color: $upse-blue;
           font-weight: 600;
-          background: #dbeafe;
+          background: $upse-blue-light;
           padding: 0 6px;
           border-radius: 8px;
           font-size: 9px;
@@ -818,6 +854,7 @@ $radius: 16px;
       font-weight: 500;
       --color: #64748b;
       --border-color: #e2e8f0;
+      transition: $transition;
 
       @media (min-width: 768px) {
         --border-radius: 8px;
@@ -836,15 +873,15 @@ $radius: 16px;
       }
 
       &:hover {
-        --color: #2563eb;
-        --border-color: #2563eb;
+        --color: $upse-blue;
+        --border-color: $upse-blue;
       }
     }
   }
 }
 
 // ============================================
-// EMPTY STATE - RESPONSIVE
+// EMPTY STATE - ESTILO UPSE
 // ============================================
 .empty-state {
   grid-column: 1 / -1;
@@ -859,7 +896,7 @@ $radius: 16px;
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: #f1f5f9;
+    background: $upse-blue-light;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -873,7 +910,7 @@ $radius: 16px;
 
     ion-icon {
       font-size: 30px;
-      color: #94a3b8;
+      color: $upse-blue;
 
       @media (min-width: 768px) {
         font-size: 40px;
@@ -905,10 +942,10 @@ $radius: 16px;
   }
 
   .btn-primary {
-    --background: #2563eb;
+    --background: $upse-blue;
     --border-radius: 10px;
     font-weight: 600;
-    --box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+    --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
     height: 38px;
     font-size: 13px;
 
@@ -925,208 +962,35 @@ $radius: 16px;
         font-size: 18px;
       }
     }
-  }
-}
 
-// ============================================
-// FAB - RESPONSIVE
-// ============================================
-ion-fab-button {
-  --background: #2563eb;
-  --box-shadow: 0 8px 24px rgba(37,99,235,0.4);
-  width: 48px;
-  height: 48px;
-
-  @media (min-width: 768px) {
-    width: 56px;
-    height: 56px;
+    &:hover {
+      --background: $upse-blue-dark;
+      --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+    }
   }
 
-  ion-icon {
-    font-size: 22px;
+  .btn-clear-filter {
+    --border-color: #e2e8f0;
+    --color: #64748b;
+    --border-radius: 10px;
+    font-weight: 600;
+    height: 38px;
+    font-size: 13px;
 
     @media (min-width: 768px) {
-      font-size: 24px;
+      height: 44px;
+      font-size: 15px;
+    }
+
+    &:hover {
+      --border-color: $upse-blue;
+      --color: $upse-blue;
     }
   }
 }
 
 // ============================================
-// MODAL - RESPONSIVE
-// ============================================
-.modal-content {
-  --background: #f8fafc;
-}
-
-.modal-container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 14px 16px;
-
-  @media (min-width: 480px) {
-    padding: 16px 20px;
-  }
-
-  @media (min-width: 768px) {
-    max-width: 600px;
-    padding: 20px 24px;
-  }
-
-  .form-field {
-    margin-bottom: 14px;
-
-    @media (min-width: 768px) {
-      margin-bottom: 18px;
-    }
-
-    .field-label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 4px;
-
-      @media (min-width: 768px) {
-        font-size: 13px;
-        gap: 6px;
-        margin-bottom: 6px;
-      }
-
-      ion-icon {
-        color: #64748b;
-        font-size: 14px;
-
-        @media (min-width: 768px) {
-          font-size: 16px;
-        }
-      }
-
-      .required {
-        color: #ef4444;
-        font-weight: 700;
-        margin-left: 2px;
-      }
-    }
-
-    .field-input {
-      --background: white;
-      --border-radius: 8px;
-      --padding-start: 10px;
-      --padding-end: 10px;
-      --inner-padding-end: 10px;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      min-height: 36px;
-
-      @media (min-width: 768px) {
-        --border-radius: 10px;
-        --padding-start: 14px;
-        --padding-end: 14px;
-        --inner-padding-end: 14px;
-        min-height: 44px;
-      }
-
-      &:focus-within {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
-      }
-
-      ion-input, ion-textarea, ion-select, ion-toggle {
-        --padding-start: 0;
-        font-size: 13px;
-
-        @media (min-width: 768px) {
-          font-size: 14px;
-        }
-      }
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 12px;
-
-    @media (min-width: 480px) {
-      flex-direction: row;
-      gap: 12px;
-    }
-
-    @media (min-width: 768px) {
-      margin-top: 16px;
-    }
-
-    .cancel-btn {
-      --border-color: #e2e8f0;
-      --color: #64748b;
-      --border-radius: 8px;
-      font-weight: 600;
-      height: 38px;
-
-      @media (min-width: 768px) {
-        --border-radius: 10px;
-        height: 44px;
-        flex: 1;
-      }
-
-      &:hover {
-        --border-color: #94a3b8;
-      }
-    }
-
-    .submit-btn {
-      --background: #6366f1;
-      --border-radius: 8px;
-      font-weight: 600;
-      height: 38px;
-      --box-shadow: 0 4px 16px rgba(99,102,241,0.3);
-
-      @media (min-width: 768px) {
-        --border-radius: 10px;
-        height: 44px;
-        flex: 2;
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        --box-shadow: none;
-      }
-
-      .spinning {
-        animation: spin 1s linear infinite;
-      }
-    }
-  }
-}
-
-// ============================================
-// ANIMATIONS
-// ============================================
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pulse-dot {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 0.7;
-  }
-}
-
-// ============================================
-// ERROR CONTAINER - RESPONSIVE
+// ERROR CONTAINER - ESTILO UPSE
 // ============================================
 .error-container {
   display: flex;
@@ -1174,22 +1038,223 @@ ion-fab-button {
   }
 
   .btn-retry {
-    --background: #2563eb;
+    --background: $upse-blue;
     --border-radius: 10px;
     font-weight: 600;
     height: 36px;
     font-size: 13px;
+    --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
 
     @media (min-width: 768px) {
       --border-radius: 12px;
       height: 44px;
       font-size: 15px;
     }
+
+    &:hover {
+      --background: $upse-blue-dark;
+      --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+    }
   }
 }
 
 // ============================================
-// SCROLLBAR PERSONALIZADA (opcional)
+// ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE)
+// ============================================
+.fab-mobile {
+  display: block;
+
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+ion-fab-button {
+  --background: $upse-blue;
+  --box-shadow: 0 8px 24px rgba(0, 27, 76, 0.45);
+
+  ion-icon {
+    font-size: 24px;
+  }
+
+  &:hover {
+    --background: $upse-blue-dark;
+  }
+}
+
+// ============================================
+// MODAL - ESTILO UPSE
+// ============================================
+.modal-content {
+  --background: #f8fafc;
+}
+
+.modal-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 14px 16px;
+
+  @media (min-width: 480px) {
+    padding: 16px 20px;
+  }
+
+  @media (min-width: 768px) {
+    max-width: 600px;
+    padding: 20px 24px;
+  }
+
+  .form-field {
+    margin-bottom: 14px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 18px;
+    }
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 4px;
+
+      @media (min-width: 768px) {
+        font-size: 13px;
+        gap: 6px;
+        margin-bottom: 6px;
+      }
+
+      ion-icon {
+        color: $upse-blue;
+        font-size: 14px;
+
+        @media (min-width: 768px) {
+          font-size: 16px;
+        }
+      }
+
+      .required {
+        color: #ef4444;
+        font-weight: 700;
+        margin-left: 2px;
+      }
+    }
+
+    .field-input {
+      --background: white;
+      --border-radius: 8px;
+      --padding-start: 10px;
+      --padding-end: 10px;
+      --inner-padding-end: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      min-height: 36px;
+      box-shadow: $shadow-sm;
+
+      @media (min-width: 768px) {
+        --border-radius: 10px;
+        --padding-start: 14px;
+        --padding-end: 14px;
+        --inner-padding-end: 14px;
+        min-height: 44px;
+      }
+
+      &:focus-within {
+        border-color: $upse-blue;
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
+      }
+
+      ion-input, ion-textarea, ion-select, ion-toggle {
+        --padding-start: 0;
+        font-size: 13px;
+
+        @media (min-width: 768px) {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+
+    @media (min-width: 480px) {
+      flex-direction: row;
+      gap: 12px;
+    }
+
+    @media (min-width: 768px) {
+      margin-top: 16px;
+    }
+
+    .cancel-btn {
+      --border-color: #e2e8f0;
+      --color: #64748b;
+      --border-radius: 8px;
+      font-weight: 600;
+      height: 38px;
+      transition: $transition;
+
+      @media (min-width: 768px) {
+        --border-radius: 10px;
+        height: 44px;
+        flex: 1;
+      }
+
+      &:hover {
+        --border-color: $upse-blue;
+        --color: $upse-blue;
+      }
+    }
+
+    .submit-btn {
+      --background: $upse-blue;
+      --border-radius: 8px;
+      font-weight: 600;
+      height: 38px;
+      --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
+
+      @media (min-width: 768px) {
+        --border-radius: 10px;
+        height: 44px;
+        flex: 2;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        --box-shadow: none;
+      }
+
+      &:hover:not(:disabled) {
+        --background: $upse-blue-dark;
+        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+      }
+
+      .spinning {
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// ============================================
+// SCROLLBAR PERSONALIZADA
 // ============================================
 ::-webkit-scrollbar {
   width: 6px;
@@ -1202,10 +1267,11 @@ ion-fab-button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #94a3b8;
+  background: $upse-blue;
   border-radius: 3px;
+  transition: $transition;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: $upse-blue-dark;
 }

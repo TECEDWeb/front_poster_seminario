@@ -1,32 +1,34 @@
 // ============================================
 // COLORES INSTITUCIONALES UPSE
 // ============================================
-$upse-blue: #003366;
-$upse-blue-light: #004d99;
-$upse-blue-bg: #e8f0fe;
+$upse-blue: #001b4c;
+$upse-blue-dark: #001433;
+$upse-blue-light: #e8f0fe;
+$upse-gold: #c9a84c;
+$upse-gold-light: #f8f0e0;
 $upse-green: #00a651;
-$upse-green-bg: #e8f5e9;
+$upse-green-light: #e8f5e9;
 $upse-orange: #f57c00;
-$upse-orange-bg: #fff3e0;
+$upse-orange-light: #fff3e0;
 $upse-cyan: #00838f;
-$upse-cyan-bg: #e0f7fa;
+$upse-cyan-light: #e0f7fa;
 $upse-red: #dc2626;
-$upse-red-bg: #fef2f2;
-$text-dark: #0f172a;
-$text-gray: #64748b;
-$text-light: #94a3b8;
-$border: #e2e8f0;
-$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-$shadow-md: 0 4px 20px rgba(0,0,0,0.08);
-$shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-$shadow-xl: 0 12px 48px rgba(0,0,0,0.15);
+$upse-red-light: #fef2f2;
+$text-dark: #1a1a1a;
+$text-gray: #4a4a4a;
+$text-light: #9e9e9e;
+$shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 27, 76, 0.08);
+$shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.12);
+$shadow-xl: 0 12px 48px rgba(0, 27, 76, 0.16);
 $radius: 16px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================
 // CONTENT
 // ============================================
 .reportes-content {
-  --background: #f1f5f9;
+  --background: #f0f4fb;
 }
 
 .page-container {
@@ -48,45 +50,50 @@ $radius: 16px;
 }
 
 // ============================================
-// TOOLBAR
+// TOOLBAR - ESTILO INSTITUCIONAL UPSE
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
-  --border-color: #e9edf5;
-  --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  --color: #0f172a;
+  --border-color: #e2e8f0;
+  --box-shadow: 0 1px 0 rgba(0, 27, 76, 0.05);
+  padding: 0 8px;
 
   ion-title {
     display: flex;
     align-items: center;
     gap: 10px;
-
+    font-weight: 600;
+    
     .title-text {
-      font-weight: 700;
       font-size: 16px;
       color: #0f172a;
+      letter-spacing: -0.5px;
 
       @media (min-width: 768px) {
         font-size: 20px;
       }
     }
-
+    
     .title-badge {
       font-size: 9px;
-      background: $upse-blue-bg;
+      background: $upse-blue-light;
       color: $upse-blue;
-      padding: 2px 10px;
-      border-radius: 12px;
+      padding: 2px 12px;
+      border-radius: 20px;
       font-weight: 600;
       display: none;
+      letter-spacing: 0.3px;
 
       @media (min-width: 480px) {
         display: inline-block;
         font-size: 10px;
-        padding: 2px 12px;
+        padding: 2px 14px;
       }
 
       @media (min-width: 768px) {
         font-size: 11px;
+        padding: 3px 16px;
       }
     }
   }
@@ -95,78 +102,27 @@ $radius: 16px;
     --padding-start: 8px;
     --padding-end: 8px;
     --color: #64748b;
-
+    --border-radius: 50%;
+    
     ion-icon {
       font-size: 18px;
+      transition: $transition;
 
       @media (min-width: 768px) {
         font-size: 20px;
       }
     }
-
+    
     &:hover {
       --color: $upse-blue;
-    }
-  }
-
-  .btn-export {
-    --background: $upse-green;
-    --color: #ffffff;
-    --border-radius: 8px;
-    font-weight: 600;
-    height: 32px;
-    font-size: 11px;
-    --box-shadow: 0 2px 8px rgba(0, 166, 81, 0.3);
-
-    @media (min-width: 768px) {
-      height: 38px;
-      font-size: 13px;
-      --padding-start: 14px;
-      --padding-end: 14px;
-    }
-
-    ion-icon {
-      font-size: 15px;
-
-      @media (min-width: 768px) {
-        font-size: 18px;
+      
+      ion-icon {
+        transform: rotate(45deg);
       }
     }
 
-    &:hover {
-      --box-shadow: 0 4px 16px rgba(0, 166, 81, 0.4);
-    }
-  }
-
-  // ============================================
-  // BOTÓN PDF
-  // ============================================
-  .btn-export-pdf {
-    --background: $upse-red;
-    --color: #ffffff;
-    --border-radius: 8px;
-    font-weight: 600;
-    height: 32px;
-    font-size: 11px;
-    --box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-
-    @media (min-width: 768px) {
-      height: 38px;
-      font-size: 13px;
-      --padding-start: 14px;
-      --padding-end: 14px;
-    }
-
-    ion-icon {
-      font-size: 15px;
-
-      @media (min-width: 768px) {
-        font-size: 18px;
-      }
-    }
-
-    &:hover {
-      --box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+    .spinning {
+      animation: spin 1s linear infinite;
     }
   }
 }
@@ -188,11 +144,13 @@ $radius: 16px;
   }
 
   .header-left {
+    flex: 1;
+
     h1 {
       margin: 0;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
-      color: #0f172a;
+      color: $upse-blue;
       letter-spacing: -0.5px;
 
       @media (min-width: 768px) {
@@ -201,18 +159,22 @@ $radius: 16px;
     }
 
     p {
-      margin: 4px 0 0;
+      margin: 6px 0 0;
       color: #64748b;
-      font-size: 13px;
+      font-size: 14px;
 
       @media (min-width: 768px) {
         font-size: 15px;
-        margin: 6px 0 0;
       }
     }
   }
 
   .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
     .last-update {
       display: flex;
       align-items: center;
@@ -233,17 +195,53 @@ $radius: 16px;
 
       ion-icon {
         font-size: 14px;
+        color: $upse-blue;
 
         @media (min-width: 768px) {
           font-size: 16px;
         }
       }
     }
+
+    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE)
+    .btn-export-desktop {
+      --background: $upse-green;
+      --color: #ffffff;
+      --border-radius: 12px;
+      font-weight: 600;
+      --box-shadow: 0 4px 16px rgba(0, 166, 81, 0.35);
+      --padding-start: 20px;
+      --padding-end: 20px;
+      height: 44px;
+      font-size: 14px;
+      
+      ion-icon {
+        font-size: 20px;
+        margin-right: 8px;
+      }
+
+      // ❌ OCULTO EN MÓVIL
+      @media (max-width: 768px) {
+        display: none !important;
+      }
+
+      &:hover:not(:disabled) {
+        --box-shadow: 0 6px 24px rgba(0, 166, 81, 0.45);
+        transform: translateY(-2px);
+        transition: $transition;
+        --background: #008f45;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        --box-shadow: none;
+      }
+    }
   }
 }
 
 // ============================================
-// STATS GRID
+// STATS GRID - ESTILO UPSE
 // ============================================
 .stats-grid {
   display: grid;
@@ -269,12 +267,12 @@ $radius: 16px;
     gap: 14px;
     border: 1px solid #eef2f7;
     box-shadow: $shadow-sm;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: $transition;
 
     &:hover {
       transform: translateY(-4px);
       box-shadow: $shadow-lg;
-      border-color: #e2e8f0;
+      border-color: $upse-blue;
     }
 
     @media (min-width: 768px) {
@@ -326,7 +324,7 @@ $radius: 16px;
         display: block;
         font-size: 20px;
         font-weight: 700;
-        color: #0f172a;
+        color: $upse-blue;
         line-height: 1.2;
         margin-top: 2px;
 
@@ -339,7 +337,7 @@ $radius: 16px;
     &.stat-blue {
       border-left: 4px solid $upse-blue;
       .stat-icon {
-        background: $upse-blue-bg;
+        background: $upse-blue-light;
         color: $upse-blue;
       }
       .stat-value { color: $upse-blue; }
@@ -348,19 +346,19 @@ $radius: 16px;
     &.stat-green {
       border-left: 4px solid $upse-green;
       .stat-icon {
-        background: $upse-green-bg;
+        background: $upse-green-light;
         color: $upse-green;
       }
       .stat-value { color: $upse-green; }
     }
 
-    &.stat-orange {
-      border-left: 4px solid $upse-orange;
+    &.stat-gold {
+      border-left: 4px solid $upse-gold;
       .stat-icon {
-        background: $upse-orange-bg;
-        color: $upse-orange;
+        background: $upse-gold-light;
+        color: $upse-gold;
       }
-      .stat-value { color: $upse-orange; }
+      .stat-value { color: $upse-gold; }
     }
 
     &.stat-purple {
@@ -375,7 +373,7 @@ $radius: 16px;
 }
 
 // ============================================
-// FILTER BAR
+// FILTER BAR - ESTILO UPSE
 // ============================================
 .filter-bar {
   display: flex;
@@ -434,7 +432,7 @@ $radius: 16px;
         border: 1px solid #e2e8f0;
         border-radius: 10px;
         width: 100%;
-        transition: all 0.3s ease;
+        transition: $transition;
 
         @media (min-width: 768px) {
           height: 42px;
@@ -443,7 +441,7 @@ $radius: 16px;
         &:focus-within {
           --border-color: $upse-blue;
           border-color: $upse-blue;
-          box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+          box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
         }
       }
     }
@@ -459,7 +457,7 @@ $radius: 16px;
       min-width: 100%;
       font-size: 13px;
       color: #0f172a;
-      transition: all 0.3s ease;
+      transition: $transition;
 
       @media (min-width: 640px) {
         min-width: 140px;
@@ -475,7 +473,7 @@ $radius: 16px;
 
       &:focus-within {
         border-color: $upse-blue;
-        box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
       }
     }
   }
@@ -487,6 +485,7 @@ $radius: 16px;
     font-size: 12px;
     font-weight: 500;
     height: 34px;
+    transition: $transition;
 
     ion-icon {
       font-size: 14px;
@@ -520,6 +519,7 @@ $radius: 16px;
   padding: 20px 24px;
   border-radius: $radius;
   border: 1px solid #f1f5f9;
+  box-shadow: $shadow-sm;
 
   .skeleton-title {
     height: 20px;
@@ -545,7 +545,7 @@ $radius: 16px;
 }
 
 // ============================================
-// ERROR
+// ERROR - ESTILO UPSE
 // ============================================
 .error-container {
   display: flex;
@@ -596,10 +596,10 @@ $radius: 16px;
     --background: $upse-blue;
     --border-radius: 10px;
     font-weight: 600;
-    --box-shadow: 0 4px 16px rgba(0, 51, 102, 0.3);
+    --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
 
     &:hover {
-      --box-shadow: 0 6px 24px rgba(0, 51, 102, 0.4);
+      --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
       transform: translateY(-2px);
     }
   }
@@ -630,7 +630,7 @@ $radius: 16px;
         margin: 0;
         font-size: 17px;
         font-weight: 600;
-        color: #0f172a;
+        color: $upse-blue;
 
         @media (min-width: 768px) {
           font-size: 20px;
@@ -653,6 +653,9 @@ $radius: 16px;
     }
 
     .section-header-right {
+      display: flex;
+      gap: 8px;
+
       .filter-btn {
         --border-radius: 8px;
         --color: #64748b;
@@ -661,6 +664,28 @@ $radius: 16px;
 
         @media (min-width: 768px) {
           font-size: 13px;
+        }
+
+        &:hover {
+          --color: $upse-blue;
+        }
+      }
+
+      // ✅ BOTÓN EXPORTAR MÓVIL
+      .export-mobile-btn {
+        --border-radius: 8px;
+        --color: $upse-green;
+        font-weight: 500;
+        font-size: 12px;
+        --border-color: $upse-green;
+
+        @media (min-width: 769px) {
+          display: none !important;
+        }
+
+        &:hover {
+          --color: #008f45;
+          --border-color: #008f45;
         }
       }
     }
@@ -685,14 +710,14 @@ $radius: 16px;
 }
 
 // ============================================
-// PROYECTO CARD
+// PROYECTO CARD - ESTILO UPSE
 // ============================================
 .proyecto-card {
   background: white;
   border-radius: $radius;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: $transition;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -700,7 +725,7 @@ $radius: 16px;
   &:hover {
     transform: translateY(-4px);
     box-shadow: $shadow-lg;
-    border-color: #e2e8f0;
+    border-color: $upse-blue;
   }
 
   .card-header {
@@ -746,9 +771,9 @@ $radius: 16px;
           }
         }
 
-        &.color-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-        &.color-green { background: linear-gradient(135deg, #10b981, #059669); }
-        &.color-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        &.color-blue { background: linear-gradient(135deg, $upse-blue, $upse-blue-dark); }
+        &.color-green { background: linear-gradient(135deg, $upse-green, #008f45); }
+        &.color-gold { background: linear-gradient(135deg, $upse-gold, #b8923c); }
         &.color-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         &.color-pink { background: linear-gradient(135deg, #ec4899, #db2777); }
         &.color-cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); }
@@ -797,16 +822,16 @@ $radius: 16px;
         }
 
         &.status-excellent {
-          background: #d1fae5;
-          color: #059669;
+          background: $upse-green-light;
+          color: $upse-green;
         }
         &.status-good {
-          background: #dbeafe;
-          color: #2563eb;
+          background: $upse-blue-light;
+          color: $upse-blue;
         }
         &.status-regular {
-          background: #fef3c7;
-          color: #d97706;
+          background: $upse-gold-light;
+          color: $upse-gold;
         }
         &.status-low {
           background: #f1f5f9;
@@ -894,7 +919,7 @@ $radius: 16px;
       .progress-fill {
         height: 100%;
         border-radius: 3px;
-        background: linear-gradient(90deg, #2563eb, #6366f1);
+        background: linear-gradient(90deg, $upse-blue, $upse-gold);
         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
@@ -926,7 +951,7 @@ $radius: 16px;
       gap: 6px;
       font-size: 11px;
       font-weight: 600;
-      color: #64748b;
+      color: $upse-blue;
       margin-bottom: 8px;
 
       @media (min-width: 768px) {
@@ -961,10 +986,11 @@ $radius: 16px;
         background: #f8fafc;
         border-radius: 8px;
         border: 1px solid #f1f5f9;
-        transition: all 0.2s ease;
+        transition: $transition;
 
         &:hover {
-          background: #f1f5f9;
+          background: $upse-blue-light;
+          border-color: $upse-blue;
         }
 
         @media (min-width: 768px) {
@@ -998,7 +1024,7 @@ $radius: 16px;
         .evaluador-puntaje {
           font-size: 13px;
           font-weight: 700;
-          color: #0f172a;
+          color: $upse-blue;
 
           @media (min-width: 768px) {
             font-size: 14px;
@@ -1031,9 +1057,6 @@ $radius: 16px;
     }
   }
 
-  // ============================================
-  // CARD ACTIONS - 3 BOTONES
-  // ============================================
   .card-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1056,7 +1079,7 @@ $radius: 16px;
       font-weight: 500;
       --color: #64748b;
       --border-color: #e2e8f0;
-      transition: all 0.2s ease;
+      transition: $transition;
 
       @media (min-width: 768px) {
         --border-radius: 8px;
@@ -1088,7 +1111,7 @@ $radius: 16px;
 }
 
 // ============================================
-// EMPTY STATE
+// EMPTY STATE - ESTILO UPSE
 // ============================================
 .empty-state {
   grid-column: 1 / -1;
@@ -1103,7 +1126,7 @@ $radius: 16px;
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: #f1f5f9;
+    background: $upse-blue-light;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1117,7 +1140,7 @@ $radius: 16px;
 
     ion-icon {
       font-size: 32px;
-      color: #94a3b8;
+      color: $upse-blue;
 
       @media (min-width: 768px) {
         font-size: 40px;
@@ -1153,6 +1176,7 @@ $radius: 16px;
     --color: #64748b;
     --border-radius: 10px;
     font-weight: 500;
+    transition: $transition;
 
     &:hover {
       --border-color: #ef4444;
@@ -1162,7 +1186,7 @@ $radius: 16px;
 }
 
 // ============================================
-// MODAL DE DETALLE
+// MODAL DE DETALLE - ESTILO UPSE
 // ============================================
 .modal-content {
   --background: #f8fafc;
@@ -1199,7 +1223,7 @@ $radius: 16px;
         margin: 0;
         font-size: 20px;
         font-weight: 700;
-        color: #0f172a;
+        color: $upse-blue;
 
         @media (min-width: 768px) {
           font-size: 24px;
@@ -1259,9 +1283,9 @@ $radius: 16px;
             font-size: 22px;
           }
 
-          &.color-green { color: #10b981; }
-          &.color-blue { color: #2563eb; }
-          &.color-orange { color: #f59e0b; }
+          &.color-green { color: $upse-green; }
+          &.color-blue { color: $upse-blue; }
+          &.color-gold { color: $upse-gold; }
           &.color-red { color: #ef4444; }
           &.color-gray { color: #94a3b8; }
         }
@@ -1273,7 +1297,7 @@ $radius: 16px;
     h3 {
       font-size: 16px;
       font-weight: 600;
-      color: #0f172a;
+      color: $upse-blue;
       margin: 0 0 16px;
 
       @media (min-width: 768px) {
@@ -1303,11 +1327,11 @@ $radius: 16px;
         background: white;
         border-radius: 12px;
         border: 1px solid #eef2f7;
-        transition: all 0.3s ease;
+        transition: $transition;
         box-shadow: $shadow-sm;
 
         &:hover {
-          border-color: #e2e8f0;
+          border-color: $upse-blue;
           box-shadow: $shadow-md;
           transform: translateY(-2px);
         }
@@ -1316,8 +1340,8 @@ $radius: 16px;
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #eef2ff, #dbeafe);
-          color: #4f46e5;
+          background: $upse-blue-light;
+          color: $upse-blue;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1484,13 +1508,13 @@ $radius: 16px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #94a3b8;
+  background: $upse-blue;
   border-radius: 3px;
-  transition: background 0.3s ease;
+  transition: $transition;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: $upse-blue-dark;
 }
 
 // ============================================
@@ -1498,7 +1522,7 @@ $radius: 16px;
 // ============================================
 @media (max-width: 480px) {
   .page-header .header-left h1 {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .stats-grid {

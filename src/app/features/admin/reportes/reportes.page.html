@@ -13,14 +13,7 @@
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
-      <ion-button class="btn-export" (click)="exportar()" [disabled]="cargando">
-        <ion-icon name="download-outline" slot="start"></ion-icon>
-        Excel
-      </ion-button>
-      <ion-button class="btn-export-pdf" (click)="exportarPDF()" [disabled]="cargando">
-        <ion-icon name="document-outline" slot="start"></ion-icon>
-        PDF
-      </ion-button>
+      <!-- ⚠️ ELIMINADO: Botones de Excel y PDF del toolbar para evitar duplicación -->
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -28,7 +21,7 @@
 <ion-content class="reportes-content">
   <div class="page-container">
 
-    <!-- HEADER -->
+    <!-- HEADER CON ESTILO UPSE -->
     <div class="page-header">
       <div class="header-left">
         <h1>Reportes y estadísticas</h1>
@@ -39,6 +32,11 @@
           <ion-icon name="time-outline"></ion-icon>
           <span>Última actualización: {{ fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
+        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE) -->
+        <ion-button class="btn-export-desktop" (click)="exportar()" [disabled]="cargando">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          Exportar reportes
+        </ion-button>
       </div>
     </div>
 
@@ -124,6 +122,11 @@
           <ion-button fill="outline" size="small" class="filter-btn" (click)="toggleFilter()">
             <ion-icon name="funnel-outline"></ion-icon>
             Filtrar
+          </ion-button>
+          <!-- ✅ BOTÓN EXPORTAR MÓVIL -->
+          <ion-button fill="outline" size="small" class="export-mobile-btn" (click)="exportar()" [disabled]="cargando">
+            <ion-icon name="download-outline"></ion-icon>
+            Exportar
           </ion-button>
         </div>
       </div>

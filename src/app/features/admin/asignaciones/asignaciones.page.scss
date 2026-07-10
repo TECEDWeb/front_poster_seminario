@@ -1,82 +1,158 @@
 // ============================================
-// VARIABLES
+// COLORES INSTITUCIONALES UPSE
 // ============================================
-$primary: #2563eb;
-$primary-dark: #1d4ed8;
-$text-dark: #0f172a;
-$text-gray: #64748b;
-$text-light: #94a3b8;
-$border: #e2e8f0;
-$bg-light: #f8fafc;
-$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-$shadow-md: 0 4px 20px rgba(0,0,0,0.08);
-$shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+$upse-blue: #001b4c;
+$upse-blue-dark: #001433;
+$upse-blue-light: #e8f0fe;
+$upse-gold: #c9a84c;
+$upse-gold-light: #f8f0e0;
+$upse-green: #00a651;
+$upse-green-light: #e8f5e9;
+$upse-orange: #f57c00;
+$upse-orange-light: #fff3e0;
+$upse-cyan: #00838f;
+$upse-cyan-light: #e0f7fa;
+$upse-gray: #f5f5f5;
+$upse-gray-dark: #757575;
+$text-dark: #1a1a1a;
+$text-gray: #4a4a4a;
+$text-light: #9e9e9e;
+$shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 27, 76, 0.08);
+$shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.12);
+$shadow-xl: 0 12px 48px rgba(0, 27, 76, 0.16);
 $radius: 16px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================
 // CONTENT
 // ============================================
 .assign-content {
-  --background: #f1f5f9;
+  --background: #f0f4fb;
 }
 
 .page-wrapper {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 20px 60px;
+  padding: 16px 12px 60px;
+
+  @media (min-width: 576px) {
+    padding: 20px 16px 60px;
+  }
 
   @media (min-width: 768px) {
-    padding: 32px 32px 60px;
+    padding: 24px 24px 60px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 28px 32px 60px;
   }
 }
 
 // ============================================
-// TOOLBAR
+// TOOLBAR - ESTILO INSTITUCIONAL UPSE
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
-  --border-color: #e9edf5;
-  --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  --color: #0f172a;
+  --border-color: #e2e8f0;
+  --box-shadow: 0 1px 0 rgba(0, 27, 76, 0.05);
+  padding: 0 8px;
 
   ion-title {
     display: flex;
     align-items: center;
-    gap: 12px;
-
+    gap: 10px;
+    font-weight: 600;
+    
     .title-text {
-      font-weight: 700;
-      font-size: 20px;
+      font-size: 16px;
       color: #0f172a;
-    }
+      letter-spacing: -0.5px;
 
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
+    }
+    
     .title-badge {
-      font-size: 11px;
-      background: #dbeafe;
-      color: #2563eb;
-      padding: 2px 14px;
+      font-size: 9px;
+      background: $upse-blue-light;
+      color: $upse-blue;
+      padding: 2px 12px;
       border-radius: 20px;
       font-weight: 600;
+      display: none;
       letter-spacing: 0.3px;
+
+      @media (min-width: 480px) {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 14px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 11px;
+        padding: 3px 16px;
+      }
     }
   }
 
-  .btn-add {
-    --background: #2563eb;
-    --color: #ffffff;
-    --border-radius: 10px;
-    font-weight: 600;
-    height: 38px;
-    font-size: 13px;
-    --box-shadow: 0 2px 8px rgba(37,99,235,0.25);
-
+  .btn-refresh {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --color: #64748b;
+    --border-radius: 50%;
+    
     ion-icon {
       font-size: 18px;
+      transition: $transition;
+
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
+    }
+    
+    &:hover {
+      --color: $upse-blue;
+      
+      ion-icon {
+        transform: rotate(45deg);
+      }
+    }
+
+    .spinning {
+      animation: spin 1s linear infinite;
     }
   }
 }
 
 // ============================================
-// STATS ROW
+// LOADING
+// ============================================
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+
+  ion-spinner {
+    width: 48px;
+    height: 48px;
+    color: $upse-blue;
+  }
+
+  p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// ============================================
+// STATS ROW - ESTILO UPSE
 // ============================================
 .stats-row {
   display: grid;
@@ -96,7 +172,8 @@ $radius: 16px;
     align-items: center;
     gap: 16px;
     border: 1px solid #eef2f7;
-    transition: all 0.2s ease;
+    box-shadow: $shadow-sm;
+    transition: $transition;
     cursor: default;
 
     &:hover {
@@ -115,16 +192,16 @@ $radius: 16px;
       flex-shrink: 0;
 
       &.blue {
-        background: #dbeafe;
-        color: #2563eb;
+        background: $upse-blue-light;
+        color: $upse-blue;
       }
       &.green {
-        background: #d1fae5;
-        color: #059669;
+        background: $upse-green-light;
+        color: $upse-green;
       }
-      &.purple {
-        background: #ede9fe;
-        color: #7c3aed;
+      &.gold {
+        background: $upse-gold-light;
+        color: $upse-gold;
       }
     }
 
@@ -135,7 +212,7 @@ $radius: 16px;
       .stat-value {
         font-size: 24px;
         font-weight: 700;
-        color: #0f172a;
+        color: $upse-blue;
         line-height: 1.2;
       }
 
@@ -149,7 +226,7 @@ $radius: 16px;
 }
 
 // ============================================
-// FORM CARD
+// FORM CARD - ESTILO UPSE
 // ============================================
 .form-card {
   border-radius: 20px;
@@ -179,10 +256,10 @@ $radius: 16px;
         gap: 12px;
         font-size: 22px;
         font-weight: 700;
-        color: #0f172a;
+        color: $upse-blue;
 
         ion-icon {
-          color: #2563eb;
+          color: $upse-blue;
           font-size: 26px;
         }
       }
@@ -197,14 +274,14 @@ $radius: 16px;
 
     .card-header-right {
       .status-chip {
-        background: #eef2ff;
-        color: #4f46e5;
+        background: $upse-blue-light;
+        color: $upse-blue;
         font-weight: 500;
         height: 28px;
         padding: 0 12px;
         
         ion-icon {
-          color: #4f46e5;
+          color: $upse-blue;
           font-size: 14px;
         }
         ion-label {
@@ -221,7 +298,7 @@ $radius: 16px;
 }
 
 // ============================================
-// FORM FIELDS
+// FORM FIELDS - ESTILO UPSE
 // ============================================
 .field-group {
   display: grid;
@@ -250,7 +327,7 @@ $radius: 16px;
     font-size: 14px;
 
     ion-icon {
-      color: #64748b;
+      color: $upse-blue;
       font-size: 16px;
     }
 
@@ -268,7 +345,7 @@ $radius: 16px;
   --padding-start: 16px;
   --inner-padding-end: 16px;
   border: 2px solid #e2e8f0;
-  transition: all 0.2s ease;
+  transition: $transition;
   min-height: 50px;
 
   &:hover {
@@ -276,13 +353,13 @@ $radius: 16px;
   }
 
   &:focus-within {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+    border-color: $upse-blue;
+    box-shadow: 0 0 0 4px rgba(0, 27, 76, 0.1);
     background: #ffffff;
   }
 
   &.has-value {
-    border-color: #2563eb;
+    border-color: $upse-blue;
     background: #ffffff;
   }
 
@@ -320,7 +397,7 @@ $radius: 16px;
 }
 
 // ============================================
-// FORM ACTIONS
+// FORM ACTIONS - ESTILO UPSE
 // ============================================
 .form-actions {
   display: flex;
@@ -338,9 +415,11 @@ $radius: 16px;
     height: 48px;
     font-weight: 600;
     flex: 1;
+    transition: $transition;
 
     &:hover {
-      --border-color: #94a3b8;
+      --border-color: $upse-blue;
+      --color: $upse-blue;
     }
   }
 
@@ -350,13 +429,14 @@ $radius: 16px;
     font-weight: 700;
     font-size: 15px;
     flex: 2;
-    --background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    --box-shadow: 0 4px 16px rgba(37,99,235,0.35);
-    transition: all 0.2s ease;
+    --background: $upse-blue;
+    --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
+    transition: $transition;
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      --box-shadow: 0 6px 24px rgba(37,99,235,0.45);
+      --background: $upse-blue-dark;
+      --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
     }
 
     &:disabled {
@@ -380,13 +460,14 @@ $radius: 16px;
 }
 
 // ============================================
-// RECENT ASSIGNMENTS
+// RECENT ASSIGNMENTS - ESTILO UPSE
 // ============================================
 .recent-assignments {
   background: white;
   border-radius: $radius;
   padding: 24px 28px;
   border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
 
   .section-header {
     display: flex;
@@ -397,14 +478,19 @@ $radius: 16px;
     h3 {
       font-size: 17px;
       font-weight: 600;
-      color: #0f172a;
+      color: $upse-blue;
       margin: 0;
     }
 
     .view-all {
-      --color: #2563eb;
+      --color: $upse-blue;
       font-weight: 500;
       font-size: 13px;
+      transition: $transition;
+
+      &:hover {
+        --color: $upse-gold;
+      }
     }
   }
 
@@ -420,10 +506,10 @@ $radius: 16px;
       padding: 12px 16px;
       background: #f8fafc;
       border-radius: 12px;
-      transition: all 0.2s ease;
+      transition: $transition;
 
       &:hover {
-        background: #f1f5f9;
+        background: $upse-blue-light;
       }
 
       .assignment-avatar {
@@ -437,18 +523,34 @@ $radius: 16px;
         flex-shrink: 0;
 
         &.pending {
-          background: #fef3c7;
-          color: #d97706;
+          background: $upse-gold-light;
+          color: $upse-gold;
         }
         &.completed {
-          background: #d1fae5;
-          color: #059669;
+          background: $upse-green-light;
+          color: $upse-green;
         }
         &.in-progress {
-          background: #dbeafe;
-          color: #2563eb;
+          background: $upse-blue-light;
+          color: $upse-blue;
         }
         &.rejected {
+          background: #fecaca;
+          color: #dc2626;
+        }
+        &.pendiente {
+          background: $upse-gold-light;
+          color: $upse-gold;
+        }
+        &.en_progreso {
+          background: $upse-blue-light;
+          color: $upse-blue;
+        }
+        &.completado {
+          background: $upse-green-light;
+          color: $upse-green;
+        }
+        &.rechazado {
           background: #fecaca;
           color: #dc2626;
         }
@@ -506,18 +608,34 @@ $radius: 16px;
             letter-spacing: 0.3px;
 
             &.pending {
-              background: #fef3c7;
-              color: #d97706;
+              background: $upse-gold-light;
+              color: $upse-gold;
             }
             &.completed {
-              background: #d1fae5;
-              color: #059669;
+              background: $upse-green-light;
+              color: $upse-green;
             }
             &.in-progress {
-              background: #dbeafe;
-              color: #2563eb;
+              background: $upse-blue-light;
+              color: $upse-blue;
             }
             &.rejected {
+              background: #fecaca;
+              color: #dc2626;
+            }
+            &.pendiente {
+              background: $upse-gold-light;
+              color: $upse-gold;
+            }
+            &.en_progreso {
+              background: $upse-blue-light;
+              color: $upse-blue;
+            }
+            &.completado {
+              background: $upse-green-light;
+              color: $upse-green;
+            }
+            &.rechazado {
               background: #fecaca;
               color: #dc2626;
             }
@@ -547,26 +665,41 @@ $radius: 16px;
   .recent-assignments {
     padding: 16px;
   }
+
+  .stats-row .stat-item {
+    padding: 14px 16px;
+
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 17px;
+    }
+
+    .stat-info .stat-value {
+      font-size: 20px;
+    }
+  }
 }
 
-// Añadir al final del archivo
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  gap: 16px;
+// ============================================
+// SCROLLBAR PERSONALIZADA
+// ============================================
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-  ion-spinner {
-    width: 48px;
-    height: 48px;
-    color: #6366f1;
-  }
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
 
-  p {
-    color: #64748b;
-    font-size: 14px;
-    margin: 0;
-  }
+::-webkit-scrollbar-thumb {
+  background: $upse-blue;
+  border-radius: 3px;
+  transition: $transition;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $upse-blue-dark;
 }

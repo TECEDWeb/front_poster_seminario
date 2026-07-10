@@ -9,25 +9,26 @@
       <span class="title-badge">Gestión</span>
     </ion-title>
 
-    <ion-buttons slot="end">
-      <ion-button class="btn-add" (click)="abrirCrear()">
-        <ion-icon name="add-outline" slot="start"></ion-icon>
-        Nuevo usuario
-      </ion-button>
-    </ion-buttons>
+    <!-- ⚠️ ELIMINADO: Botón duplicado en toolbar -->
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="usuarios-content">
   <div class="page-container">
 
-    <!-- HEADER -->
+    <!-- HEADER CON ESTILO UPSE -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de usuarios</h1>
         <p>Administra evaluadores y accesos al sistema</p>
       </div>
       <div class="header-right">
+        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE) -->
+        <ion-button class="btn-add-desktop" (click)="abrirCrear()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          <span>Nuevo usuario</span>
+        </ion-button>
+
         <div class="stats-mini">
           <span class="stat-count">{{ usuarios.length }}</span>
           <span class="stat-label">Total</span>
@@ -88,7 +89,7 @@
       </div>
     </div>
 
-    <!-- Reemplazar el loading actual con este -->
+    <!-- LOADING -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="user-skeleton" *ngFor="let i of [1,2,3,4,5]">
         <div class="skeleton-header">
@@ -204,8 +205,8 @@
 
   </div>
 
-  <!-- FAB -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE) -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>

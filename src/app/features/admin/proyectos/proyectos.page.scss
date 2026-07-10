@@ -1,80 +1,124 @@
 // ============================================
-// VARIABLES
+// COLORES INSTITUCIONALES UPSE
 // ============================================
-$primary: #6366f1;
-$primary-dark: #4f46e5;
-$success: #10b981;
-$danger: #ef4444;
-$warning: #f59e0b;
-$text-dark: #0f172a;
-$text-gray: #64748b;
-$text-light: #94a3b8;
-$border: #e2e8f0;
-$bg-light: #f1f5f9;
-$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-$shadow-md: 0 4px 20px rgba(0,0,0,0.08);
-$shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+$upse-blue: #001b4c;
+$upse-blue-dark: #001433;
+$upse-blue-light: #e8f0fe;
+$upse-gold: #c9a84c;
+$upse-gold-light: #f8f0e0;
+$upse-green: #00a651;
+$upse-green-light: #e8f5e9;
+$upse-orange: #f57c00;
+$upse-orange-light: #fff3e0;
+$upse-cyan: #00838f;
+$upse-cyan-light: #e0f7fa;
+$upse-gray: #f5f5f5;
+$upse-gray-dark: #757575;
+$text-dark: #1a1a1a;
+$text-gray: #4a4a4a;
+$text-light: #9e9e9e;
+$shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 27, 76, 0.08);
+$shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.12);
+$shadow-xl: 0 12px 48px rgba(0, 27, 76, 0.16);
 $radius: 16px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================
 // CONTENT
 // ============================================
 .proyectos-content {
-  --background: #f1f5f9;
+  --background: #f0f4fb;
 }
 
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 20px 80px;
+  padding: 16px 12px 80px;
+
+  @media (min-width: 576px) {
+    padding: 20px 16px 80px;
+  }
 
   @media (min-width: 768px) {
-    padding: 32px 32px 80px;
+    padding: 24px 24px 80px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 28px 32px 80px;
   }
 }
 
 // ============================================
-// TOOLBAR - SIN BOTÓN DUPLICADO
+// TOOLBAR - ESTILO INSTITUCIONAL UPSE
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
-  --border-color: #e9edf5;
-  --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
-  --min-height: 56px;
+  --color: #0f172a;
+  --border-color: #e2e8f0;
+  --box-shadow: 0 1px 0 rgba(0, 27, 76, 0.05);
+  padding: 0 8px;
 
   ion-title {
     display: flex;
     align-items: center;
-    gap: 12px;
-
+    gap: 10px;
+    font-weight: 600;
+    
     .title-text {
-      font-weight: 700;
-      font-size: 20px;
+      font-size: 16px;
       color: #0f172a;
-    }
+      letter-spacing: -0.5px;
 
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
+    }
+    
     .title-badge {
-      font-size: 11px;
-      background: #eef2ff;
-      color: #6366f1;
-      padding: 2px 14px;
+      font-size: 9px;
+      background: $upse-blue-light;
+      color: $upse-blue;
+      padding: 2px 12px;
       border-radius: 20px;
       font-weight: 600;
+      display: none;
       letter-spacing: 0.3px;
+
+      @media (min-width: 480px) {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 14px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 11px;
+        padding: 3px 16px;
+      }
     }
   }
 
   .btn-refresh {
+    --padding-start: 8px;
+    --padding-end: 8px;
     --color: #64748b;
-    --border-radius: 8px;
-    height: 36px;
-    width: 36px;
-    --padding-start: 0;
-    --padding-end: 0;
-    margin-right: 4px;
-
+    --border-radius: 50%;
+    
     ion-icon {
-      font-size: 20px;
+      font-size: 18px;
+      transition: $transition;
+
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
+    }
+    
+    &:hover {
+      --color: $upse-blue;
+      
+      ion-icon {
+        transform: rotate(45deg);
+      }
     }
 
     .spinning {
@@ -100,16 +144,24 @@ $radius: 16px;
 
     h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 700;
-      color: #0f172a;
+      color: $upse-blue;
       letter-spacing: -0.5px;
+
+      @media (min-width: 768px) {
+        font-size: 28px;
+      }
     }
 
     p {
       margin: 6px 0 0;
       color: #64748b;
-      font-size: 15px;
+      font-size: 14px;
+
+      @media (min-width: 768px) {
+        font-size: 15px;
+      }
     }
   }
 
@@ -119,13 +171,13 @@ $radius: 16px;
     gap: 12px;
     flex-wrap: wrap;
 
-    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO
+    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE)
     .btn-add-desktop {
-      --background: #6366f1;
+      --background: $upse-blue;
       --color: #ffffff;
       --border-radius: 12px;
       font-weight: 600;
-      --box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+      --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
       --padding-start: 20px;
       --padding-end: 20px;
       height: 44px;
@@ -142,9 +194,10 @@ $radius: 16px;
       }
 
       &:hover {
-        --box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
         transform: translateY(-2px);
-        transition: all 0.2s ease;
+        transition: $transition;
+        --background: $upse-blue-dark;
       }
     }
 
@@ -157,12 +210,17 @@ $radius: 16px;
       border-radius: 12px;
       border: 1px solid #eef2f7;
       min-width: 60px;
+      box-shadow: $shadow-sm;
 
       .stat-count {
         font-size: 20px;
         font-weight: 700;
-        color: #0f172a;
+        color: $upse-blue;
         line-height: 1.2;
+
+        @media (min-width: 768px) {
+          font-size: 22px;
+        }
       }
 
       .stat-label {
@@ -171,6 +229,10 @@ $radius: 16px;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.3px;
+
+        @media (min-width: 768px) {
+          font-size: 11px;
+        }
       }
     }
   }
@@ -199,6 +261,11 @@ $radius: 16px;
       padding: 0;
       height: 44px;
       --icon-color: #94a3b8;
+
+      &:focus-within {
+        --border-color: $upse-blue;
+        --box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
+      }
     }
   }
 
@@ -217,6 +284,12 @@ $radius: 16px;
       min-width: 140px;
       font-size: 14px;
       color: #0f172a;
+      --box-shadow: $shadow-sm;
+
+      &:focus-within {
+        border-color: $upse-blue;
+        --box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
+      }
     }
   }
 }
@@ -243,6 +316,7 @@ $radius: 16px;
   padding: 20px;
   border-radius: $radius;
   border: 1px solid #f1f5f9;
+  box-shadow: $shadow-sm;
 
   .skeleton-header {
     display: flex;
@@ -302,14 +376,14 @@ $radius: 16px;
 }
 
 // ============================================
-// PROYECTO CARD
+// PROYECTO CARD - ESTILO UPSE
 // ============================================
 .proyecto-card {
   background: white;
   border-radius: $radius;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
-  transition: all 0.25s ease;
+  transition: $transition;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -317,11 +391,11 @@ $radius: 16px;
   &:hover {
     transform: translateY(-4px);
     box-shadow: $shadow-lg;
-    border-color: #e2e8f0;
+    border-color: $upse-blue;
   }
 
   &.card-active {
-    border-left: 4px solid #6366f1;
+    border-left: 4px solid $upse-blue;
   }
 
   &.card-inactive {
@@ -345,9 +419,9 @@ $radius: 16px;
       font-size: 22px;
       flex-shrink: 0;
 
-      &.icon-indigo {
-        background: #eef2ff;
-        color: #6366f1;
+      &.icon-upse {
+        background: $upse-blue-light;
+        color: $upse-blue;
       }
 
       &.icon-slate {
@@ -388,13 +462,13 @@ $radius: 16px;
           }
 
           &.tag-area {
-            background: #eef2ff;
-            color: #4f46e5;
+            background: $upse-blue-light;
+            color: $upse-blue;
           }
 
           &.tag-nivel {
-            background: #fef3c7;
-            color: #d97706;
+            background: $upse-gold-light;
+            color: $upse-gold;
           }
         }
       }
@@ -422,11 +496,11 @@ $radius: 16px;
         }
 
         &.status-active {
-          background: #dcfce7;
-          color: #15803d;
+          background: $upse-green-light;
+          color: $upse-green;
 
           .status-dot {
-            background: #22c55e;
+            background: $upse-green;
             animation: pulse-dot 2s ease-in-out infinite;
           }
         }
@@ -511,13 +585,13 @@ $radius: 16px;
       .chip-concurso {
         height: 24px;
         font-size: 11px;
-        background: #fef3c7;
-        color: #d97706;
+        background: $upse-gold-light;
+        color: $upse-gold;
         margin: 0;
 
         ion-icon {
           font-size: 12px;
-          color: #d97706;
+          color: $upse-gold;
         }
         ion-label {
           font-size: 11px;
@@ -544,7 +618,7 @@ $radius: 16px;
         }
 
         &:hover {
-          --color: #6366f1;
+          --color: $upse-blue;
         }
 
         &.danger:hover {
@@ -556,7 +630,7 @@ $radius: 16px;
 }
 
 // ============================================
-// EMPTY STATE
+// EMPTY STATE - ESTILO UPSE
 // ============================================
 .empty-state {
   grid-column: 1 / -1;
@@ -567,7 +641,7 @@ $radius: 16px;
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: #f1f5f9;
+    background: $upse-blue-light;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -575,7 +649,7 @@ $radius: 16px;
 
     ion-icon {
       font-size: 40px;
-      color: #94a3b8;
+      color: $upse-blue;
     }
   }
 
@@ -593,19 +667,24 @@ $radius: 16px;
   }
 
   .btn-primary {
-    --background: #6366f1;
+    --background: $upse-blue;
     --border-radius: 12px;
     font-weight: 600;
-    --box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+    --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
 
     ion-icon {
       font-size: 18px;
+    }
+
+    &:hover {
+      --background: $upse-blue-dark;
+      --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
     }
   }
 }
 
 // ============================================
-// ✅ FAB - SOLO VISIBLE EN MÓVIL
+// ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE)
 // ============================================
 .fab-mobile {
   display: block;
@@ -616,16 +695,138 @@ $radius: 16px;
 }
 
 ion-fab-button {
-  --background: #6366f1;
-  --box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+  --background: $upse-blue;
+  --box-shadow: 0 8px 24px rgba(0, 27, 76, 0.45);
 
   ion-icon {
     font-size: 24px;
   }
+
+  &:hover {
+    --background: $upse-blue-dark;
+  }
 }
 
 // ============================================
-// ANIMATIONS
+// MODAL - ESTILO UPSE
+// ============================================
+.modal-content {
+  --background: #f8fafc;
+}
+
+.modal-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+
+  .form-field {
+    margin-bottom: 18px;
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+
+      ion-icon {
+        color: $upse-blue;
+        font-size: 16px;
+      }
+
+      .required {
+        color: #ef4444;
+        font-weight: 700;
+        margin-left: 2px;
+      }
+    }
+
+    .field-input {
+      --background: white;
+      --border-radius: 10px;
+      --padding-start: 14px;
+      --padding-end: 14px;
+      --inner-padding-end: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      min-height: 44px;
+      box-shadow: $shadow-sm;
+
+      &:focus-within {
+        border-color: $upse-blue;
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
+      }
+
+      ion-input, ion-textarea, ion-select, ion-toggle {
+        --padding-start: 0;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+
+    .cancel-btn {
+      --border-color: #e2e8f0;
+      --color: #64748b;
+      --border-radius: 10px;
+      font-weight: 600;
+      flex: 1;
+      height: 44px;
+
+      &:hover {
+        --border-color: $upse-blue;
+        --color: $upse-blue;
+      }
+    }
+
+    .submit-btn {
+      --background: $upse-blue;
+      --border-radius: 10px;
+      font-weight: 600;
+      flex: 2;
+      height: 44px;
+      --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
+
+      &:disabled {
+        opacity: 0.5;
+        --box-shadow: none;
+      }
+
+      &:hover:not(:disabled) {
+        --background: $upse-blue-dark;
+        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+      }
+
+      .spinning {
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-container {
+    padding: 16px;
+
+    .form-actions {
+      flex-direction: column;
+
+      .cancel-btn, .submit-btn {
+        flex: none;
+        width: 100%;
+      }
+    }
+  }
+}
+
+// ============================================
+// ANIMACIONES
 // ============================================
 @keyframes pulse-dot {
   0%, 100% {
@@ -691,113 +892,49 @@ ion-fab-button {
   }
 }
 
-// ============================================
-// MODAL
-// ============================================
-.modal-content {
-  --background: #f8fafc;
-}
-
-.modal-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-
-  .form-field {
-    margin-bottom: 18px;
-
-    .field-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 6px;
-
-      ion-icon {
-        color: #64748b;
-        font-size: 16px;
-      }
-
-      .required {
-        color: #ef4444;
-        font-weight: 700;
-        margin-left: 2px;
-      }
-    }
-
-    .field-input {
-      --background: white;
-      --border-radius: 10px;
-      --padding-start: 14px;
-      --padding-end: 14px;
-      --inner-padding-end: 14px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      min-height: 44px;
-
-      &:focus-within {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
-      }
-
-      ion-input, ion-textarea, ion-select, ion-toggle {
-        --padding-start: 0;
-        font-size: 14px;
-      }
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 8px;
-
-    .cancel-btn {
-      --border-color: #e2e8f0;
-      --color: #64748b;
-      --border-radius: 10px;
-      font-weight: 600;
-      flex: 1;
-      height: 44px;
-
-      &:hover {
-        --border-color: #94a3b8;
-      }
-    }
-
-    .submit-btn {
-      --background: #6366f1;
-      --border-radius: 10px;
-      font-weight: 600;
-      flex: 2;
-      height: 44px;
-      --box-shadow: 0 4px 16px rgba(99,102,241,0.3);
-
-      &:disabled {
-        opacity: 0.5;
-        --box-shadow: none;
-      }
-
-      .spinning {
-        animation: spin 1s linear infinite;
-      }
-    }
-  }
-}
-
 @media (max-width: 480px) {
-  .modal-container {
-    padding: 16px;
+  .page-header {
+    .header-left h1 {
+      font-size: 20px;
+    }
 
-    .form-actions {
-      flex-direction: column;
+    .header-right .stats-mini {
+      padding: 4px 10px;
+      min-width: 50px;
 
-      .cancel-btn, .submit-btn {
-        flex: none;
-        width: 100%;
+      .stat-count {
+        font-size: 15px;
+      }
+      .stat-label {
+        font-size: 9px;
       }
     }
   }
+
+  .proyecto-card .card-body .card-participants {
+    padding: 10px 12px;
+  }
+}
+
+// ============================================
+// SCROLLBAR PERSONALIZADA
+// ============================================
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $upse-blue;
+  border-radius: 3px;
+  transition: $transition;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $upse-blue-dark;
 }
