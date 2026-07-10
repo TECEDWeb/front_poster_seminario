@@ -61,7 +61,7 @@
         <div class="avatar-small" *ngIf="usuario() as u">
           {{ iniciales() }}
         </div>
-        <span class="user-name">{{ usuario()?.nombre?.split(' ')[0] || 'Usuario' }}</span>
+        <span class="user-name">{{ (usuario()?.nombre || 'Usuario').split(' ')[0] }}</span>
       </div>
       <button class="btn-logout" (click)="cerrarSesion()">
         <ion-icon name="log-out-outline"></ion-icon>
