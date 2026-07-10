@@ -119,33 +119,52 @@ export class FormularioEvaluacionPage implements OnInit {
       next: (res: any) => {
         console.log('================================');
         console.log('🟢 RESPUESTA BACKEND', res);
+        console.log('================================');
 
+        // Si la respuesta tiene ok: false
         if (res?.ok === false) {
           console.error('❌ Backend error', res.mensaje);
           this.error = res.mensaje || 'Error al cargar el formulario';
           this.formulario = null;
-        } else {
-          // Normalizar respuesta
-          this.formulario = res?.data?.data ?? res?.data ?? res;
+          this.cargando = false;
+          return;
+        }
+
+        // Extraer los datos correctamente
+        // El backend devuelve: { ok: true, data: { rubrica, secciones, proyecto, concurso } }
+        let data = res?.data || res || {};
+
+        console.log('📦 DATA extraída:', data);
+
+        // Si la data tiene la estructura esperada
+        if (data && data.secciones && data.rubrica) {
+          this.formulario = data;
           
           // Extraer información del proyecto y concurso
-          if (this.formulario?.proyecto) {
-            this.proyectoNombre = this.formulario.proyecto.nombre || 'Proyecto sin nombre';
+          if (data.proyecto) {
+            this.proyectoNombre = data.proyecto.nombre || 'Proyecto sin nombre';
           }
-          if (this.formulario?.concurso) {
-            this.concursoNombre = this.formulario.concurso.nombre || '';
+          if (data.concurso) {
+            this.concursoNombre = data.concurso.nombre || '';
           }
 
           // Contar criterios totales
-          this.totalCriterios = this.formulario?.secciones?.reduce(
+          this.totalCriterios = data.secciones?.reduce(
             (total: number, seccion: any) => total + (seccion.criterios?.length || 0),
             0
           ) || 0;
 
           console.log('🟢 FORMULARIO CARGADO', this.formulario);
-          console.log('🟢 SECCIONES:', this.formulario?.secciones?.length);
+          console.log('🟢 SECCIONES:', data.secciones?.length);
           console.log('🟢 TOTAL CRITERIOS:', this.totalCriterios);
+          console.log('🟢 RÚBRICA:', data.rubrica);
+        } else {
+          // Si no tiene la estructura esperada
+          console.error('❌ Estructura de datos incorrecta', data);
+          this.error = 'El formulario no tiene la estructura esperada';
+          this.formulario = null;
         }
+
         this.cargando = false;
       },
       error: (err) => {

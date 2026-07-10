@@ -3,5 +3,4 @@ export interface Asignacion {
   proyecto: string;
   evaluadorId: number;
   evaluador: string;
-
 }

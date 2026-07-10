@@ -14,10 +14,6 @@ export class EvaluacionService {
 
   constructor(private http: HttpClient) {}
 
-  // =====================================================
-  // CRUD BÁSICO (si lo usas en admin)
-  // =====================================================
-
   listar(): Observable<any> {
     return this.http.get(`${this.apiUrl}`);
   }
@@ -37,10 +33,6 @@ export class EvaluacionService {
   eliminar(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
-
-  // =====================================================
-  // DASHBOARD / REPORTES
-  // =====================================================
 
   listarResumen(): Observable<any> {
     return this.http.get(`${this.apiUrl}/resumen`);
@@ -62,20 +54,10 @@ export class EvaluacionService {
     return this.http.get(`${this.apiUrl}/reporte-admin`);
   }
 
-  // =====================================================
-  // FORMULARIO DE EVALUACIÓN (IMPORTANTE)
-  // =====================================================
-
-  /**
-   * Backend: GET /evaluaciones/:id/formulario
-   */
   getFormulario(id: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/${id}/formulario`);
   }
 
-  /**
-   * Backend: POST /evaluaciones/:id/guardar
-   */
   guardar(id: number, payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${id}/guardar`, payload);
   }
