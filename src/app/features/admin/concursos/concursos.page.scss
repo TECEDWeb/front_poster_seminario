@@ -31,7 +31,7 @@ $radius: 16px;
 }
 
 // ============================================
-// TOOLBAR - CON BOTÓN VISIBLE EN ESCRITORIO
+// TOOLBAR - SIN BOTÓN DUPLICADO
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
@@ -60,57 +60,10 @@ $radius: 16px;
       letter-spacing: 0.3px;
     }
   }
-
-  // Asegurar que los slots se muestren correctamente
-  ion-buttons {
-    display: flex !important;
-    align-items: center !important;
-  }
-
-  // BOTÓN EN EL HEADER - VISIBLE EN TODOS LOS TAMAÑOS
-  .btn-add-header {
-    --background: #2563eb;
-    --color: #ffffff;
-    --border-radius: 10px;
-    font-weight: 600;
-    height: 38px;
-    font-size: 13px;
-    --box-shadow: 0 2px 8px rgba(37,99,235,0.25);
-    --padding-start: 16px;
-    --padding-end: 16px;
-    display: flex !important;
-    align-items: center !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-
-    ion-icon {
-      font-size: 18px;
-      margin-right: 6px;
-    }
-
-    .btn-text {
-      display: inline-block !important;
-    }
-
-    // En móvil muy pequeño, solo ícono
-    @media (max-width: 480px) {
-      --padding-start: 10px;
-      --padding-end: 10px;
-      
-      .btn-text {
-        display: none !important;
-      }
-      
-      ion-icon {
-        margin-right: 0;
-        font-size: 20px;
-      }
-    }
-  }
 }
 
 // ============================================
-// PAGE HEADER CON BOTÓN PRINCIPAL
+// PAGE HEADER - CON BOTÓN ÚNICO PARA ESCRITORIO
 // ============================================
 .page-header {
   display: flex;
@@ -145,8 +98,8 @@ $radius: 16px;
     gap: 16px;
     flex-wrap: wrap;
 
-    // BOTÓN PRINCIPAL EN EL HEADER - SOLO ESCRITORIO
-    .btn-primary-header {
+    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO
+    .btn-add-desktop {
       --background: #2563eb;
       --color: #ffffff;
       --border-radius: 12px;
@@ -162,11 +115,7 @@ $radius: 16px;
         margin-right: 8px;
       }
 
-      .btn-text-header {
-        display: inline-block;
-      }
-
-      // Ocultar en móvil (el FAB y el toolbar ya tienen botones)
+      // ❌ OCULTO EN MÓVIL (el FAB toma el control)
       @media (max-width: 768px) {
         display: none !important;
       }
@@ -607,12 +556,12 @@ $radius: 16px;
 }
 
 // ============================================
-// FAB - SOLO VISIBLE EN MÓVIL
+// ✅ FAB - SOLO VISIBLE EN MÓVIL
 // ============================================
 .fab-mobile {
   display: block;
 
-  @media (min-width: 992px) {
+  @media (min-width: 769px) {
     display: none !important;
   }
 }

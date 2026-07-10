@@ -9,13 +9,7 @@
       <span class="title-badge">Científicos</span>
     </ion-title>
 
-    <!-- CAMBIO: Agregar clase y estilo específico para desktop -->
-    <ion-buttons slot="end" class="desktop-actions">
-      <ion-button class="btn-add-desktop" (click)="abrirCrear()">
-        <ion-icon name="add-outline" slot="start"></ion-icon>
-        <span class="btn-text">Nuevo concurso</span>
-      </ion-button>
-    </ion-buttons>
+    <!-- ⚠️ ELIMINADO: Botón duplicado en toolbar -->
   </ion-toolbar>
 </ion-header>
 
@@ -29,6 +23,12 @@
         <p>Administra los concursos científicos y sus convocatorias</p>
       </div>
       <div class="header-right">
+        <!-- ✅ BOTÓN ÚNICO - SOLO EN ESCRITORIO -->
+        <ion-button class="btn-add-desktop" (click)="abrirCrear()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          <span>Nuevo concurso</span>
+        </ion-button>
+        
         <div class="stats-mini">
           <span class="stat-count">{{ concursos.length }}</span>
           <span class="stat-label">Total concursos</span>
@@ -203,7 +203,7 @@
 
   </div>
 
-  <!-- FAB - SOLO EN MÓVIL (se oculta en desktop) -->
+  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
