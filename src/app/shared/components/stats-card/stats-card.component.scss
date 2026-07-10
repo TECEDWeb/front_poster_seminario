@@ -1,39 +1,95 @@
+// ============================================
+// COLORES INSTITUCIONALES UPSE
+// ============================================
+$upse-blue: #003366;
+$upse-blue-light: #004d99;
+$upse-blue-bg: #e8f0fe;
+$upse-green: #00a651;
+$upse-green-bg: #e8f5e9;
+$upse-orange: #f57c00;
+$upse-orange-bg: #fff3e0;
+$upse-cyan: #00838f;
+$upse-cyan-bg: #e0f7fa;
+$text-dark: #0f172a;
+$text-gray: #64748b;
+$shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+$shadow-md: 0 8px 25px rgba(0,0,0,0.08);
+
 .stats-card {
   margin: 0;
   border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  transition: all 0.2s ease;
+  box-shadow: $shadow-sm;
+  transition: all 0.25s ease;
   cursor: default;
+  overflow: hidden;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transform: translateY(-4px);
+    box-shadow: $shadow-md;
   }
 
   ion-card-content {
-    padding: 18px 20px;
+    padding: 16px 18px;
+
+    @media (min-width: 768px) {
+      padding: 18px 20px;
+    }
   }
 
   .stats-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 12px;
+    }
   }
 
   .stats-icon {
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
+    flex-shrink: 0;
 
     ion-icon {
-      font-size: 22px;
+      font-size: 20px;
     }
 
+    @media (min-width: 768px) {
+      width: 42px;
+      height: 42px;
+      font-size: 20px;
+      border-radius: 12px;
+
+      ion-icon {
+        font-size: 22px;
+      }
+    }
+
+    // Colores UPSE
+    &.bg-blue-upse {
+      background: $upse-blue-bg;
+      color: $upse-blue;
+    }
+    &.bg-green-upse {
+      background: $upse-green-bg;
+      color: $upse-green;
+    }
+    &.bg-cyan-upse {
+      background: $upse-cyan-bg;
+      color: $upse-cyan;
+    }
+    &.bg-orange-upse {
+      background: $upse-orange-bg;
+      color: $upse-orange;
+    }
+    // Colores originales (backward compatibility)
     &.bg-indigo {
       background: #eef2ff;
       color: #4f46e5;
@@ -53,8 +109,13 @@
   }
 
   .stats-trend {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
+    flex-shrink: 0;
+
+    @media (min-width: 768px) {
+      font-size: 12px;
+    }
 
     .trend-up {
       color: #10b981;
@@ -66,7 +127,11 @@
       gap: 2px;
 
       ion-icon {
-        font-size: 14px;
+        font-size: 13px;
+
+        @media (min-width: 768px) {
+          font-size: 14px;
+        }
       }
     }
 
@@ -80,7 +145,11 @@
       gap: 2px;
 
       ion-icon {
-        font-size: 14px;
+        font-size: 13px;
+
+        @media (min-width: 768px) {
+          font-size: 14px;
+        }
       }
     }
   }
@@ -90,22 +159,113 @@
     flex-direction: column;
 
     .stats-value {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 700;
       color: #0f172a;
       line-height: 1.2;
+
+      @media (min-width: 768px) {
+        font-size: 26px;
+      }
     }
 
     .stats-title {
-      font-size: 13px;
+      font-size: 12px;
       color: #64748b;
       font-weight: 500;
       margin-top: 2px;
+
+      @media (min-width: 768px) {
+        font-size: 13px;
+      }
     }
   }
 
-  &.stats-indigo .stats-value { color: #4f46e5; }
-  &.stats-amber .stats-value { color: #f59e0b; }
-  &.stats-emerald .stats-value { color: #10b981; }
-  &.stats-violet .stats-value { color: #8b5cf6; }
+  // ============================================
+  // COLORES INSTITUCIONALES UPSE
+  // ============================================
+  // Azul UPSE
+  &.stats-blue-upse {
+    border-left: 4px solid $upse-blue;
+    
+    .stats-value {
+      color: $upse-blue;
+    }
+  }
+
+  // Verde UPSE
+  &.stats-green-upse {
+    border-left: 4px solid $upse-green;
+    
+    .stats-value {
+      color: $upse-green;
+    }
+  }
+
+  // Cyan UPSE
+  &.stats-cyan-upse {
+    border-left: 4px solid $upse-cyan;
+    
+    .stats-value {
+      color: $upse-cyan;
+    }
+  }
+
+  // Naranja UPSE
+  &.stats-orange-upse {
+    border-left: 4px solid $upse-orange;
+    
+    .stats-value {
+      color: $upse-orange;
+    }
+  }
+
+  // ============================================
+  // COLORES ORIGINALES (backward compatibility)
+  // ============================================
+  &.stats-indigo {
+    border-left: 4px solid #4f46e5;
+    .stats-value { color: #4f46e5; }
+  }
+  &.stats-amber {
+    border-left: 4px solid #f59e0b;
+    .stats-value { color: #f59e0b; }
+  }
+  &.stats-emerald {
+    border-left: 4px solid #10b981;
+    .stats-value { color: #10b981; }
+  }
+  &.stats-violet {
+    border-left: 4px solid #8b5cf6;
+    .stats-value { color: #8b5cf6; }
+  }
+}
+
+// ============================================
+// RESPONSIVE ADICIONAL
+// ============================================
+@media (max-width: 480px) {
+  .stats-card {
+    ion-card-content {
+      padding: 12px 14px;
+    }
+
+    .stats-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+
+      ion-icon {
+        font-size: 16px;
+      }
+    }
+
+    .stats-content .stats-value {
+      font-size: 18px;
+    }
+
+    .stats-content .stats-title {
+      font-size: 10px;
+    }
+  }
 }

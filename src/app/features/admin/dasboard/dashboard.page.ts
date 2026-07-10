@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -72,6 +72,7 @@ interface Activity {
 export class DashboardPage implements OnInit {
 
   private dashboardService = inject(DashboardService);
+  private router = inject(Router);
 
   usuarios = 0;
   concursos = 0;
@@ -84,6 +85,7 @@ export class DashboardPage implements OnInit {
   today: Date = new Date();
   recentActivities: Activity[] = [];
   notificacionesPendientes: number = 0;
+
   constructor() {
     addIcons({
       peopleOutline,
@@ -109,6 +111,7 @@ export class DashboardPage implements OnInit {
 
   ngOnInit(): void {
     this.cargarResumen();
+    this.cargarNotificaciones();
   }
 
   ionViewWillEnter() {
@@ -136,37 +139,16 @@ export class DashboardPage implements OnInit {
   }
 
   cargarActividadesRecientes() {
-    // Cargar actividades reales desde el servicio
     this.dashboardService.obtenerActividadesRecientes().subscribe({
       next: (actividades: Activity[]) => {
         this.recentActivities = actividades;
       },
       error: () => {
-        // Si falla, usar datos vacíos o de ejemplo
         this.recentActivities = [];
       }
     });
   }
 
-  // Método para recargar manualmente
-  recargar() {
-    this.cargarResumen();
-  }
-
-  verNotificaciones(): void {
-    console.log('Ver notificaciones');
-    // Aquí puedes abrir un modal o navegar a la página de notificaciones
-    alert('Abrir panel de notificaciones');
-  }
-
-  verTodasActividades(): void {
-    console.log('Ver todas las actividades');
-    // Aquí puedes navegar a la página de actividades
-    // this.router.navigate(['/admin/actividades']);
-    alert('Ver todas las actividades');
-  }
-
-  // En cargarResumen() o en el constructor, cargar notificaciones
   cargarNotificaciones(): void {
     this.dashboardService.contarNotificaciones().subscribe({
       next: (count) => {
@@ -176,5 +158,40 @@ export class DashboardPage implements OnInit {
         this.notificacionesPendientes = 0;
       }
     });
+  }
+
+  recargar() {
+    this.cargarResumen();
+    this.cargarNotificaciones();
+  }
+
+  verNotificaciones(): void {
+    if (this.notificacionesPendientes > 0) {
+      // Marcar como leídas y mostrar
+      this.dashboardService.marcarNotificacionesComoLeidas().subscribe({
+        next: () => {
+          this.notificacionesPendientes = 0;
+          alert('📬 Notificaciones marcadas como leídas');
+        },
+        error: () => {
+          alert('📬 No tienes notificaciones pendientes');
+        }
+      });
+    } else {
+      alert('📬 No tienes notificaciones pendientes');
+    }
+  }
+
+  verTodasActividades(): void {
+    alert('📋 Mostrando todas las actividades');
+  }
+
+  // Método para abrir nuevo concurso desde el dashboard
+  abrirNuevoConcurso(): void {
+    // Navegar a la página de concursos y abrir el modal
+    this.router.navigate(['/admin/concursos']);
+    // El modal se abrirá automáticamente si usas un servicio o evento
+    // Alternativa: abrir directamente el modal con un servicio compartido
+    alert('Para crear un nuevo concurso, ve a la página de Concursos y usa el botón "Nuevo concurso"');
   }
 }

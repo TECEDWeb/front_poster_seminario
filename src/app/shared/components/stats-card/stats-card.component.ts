@@ -24,6 +24,6 @@ export class StatsCardComponent {
   @Input() valor: number | string = '';
   @Input() icono = 'stats-chart';
   @Input() color: string = 'indigo';
-  @Input() trend?: number | null; // Añadir propiedad trend opcional
+  @Input() trend?: number | null;
 
 }
