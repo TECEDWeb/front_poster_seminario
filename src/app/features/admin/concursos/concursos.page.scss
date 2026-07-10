@@ -31,12 +31,13 @@ $radius: 16px;
 }
 
 // ============================================
-// TOOLBAR
+// TOOLBAR - CON BOTÓN VISIBLE EN ESCRITORIO
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
   --border-color: #e9edf5;
   --box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  --min-height: 56px;
 
   ion-title {
     display: flex;
@@ -60,7 +61,14 @@ $radius: 16px;
     }
   }
 
-  .btn-add {
+  // Asegurar que los slots se muestren correctamente
+  ion-buttons {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  // BOTÓN EN EL HEADER - VISIBLE EN TODOS LOS TAMAÑOS
+  .btn-add-header {
     --background: #2563eb;
     --color: #ffffff;
     --border-radius: 10px;
@@ -68,21 +76,33 @@ $radius: 16px;
     height: 38px;
     font-size: 13px;
     --box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+    --padding-start: 16px;
+    --padding-end: 16px;
+    display: flex !important;
+    align-items: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 
     ion-icon {
       font-size: 18px;
+      margin-right: 6px;
     }
 
     .btn-text {
-      display: inline-block;
+      display: inline-block !important;
     }
 
+    // En móvil muy pequeño, solo ícono
     @media (max-width: 480px) {
+      --padding-start: 10px;
+      --padding-end: 10px;
+      
       .btn-text {
-        display: none;
+        display: none !important;
       }
       
       ion-icon {
+        margin-right: 0;
         font-size: 20px;
       }
     }
@@ -90,7 +110,7 @@ $radius: 16px;
 }
 
 // ============================================
-// PAGE HEADER
+// PAGE HEADER CON BOTÓN PRINCIPAL
 // ============================================
 .page-header {
   display: flex;
@@ -101,6 +121,9 @@ $radius: 16px;
   gap: 16px;
 
   .header-left {
+    flex: 1;
+    min-width: 200px;
+
     h1 {
       margin: 0;
       font-size: 28px;
@@ -118,7 +141,42 @@ $radius: 16px;
 
   .header-right {
     display: flex;
+    align-items: center;
     gap: 16px;
+    flex-wrap: wrap;
+
+    // BOTÓN PRINCIPAL EN EL HEADER - SOLO ESCRITORIO
+    .btn-primary-header {
+      --background: #2563eb;
+      --color: #ffffff;
+      --border-radius: 12px;
+      font-weight: 600;
+      --box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+      --padding-start: 20px;
+      --padding-end: 20px;
+      height: 44px;
+      font-size: 14px;
+      
+      ion-icon {
+        font-size: 20px;
+        margin-right: 8px;
+      }
+
+      .btn-text-header {
+        display: inline-block;
+      }
+
+      // Ocultar en móvil (el FAB y el toolbar ya tienen botones)
+      @media (max-width: 768px) {
+        display: none !important;
+      }
+
+      &:hover {
+        --box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+      }
+    }
 
     .stats-mini {
       display: flex;
@@ -696,7 +754,7 @@ ion-fab-button {
 // ============================================
 // RESPONSIVE
 // ============================================
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .page-header {
     .header-right {
       width: 100%;
@@ -726,5 +784,17 @@ ion-fab-button {
         flex-wrap: wrap;
       }
     }
+  }
+}
+
+// ============================================
+// KEYFRAMES
+// ============================================
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

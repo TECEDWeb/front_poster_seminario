@@ -9,9 +9,9 @@
       <span class="title-badge">Científicos</span>
     </ion-title>
 
-    <ion-buttons slot="end">
-      <!-- Botón en toolbar - Visible en desktop y móvil -->
-      <ion-button class="btn-add" (click)="abrirCrear()">
+    <!-- CAMBIO: Agregar clase y estilo específico para desktop -->
+    <ion-buttons slot="end" class="desktop-actions">
+      <ion-button class="btn-add-desktop" (click)="abrirCrear()">
         <ion-icon name="add-outline" slot="start"></ion-icon>
         <span class="btn-text">Nuevo concurso</span>
       </ion-button>
