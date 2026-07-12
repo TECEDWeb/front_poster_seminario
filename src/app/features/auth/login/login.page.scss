@@ -1,5 +1,12 @@
+// Idealmente estas variables ya viven en tu theme/variables.scss y aquí solo las importas
+$upse-blue: #001b4c;
+$upse-blue-light: #e8f0fe;
+$upse-gold: #c9a84c;
+$upse-green: #00a651;
+$upse-orange: #f57c00;
+
 .login-content {
-  --background: #f0f4ff;
+  --background: linear-gradient(160deg, #{$upse-blue-light} 0%, #f8fafc 55%, #ffffff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,23 +18,27 @@
   justify-content: center;
   width: 100%;
   min-height: 100%;
-  padding: 20px;
+  padding: clamp(16px, 5vw, 40px);
 }
 
 .login-card {
-  background: white;
-  border-radius: 20px;
-  padding: 40px 32px 32px;
-  max-width: 420px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: clamp(28px, 6vw, 48px) clamp(20px, 5vw, 40px) clamp(24px, 5vw, 36px);
+  max-width: 440px;
   width: 100%;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-  animation: slideUp 0.5s ease-out;
+  box-shadow:
+    0 1px 2px rgba(0, 27, 76, 0.04),
+    0 20px 50px rgba(0, 27, 76, 0.12);
+  animation: slideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -37,25 +48,46 @@
 
 .login-brand {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: clamp(24px, 5vw, 36px);
+
+  .login-logo-halo {
+    position: relative;
+    display: inline-flex;
+    margin-bottom: 20px;
+
+    // halo institucional detrás del logo
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba($upse-gold, 0.16) 0%, rgba($upse-blue, 0.06) 60%, transparent 80%);
+      z-index: 0;
+    }
+  }
 
   .login-logo {
-    width: 140px;
-    height: 140px;
+    position: relative;
+    z-index: 1;
+    width: clamp(140px, 30vw, 220px);
+    height: clamp(140px, 30vw, 220px);
     object-fit: contain;
-    margin-bottom: 28px;
     border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0, 27, 76, 0.12);
+    background: #fff;
+    padding: 8px;
   }
 
   .login-title {
-    font-size: 24px;
+    font-size: clamp(20px, 4.5vw, 27px);
     font-weight: 700;
-    color: #0f172a;
+    color: $upse-blue;
     margin: 0 0 6px;
+    letter-spacing: -0.01em;
   }
 
   .login-subtitle {
-    font-size: 14px;
+    font-size: clamp(13px, 3vw, 15px);
     color: #64748b;
     margin: 0;
   }
@@ -69,17 +101,19 @@
 
 .login-input {
   --background: #f8fafc;
-  --border-radius: 12px;
+  --border-radius: 14px;
   --padding-start: 16px;
   --padding-end: 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  transition: all 0.2s ease;
+  --min-height: 52px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 
   &:focus-within {
-    border-color: #6366f1;
+    border-color: $upse-gold;
     --background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 4px rgba($upse-gold, 0.15);
+    transform: translateY(-1px);
   }
 
   ion-icon {
@@ -94,8 +128,6 @@
 
   .toggle-password {
     --color: #94a3b8;
-    font-size: 13px;
-    font-weight: 500;
     --padding-start: 8px;
     --padding-end: 8px;
     height: 32px;
@@ -116,6 +148,7 @@
   border-radius: 10px;
   font-size: 13px;
   border: 1px solid #fecaca;
+  animation: shake 0.4s ease;
 
   ion-icon {
     font-size: 18px;
@@ -123,18 +156,40 @@
   }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
 .login-submit {
-  --background: linear-gradient(135deg, #6366f1, #4f46e5);
-  --border-radius: 12px;
-  --box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
-  height: 48px;
+  --background: linear-gradient(135deg, #{$upse-blue}, #002e6d);
+  --border-radius: 14px;
+  --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.3);
+  position: relative;
+  overflow: hidden;
+  height: 50px;
   font-weight: 700;
   font-size: 16px;
-  margin-top: 4px;
+  margin-top: 6px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.18), transparent);
+    transform: translateX(-100%);
+  }
 
   &:hover:not(:disabled) {
-    --box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45);
+    --box-shadow: 0 8px 28px rgba(0, 27, 76, 0.4);
     transform: translateY(-2px);
+
+    &::after {
+      transform: translateX(100%);
+      transition: transform 0.7s ease;
+    }
   }
 
   &:disabled {
@@ -160,20 +215,44 @@
   }
 }
 
-// Responsive
-@media (max-width: 480px) {
-  .login-card {
-    padding: 28px 20px 24px;
-  }
+// ---------- Responsive ----------
 
-  .login-brand {
-    .login-title {
-      font-size: 20px;
-    }
+// Móvil muy pequeño (iPhone SE, etc.)
+@media (max-width: 360px) {
+  .login-card {
+    padding: 24px 16px 20px;
+    border-radius: 18px;
   }
 
   .login-submit {
-    height: 44px;
+    height: 46px;
     font-size: 14px;
+  }
+}
+
+// Tablet
+@media (min-width: 768px) {
+  .login-card {
+    max-width: 460px;
+  }
+}
+
+// Desktop grande
+@media (min-width: 1200px) {
+  .login-card {
+    max-width: 480px;
+    padding: 56px 48px 40px;
+  }
+}
+
+// Landscape en móvil (evita que el logo empuje todo fuera de pantalla)
+@media (max-height: 560px) and (orientation: landscape) {
+  .login-brand {
+    margin-bottom: 16px;
+
+    .login-logo {
+      width: 90px;
+      height: 90px;
+    }
   }
 }

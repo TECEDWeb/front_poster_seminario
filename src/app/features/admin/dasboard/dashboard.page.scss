@@ -12,17 +12,24 @@ $upse-orange: #f57c00;
 $upse-orange-light: #fff3e0;
 $upse-cyan: #00838f;
 $upse-cyan-light: #e0f7fa;
-$upse-gray: #f5f5f5;
-$upse-gray-dark: #757575;
 $text-dark: #1a1a1a;
 $text-gray: #4a4a4a;
-$text-light: #9e9e9e;
 $shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
 $shadow-md: 0 4px 20px rgba(0, 27, 76, 0.08);
 $shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.12);
-$shadow-xl: 0 12px 48px rgba(0, 27, 76, 0.16);
+$shadow-xl: 0 20px 60px rgba(0, 27, 76, 0.18);
 $radius: 16px;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ============================================
+// ACCESIBILIDAD: respeta reduce motion
+// ============================================
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 // ============================================
 // CONTENT
@@ -47,10 +54,16 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   @media (min-width: 1024px) {
     padding: 28px 32px 60px;
   }
+
+  // Desktop grande: aprovechar espacio con más aire
+  @media (min-width: 1440px) {
+    max-width: 1360px;
+    padding: 36px 40px 70px;
+  }
 }
 
 // ============================================
-// TOOLBAR - ESTILO INSTITUCIONAL
+// TOOLBAR
 // ============================================
 .dashboard-toolbar {
   --background: #ffffff;
@@ -64,7 +77,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    
+
     .title-text {
       font-size: 16px;
       color: #0f172a;
@@ -74,7 +87,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 20px;
       }
     }
-    
+
     .title-badge {
       font-size: 9px;
       background: $upse-blue-light;
@@ -103,7 +116,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --padding-start: 8px;
     --padding-end: 8px;
     --border-radius: 50%;
-    
+
     .notification-badge {
       position: absolute;
       top: -2px;
@@ -139,10 +152,15 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    &:hover {
-      ion-icon {
+    // Solo hover en dispositivos que realmente lo soportan
+    @media (hover: hover) and (pointer: fine) {
+      &:hover ion-icon {
         color: $upse-blue;
       }
+    }
+
+    &:active ion-icon {
+      transform: scale(0.9);
     }
   }
 
@@ -151,7 +169,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --padding-end: 8px;
     --color: #64748b;
     --border-radius: 50%;
-    
+
     ion-icon {
       font-size: 18px;
       transition: $transition;
@@ -160,13 +178,19 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 20px;
       }
     }
-    
-    &:hover {
-      --color: $upse-blue;
-      
-      ion-icon {
-        transform: rotate(45deg);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --color: #{$upse-blue};
+
+        ion-icon {
+          transform: rotate(180deg);
+        }
       }
+    }
+
+    &:active ion-icon {
+      transform: rotate(90deg) scale(0.9);
     }
   }
 }
@@ -195,7 +219,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     gap: 10px;
-    
+
     .error-icon {
       font-size: 20px;
       color: #dc2626;
@@ -204,11 +228,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 24px;
       }
     }
-    
+
     .error-message {
       display: flex;
       flex-direction: column;
-      
+
       strong {
         color: #991b1b;
         font-size: 13px;
@@ -217,7 +241,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 14px;
         }
       }
-      
+
       span {
         color: #7f1d1d;
         font-size: 12px;
@@ -243,16 +267,18 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-size: 13px;
     }
 
-    &:hover {
-      --border-color: #991b1b;
-      --color: #991b1b;
-      transform: translateY(-1px);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --border-color: #991b1b;
+        --color: #991b1b;
+        transform: translateY(-1px);
+      }
     }
   }
 }
 
 // ============================================
-// WELCOME SECTION - ESTILO INSTITUCIONAL
+// WELCOME SECTION
 // ============================================
 .welcome-section {
   background: linear-gradient(135deg, $upse-blue 0%, $upse-blue-dark 100%);
@@ -270,7 +296,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     right: -10%;
     width: 300px;
     height: 300px;
-    background: rgba(201, 168, 76, 0.05);
+    background: rgba($upse-gold, 0.08);
     border-radius: 50%;
   }
 
@@ -288,6 +314,16 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   @media (min-width: 768px) {
     padding: 28px 32px;
     margin-bottom: 28px;
+  }
+
+  // Desktop: efecto de brillo sutil que sigue el mouse (glow estático elegante)
+  @media (min-width: 1024px) {
+    padding: 36px 44px;
+
+    &::before {
+      width: 420px;
+      height: 420px;
+    }
   }
 
   .welcome-content {
@@ -315,8 +351,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 24px;
           margin: 0 0 6px 0;
         }
+
+        @media (min-width: 1024px) {
+          font-size: 28px;
+        }
       }
-      
+
       p {
         color: rgba(255, 255, 255, 0.85);
         font-size: 13px;
@@ -335,11 +375,19 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border: 1px solid rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(8px);
         padding: 6px 16px;
-        
+        transition: $transition;
+
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba($upse-gold, 0.4);
+          }
+        }
+
         ion-icon {
           color: rgba(255, 255, 255, 0.7);
         }
-        
+
         ion-label {
           color: white;
           font-weight: 500;
@@ -368,7 +416,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    
+
     @media (min-width: 768px) {
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
@@ -410,7 +458,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       ion-skeleton-text {
         height: 12px;
-        
+
         @media (min-width: 768px) {
           height: 14px;
         }
@@ -433,6 +481,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     @media (min-width: 1024px) {
       grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
     }
   }
 }
@@ -482,17 +531,17 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .view-all-btn {
-    --color: $upse-blue;
+    --color: #{$upse-blue};
     font-weight: 500;
     font-size: 12px;
     --padding-start: 8px;
     --padding-end: 8px;
     transition: $transition;
-    
+
     @media (min-width: 768px) {
       font-size: 13px;
     }
-    
+
     ion-icon {
       font-size: 14px;
       transition: $transition;
@@ -502,11 +551,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    &:hover {
-      --color: $upse-gold;
-      
-      ion-icon {
-        transform: translateX(4px);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --color: #{$upse-gold};
+
+        ion-icon {
+          transform: translateX(4px);
+        }
       }
     }
   }
@@ -540,14 +591,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: #0f172a;
     position: relative;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
 
     &::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       background: linear-gradient(135deg, rgba(0, 27, 76, 0.02), transparent);
       opacity: 0;
       transition: $transition;
@@ -559,28 +608,36 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 14px;
     }
 
-    &:hover {
-      border-color: $upse-blue;
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 27, 76, 0.12);
-      
-      &::before {
-        opacity: 1;
-      }
-      
-      .action-arrow {
-        transform: translateX(4px);
-        opacity: 1;
-        color: $upse-blue;
-      }
+    // ---- DESKTOP: hover con elevación + borde animado ----
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        border-color: $upse-blue;
+        transform: translateY(-6px);
+        box-shadow: $shadow-xl;
 
-      .action-icon {
-        transform: scale(1.05);
+        &::before {
+          opacity: 1;
+        }
+
+        .action-arrow {
+          transform: translateX(4px);
+          opacity: 1;
+          color: $upse-blue;
+        }
+
+        .action-icon {
+          transform: scale(1.08) rotate(-4deg);
+        }
       }
     }
 
-    &:active {
-      transform: scale(0.97);
+    // ---- MÓVIL/TOUCH: feedback táctil inmediato, sin hover ----
+    @media (hover: none) and (pointer: coarse) {
+      &:active {
+        transform: scale(0.96);
+        background: #f8fafc;
+        border-color: $upse-blue;
+      }
     }
 
     .action-icon {
@@ -601,22 +658,16 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 12px;
       }
 
-      &.blue-upse {
-        background: $upse-blue-light;
-        color: $upse-blue;
+      @media (min-width: 1024px) {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
       }
-      &.green-upse {
-        background: $upse-green-light;
-        color: $upse-green;
-      }
-      &.cyan-upse {
-        background: $upse-cyan-light;
-        color: $upse-cyan;
-      }
-      &.orange-upse {
-        background: $upse-orange-light;
-        color: $upse-orange;
-      }
+
+      &.blue-upse { background: $upse-blue-light; color: $upse-blue; }
+      &.green-upse { background: $upse-green-light; color: $upse-green; }
+      &.cyan-upse { background: $upse-cyan-light; color: $upse-cyan; }
+      &.orange-upse { background: $upse-orange-light; color: $upse-orange; }
     }
 
     .action-info {
@@ -634,6 +685,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 13px;
           margin-bottom: 2px;
         }
+
+        @media (min-width: 1024px) {
+          font-size: 14px;
+        }
       }
 
       .action-desc {
@@ -643,6 +698,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
         @media (min-width: 768px) {
           font-size: 11px;
+        }
+
+        @media (min-width: 1024px) {
+          font-size: 12px;
         }
       }
     }
@@ -656,6 +715,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       @media (min-width: 768px) {
         font-size: 18px;
+      }
+
+      // en móvil ocultamos la flecha: no aporta nada sin hover y ahorra espacio
+      @media (max-width: 480px) {
+        display: none;
       }
     }
   }
@@ -672,12 +736,18 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: $shadow-sm;
   transition: $transition;
 
-  &:hover {
-    box-shadow: $shadow-md;
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      box-shadow: $shadow-md;
+    }
   }
 
   @media (min-width: 768px) {
     padding: 20px 24px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 24px 28px;
   }
 
   .activity-list {
@@ -696,6 +766,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       padding: 8px 0;
       border-bottom: 1px solid #f1f5f9;
       transition: $transition;
+      border-radius: 8px;
 
       @media (min-width: 768px) {
         gap: 14px;
@@ -706,10 +777,17 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-bottom: none;
       }
 
-      &:hover {
-        padding-left: 8px;
-        background: #fafafa;
-        border-radius: 8px;
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          padding-left: 10px;
+          background: #fafbfc;
+        }
+      }
+
+      @media (hover: none) and (pointer: coarse) {
+        &:active {
+          background: #f1f5f9;
+        }
       }
 
       .activity-avatar {
@@ -729,46 +807,20 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 16px;
         }
 
-        &.indigo {
-          background: #eef2ff;
-          color: #4f46e5;
-        }
-        &.amber {
-          background: #fffbeb;
-          color: #f59e0b;
-        }
-        &.emerald {
-          background: #ecfdf5;
-          color: #10b981;
-        }
-        &.violet {
-          background: #f5f3ff;
-          color: #8b5cf6;
-        }
-        &.rose {
-          background: #fef2f2;
-          color: #ef4444;
-        }
-        &.slate {
-          background: #f1f5f9;
-          color: #64748b;
-        }
-        &.blue-upse {
-          background: $upse-blue-light;
-          color: $upse-blue;
-        }
-        &.green-upse {
-          background: $upse-green-light;
-          color: $upse-green;
-        }
-        &.gold-upse {
-          background: $upse-gold-light;
-          color: $upse-gold;
-        }
+        &.indigo { background: #eef2ff; color: #4f46e5; }
+        &.amber { background: #fffbeb; color: #f59e0b; }
+        &.emerald { background: #ecfdf5; color: #10b981; }
+        &.violet { background: #f5f3ff; color: #8b5cf6; }
+        &.rose { background: #fef2f2; color: #ef4444; }
+        &.slate { background: #f1f5f9; color: #64748b; }
+        &.blue-upse { background: $upse-blue-light; color: $upse-blue; }
+        &.green-upse { background: $upse-green-light; color: $upse-green; }
+        &.gold-upse { background: $upse-gold-light; color: $upse-gold; }
       }
 
       .activity-content {
         flex: 1;
+        min-width: 0;
 
         .activity-text {
           font-size: 13px;
@@ -815,15 +867,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 32px;
       }
     }
-
-    span {
-      color: #94a3b8;
-    }
   }
 }
 
 // ============================================
-// ANIMACIONES
+// ANIMACIONES DE ENTRADA
 // ============================================
 @keyframes fadeInUp {
   from {
@@ -836,7 +884,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-.stats-grid-container > * {
+.stats-grid-container > *,
+.actions-grid .action-card {
   animation: fadeInUp 0.5s ease-out both;
 }
 
@@ -845,57 +894,50 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 .stats-grid-container > *:nth-child(3) { animation-delay: 0.15s; }
 .stats-grid-container > *:nth-child(4) { animation-delay: 0.2s; }
 
-.actions-grid .action-card {
-  animation: fadeInUp 0.5s ease-out both;
-}
-
 .actions-grid .action-card:nth-child(1) { animation-delay: 0.1s; }
 .actions-grid .action-card:nth-child(2) { animation-delay: 0.15s; }
 .actions-grid .action-card:nth-child(3) { animation-delay: 0.2s; }
 .actions-grid .action-card:nth-child(4) { animation-delay: 0.25s; }
 
 // ============================================
-// SCROLLBAR PERSONALIZADA
+// SCROLLBAR (solo aplica en desktop realmente)
 // ============================================
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
-}
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 3px;
-  transition: background 0.3s ease;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 3px;
+    transition: background 0.3s ease;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
 }
 
 // ============================================
-// RESPONSIVE
+// RESPONSIVE FINO
 // ============================================
 @media (max-width: 480px) {
   .welcome-section {
     padding: 16px 18px;
 
-    .welcome-text h1 {
-      font-size: 16px;
-    }
-
-    .welcome-text p {
-      font-size: 12px;
-    }
+    .welcome-text h1 { font-size: 16px; }
+    .welcome-text p { font-size: 12px; }
   }
 
   .actions-grid .action-card {
     padding: 12px 14px;
-    
+
     .action-icon {
       width: 32px;
       height: 32px;
@@ -903,36 +945,19 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 8px;
     }
 
-    .action-info .action-title {
-      font-size: 11px;
-    }
-
-    .action-info .action-desc {
-      font-size: 9px;
-    }
+    .action-info .action-title { font-size: 11px; }
+    .action-info .action-desc { font-size: 9px; }
   }
 
   .recent-activity {
     padding: 14px 16px;
   }
 
-  .stats-grid {
-    .stats-grid-container {
-      gap: 8px;
-    }
-
-    .stat-skeleton {
-      padding: 12px 14px;
-    }
-  }
+  .stats-grid .stats-grid-container { gap: 8px; }
+  .stats-grid .stat-skeleton { padding: 12px 14px; }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
-  .welcome-section {
-    padding: 20px 24px;
-  }
-
-  .actions-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .welcome-section { padding: 20px 24px; }
+  .actions-grid { grid-template-columns: repeat(2, 1fr); }
 }

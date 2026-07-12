@@ -13,7 +13,9 @@ import {
   IonSkeletonText,
   IonBadge,
   IonChip,
-  IonLabel
+  IonLabel,
+  IonRefresher,
+  IonRefresherContent
 } from '@ionic/angular/standalone';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { StatsCardComponent } from '../../../shared/components/stats-card/stats-card.component';
@@ -36,7 +38,8 @@ import {
   arrowForwardOutline,
   timeOutline,
   checkmarkCircleOutline,
-  createOutline
+  createOutline,
+  chevronDownCircleOutline
 } from 'ionicons/icons';
 
 interface Activity {
@@ -64,6 +67,8 @@ interface Activity {
     IonBadge,
     IonChip,
     IonLabel,
+    IonRefresher,
+    IonRefresherContent,
     StatsCardComponent
   ],
   templateUrl: './dashboard.page.html',
@@ -86,9 +91,6 @@ export class DashboardPage implements OnInit {
   recentActivities: Activity[] = [];
   notificacionesPendientes: number = 0;
 
-  // Servicio para comunicación entre componentes (opcional)
-  // private modalService = inject(ModalService);
-
   constructor() {
     addIcons({
       peopleOutline,
@@ -108,7 +110,8 @@ export class DashboardPage implements OnInit {
       arrowForwardOutline,
       timeOutline,
       checkmarkCircleOutline,
-      createOutline
+      createOutline,
+      chevronDownCircleOutline
     });
   }
 
@@ -145,10 +148,8 @@ export class DashboardPage implements OnInit {
     this.dashboardService.obtenerActividadesRecientes().subscribe({
       next: (actividades: Activity[]) => {
         this.recentActivities = actividades || [];
-        console.log('📋 Actividades recientes cargadas:', this.recentActivities.length);
       },
-      error: (err) => {
-        console.error('❌ Error cargando actividades:', err);
+      error: () => {
         this.recentActivities = [];
       }
     });
@@ -170,38 +171,45 @@ export class DashboardPage implements OnInit {
     this.cargarNotificaciones();
   }
 
+  // Pull-to-refresh handler (móvil/touch)
+  onRefresh(event: any) {
+    this.dashboardService.obtenerResumenAdmin().subscribe({
+      next: (data) => {
+        this.usuarios = data.usuarios ?? 0;
+        this.concursos = data.concursos ?? 0;
+        this.proyectos = data.proyectos ?? 0;
+        this.reportes = data.reportes ?? 0;
+        this.cargarActividadesRecientes();
+        this.cargarNotificaciones();
+        event.target.complete();
+      },
+      error: () => {
+        this.error = true;
+        event.target.complete();
+      }
+    });
+  }
+
   verNotificaciones(): void {
     if (this.notificacionesPendientes > 0) {
-      // Marcar como leídas y mostrar
       this.dashboardService.marcarNotificacionesComoLeidas().subscribe({
         next: () => {
           this.notificacionesPendientes = 0;
-          alert('📬 Notificaciones marcadas como leídas');
         },
-        error: () => {
-          alert('📬 No tienes notificaciones pendientes');
-        }
+        error: () => {}
       });
-    } else {
-      alert('📬 No tienes notificaciones pendientes');
     }
   }
 
   verTodasActividades(): void {
-    // Navegar a la página de actividades o reportes
     this.router.navigate(['/admin/reportes']);
   }
 
-  /**
-   * Abrir el modal de creación de concurso directamente
-   * Usa un evento global o servicio para comunicarse con la página de concursos
-   */
   abrirNuevoConcurso(): void {
-    // Opción 1: Navegar a concursos y abrir modal con parámetro
-    this.router.navigate(['/admin/concursos'], { 
-      queryParams: { 
-        openModal: 'true' 
-      } 
+    this.router.navigate(['/admin/concursos'], {
+      queryParams: {
+        openModal: 'true'
+      }
     });
   }
 }

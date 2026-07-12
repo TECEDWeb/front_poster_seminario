@@ -9,7 +9,7 @@
     </ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" class="notification-btn" (click)="verNotificaciones()">
-        <ion-badge class="notification-badge">{{ notificacionesPendientes }}</ion-badge>
+        <ion-badge class="notification-badge" *ngIf="notificacionesPendientes > 0">{{ notificacionesPendientes }}</ion-badge>
         <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
       </ion-button>
       <ion-button fill="clear" class="btn-refresh" (click)="recargar()">
@@ -20,6 +20,17 @@
 </ion-header>
 
 <ion-content class="dashboard-content">
+
+  <!-- Pull to refresh: solo tiene efecto real en touch/móvil -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="crescent"
+      refreshingText="Actualizando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <div class="page-container">
 
     <!-- Error Banner -->

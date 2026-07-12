@@ -11,7 +11,7 @@ import {
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { personOutline, lockClosedOutline, logInOutline } from 'ionicons/icons';
+import { personOutline, lockClosedOutline, logInOutline, alertCircleOutline } from 'ionicons/icons';
 
 import { AuthService } from 'src/app/core/services/auth.service';
 import { LoginPayload, LoginResponse } from 'src/app/core/models/auth-reponse.model';
@@ -50,11 +50,7 @@ export class LoginPage implements OnInit, AfterViewInit, OnDestroy {
     console.log("URL:", window.location.href);
     console.log("======================================");
 
-    addIcons({
-      personOutline,
-      lockClosedOutline,
-      logInOutline
-    });
+    addIcons({personOutline,lockClosedOutline,alertCircleOutline,logInOutline});
   }
 
   ngOnInit(): void {
