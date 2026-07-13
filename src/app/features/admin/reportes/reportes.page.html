@@ -20,6 +20,7 @@
 <ion-content class="reportes-content">
   <div class="page-container">
 
+    <!-- HEADER -->
     <div class="page-header">
       <div class="header-left">
         <h1>Reportes y estadísticas</h1>
@@ -37,6 +38,7 @@
       </div>
     </div>
 
+    <!-- STATS CARDS -->
     <div class="stats-grid">
       <div class="stat-card" [class]="'stat-' + stat.color" *ngFor="let stat of statsCards">
         <div class="stat-icon">
@@ -67,7 +69,7 @@
       </button>
     </div>
 
-    <!-- FILTROS (solo aplican a la vista de proyectos) -->
+    <!-- FILTROS (solo vista de proyectos) -->
     <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0 && vistaActual === 'proyectos'">
       <div class="filter-group search-group">
         <ion-searchbar
@@ -119,6 +121,7 @@
       </ion-button>
     </div>
 
+    <!-- LOADING -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="report-skeleton" *ngFor="let i of [1,2,3]">
         <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
@@ -127,6 +130,7 @@
       </div>
     </div>
 
+    <!-- ERROR -->
     <div class="error-container" *ngIf="!cargando && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los datos</h3>
@@ -255,7 +259,7 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- VISTA: POR EVALUADOR (nueva) -->
+    <!-- VISTA: POR EVALUADOR -->
     <!-- ============================================ -->
     <div class="evaluadores-resumen-section" *ngIf="!cargando && !error && vistaActual === 'evaluadores'">
       <div class="section-header">
@@ -307,7 +311,7 @@
 
   </div>
 
-  <!-- MODAL DE DETALLE (sin cambios) -->
+  <!-- MODAL DE DETALLE DE PROYECTO -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -342,6 +346,7 @@
             </div>
           </div>
 
+          <!-- Evaluadores (resumen) -->
           <div class="detalle-evaluadores">
             <h3>Evaluadores</h3>
             <div class="evaluadores-grid">
@@ -354,6 +359,33 @@
                   <span class="evaluador-rol">{{ e.rol || 'Evaluador' }}</span>
                   <span class="evaluador-puntaje">Puntaje: {{ e.puntaje || 0 }}</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evaluaciones individuales -->
+          <div class="detalle-evaluaciones" *ngIf="proyectoSeleccionado.evaluaciones?.length">
+            <h3>Evaluaciones registradas</h3>
+            <div class="evaluaciones-list">
+              <div class="evaluacion-item" *ngFor="let ev of proyectoSeleccionado.evaluaciones">
+                <div class="ei-info">
+                  <span class="ei-evaluador">{{ ev.evaluador }}</span>
+                  <span class="ei-meta">
+                    <span class="ei-estado" [class]="getEstadoEvaluacionClass(ev.estado)">
+                      {{ ev.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
+                    </span>
+                    <span class="ei-fecha" *ngIf="ev.fecha_evaluacion">
+                      {{ ev.fecha_evaluacion | date:'dd/MM/yyyy' }}
+                    </span>
+                  </span>
+                </div>
+                <button
+                  class="ei-btn"
+                  *ngIf="ev.estado === 'evaluado'"
+                  (click)="verRespuestas(ev.id)">
+                  <ion-icon name="eye-outline"></ion-icon>
+                  Ver respuestas
+                </button>
               </div>
             </div>
           </div>
@@ -377,6 +409,78 @@
         <div class="modal-loading" *ngIf="cargandoDetalle">
           <ion-spinner name="crescent"></ion-spinner>
           <p>Cargando detalle del proyecto...</p>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL DE RESPUESTAS DE UNA EVALUACIÓN -->
+  <ion-modal [isOpen]="modalRespuestasAbierto" (didDismiss)="cerrarModalRespuestas()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Respuestas de la evaluación</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalRespuestas()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="modal-container">
+
+          <div class="modal-loading" *ngIf="cargandoRespuestas">
+            <ion-spinner name="crescent"></ion-spinner>
+            <p>Cargando respuestas...</p>
+          </div>
+
+          <div class="modal-error" *ngIf="!cargandoRespuestas && errorRespuestas">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <p>{{ errorRespuestas }}</p>
+          </div>
+
+          <ng-container *ngIf="!cargandoRespuestas && !errorRespuestas && respuestasDetalle">
+            <div class="detalle-header">
+              <h2>{{ respuestasDetalle.proyectoNombre }}</h2>
+              <p *ngIf="respuestasDetalle.concursoNombre">{{ respuestasDetalle.concursoNombre }}</p>
+              <span class="detalle-rubrica">{{ respuestasDetalle.rubricaNombre }}</span>
+
+              <div class="er-evaluador-tag">
+                <ion-icon name="person-outline"></ion-icon>
+                <span>{{ respuestasDetalle.evaluadorNombre }}</span>
+                <span class="er-rol-badge">{{ respuestasDetalle.evaluadorRol }}</span>
+              </div>
+            </div>
+
+            <div class="detalle-secciones">
+              <div class="detalle-seccion" *ngFor="let seccion of respuestasDetalle.secciones; let i = index">
+                <div class="detalle-seccion-titulo">
+                  <span class="num">{{ i + 1 }}</span>
+                  {{ seccion.nombre }}
+                </div>
+
+                <div class="detalle-criterio" *ngFor="let item of seccion.items">
+                  <p class="criterio-texto">{{ item.criterio }}</p>
+                  <div class="detalle-nivel-elegido">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <span class="nivel-nombre">{{ item.nivel }}</span>
+                    <span class="nivel-puntaje">{{ item.puntaje }} pts</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detalle-observacion" *ngIf="respuestasDetalle.observaciones">
+              <div class="obs-header">
+                <ion-icon name="chatbubble-outline"></ion-icon>
+                <span>Observaciones del evaluador</span>
+              </div>
+              <p>{{ respuestasDetalle.observaciones }}</p>
+            </div>
+          </ng-container>
+
         </div>
       </ion-content>
     </ng-template>

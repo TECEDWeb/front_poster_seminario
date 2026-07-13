@@ -41,7 +41,10 @@ import {
   checkmarkCircleOutline,
   alertCircleOutline,
   gridOutline,
-  listOutline, chevronForwardOutline } from 'ionicons/icons';
+  listOutline,
+  chevronForwardOutline,
+  chatbubbleOutline
+} from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 
 interface StatCard {
@@ -113,20 +116,50 @@ export class ReportesPage implements OnInit {
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
 
-  // Vista: 'proyectos' | 'evaluadores'
   vistaActual: 'proyectos' | 'evaluadores' = 'proyectos';
 
-  // Filtros
   filtroBusqueda: string = '';
   filtroStatus: string = 'todos';
   filtroEvaluador: string = 'todos';
 
+  // Modal de detalle de proyecto
   modalAbierto = false;
   proyectoSeleccionado: DetalleProyecto | null = null;
   cargandoDetalle: boolean = false;
 
+  // Modal de detalle de una evaluación individual (respuestas)
+  modalRespuestasAbierto = false;
+  cargandoRespuestas = false;
+  errorRespuestas: string | null = null;
+  respuestasDetalle: any = null;
+
   constructor(private reporteService: ReporteService) {
-    addIcons({refreshOutline,timeOutline,downloadOutline,gridOutline,peopleOutline,closeOutline,alertCircleOutline,documentOutline,eyeOutline,filterOutline,statsChartOutline,folderOutline,chevronForwardOutline,checkmarkDoneOutline,trophyOutline,funnelOutline,documentTextOutline,personOutline,barChartOutline,calendarOutline,closeCircleOutline,checkmarkCircleOutline,listOutline});
+    addIcons({
+      downloadOutline,
+      statsChartOutline,
+      folderOutline,
+      checkmarkDoneOutline,
+      trophyOutline,
+      documentOutline,
+      timeOutline,
+      funnelOutline,
+      peopleOutline,
+      eyeOutline,
+      refreshOutline,
+      closeOutline,
+      filterOutline,
+      documentTextOutline,
+      personOutline,
+      barChartOutline,
+      calendarOutline,
+      closeCircleOutline,
+      checkmarkCircleOutline,
+      alertCircleOutline,
+      gridOutline,
+      listOutline,
+      chevronForwardOutline,
+      chatbubbleOutline
+    });
   }
 
   ngOnInit(): void {
@@ -188,11 +221,6 @@ export class ReportesPage implements OnInit {
     ];
   }
 
-  /**
-   * Agrega, a partir de los evaluadores embebidos en cada proyecto,
-   * un resumen por evaluador: cuántos proyectos calificó y su
-   * promedio otorgado a lo largo de todos ellos.
-   */
   construirResumenEvaluadores(): void {
     const mapa = new Map<string, EvaluadorResumen>();
 
@@ -376,6 +404,70 @@ export class ReportesPage implements OnInit {
   }
 
   /**
+   * NUEVO: abre un segundo modal con el desglose completo
+   * sección → criterio → nivel elegido para una evaluación puntual.
+   */
+  verRespuestas(evaluacionId: number): void {
+    if (!evaluacionId) {
+      alert('No se puede ver el detalle: ID de evaluación no disponible');
+      return;
+    }
+
+    this.modalRespuestasAbierto = true;
+    this.cargandoRespuestas = true;
+    this.errorRespuestas = null;
+    this.respuestasDetalle = null;
+
+    this.reporteService.getDetalleEvaluacion(evaluacionId).subscribe({
+      next: (res: any) => {
+        if (res?.ok === false) {
+          this.errorRespuestas = res.mensaje || 'No se pudo cargar el detalle';
+          this.cargandoRespuestas = false;
+          return;
+        }
+
+        const data = res?.data ?? res;
+
+        const seccionesMap: { [nombre: string]: any[] } = {};
+        (data.detalles || []).forEach((d: any) => {
+          if (!seccionesMap[d.seccion]) {
+            seccionesMap[d.seccion] = [];
+          }
+          seccionesMap[d.seccion].push(d);
+        });
+
+        this.respuestasDetalle = {
+          evaluadorNombre: data.evaluadorNombre,
+          evaluadorRol: data.evaluadorRol,
+          proyectoNombre: data.proyectoNombre,
+          concursoNombre: data.concursoNombre,
+          rubricaNombre: data.rubricaNombre,
+          observaciones: data.observaciones || '',
+          fecha: data.fecha,
+          puntajeMaximo: data.puntajeMaximo,
+          secciones: Object.keys(seccionesMap).map(nombre => ({
+            nombre,
+            items: seccionesMap[nombre]
+          }))
+        };
+
+        this.cargandoRespuestas = false;
+      },
+      error: (err) => {
+        console.error('Error cargando respuestas:', err);
+        this.errorRespuestas = err.error?.mensaje || 'Error al cargar las respuestas';
+        this.cargandoRespuestas = false;
+      }
+    });
+  }
+
+  cerrarModalRespuestas(): void {
+    this.modalRespuestasAbierto = false;
+    this.respuestasDetalle = null;
+    this.errorRespuestas = null;
+  }
+
+  /**
    * Ver todos los proyectos calificados por un evaluador específico,
    * saltando desde la vista de evaluadores a la vista de proyectos filtrada.
    */
@@ -442,6 +534,14 @@ export class ReportesPage implements OnInit {
     if (promedio >= 6) return 'color-blue';
     if (promedio >= 4) return 'color-orange';
     return 'color-red';
+  }
+
+  /**
+   * Estado visual para el estado textual de una evaluación
+   * dentro del modal de detalle del proyecto.
+   */
+  getEstadoEvaluacionClass(estado: string): string {
+    return estado === 'evaluado' ? 'status-excellent' : 'status-regular';
   }
 
   trackById(index: number, item: any): number {

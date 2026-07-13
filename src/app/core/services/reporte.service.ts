@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
 import { environment } from '../../../environments/environment';
-import { Reporte, ReporteStats, Ranking } from '../models/reporte.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,74 +12,43 @@ export class ReporteService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Estadísticas generales
-   */
-  getStats(): Observable<ReporteStats> {
-    return this.http.get<ReporteStats>(`${this.apiUrl}/stats`);
+  getStats(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/stats`);
   }
 
-  /**
-   * Ranking general
-   */
   getRanking(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/ranking`);
+    return this.http.get(`${this.apiUrl}/ranking`);
   }
 
-  /**
-   * Reportes agrupados por proyecto
-   */
   getReporteProyectos(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/proyectos`);
+    return this.http.get(`${this.apiUrl}/proyectos`);
   }
 
-  /**
-   * Reporte completo
-   */
-  getReportes(): Observable<Reporte[]> {
-    return this.http.get<Reporte[]>(`${this.apiUrl}`);
-  }
-
-  /**
-   * Exportar Excel general
-   */
-  exportar(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/exportar`, {
-      responseType: 'blob'
-    });
-  }
-
-  /**
-   * Exportar Excel de un proyecto específico
-   */
-  exportarProyecto(proyectoId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/exportar/proyecto/${proyectoId}`, {
-      responseType: 'blob'
-    });
-  }
-
-  /**
-   * Obtener detalle de un proyecto específico
-   */
   getDetalleProyecto(proyectoId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/proyecto/${proyectoId}`);
   }
 
   /**
-   * Exportar PDF general
+   * NUEVO: detalle completo de una evaluación individual —
+   * respuestas sección → criterio → nivel elegido, con puntajes.
    */
-  exportarPDF(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/exportar-pdf`, {
-      responseType: 'blob'
-    });
+  getDetalleEvaluacion(evaluacionId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/evaluacion/${evaluacionId}/detalle`);
   }
 
-  /**
-   * Exportar PDF de un proyecto específico
-   */
+  exportar(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/exportar`, { responseType: 'blob' });
+  }
+
+  exportarPDF(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/exportar-pdf`, { responseType: 'blob' });
+  }
+
+  exportarProyecto(proyectoId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/exportar/proyecto/${proyectoId}`, { responseType: 'blob' });
+  }
+
   exportarPDFProyecto(proyectoId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/exportar-pdf/proyecto/${proyectoId}`, {
-      responseType: 'blob'
-    });
+    return this.http.get(`${this.apiUrl}/exportar-pdf/proyecto/${proyectoId}`, { responseType: 'blob' });
   }
 }

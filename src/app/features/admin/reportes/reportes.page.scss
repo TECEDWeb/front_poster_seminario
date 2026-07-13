@@ -50,7 +50,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TOOLBAR - ESTILO INSTITUCIONAL UPSE
+// TOOLBAR
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
@@ -64,7 +64,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    
+
     .title-text {
       font-size: 16px;
       color: #0f172a;
@@ -74,7 +74,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 20px;
       }
     }
-    
+
     .title-badge {
       font-size: 9px;
       background: $upse-blue-light;
@@ -103,7 +103,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --padding-end: 8px;
     --color: #64748b;
     --border-radius: 50%;
-    
+
     ion-icon {
       font-size: 18px;
       transition: $transition;
@@ -112,17 +112,15 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 20px;
       }
     }
-    
-    &:hover {
-      --color: $upse-blue;
-      
-      ion-icon {
-        transform: rotate(45deg);
-      }
-    }
 
-    .spinning {
-      animation: spin 1s linear infinite;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --color: #{$upse-blue};
+
+        ion-icon {
+          transform: rotate(45deg);
+        }
+      }
     }
   }
 }
@@ -203,9 +201,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE)
     .btn-export-desktop {
-      --background: $upse-green;
+      --background: #{$upse-green};
       --color: #ffffff;
       --border-radius: 12px;
       font-weight: 600;
@@ -214,22 +211,23 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --padding-end: 20px;
       height: 44px;
       font-size: 14px;
-      
+
       ion-icon {
         font-size: 20px;
         margin-right: 8px;
       }
 
-      // ❌ OCULTO EN MÓVIL
       @media (max-width: 768px) {
         display: none !important;
       }
 
-      &:hover:not(:disabled) {
-        --box-shadow: 0 6px 24px rgba(0, 166, 81, 0.45);
-        transform: translateY(-2px);
-        transition: $transition;
-        --background: #008f45;
+      @media (hover: hover) and (pointer: fine) {
+        &:hover:not(:disabled) {
+          --box-shadow: 0 6px 24px rgba(0, 166, 81, 0.45);
+          transform: translateY(-2px);
+          transition: $transition;
+          --background: #008f45;
+        }
       }
 
       &:disabled {
@@ -241,13 +239,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// STATS GRID - ESTILO UPSE
+// STATS GRID
 // ============================================
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   @media (min-width: 640px) {
     gap: 16px;
@@ -255,7 +253,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
 
   .stat-card {
@@ -269,10 +267,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: $shadow-sm;
     transition: $transition;
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: $shadow-lg;
-      border-color: $upse-blue;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: $shadow-lg;
+        border-color: $upse-blue;
+      }
     }
 
     @media (min-width: 768px) {
@@ -336,44 +336,83 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &.stat-blue {
       border-left: 4px solid $upse-blue;
-      .stat-icon {
-        background: $upse-blue-light;
-        color: $upse-blue;
-      }
+      .stat-icon { background: $upse-blue-light; color: $upse-blue; }
       .stat-value { color: $upse-blue; }
     }
 
     &.stat-green {
       border-left: 4px solid $upse-green;
-      .stat-icon {
-        background: $upse-green-light;
-        color: $upse-green;
-      }
+      .stat-icon { background: $upse-green-light; color: $upse-green; }
       .stat-value { color: $upse-green; }
     }
 
     &.stat-gold {
       border-left: 4px solid $upse-gold;
-      .stat-icon {
-        background: $upse-gold-light;
-        color: $upse-gold;
-      }
+      .stat-icon { background: $upse-gold-light; color: $upse-gold; }
       .stat-value { color: $upse-gold; }
     }
 
     &.stat-purple {
       border-left: 4px solid #7c3aed;
-      .stat-icon {
-        background: #ede9fe;
-        color: #7c3aed;
-      }
+      .stat-icon { background: #ede9fe; color: #7c3aed; }
       .stat-value { color: #7c3aed; }
     }
   }
 }
 
 // ============================================
-// FILTER BAR - ESTILO UPSE
+// TOGGLE DE VISTA
+// ============================================
+.vista-toggle {
+  display: inline-flex;
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+  margin-bottom: 20px;
+  gap: 2px;
+
+  .toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 9px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: $transition;
+    -webkit-tap-highlight-color: transparent;
+
+    ion-icon {
+      font-size: 16px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(.active) {
+        background: #f8fafc;
+        color: #{$upse-blue};
+      }
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &.active {
+      background: $upse-blue;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 27, 76, 0.25);
+    }
+  }
+}
+
+// ============================================
+// FILTER BAR
 // ============================================
 .filter-bar {
   display: flex;
@@ -439,7 +478,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         &:focus-within {
-          --border-color: $upse-blue;
+          --border-color: #{$upse-blue};
           border-color: $upse-blue;
           box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
         }
@@ -491,8 +530,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-size: 14px;
     }
 
-    &:hover {
-      --color: #ef4444;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --color: #ef4444;
+      }
     }
   }
 }
@@ -545,7 +586,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// ERROR - ESTILO UPSE
+// ERROR
 // ============================================
 .error-container {
   display: flex;
@@ -593,14 +634,16 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-retry {
-    --background: $upse-blue;
+    --background: #{$upse-blue};
     --border-radius: 10px;
     font-weight: 600;
     --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
 
-    &:hover {
-      --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
-      transform: translateY(-2px);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+        transform: translateY(-2px);
+      }
     }
   }
 }
@@ -656,36 +699,68 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       gap: 8px;
 
-      .filter-btn {
-        --border-radius: 8px;
-        --color: #64748b;
-        font-weight: 500;
-        font-size: 12px;
-
-        @media (min-width: 768px) {
-          font-size: 13px;
-        }
-
-        &:hover {
-          --color: $upse-blue;
-        }
-      }
-
-      // ✅ BOTÓN EXPORTAR MÓVIL
       .export-mobile-btn {
         --border-radius: 8px;
-        --color: $upse-green;
+        --color: #{$upse-green};
         font-weight: 500;
         font-size: 12px;
-        --border-color: $upse-green;
+        --border-color: #{$upse-green};
 
         @media (min-width: 769px) {
           display: none !important;
         }
 
-        &:hover {
-          --color: #008f45;
-          --border-color: #008f45;
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            --color: #008f45;
+            --border-color: #008f45;
+          }
+        }
+      }
+    }
+  }
+}
+
+.evaluadores-resumen-section {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 20px;
+    }
+
+    .section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      h2 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 600;
+        color: $upse-blue;
+
+        @media (min-width: 768px) {
+          font-size: 20px;
+        }
+      }
+
+      .section-count {
+        font-size: 12px;
+        color: #94a3b8;
+        background: white;
+        padding: 2px 12px;
+        border-radius: 20px;
+        border: 1px solid #eef2f7;
+
+        @media (min-width: 768px) {
+          font-size: 13px;
+          padding: 4px 14px;
         }
       }
     }
@@ -710,7 +785,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// PROYECTO CARD - ESTILO UPSE
+// PROYECTO CARD
 // ============================================
 .proyecto-card {
   background: white;
@@ -722,10 +797,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-direction: column;
   overflow: hidden;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: $shadow-lg;
-    border-color: $upse-blue;
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: $shadow-lg;
+      border-color: $upse-blue;
+    }
   }
 
   .card-header {
@@ -821,22 +898,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
-        &.status-excellent {
-          background: $upse-green-light;
-          color: $upse-green;
-        }
-        &.status-good {
-          background: $upse-blue-light;
-          color: $upse-blue;
-        }
-        &.status-regular {
-          background: $upse-gold-light;
-          color: $upse-gold;
-        }
-        &.status-low {
-          background: #f1f5f9;
-          color: #64748b;
-        }
+        &.status-excellent { background: $upse-green-light; color: $upse-green; }
+        &.status-good { background: $upse-blue-light; color: $upse-blue; }
+        &.status-regular { background: $upse-gold-light; color: $upse-gold; }
+        &.status-low { background: #f1f5f9; color: #64748b; }
       }
     }
   }
@@ -988,9 +1053,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border: 1px solid #f1f5f9;
         transition: $transition;
 
-        &:hover {
-          background: $upse-blue-light;
-          border-color: $upse-blue;
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            background: $upse-blue-light;
+            border-color: $upse-blue;
+          }
         }
 
         @media (min-width: 768px) {
@@ -1097,546 +1164,17 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
       }
 
-      &:hover {
-        --color: $upse-blue;
-        --border-color: $upse-blue;
-        transform: translateY(-1px);
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          --color: #{$upse-blue};
+          --border-color: #{$upse-blue};
+          transform: translateY(-1px);
+        }
       }
 
       &:active {
         transform: scale(0.97);
       }
-    }
-  }
-}
-
-// ============================================
-// EMPTY STATE - ESTILO UPSE
-// ============================================
-.empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 40px 20px;
-
-  @media (min-width: 768px) {
-    padding: 60px 20px;
-  }
-
-  .empty-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: $upse-blue-light;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-
-    @media (min-width: 768px) {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 20px;
-    }
-
-    ion-icon {
-      font-size: 32px;
-      color: $upse-blue;
-
-      @media (min-width: 768px) {
-        font-size: 40px;
-      }
-    }
-  }
-
-  h3 {
-    margin: 0 0 6px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #0f172a;
-
-    @media (min-width: 768px) {
-      font-size: 22px;
-      margin: 0 0 8px;
-    }
-  }
-
-  p {
-    margin: 0 0 16px;
-    color: #64748b;
-    font-size: 14px;
-
-    @media (min-width: 768px) {
-      font-size: 16px;
-      margin: 0 0 24px;
-    }
-  }
-
-  .btn-clear-filter {
-    --border-color: #e2e8f0;
-    --color: #64748b;
-    --border-radius: 10px;
-    font-weight: 500;
-    transition: $transition;
-
-    &:hover {
-      --border-color: #ef4444;
-      --color: #ef4444;
-    }
-  }
-}
-
-// ============================================
-// MODAL DE DETALLE - ESTILO UPSE
-// ============================================
-.modal-content {
-  --background: #f8fafc;
-}
-
-.modal-container {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 20px;
-
-  @media (min-width: 768px) {
-    padding: 24px;
-  }
-
-  .detalle-header {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 20px;
-
-    @media (min-width: 640px) {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-    }
-
-    .detalle-titulo {
-      flex: 1;
-
-      h2 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 700;
-        color: $upse-blue;
-
-        @media (min-width: 768px) {
-          font-size: 24px;
-        }
-      }
-
-      p {
-        margin: 4px 0 0;
-        color: #64748b;
-        font-size: 14px;
-
-        @media (min-width: 768px) {
-          font-size: 16px;
-        }
-      }
-    }
-
-    .detalle-stats {
-      display: flex;
-      gap: 12px;
-
-      .detalle-stat {
-        text-align: center;
-        padding: 8px 16px;
-        background: white;
-        border-radius: 10px;
-        border: 1px solid #eef2f7;
-        min-width: 70px;
-        box-shadow: $shadow-sm;
-
-        @media (min-width: 768px) {
-          padding: 10px 20px;
-          min-width: 80px;
-        }
-
-        .stat-label {
-          display: block;
-          font-size: 10px;
-          color: #94a3b8;
-          text-transform: uppercase;
-          font-weight: 500;
-          letter-spacing: 0.5px;
-
-          @media (min-width: 768px) {
-            font-size: 11px;
-          }
-        }
-
-        .stat-value {
-          display: block;
-          font-size: 18px;
-          font-weight: 700;
-          color: #0f172a;
-          margin-top: 2px;
-
-          @media (min-width: 768px) {
-            font-size: 22px;
-          }
-
-          &.color-green { color: $upse-green; }
-          &.color-blue { color: $upse-blue; }
-          &.color-gold { color: $upse-gold; }
-          &.color-red { color: #ef4444; }
-          &.color-gray { color: #94a3b8; }
-        }
-      }
-    }
-  }
-
-  .detalle-evaluadores {
-    h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: $upse-blue;
-      margin: 0 0 16px;
-
-      @media (min-width: 768px) {
-        font-size: 18px;
-        margin: 0 0 20px;
-      }
-    }
-
-    .evaluadores-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-
-      @media (min-width: 480px) {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      @media (min-width: 768px) {
-        gap: 12px;
-      }
-
-      .evaluador-card {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        background: white;
-        border-radius: 12px;
-        border: 1px solid #eef2f7;
-        transition: $transition;
-        box-shadow: $shadow-sm;
-
-        &:hover {
-          border-color: $upse-blue;
-          box-shadow: $shadow-md;
-          transform: translateY(-2px);
-        }
-
-        .evaluador-avatar {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: $upse-blue-light;
-          color: $upse-blue;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 14px;
-          flex-shrink: 0;
-
-          @media (min-width: 768px) {
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-          }
-        }
-
-        .evaluador-info {
-          flex: 1;
-          min-width: 0;
-
-          .evaluador-nombre {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: #0f172a;
-
-            @media (min-width: 768px) {
-              font-size: 15px;
-            }
-          }
-
-          .evaluador-rol {
-            display: block;
-            font-size: 11px;
-            color: #94a3b8;
-
-            @media (min-width: 768px) {
-              font-size: 12px;
-            }
-          }
-
-          .evaluador-puntaje {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: $upse-blue;
-            margin-top: 2px;
-
-            @media (min-width: 768px) {
-              font-size: 13px;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .detalle-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid #e2e8f0;
-    flex-wrap: wrap;
-
-    @media (min-width: 768px) {
-      gap: 12px;
-      margin-top: 28px;
-      padding-top: 20px;
-    }
-
-    ion-button {
-      --border-radius: 10px;
-      font-weight: 500;
-      --padding-start: 14px;
-      --padding-end: 14px;
-      flex: 1;
-      min-width: 80px;
-
-      @media (min-width: 480px) {
-        flex: none;
-      }
-
-      &:hover {
-        transform: translateY(-2px);
-      }
-    }
-  }
-}
-
-.modal-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  gap: 16px;
-
-  ion-spinner {
-    width: 48px;
-    height: 48px;
-    color: $upse-blue;
-
-    @media (min-width: 768px) {
-      width: 56px;
-      height: 56px;
-    }
-  }
-
-  p {
-    color: #64748b;
-    font-size: 14px;
-    margin: 0;
-
-    @media (min-width: 768px) {
-      font-size: 16px;
-    }
-  }
-}
-
-// ============================================
-// ANIMATIONS
-// ============================================
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.proyecto-card {
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-.proyecto-card:nth-child(1) { animation-delay: 0.05s; }
-.proyecto-card:nth-child(2) { animation-delay: 0.1s; }
-.proyecto-card:nth-child(3) { animation-delay: 0.15s; }
-.proyecto-card:nth-child(4) { animation-delay: 0.2s; }
-.proyecto-card:nth-child(5) { animation-delay: 0.25s; }
-.proyecto-card:nth-child(6) { animation-delay: 0.3s; }
-
-// ============================================
-// SCROLLBAR PERSONALIZADA
-// ============================================
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: $upse-blue;
-  border-radius: 3px;
-  transition: $transition;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: $upse-blue-dark;
-}
-
-// ============================================
-// RESPONSIVE FINAL
-// ============================================
-@media (max-width: 480px) {
-  .page-header .header-left h1 {
-    font-size: 20px;
-  }
-
-  .stats-grid {
-    gap: 8px;
-
-    .stat-card {
-      padding: 12px 14px;
-
-      .stat-value {
-        font-size: 17px;
-      }
-
-      .stat-icon {
-        width: 32px;
-        height: 32px;
-
-        ion-icon {
-          font-size: 16px;
-        }
-      }
-    }
-  }
-
-  .proyecto-card {
-    .card-header {
-      flex-wrap: wrap;
-    }
-
-    .card-actions {
-      grid-template-columns: 1fr 1fr;
-
-      .action-btn {
-        font-size: 9px;
-        height: 26px;
-
-        ion-icon {
-          font-size: 10px;
-        }
-      }
-    }
-  }
-
-  .detalle-stats {
-    flex-wrap: wrap;
-
-    .detalle-stat {
-      flex: 1;
-      min-width: 60px;
-    }
-  }
-}
-
-@media (max-width: 360px) {
-  .proyecto-card .card-stats {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
-  .proyecto-card .card-actions {
-    grid-template-columns: 1fr;
-
-    .action-btn {
-      width: 100%;
-    }
-  }
-}
-
-// ============================================
-// TOGGLE DE VISTA
-// ============================================
-.vista-toggle {
-  display: inline-flex;
-  background: white;
-  border-radius: 12px;
-  padding: 4px;
-  border: 1px solid #eef2f7;
-  box-shadow: $shadow-sm;
-  margin-bottom: 20px;
-  gap: 2px;
-
-  .toggle-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 9px;
-    background: none;
-    border: none;
-    font-size: 13px;
-    font-weight: 600;
-    color: #64748b;
-    cursor: pointer;
-    transition: $transition;
-    -webkit-tap-highlight-color: transparent;
-
-    ion-icon {
-      font-size: 16px;
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover:not(.active) {
-        background: #f8fafc;
-        color: #{$upse-blue};
-      }
-    }
-
-    &:active {
-      transform: scale(0.96);
-    }
-
-    &.active {
-      background: $upse-blue;
-      color: white;
-      box-shadow: 0 2px 8px rgba(0, 27, 76, 0.25);
     }
   }
 }
@@ -1790,6 +1328,774 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     ion-icon:last-child {
       transition: transform 0.2s ease;
+    }
+  }
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+
+  @media (min-width: 768px) {
+    padding: 60px 20px;
+  }
+
+  .empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: $upse-blue-light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+
+    @media (min-width: 768px) {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+    }
+
+    ion-icon {
+      font-size: 32px;
+      color: $upse-blue;
+
+      @media (min-width: 768px) {
+        font-size: 40px;
+      }
+    }
+  }
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+
+    @media (min-width: 768px) {
+      font-size: 22px;
+      margin: 0 0 8px;
+    }
+  }
+
+  p {
+    margin: 0 0 16px;
+    color: #64748b;
+    font-size: 14px;
+
+    @media (min-width: 768px) {
+      font-size: 16px;
+      margin: 0 0 24px;
+    }
+  }
+
+  .btn-clear-filter {
+    --border-color: #e2e8f0;
+    --color: #64748b;
+    --border-radius: 10px;
+    font-weight: 500;
+    transition: $transition;
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --border-color: #ef4444;
+        --color: #ef4444;
+      }
+    }
+  }
+}
+
+// ============================================
+// MODAL DE DETALLE DE PROYECTO
+// ============================================
+.modal-content {
+  --background: #f8fafc;
+}
+
+.modal-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+
+  @media (min-width: 768px) {
+    padding: 24px;
+  }
+
+  .detalle-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .detalle-titulo {
+      flex: 1;
+
+      h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: $upse-blue;
+
+        @media (min-width: 768px) {
+          font-size: 24px;
+        }
+      }
+
+      p {
+        margin: 4px 0 0;
+        color: #64748b;
+        font-size: 14px;
+
+        @media (min-width: 768px) {
+          font-size: 16px;
+        }
+      }
+    }
+
+    .detalle-stats {
+      display: flex;
+      gap: 12px;
+
+      .detalle-stat {
+        text-align: center;
+        padding: 8px 16px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #eef2f7;
+        min-width: 70px;
+        box-shadow: $shadow-sm;
+
+        @media (min-width: 768px) {
+          padding: 10px 20px;
+          min-width: 80px;
+        }
+
+        .stat-label {
+          display: block;
+          font-size: 10px;
+          color: #94a3b8;
+          text-transform: uppercase;
+          font-weight: 500;
+          letter-spacing: 0.5px;
+
+          @media (min-width: 768px) {
+            font-size: 11px;
+          }
+        }
+
+        .stat-value {
+          display: block;
+          font-size: 18px;
+          font-weight: 700;
+          color: #0f172a;
+          margin-top: 2px;
+
+          @media (min-width: 768px) {
+            font-size: 22px;
+          }
+
+          &.color-green { color: $upse-green; }
+          &.color-blue { color: $upse-blue; }
+          &.color-gold { color: $upse-gold; }
+          &.color-red { color: #ef4444; }
+          &.color-gray { color: #94a3b8; }
+        }
+      }
+    }
+  }
+
+  .detalle-evaluadores {
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: $upse-blue;
+      margin: 0 0 16px;
+
+      @media (min-width: 768px) {
+        font-size: 18px;
+        margin: 0 0 20px;
+      }
+    }
+
+    .evaluadores-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+
+      @media (min-width: 480px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (min-width: 768px) {
+        gap: 12px;
+      }
+
+      .evaluador-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #eef2f7;
+        transition: $transition;
+        box-shadow: $shadow-sm;
+
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            border-color: $upse-blue;
+            box-shadow: $shadow-md;
+            transform: translateY(-2px);
+          }
+        }
+
+        .evaluador-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: $upse-blue-light;
+          color: $upse-blue;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 14px;
+          flex-shrink: 0;
+
+          @media (min-width: 768px) {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+          }
+        }
+
+        .evaluador-info {
+          flex: 1;
+          min-width: 0;
+
+          .evaluador-nombre {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+
+            @media (min-width: 768px) {
+              font-size: 15px;
+            }
+          }
+
+          .evaluador-rol {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+
+            @media (min-width: 768px) {
+              font-size: 12px;
+            }
+          }
+
+          .evaluador-puntaje {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: $upse-blue;
+            margin-top: 2px;
+
+            @media (min-width: 768px) {
+              font-size: 13px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .detalle-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+
+    @media (min-width: 768px) {
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 20px;
+    }
+
+    ion-button {
+      --border-radius: 10px;
+      font-weight: 500;
+      --padding-start: 14px;
+      --padding-end: 14px;
+      flex: 1;
+      min-width: 80px;
+
+      @media (min-width: 480px) {
+        flex: none;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// EVALUACIONES INDIVIDUALES (dentro del modal de proyecto)
+// ============================================
+.detalle-evaluaciones {
+  margin-top: 20px;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: $upse-blue;
+    margin: 0 0 16px;
+
+    @media (min-width: 768px) {
+      font-size: 18px;
+      margin: 0 0 20px;
+    }
+  }
+}
+
+.evaluaciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.evaluacion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #eef2f7;
+  transition: $transition;
+  flex-wrap: wrap;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: $upse-blue;
+      box-shadow: $shadow-sm;
+    }
+  }
+
+  .ei-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+
+    .ei-evaluador {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .ei-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .ei-estado {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+
+        &.status-excellent { background: $upse-green-light; color: $upse-green; }
+        &.status-regular { background: #fef3c7; color: #d97706; }
+      }
+
+      .ei-fecha {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    }
+  }
+
+  .ei-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: $upse-blue-light;
+    color: $upse-blue;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+
+    ion-icon {
+      font-size: 15px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: $upse-blue;
+        color: white;
+      }
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+}
+
+// ============================================
+// MODAL DE RESPUESTAS — TAG DE EVALUADOR
+// ============================================
+.er-evaluador-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #0f172a;
+  font-weight: 600;
+
+  ion-icon {
+    font-size: 16px;
+    color: $upse-blue;
+  }
+
+  .er-rol-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: $upse-blue-light;
+    color: $upse-blue;
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+}
+
+// ============================================
+// MODAL LOADING / ERROR (compartido entre ambos modales)
+// ============================================
+.modal-loading,
+.modal-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  gap: 14px;
+  text-align: center;
+
+  ion-spinner {
+    width: 48px;
+    height: 48px;
+    color: $upse-blue;
+
+    @media (min-width: 768px) {
+      width: 56px;
+      height: 56px;
+    }
+  }
+
+  ion-icon {
+    font-size: 44px;
+    color: #ef4444;
+  }
+
+  p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+
+    @media (min-width: 768px) {
+      font-size: 16px;
+    }
+  }
+}
+
+// ============================================
+// DETALLE DE RESPUESTAS — SECCIONES/CRITERIOS/NIVEL ELEGIDO
+// ============================================
+.detalle-rubrica {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4f46e5;
+  background: #eef2ff;
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+
+.detalle-secciones {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.detalle-seccion {
+  background: white;
+  border-radius: $radius;
+  padding: 18px 20px;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+
+  .detalle-seccion-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 14px;
+
+    .num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: $upse-blue;
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.detalle-criterio {
+  padding: 12px 0;
+  border-top: 1px solid #f1f5f9;
+
+  &:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .criterio-texto {
+    margin: 0 0 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.5;
+  }
+}
+
+.detalle-nivel-elegido {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: $upse-blue-light;
+  border: 1.5px solid $upse-blue;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+
+  ion-icon {
+    font-size: 18px;
+    color: $upse-green;
+    flex-shrink: 0;
+  }
+
+  .nivel-nombre {
+    flex: 1;
+  }
+
+  .nivel-puntaje {
+    font-size: 12px;
+    font-weight: 700;
+    color: $upse-blue;
+  }
+}
+
+.detalle-observacion {
+  background: white;
+  border-radius: $radius;
+  padding: 18px 20px;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+
+  .obs-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+
+    ion-icon {
+      font-size: 18px;
+      color: $upse-blue;
+    }
+  }
+
+  p {
+    margin: 0;
+    font-size: 13.5px;
+    color: #475569;
+    line-height: 1.6;
+  }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.proyecto-card {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.proyecto-card:nth-child(1) { animation-delay: 0.05s; }
+.proyecto-card:nth-child(2) { animation-delay: 0.1s; }
+.proyecto-card:nth-child(3) { animation-delay: 0.15s; }
+.proyecto-card:nth-child(4) { animation-delay: 0.2s; }
+.proyecto-card:nth-child(5) { animation-delay: 0.25s; }
+.proyecto-card:nth-child(6) { animation-delay: 0.3s; }
+
+// ============================================
+// SCROLLBAR
+// ============================================
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $upse-blue;
+    border-radius: 3px;
+    transition: $transition;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: $upse-blue-dark;
+  }
+}
+
+// ============================================
+// RESPONSIVE FINAL
+// ============================================
+@media (max-width: 480px) {
+  .page-header .header-left h1 {
+    font-size: 20px;
+  }
+
+  .stats-grid {
+    gap: 8px;
+
+    .stat-card {
+      padding: 12px 14px;
+
+      .stat-value {
+        font-size: 17px;
+      }
+
+      .stat-icon {
+        width: 32px;
+        height: 32px;
+
+        ion-icon {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .proyecto-card {
+    .card-header {
+      flex-wrap: wrap;
+    }
+
+    .card-actions {
+      grid-template-columns: 1fr 1fr;
+
+      .action-btn {
+        font-size: 9px;
+        height: 26px;
+
+        ion-icon {
+          font-size: 10px;
+        }
+      }
+    }
+  }
+
+  .detalle-stats {
+    flex-wrap: wrap;
+
+    .detalle-stat {
+      flex: 1;
+      min-width: 60px;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .proyecto-card .card-stats {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .proyecto-card .card-actions {
+    grid-template-columns: 1fr;
+
+    .action-btn {
+      width: 100%;
     }
   }
 }
