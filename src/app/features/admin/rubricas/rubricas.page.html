@@ -156,7 +156,7 @@
           </div>
         </div>
 
-        <div class="secciones-section" *ngIf="r.secciones?.length">
+        <div class="secciones-section" *ngIf="r.secciones.length">
           <div class="secciones-header">
             <ion-icon name="layers-outline"></ion-icon>
             <span>Secciones</span>
@@ -172,7 +172,7 @@
           </div>
         </div>
 
-        <div class="niveles-section" *ngIf="r.niveles?.length">
+        <div class="niveles-section" *ngIf="r.niveles.length">
           <div class="niveles-header">
             <ion-icon name="list-outline"></ion-icon>
             <span>Niveles de desempeño</span>
@@ -204,7 +204,7 @@
         </div>
       </div>
 
-      <div class="empty-state" *ngIf="rubricasFiltradas?.length === 0 && rubricas.length > 0">
+      <div class="empty-state" *ngIf="rubricasFiltradas.length === 0 && rubricas.length > 0">
         <div class="empty-icon">
           <ion-icon name="filter-outline"></ion-icon>
         </div>

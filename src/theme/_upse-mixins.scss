@@ -1,0 +1,55 @@
+@use './upse-variables' as *;
+
+@mixin card-hover-lift($lift: -4px, $shadow: $shadow-lg) {
+  background: white;
+  border-radius: $radius;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+  transition: $transition;
+
+  &:hover {
+    transform: translateY($lift);
+    box-shadow: $shadow;
+    border-color: $upse-blue;
+  }
+}
+
+@mixin status-badge($bg, $color) {
+  background: $bg;
+  color: $color;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  @media (min-width: 768px) {
+    font-size: 11px;
+    padding: 4px 12px;
+  }
+}
+
+@mixin icon-box($size: 40px, $size-desktop: 48px, $bg: $upse-blue-light, $color: $upse-blue) {
+  width: $size;
+  height: $size;
+  border-radius: 12px;
+  background: $bg;
+  color: $color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  @media (min-width: 768px) {
+    width: $size-desktop;
+    height: $size-desktop;
+  }
+}
+
+@mixin icon-gradient($from, $to) {
+  background: linear-gradient(135deg, $from, $to);
+}
