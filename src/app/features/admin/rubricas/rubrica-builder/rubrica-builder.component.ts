@@ -7,9 +7,30 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  addOutline, createOutline, trashOutline, checkmarkOutline, closeOutline,
-  chevronDownOutline, chevronForwardOutline, layersOutline, listOutline,
-  starOutline, alertCircleOutline, optionsOutline, saveOutline
+  addOutline, 
+  createOutline, 
+  trashOutline, 
+  checkmarkOutline, 
+  closeOutline,
+  chevronDownOutline, 
+  chevronForwardOutline, 
+  layersOutline, 
+  listOutline,
+  starOutline, 
+  alertCircleOutline, 
+  optionsOutline, 
+  saveOutline,
+  informationCircleOutline,  // ← AGREGAR ESTE
+  refreshOutline,            // ← AGREGAR ESTE
+  checkboxOutline,           // ← AGREGAR ESTE
+  eyeOutline,                // ← AGREGAR ESTE
+  downloadOutline,           // ← AGREGAR ESTE
+  filterOutline,             // ← AGREGAR ESTE
+  trophyOutline,             // ← AGREGAR ESTE
+  pricetagOutline,           // ← AGREGAR ESTE
+  documentTextOutline,       // ← AGREGAR ESTE
+  searchOutline,             // ← AGREGAR ESTE
+  funnelOutline              // ← AGREGAR ESTE
 } from 'ionicons/icons';
 
 import { SeccionService } from '../../../../core/services/seccion.service';
@@ -81,10 +102,32 @@ export class RubricaBuilderComponent implements OnChanges {
     private criterioService: CriterioService,
     private nivelService: NivelService
   ) {
+    // REGISTRAR TODOS LOS ÍCONOS NECESARIOS
     addIcons({
-      addOutline, createOutline, trashOutline, checkmarkOutline, closeOutline,
-      chevronDownOutline, chevronForwardOutline, layersOutline, listOutline,
-      starOutline, alertCircleOutline, optionsOutline, saveOutline
+      addOutline, 
+      createOutline, 
+      trashOutline, 
+      checkmarkOutline, 
+      closeOutline,
+      chevronDownOutline, 
+      chevronForwardOutline, 
+      layersOutline, 
+      listOutline,
+      starOutline, 
+      alertCircleOutline, 
+      optionsOutline, 
+      saveOutline,
+      informationCircleOutline,  // ← IMPORTANTE
+      refreshOutline,
+      checkboxOutline,
+      eyeOutline,
+      downloadOutline,
+      filterOutline,
+      trophyOutline,
+      pricetagOutline,
+      documentTextOutline,
+      searchOutline,
+      funnelOutline
     });
   }
 
@@ -187,7 +230,6 @@ export class RubricaBuilderComponent implements OnChanges {
         };
         this.secciones.push(nuevaSeccion);
         this.agregandoSeccion = false;
-        // Recargar para asegurar consistencia
         this.cargarCriterios(nuevaSeccion);
       },
       error: (err) => {

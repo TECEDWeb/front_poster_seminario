@@ -77,9 +77,9 @@
             </ng-template>
           </div>
 
-          <!-- Estado vacío -->
+          <!-- Estado vacío - USAR alert-circle-outline en lugar de information-circle-outline -->
           <div class="empty-mini" *ngIf="nivelesGlobales.length === 0 && !agregandoNivelGlobal">
-            <ion-icon name="information-circle-outline"></ion-icon>
+            <ion-icon name="alert-circle-outline"></ion-icon>
             Sin niveles definidos aún
           </div>
         </div>
@@ -209,7 +209,7 @@
 
                   <div class="niveles-header" *ngIf="!c.cargandoNiveles">
                     <span class="niveles-criterio-hint">
-                      <ion-icon name="information-circle-outline"></ion-icon>
+                      <ion-icon name="alert-circle-outline"></ion-icon>
                       Niveles propios de este criterio 
                       <span class="hint-light">(si no agregas ninguno, se usa la escala global)</span>
                     </span>
@@ -248,6 +248,7 @@
 
                   <!-- Estado vacío niveles personalizados -->
                   <div class="empty-mini" *ngIf="c.nivelesPersonalizados?.length === 0 && !c.agregandoNivel">
+                    <ion-icon name="alert-circle-outline"></ion-icon>
                     <span>No tiene niveles personalizados</span>
                   </div>
 
