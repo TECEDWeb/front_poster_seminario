@@ -51,6 +51,7 @@ export class EvaluacionService {
   getMisResultados(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/mis-resultados`).pipe(
       map((res: any) => {
+        console.log('🔍 RAW MIS-RESULTADOS (sin normalizar):', JSON.stringify(res, null, 2));
         const data = res?.data ?? res ?? [];
         const lista = Array.isArray(data) ? data : (data ? [data] : []);
         return {
