@@ -22,8 +22,7 @@ import {
   IonChip,
   IonDatetime,
   IonLabel,
-  IonSkeletonText,
-  IonSpinner  
+  IonSkeletonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -74,8 +73,7 @@ import { AuthService } from '../../../core/services/auth.service';
     IonChip,
     IonDatetime,
     IonLabel,
-    IonSkeletonText,
-    IonSpinner  
+    IonSkeletonText
   ],
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss']
@@ -134,7 +132,6 @@ export class AsignacionesPage implements OnInit {
   cargarProyectos(): void {
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
-        // Normalizar respuesta
         this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
         console.log('Proyectos cargados:', this.proyectos.length);
       },
@@ -146,10 +143,8 @@ export class AsignacionesPage implements OnInit {
   }
 
   cargarEvaluadores(): void {
-    // Usar el endpoint de usuarios con rol evaluador
     this.asignacionService.obtenerEvaluadores().subscribe({
       next: (res: any) => {
-        // Normalizar respuesta
         this.evaluadores = res?.data ?? res?.usuarios ?? res ?? [];
         console.log('Evaluadores cargados:', this.evaluadores.length);
         this.verificarCargaCompleta();
@@ -165,7 +160,6 @@ export class AsignacionesPage implements OnInit {
   cargarAsignacionesRecientes(): void {
     this.asignacionService.listar().subscribe({
       next: (res: any) => {
-        // Normalizar respuesta
         const data = res?.data ?? res ?? [];
         this.asignacionesRecientes = Array.isArray(data) ? data.slice(0, 5) : [];
         this.asignacionesCount = Array.isArray(data) ? data.length : 0;
@@ -181,17 +175,14 @@ export class AsignacionesPage implements OnInit {
   }
 
   verificarCargaCompleta(): void {
-    // Si ya tenemos proyectos, evaluadores y asignaciones, terminar loading
     if (this.proyectos.length > 0 && this.evaluadores.length > 0) {
       this.cargando = false;
     }
-    // Timeout de seguridad
     setTimeout(() => {
       this.cargando = false;
     }, 5000);
   }
 
-  // En el método guardar() - CORREGIDO
   guardar(): void {
     if (!this.proyectoId || !this.evaluadorId) {
       this.showError('Selecciona un proyecto y un evaluador');
@@ -200,7 +191,6 @@ export class AsignacionesPage implements OnInit {
 
     this.submitting = true;
 
-    // IMPORTANTE: El backend espera proyecto_id y evaluador_id
     const payload = {
       proyecto_id: this.proyectoId,
       evaluador_id: this.evaluadorId
@@ -219,8 +209,7 @@ export class AsignacionesPage implements OnInit {
       error: (err: any) => {
         this.submitting = false;
         console.error('❌ Error asignando:', err);
-        
-        // Mostrar mensaje de error más amigable
+
         let mensaje = err.error?.mensaje || 'Error al asignar el proyecto';
         if (mensaje === 'El proyecto no tiene rúbrica') {
           mensaje = 'El proyecto no tiene una rúbrica asociada. Por favor, crea una rúbrica primero.';
@@ -273,7 +262,6 @@ export class AsignacionesPage implements OnInit {
   }
 
   private showSuccess(message: string): void {
-    // Usar ToastController o AlertController según prefieras
     alert('✅ ' + message);
   }
 

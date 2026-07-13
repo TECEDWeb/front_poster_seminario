@@ -4,10 +4,6 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonHeader,
   IonToolbar,
   IonButtons,
@@ -18,18 +14,13 @@ import {
   IonSkeletonText,
   IonFab,
   IonFabButton,
-  IonChip,
-  IonLabel,
-  IonSpinner,
   IonSearchbar,
   IonSelect,
   IonSelectOption,
   IonModal,
   IonItem,
   IonInput,
-  IonTextarea,
-  IonToggle,
-  IonDatetime
+  IonTextarea
 } from '@ionic/angular/standalone';
 import { RubricaService } from '../../../core/services/rubrica.service';
 import { RubricaConcurso } from '../../../core/models/rubrica.model';
@@ -54,8 +45,7 @@ import {
   folderOutline,
   pricetagOutline,
   starOutline,
-  trophyOutline
-} from 'ionicons/icons';
+  trophyOutline, filterOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-rubricas',
@@ -65,10 +55,6 @@ import {
     RouterModule,
     FormsModule,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -79,18 +65,13 @@ import {
     IonSkeletonText,
     IonFab,
     IonFabButton,
-    IonChip,
-    IonLabel,
-    IonSpinner,
     IonSearchbar,
     IonSelect,
     IonSelectOption,
     IonModal,
     IonItem,
     IonInput,
-    IonTextarea,
-    IonToggle,
-    IonDatetime
+    IonTextarea
   ],
   templateUrl: './rubricas.page.html',
   styleUrls: ['./rubricas.page.scss']
@@ -105,11 +86,9 @@ export class RubricasPage implements OnInit {
   totalNiveles: number = 0;
   totalCriteriosGlobal: number = 0;
 
-  // Filtros
   filtroBusqueda: string = '';
   filtroSecciones: string = 'todos';
 
-  // Modal
   modalAbierto = false;
   editando = false;
   guardando = false;
@@ -124,28 +103,7 @@ export class RubricasPage implements OnInit {
   };
 
   constructor(private rubricaService: RubricaService) {
-    addIcons({
-      addOutline,
-      checkboxOutline,
-      createOutline,
-      trashOutline,
-      eyeOutline,
-      layersOutline,
-      listOutline,
-      checkmarkCircleOutline,
-      downloadOutline,
-      refreshOutline,
-      searchOutline,
-      funnelOutline,
-      closeOutline,
-      alertCircleOutline,
-      checkmarkOutline,
-      documentTextOutline,
-      folderOutline,
-      pricetagOutline,
-      starOutline,
-      trophyOutline
-    });
+    addIcons({refreshOutline,addOutline,closeOutline,alertCircleOutline,checkboxOutline,eyeOutline,createOutline,trashOutline,layersOutline,listOutline,checkmarkCircleOutline,downloadOutline,filterOutline,trophyOutline,pricetagOutline,documentTextOutline,starOutline,searchOutline,funnelOutline,checkmarkOutline,folderOutline});
   }
 
   ngOnInit(): void {
@@ -238,9 +196,6 @@ export class RubricasPage implements OnInit {
     this.aplicarFiltros();
   }
 
-  // =========================
-  // MODAL - ABRIR CREAR
-  // =========================
   abrirCrear(): void {
     this.editando = false;
     this.form = {
@@ -253,59 +208,45 @@ export class RubricasPage implements OnInit {
     this.modalAbierto = true;
   }
 
-  // =========================
-  // MODAL - CERRAR
-  // =========================
   cerrarModal(): void {
     this.modalAbierto = false;
   }
 
-  // =========================
-  // MODAL - EDITAR
-  // =========================
   editar(rubrica: RubricaConcurso): void {
     console.log('📝 Editando rúbrica:', rubrica);
-    
+
     this.editando = true;
-    
-    // Buscar el concurso correspondiente
+
     const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
-    
-    // IMPORTANTE: Asignar el nombre correctamente
-    // Si el concurso tiene nombre, usarlo; si no, usar un nombre por defecto
-    const nombreRubrica = concurso?.nombre 
-      ? `Rúbrica: ${concurso.nombre}` 
+
+    const nombreRubrica = concurso?.nombre
+      ? `Rúbrica: ${concurso.nombre}`
       : `Rúbrica del concurso #${rubrica.concursoId}`;
-    
+
     this.form = {
       id: rubrica.concursoId,
       concursoId: rubrica.concursoId,
-      nombre: nombreRubrica,  // ← Asegurar que el nombre se asigna
+      nombre: nombreRubrica,
       descripcion: concurso?.descripcion || '',
       puntajeMaximo: 100
     };
-    
+
     console.log('📝 Formulario después de editar:', this.form);
-    
+
     this.modalAbierto = true;
   }
 
-  // =========================
-  // MODAL - GUARDAR
-  // =========================
   guardar(): void {
     console.log('🔍 Iniciando guardar()');
     console.log('🔍 Form actual:', this.form);
     console.log('🔍 editando:', this.editando);
 
-    // Validar que tenga concurso seleccionado
     if (!this.form.concursoId) {
       console.log('❌ Error: No hay concurso seleccionado');
       alert('Por favor seleccione un concurso');
       return;
     }
 
-    // Validar que tenga nombre
     if (!this.form.nombre || this.form.nombre.trim() === '') {
       console.log('❌ Error: Nombre vacío');
       console.log('❌ Valor actual de form.nombre:', this.form.nombre);
@@ -315,7 +256,6 @@ export class RubricasPage implements OnInit {
 
     this.guardando = true;
 
-    // Construir payload - Asegurar que todos los campos estén presentes
     const payload = {
       concurso_id: this.form.concursoId,
       nombre: this.form.nombre.trim(),
@@ -326,16 +266,7 @@ export class RubricasPage implements OnInit {
     };
 
     console.log('📤 PAYLOAD COMPLETO:', JSON.stringify(payload, null, 2));
-    console.log('📤 TIPO DE DATOS:', {
-      concurso_id: typeof payload.concurso_id,
-      nombre: typeof payload.nombre,
-      descripcion: typeof payload.descripcion,
-      puntaje_maximo: typeof payload.puntaje_maximo,
-      secciones: Array.isArray(payload.secciones),
-      niveles: Array.isArray(payload.niveles)
-    });
 
-    // Determinar si es crear o actualizar
     const req = this.editando
       ? this.rubricaService.actualizar(this.form.id, payload)
       : this.rubricaService.crear(payload);
@@ -354,16 +285,13 @@ export class RubricasPage implements OnInit {
         console.error('❌ Error guardando rúbrica:', err);
         console.error('❌ Detalles del error:', err.error);
         this.guardando = false;
-        
-        // Mostrar mensaje de error más descriptivo
+
         const mensaje = err.error?.mensaje || 'Error al guardar la rúbrica';
         alert(mensaje);
       }
     });
   }
-  // =========================
-  // ELIMINAR RÚBRICA
-  // =========================
+
   confirmarEliminar(rubrica: RubricaConcurso): void {
     if (confirm(`¿Estás seguro de eliminar la rúbrica del concurso #${rubrica.concursoId}?`)) {
       this.eliminarRubrica(rubrica.concursoId);
@@ -383,20 +311,16 @@ export class RubricasPage implements OnInit {
     });
   }
 
-  // EXPORTAR RÚBRICA
   exportarRubrica(rubrica: RubricaConcurso): void {
     console.log('📤 Exportando rúbrica:', rubrica);
-    
-    // Usar el servicio de exportación
+
     this.rubricaService.exportar(rubrica.concursoId).subscribe({
       next: (blob: Blob) => {
-        // Verificar que el blob no esté vacío
         if (!blob || blob.size === 0) {
           alert('Error: El archivo exportado está vacío');
           return;
         }
-        
-        // Crear URL para descargar el archivo
+
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -405,13 +329,12 @@ export class RubricasPage implements OnInit {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        
+
         console.log('✅ Rúbrica exportada correctamente');
       },
       error: (err) => {
         console.error('❌ Error exportando rúbrica:', err);
-        
-        // Mensaje de error más amigable
+
         let mensaje = 'Error al exportar la rúbrica';
         if (err.status === 404) {
           mensaje = 'La funcionalidad de exportación está en desarrollo.\n\n' +
@@ -421,19 +344,18 @@ export class RubricasPage implements OnInit {
         } else if (err.message) {
           mensaje = err.message;
         }
-        
+
         alert(mensaje);
       }
     });
   }
-  // VER DETALLE
+
   verDetalle(rubrica: RubricaConcurso): void {
     console.log('📋 Ver detalle de rúbrica:', rubrica);
-    
-    // Crear un mensaje con la estructura completa
+
     let mensaje = `📋 RÚBRICA DEL CONCURSO #${rubrica.concursoId}\n\n`;
     mensaje += `📌 SECCIONES (${rubrica.secciones?.length || 0}):\n`;
-    
+
     if (rubrica.secciones && rubrica.secciones.length > 0) {
       rubrica.secciones.forEach((seccion, idx) => {
         mensaje += `\n  ${idx + 1}. ${seccion.nombre}`;
@@ -441,7 +363,7 @@ export class RubricasPage implements OnInit {
           mensaje += `\n     📝 ${seccion.descripcion}`;
         }
         mensaje += `\n     📋 Criterios (${seccion.criterios?.length || 0}):`;
-        
+
         if (seccion.criterios && seccion.criterios.length > 0) {
           seccion.criterios.forEach((criterio, cIdx) => {
             mensaje += `\n       ${cIdx + 1}. ${criterio.texto}`;
@@ -453,7 +375,7 @@ export class RubricasPage implements OnInit {
     } else {
       mensaje += `\n  (Sin secciones)`;
     }
-    
+
     mensaje += `\n\n📊 NIVELES (${rubrica.niveles?.length || 0}):`;
     if (rubrica.niveles && rubrica.niveles.length > 0) {
       rubrica.niveles.forEach((nivel) => {
@@ -465,14 +387,10 @@ export class RubricasPage implements OnInit {
     } else {
       mensaje += `\n  (Sin niveles)`;
     }
-    
-    // Mostrar en una alerta
+
     alert(mensaje);
   }
 
-  // =========================
-  // UTILITIES
-  // =========================
   getStatusClass(seccionesCount: number): string {
     if (seccionesCount >= 3) return 'status-excellent';
     if (seccionesCount >= 2) return 'status-good';

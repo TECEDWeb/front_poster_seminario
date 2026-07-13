@@ -23,13 +23,35 @@
 <ion-content class="dashboard-content">
   <div class="page-container">
 
-    <!-- LOADING -->
-    <div class="loading-container" *ngIf="isLoading">
-      <div class="loading-spinner">
-        <ion-spinner name="crescent"></ion-spinner>
-        <span>Cargando tu información...</span>
+    <!-- SKELETON LOADING -->
+    <ng-container *ngIf="isLoading">
+      <div class="saludo-skeleton">
+        <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
+        <div class="skeleton-saludo-text">
+          <ion-skeleton-text animated class="skeleton-line-sm"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-line-md"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-line-lg"></ion-skeleton-text>
+        </div>
       </div>
-    </div>
+
+      <div class="stats-grid-3">
+        <div class="stat-skeleton" *ngFor="let i of [1,2,3]">
+          <ion-skeleton-text animated class="skeleton-stat-icon"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-stat-value"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-stat-label"></ion-skeleton-text>
+        </div>
+      </div>
+
+      <div class="quick-grid">
+        <div class="quick-skeleton" *ngFor="let i of [1,2]">
+          <ion-skeleton-text animated class="skeleton-quick-icon"></ion-skeleton-text>
+          <div class="skeleton-quick-text">
+            <ion-skeleton-text animated class="skeleton-line-md"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-line-sm"></ion-skeleton-text>
+          </div>
+        </div>
+      </div>
+    </ng-container>
 
     <!-- ERROR -->
     <div class="error-container" *ngIf="!isLoading && error">
@@ -133,7 +155,8 @@
       </div>
 
       <!-- Actividad reciente -->
-        <div class="recent-section" *ngIf="actividadesRecientes && actividadesRecientes.length > 0">        <div class="section-title">
+      <div class="recent-section" *ngIf="actividadesRecientes && actividadesRecientes.length > 0">
+        <div class="section-title">
           <h2>Actividad reciente</h2>
         </div>
         <div class="recent-list">

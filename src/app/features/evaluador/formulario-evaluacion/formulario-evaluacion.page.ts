@@ -19,7 +19,6 @@ import {
   IonTextarea
 } from '@ionic/angular/standalone';
 
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { addIcons } from 'ionicons';
 import {
@@ -56,8 +55,7 @@ import {
     IonTitle,
     IonIcon,
     IonSpinner,
-    IonTextarea,
-    HeaderComponent
+    IonTextarea
   ],
   templateUrl: './formulario-evaluacion.page.html',
   styleUrls: ['./formulario-evaluacion.page.scss']
@@ -75,7 +73,6 @@ export class FormularioEvaluacionPage implements OnInit {
   concursoNombre: string = '';
   today: Date = new Date();
 
-  // Estadísticas de progreso
   totalCriterios: number = 0;
   criteriosRespondidos: number = 0;
 
@@ -122,7 +119,6 @@ export class FormularioEvaluacionPage implements OnInit {
         console.log('🟢 RESPUESTA BACKEND COMPLETA', JSON.stringify(res, null, 2));
         console.log('================================');
 
-        // Si la respuesta tiene ok: false
         if (res?.ok === false) {
           console.error('❌ Backend error', res.mensaje);
           this.error = res.mensaje || 'Error al cargar el formulario';
@@ -131,7 +127,6 @@ export class FormularioEvaluacionPage implements OnInit {
           return;
         }
 
-        // Extraer los datos - probar diferentes estructuras
         let data = res?.data?.data || res?.data || res || {};
 
         console.log('📦 DATA extraída:', data);
@@ -139,11 +134,9 @@ export class FormularioEvaluacionPage implements OnInit {
         console.log('📦 DATA secciones:', data.secciones);
         console.log('📦 DATA rubrica:', data.rubrica);
 
-        // Si la data tiene la estructura esperada
         if (data && data.secciones && data.rubrica) {
           this.formulario = data;
-          
-          // Extraer información del proyecto y concurso
+
           if (data.proyecto) {
             this.proyectoNombre = data.proyecto.nombre || 'Proyecto sin nombre';
           }
@@ -151,7 +144,6 @@ export class FormularioEvaluacionPage implements OnInit {
             this.concursoNombre = data.concurso.nombre || '';
           }
 
-          // Contar criterios totales
           this.totalCriterios = data.secciones?.reduce(
             (total: number, seccion: any) => total + (seccion.criterios?.length || 0),
             0
@@ -162,14 +154,11 @@ export class FormularioEvaluacionPage implements OnInit {
           console.log('🟢 TOTAL CRITERIOS:', this.totalCriterios);
           console.log('🟢 RÚBRICA:', data.rubrica);
 
-          // Verificar que los criterios tienen niveles
           this.verificarNiveles();
 
         } else {
-          // Si no tiene la estructura esperada, intentar otra forma
           console.error('❌ Estructura de datos incorrecta', data);
-          
-          // Si los datos están en otro lugar
+
           if (data.data && data.data.secciones) {
             this.formulario = data.data;
             this.totalCriterios = data.data.secciones?.reduce(
@@ -219,10 +208,8 @@ export class FormularioEvaluacionPage implements OnInit {
 
   seleccionar(criterioId: number, nivelId: number): void {
     console.log('Respuesta seleccionada', { criterioId, nivelId });
-    
-    // Si ya había una respuesta seleccionada, actualizar
+
     if (this.respuestas[criterioId] !== undefined) {
-      // Si es el mismo nivel, deseleccionar (toggle)
       if (this.respuestas[criterioId] === nivelId) {
         delete this.respuestas[criterioId];
         console.log('🗑️ Respuesta removida para criterio:', criterioId);
@@ -235,7 +222,6 @@ export class FormularioEvaluacionPage implements OnInit {
       console.log('✅ Nueva respuesta para criterio:', criterioId);
     }
 
-    // Actualizar contador
     this.actualizarProgreso();
     console.log('📊 Criterios respondidos:', this.criteriosRespondidos);
     console.log('📊 Total criterios:', this.totalCriterios);
@@ -288,16 +274,16 @@ export class FormularioEvaluacionPage implements OnInit {
 
   getPorcentajeSeccion(seccion: any): number {
     if (!seccion?.criterios?.length) return 0;
-    
+
     let respondidos = 0;
     let total = seccion.criterios.length;
-    
+
     seccion.criterios.forEach((criterio: any) => {
       if (this.respuestas[criterio.id] !== undefined) {
         respondidos++;
       }
     });
-    
+
     return Math.round((respondidos / total) * 100);
   }
 
@@ -310,7 +296,6 @@ export class FormularioEvaluacionPage implements OnInit {
   }
 
   guardar(): void {
-    // Verificar que hay respuestas seleccionadas
     const detalles = Object.keys(this.respuestas).map(id => ({
       criterio_id: Number(id),
       nivel_id: this.respuestas[Number(id)]
@@ -344,7 +329,7 @@ export class FormularioEvaluacionPage implements OnInit {
         console.error('❌ ERROR GUARDANDO:', err);
         console.error('❌ Detalles del error:', err.error);
         this.guardando = false;
-        
+
         let mensaje = err.error?.mensaje || 'Error al guardar la evaluación';
         if (err.status === 0) {
           mensaje = 'Error de conexión. Verifica tu conexión a internet.';
@@ -375,7 +360,6 @@ export class FormularioEvaluacionPage implements OnInit {
     alert(`${icono} ${mensaje}`);
   }
 
-  // Método para depuración - muestra el estado actual
   debugEstado(): void {
     console.log('🔍 DEBUG ESTADO:');
     console.log('  - Evaluación ID:', this.evaluacionId);
@@ -387,7 +371,6 @@ export class FormularioEvaluacionPage implements OnInit {
     console.log('  - Concurso:', this.concursoNombre);
   }
 
-  // Método para verificar si hay respuestas incompletas
   tieneRespuestasIncompletas(): boolean {
     if (!this.formulario) return false;
     let total = 0;
@@ -403,7 +386,6 @@ export class FormularioEvaluacionPage implements OnInit {
     return respondidas > 0 && respondidas < total;
   }
 
-  // Método para obtener el resumen de respuestas
   getResumenRespuestas(): string {
     if (this.criteriosRespondidos === 0) return 'Sin respuestas';
     if (this.criteriosRespondidos === this.totalCriterios) return 'Completo';

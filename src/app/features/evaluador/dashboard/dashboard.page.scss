@@ -80,40 +80,104 @@ $radius: 16px;
 }
 
 // ============================================
-// LOADING
+// SKELETON LOADING (nuevo)
 // ============================================
-.loading-container {
+ion-skeleton-text {
+  --background: #e2e8f0;
+  --background-rgb: 226, 232, 240;
+  border-radius: 6px;
+}
+
+.saludo-skeleton {
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 300px;
+  gap: 16px;
+  background: white;
+  border: 1px solid #eef2f7;
+  border-radius: $radius;
+  padding: 20px 24px;
+  margin-bottom: 20px;
 
-  .loading-spinner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    color: #94a3b8;
+  .skeleton-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    flex-shrink: 0;
+    margin: 0;
+  }
 
-    ion-icon {
-      font-size: 32px;
-      color: #6366f1;
-    }
-
-    .spinning {
-      animation: spin 1s linear infinite;
-    }
-
-    span {
-      font-size: 14px;
-      color: #64748b;
-    }
+  .skeleton-saludo-text {
+    flex: 1;
   }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.skeleton-line-sm {
+  width: 90px;
+  height: 11px;
+  margin: 0 0 8px;
+}
+
+.skeleton-line-md {
+  width: 140px;
+  height: 15px;
+  margin: 0 0 6px;
+}
+
+.skeleton-line-lg {
+  width: 200px;
+  height: 13px;
+  margin: 0;
+}
+
+.stat-skeleton {
+  background: white;
+  border: 1px solid #eef2f7;
+  border-radius: $radius;
+  padding: 16px 14px;
+  text-align: center;
+  box-shadow: $shadow-sm;
+
+  .skeleton-stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    margin: 0 auto 10px;
+  }
+
+  .skeleton-stat-value {
+    width: 40px;
+    height: 20px;
+    margin: 0 auto 6px;
+  }
+
+  .skeleton-stat-label {
+    width: 60px;
+    height: 11px;
+    margin: 0 auto;
+  }
+}
+
+.quick-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border: 1px solid #eef2f7;
+  border-radius: $radius;
+  padding: 16px 20px;
+  box-shadow: $shadow-sm;
+
+  .skeleton-quick-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .skeleton-quick-text {
+    flex: 1;
+  }
 }
 
 // ============================================
@@ -467,6 +531,10 @@ $radius: 16px;
           background: #f5f3ff;
           color: #8b5cf6;
         }
+        &.slate {
+          background: #f1f5f9;
+          color: #64748b;
+        }
       }
 
       .recent-content {
@@ -488,6 +556,75 @@ $radius: 16px;
         }
       }
     }
+  }
+}
+
+// ============================================
+// TOOLBAR - REFRESH BUTTON
+// ============================================
+.btn-refresh {
+  --color: #64748b;
+  --border-radius: 10px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  height: 38px;
+  width: 38px;
+
+  ion-icon {
+    font-size: 20px;
+  }
+
+  &:hover {
+    --color: #6366f1;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// ============================================
+// ERROR CONTAINER
+// ============================================
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 12px;
+  text-align: center;
+
+  .error-icon {
+    font-size: 48px;
+    color: #ef4444;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0 0 16px;
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  .btn-retry {
+    --background: #6366f1;
+    --border-radius: 12px;
+    font-weight: 600;
   }
 }
 
@@ -529,101 +666,7 @@ $radius: 16px;
       font-size: 12px;
     }
   }
-}
 
-// Añadir al final del archivo SCSS
-
-// ============================================
-// TOOLBAR - REFRESH BUTTON
-// ============================================
-.btn-refresh {
-  --color: #64748b;
-  --border-radius: 10px;
-  --padding-start: 8px;
-  --padding-end: 8px;
-  height: 38px;
-  width: 38px;
-
-  ion-icon {
-    font-size: 20px;
-  }
-
-  &:hover {
-    --color: #6366f1;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-  }
-}
-
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-// ============================================
-// ERROR CONTAINER
-// ============================================
-.error-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  gap: 12px;
-  text-align: center;
-
-  .error-icon {
-    font-size: 48px;
-    color: #ef4444;
-  }
-
-  h3 {
-    margin: 0;
-    font-size: 20px;
-    color: #0f172a;
-  }
-
-  p {
-    margin: 0 0 16px;
-    color: #64748b;
-    font-size: 14px;
-  }
-
-  .btn-retry {
-    --background: #6366f1;
-    --border-radius: 12px;
-    font-weight: 600;
-  }
-}
-
-// ============================================
-// LOADING - SPINNER
-// ============================================
-.loading-container {
-  .loading-spinner {
-    ion-spinner {
-      width: 48px;
-      height: 48px;
-      color: #6366f1;
-    }
-  }
-}
-
-// ============================================
-// ACTIVIDAD RECIENTE - COLOR SLATE
-// ============================================
-.recent-icon {
-  &.slate {
-    background: #f1f5f9;
-    color: #64748b;
-  }
-}
-
-// ============================================
-// RESPONSIVE - ERROR
-// ============================================
-@media (max-width: 480px) {
   .error-container {
     padding: 20px;
     min-height: 200px;

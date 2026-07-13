@@ -9,7 +9,6 @@
       <span class="title-badge">Investigación</span>
     </ion-title>
 
-    <!-- ⚠️ ELIMINADO: Botón de "Nuevo proyecto" del toolbar -->
     <ion-buttons slot="end">
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
@@ -21,14 +20,12 @@
 <ion-content class="proyectos-content">
   <div class="page-container">
 
-    <!-- HEADER CON BOTÓN ÚNICO PARA ESCRITORIO -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de proyectos</h1>
         <p>{{ proyectos.length }} proyectos registrados en el sistema</p>
       </div>
       <div class="header-right">
-        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE) -->
         <ion-button class="btn-add-desktop" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           <span>Nuevo proyecto</span>
@@ -49,7 +46,6 @@
       </div>
     </div>
 
-    <!-- FILTROS Y BÚSQUEDA -->
     <div class="filter-bar">
       <div class="search-group">
         <ion-searchbar
@@ -90,7 +86,6 @@
       </div>
     </div>
 
-    <!-- LOADING -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="proyecto-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
         <div class="skeleton-header">
@@ -107,14 +102,12 @@
       </div>
     </div>
 
-    <!-- LISTA DE PROYECTOS -->
     <div class="proyectos-grid" *ngIf="!cargando">
       <div class="proyecto-card" 
            *ngFor="let p of proyectosFiltrados || []; trackBy: trackById"
            [class.card-active]="p.activo"
            [class.card-inactive]="!p.activo">
 
-        <!-- Header -->
         <div class="card-header">
           <div class="card-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
             <ion-icon name="document-text-outline"></ion-icon>
@@ -142,7 +135,6 @@
           </div>
         </div>
 
-        <!-- Body -->
         <div class="card-body">
           <p class="card-description" *ngIf="p.descripcion">
             {{ p.descripcion | slice:0:100 }}{{ p.descripcion.length > 100 ? '...' : '' }}
@@ -151,20 +143,19 @@
           <div class="card-participants">
             <div class="participants-header">
               <ion-icon name="people-outline"></ion-icon>
-              <span>Participantes ({{ p.participantes?.length || 0 }})</span>
+              <span>Participantes ({{ p.participantes.length || 0 }})</span>
             </div>
             <div class="participants-list">
               <div class="participant-chip" *ngFor="let part of (p.participantes || []).slice(0, 3)">
                 {{ part.nombre }}
               </div>
-              <div class="participant-more" *ngIf="(p.participantes?.length || 0) > 3">
-                +{{ (p.participantes?.length || 0) - 3 }} más
+              <div class="participant-more" *ngIf="(p.participantes.length || 0) > 3">
+                +{{ (p.participantes.length || 0) - 3 }} más
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="card-actions">
           <div class="actions-left">
             <ion-chip class="chip-concurso" *ngIf="p.concursoId">
@@ -191,7 +182,6 @@
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0">
         <div class="empty-icon">
           <ion-icon name="folder-open-outline"></ion-icon>
@@ -212,16 +202,12 @@
 
   </div>
 
-  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE) -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- ============================================ -->
-  <!-- MODAL DE PROYECTO -->
-  <!-- ============================================ -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -238,7 +224,6 @@
       <ion-content class="modal-content">
         <div class="modal-container">
           <form (ngSubmit)="guardar()" #proyectoForm="ngForm">
-            <!-- Nombre -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>
@@ -255,7 +240,6 @@
               </ion-item>
             </div>
 
-            <!-- Nombre del Estudiante -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="person-outline"></ion-icon>
@@ -272,7 +256,6 @@
               </ion-item>
             </div>
 
-            <!-- Descripción -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="document-text-outline"></ion-icon>
@@ -288,7 +271,6 @@
               </ion-item>
             </div>
 
-            <!-- Concurso -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="trophy-outline"></ion-icon>
@@ -307,7 +289,6 @@
               </ion-item>
             </div>
 
-            <!-- Nivel -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="bar-chart-outline"></ion-icon>
@@ -322,7 +303,6 @@
               </ion-item>
             </div>
 
-            <!-- Área -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="business-outline"></ion-icon>
@@ -337,7 +317,6 @@
               </ion-item>
             </div>
 
-            <!-- Estado -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="toggle-outline"></ion-icon>
@@ -353,7 +332,6 @@
               </ion-item>
             </div>
 
-            <!-- Botones -->
             <div class="form-actions">
               <ion-button
                 type="button"

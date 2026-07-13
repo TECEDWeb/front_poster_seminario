@@ -14,8 +14,7 @@ import {
   IonSkeletonText,
   IonChip,
   IonLabel,
-  IonBadge,
-  IonSpinner
+  IonBadge
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
@@ -58,8 +57,7 @@ import { ProyectoAsignado } from '../../../core/models/proyecto.model';
     IonSkeletonText,
     IonChip,
     IonLabel,
-    IonBadge,
-    IonSpinner
+    IonBadge
   ],
   templateUrl: './proyectos-asignados.page.html',
   styleUrls: ['./proyectos-asignados.page.scss']
@@ -71,14 +69,13 @@ export class ProyectosAsignadosPage implements OnInit {
   loading: boolean = true;
   error: string | null = null;
 
-  // Estadísticas
   totalAsignados: number = 0;
   pendientes: number = 0;
   evaluados: number = 0;
 
-  // Filtros
   filtroEstado: string = 'todos';
   filtroBusqueda: string = '';
+
   constructor(
     private evaluacionService: EvaluacionService,
     private router: Router
@@ -112,16 +109,11 @@ export class ProyectosAsignadosPage implements OnInit {
       next: (res: any) => {
         console.log('🟢 RESPUESTA ASIGNADOS:', res);
 
-        // Normalizar respuesta - soportar diferentes formatos
         let data = res?.data ?? res ?? [];
 
-        // Asegurar que sea un array
         this.proyectos = Array.isArray(data) ? data : data ? [data] : [];
 
-        // Calcular estadísticas
         this.calcularEstadisticas();
-
-        // Aplicar filtros
         this.aplicarFiltros();
 
         this.loading = false;
@@ -147,11 +139,9 @@ export class ProyectosAsignadosPage implements OnInit {
     this.aplicarFiltros();
   }
 
-  // Modificar aplicarFiltros para incluir búsqueda
   aplicarFiltros(): void {
     let filtered = [...this.proyectos];
 
-    // Filtro por búsqueda
     if (this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
       filtered = filtered.filter(p =>
@@ -160,14 +150,12 @@ export class ProyectosAsignadosPage implements OnInit {
       );
     }
 
-    // Filtro por estado
     if (this.filtroEstado === 'pendientes') {
       filtered = filtered.filter(p => !p.yaEvaluado);
     } else if (this.filtroEstado === 'evaluados') {
       filtered = filtered.filter(p => p.yaEvaluado);
     }
 
-    // Ordenar
     filtered.sort((a, b) => {
       if (a.yaEvaluado && !b.yaEvaluado) return 1;
       if (!a.yaEvaluado && b.yaEvaluado) return -1;
@@ -176,6 +164,7 @@ export class ProyectosAsignadosPage implements OnInit {
 
     this.proyectosFiltrados = filtered;
   }
+
   cambiarFiltro(estado: string): void {
     this.filtroEstado = estado;
     this.aplicarFiltros();
@@ -223,6 +212,4 @@ export class ProyectosAsignadosPage implements OnInit {
   trackByEvaluacionId(index: number, item: ProyectoAsignado): number {
     return item?.evaluacionId ?? index;
   }
-
-  
 }

@@ -3,23 +3,14 @@
   height: 100%;
 }
 
-ion-app {
-  height: 100%;
-}
-
 #main-content {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 ion-router-outlet {
   flex: 1;
   display: block;
-}
-
-// El ion-menu solo se muestra en móvil (el sidebar maneja la visibilidad)
-.menu-lateral {
-  --width: 280px;
-  --max-width: 280px;
 }

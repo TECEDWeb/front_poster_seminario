@@ -1,15 +1,4 @@
-<ion-app>
-  <!-- Menú Lateral (Móvil) - Siempre presente pero solo visible en móvil -->
-  <ion-menu contentId="main-content" side="start" class="menu-lateral">
-    <ion-content>
-      <app-sidebar></app-sidebar>
-    </ion-content>
-  </ion-menu>
-
-  <!-- Contenido Principal -->
-  <div id="main-content">
-    <!-- Aquí se renderiza el sidebar horizontal (desktop) y el contenido -->
-    <app-sidebar></app-sidebar>
-    <ion-router-outlet></ion-router-outlet>
-  </div>
-</ion-app>
+<app-sidebar></app-sidebar>
+<div id="main-content">
+  <ion-router-outlet></ion-router-outlet>
+</div>

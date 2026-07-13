@@ -20,7 +20,6 @@
 <ion-content class="asignados-content">
   <div class="page-container">
 
-    <!-- HEADER -->
     <div class="page-header">
       <div class="header-left">
         <h1>Proyectos asignados</h1>
@@ -42,7 +41,6 @@
       </div>
     </div>
 
-    <!-- PROGRESS -->
     <div class="progress-card" *ngIf="totalAsignados > 0">
       <div class="progress-header">
         <span class="progress-label">Progreso de evaluaciones</span>
@@ -60,7 +58,6 @@
       </div>
     </div>
 
-    <!-- FILTROS -->
     <div class="filter-bar" *ngIf="!loading && totalAsignados > 0">
       <div class="filter-group">
         <span class="filter-label">Filtrar:</span>
@@ -87,7 +84,6 @@
       </div>
     </div>
 
-    <!-- LOADING -->
     <div class="loading-grid" *ngIf="loading">
       <div class="proyecto-skeleton" *ngFor="let i of [1,2,3]">
         <div class="skeleton-header">
@@ -105,7 +101,6 @@
       </div>
     </div>
 
-    <!-- ERROR -->
     <div class="error-container" *ngIf="!loading && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los proyectos</h3>
@@ -116,29 +111,27 @@
       </ion-button>
     </div>
 
-    <!-- LISTA DE PROYECTOS -->
     <div class="proyectos-list" *ngIf="!loading && !error">
       <div class="proyecto-card" 
            *ngFor="let p of proyectosFiltrados || []"
            [class.card-pending]="!p.yaEvaluado"
            [class.card-completed]="p.yaEvaluado">
 
-        <!-- Card Header -->
         <div class="card-header">
           <div class="card-icon" [class]="p.yaEvaluado ? 'icon-completed' : 'icon-pending'">
             <ion-icon name="document-text-outline"></ion-icon>
           </div>
 
           <div class="card-info">
-            <div class="card-title">{{ p.proyecto?.nombre || 'Proyecto sin nombre' }}</div>
+            <div class="card-title">{{ p.proyecto.nombre || 'Proyecto sin nombre' }}</div>
             <div class="card-subtitle">
               <span class="subtitle-item">
                 <ion-icon name="folder-outline"></ion-icon>
-                {{ p.proyecto?.tipo || 'Proyecto' }}
+                {{ p.proyecto.tipo || 'Proyecto' }}
               </span>
               <span class="subtitle-item" *ngIf="p.proyecto?.concursoNombre">
                 <ion-icon name="trophy-outline"></ion-icon>
-                {{ p.proyecto?.concursoNombre }}
+                {{ p.proyecto.concursoNombre }}
               </span>
             </div>
           </div>
@@ -151,20 +144,19 @@
           </div>
         </div>
 
-        <!-- Card Body -->
         <div class="card-body">
           <p class="card-description" *ngIf="p.proyecto?.descripcion">
-            {{ (p.proyecto?.descripcion?.length || 0) > 150 ? ((p.proyecto?.descripcion || '') | slice:0:150) + '...' : p.proyecto?.descripcion }}
+            {{ (p.proyecto.descripcion?.length || 0) > 150 ? ((p.proyecto.descripcion || '') | slice:0:150) + '...' : p.proyecto.descripcion }}
           </p>
 
           <div class="card-meta">
             <div class="meta-item" *ngIf="p.proyecto?.participantes?.length">
               <ion-icon name="people-outline"></ion-icon>
-              <span>{{ p.proyecto?.participantes?.length }} participante{{ p.proyecto?.participantes?.length !== 1 ? 's' : '' }}</span>
+              <span>{{ p.proyecto.participantes?.length }} participante{{ p.proyecto.participantes?.length !== 1 ? 's' : '' }}</span>
             </div>
             <div class="meta-item" *ngIf="p.proyecto?.puntajeMaximo">
               <ion-icon name="star-outline"></ion-icon>
-              <span>Puntaje máx: {{ p.proyecto?.puntajeMaximo }} pts</span>
+              <span>Puntaje máx: {{ p.proyecto.puntajeMaximo }} pts</span>
             </div>
             <div class="meta-item" *ngIf="p.fechaAsignacion">
               <ion-icon name="calendar-outline"></ion-icon>
@@ -173,7 +165,6 @@
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="card-actions">
           <ion-button 
             expand="block"
@@ -192,14 +183,12 @@
           </ion-button>
         </div>
 
-        <!-- Badge de completado -->
         <div class="completed-overlay" *ngIf="p.yaEvaluado">
           <ion-icon name="checkmark-circle"></ion-icon>
           <span>Completado</span>
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0 && !loading">
         <div class="empty-icon" *ngIf="proyectos.length === 0">
           <ion-icon name="folder-open-outline"></ion-icon>

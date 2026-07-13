@@ -1,4 +1,6 @@
-<!-- MENÚ HORIZONTAL (Desktop) - Se muestra en la parte superior -->
+<!-- ============================================ -->
+<!-- MENÚ HORIZONTAL (Desktop) -->
+<!-- ============================================ -->
 <nav class="menu-horizontal desktop-menu">
   <div class="menu-container-horizontal">
     <div class="menu-brand">
@@ -10,130 +12,113 @@
 
     <div class="menu-items">
       <ng-container *ngIf="usuario()?.rol === 'admin'">
-        <a class="menu-link" routerLink="/admin/dashboard" routerLinkActive="active">
-          <ion-icon name="grid-outline"></ion-icon>
-          <span>Dashboard</span>
-        </a>
-        <a class="menu-link" routerLink="/admin/usuarios" routerLinkActive="active">
-          <ion-icon name="people-outline"></ion-icon>
-          <span>Usuarios</span>
-        </a>
-        <a class="menu-link" routerLink="/admin/concursos" routerLinkActive="active">
-          <ion-icon name="trophy-outline"></ion-icon>
-          <span>Concursos</span>
-        </a>
-        <a class="menu-link" routerLink="/admin/proyectos" routerLinkActive="active">
-          <ion-icon name="folder-open-outline"></ion-icon>
-          <span>Proyectos</span>
-        </a>
-        <a class="menu-link" routerLink="/admin/reportes" routerLinkActive="active">
-          <ion-icon name="bar-chart-outline"></ion-icon>
-          <span>Reportes</span>
-        </a>
-        <a class="menu-link" routerLink="/admin/rubricas" routerLinkActive="active">
-          <ion-icon name="checkbox-outline"></ion-icon>
-          <span>Rúbricas</span>
-        </a>
-        <a class="menu-link" routerLink="/admin/asignaciones" routerLinkActive="active">
-          <ion-icon name="swap-horizontal-outline"></ion-icon>
-          <span>Asignaciones</span>
+        <a *ngFor="let item of adminMenuItems"
+           class="menu-link"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           #rla="routerLinkActive">
+          <span class="menu-link-icon">
+            <ion-icon [name]="rla.isActive ? item.iconActive : item.icon"></ion-icon>
+          </span>
+          <span class="menu-link-text">{{ item.label }}</span>
         </a>
       </ng-container>
 
       <ng-container *ngIf="usuario()?.rol === 'evaluador'">
-        <a class="menu-link" routerLink="/evaluador/dashboard" routerLinkActive="active">
-          <ion-icon name="grid-outline"></ion-icon>
-          <span>Dashboard</span>
-        </a>
-        <a class="menu-link" routerLink="/evaluador/proyectos-asignados" routerLinkActive="active">
-          <ion-icon name="clipboard-outline"></ion-icon>
-          <span>Proyectos</span>
-        </a>
-        <a class="menu-link" routerLink="/evaluador/mis-resultados" routerLinkActive="active">
-          <ion-icon name="stats-chart-outline"></ion-icon>
-          <span>Resultados</span>
+        <a *ngFor="let item of evaluadorMenuItems"
+           class="menu-link"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           #rla="routerLinkActive">
+          <span class="menu-link-icon">
+            <ion-icon [name]="rla.isActive ? item.iconActive : item.icon"></ion-icon>
+          </span>
+          <span class="menu-link-text">{{ item.label }}</span>
         </a>
       </ng-container>
     </div>
 
     <div class="menu-actions">
-      <div class="user-info-horizontal">
-        <div class="avatar-small" *ngIf="usuario() as u">
-          {{ iniciales() }}
+      <div class="user-menu-wrapper">
+        <button class="user-info-horizontal" (click)="toggleUserMenu($event)" [class.open]="userMenuOpen">
+          <div class="avatar-small">{{ iniciales() }}</div>
+          <span class="user-name">{{ (usuario()?.nombre || 'Usuario').split(' ')[0] }}</span>
+          <ion-icon name="chevron-down-outline" class="chevron" [class.rotated]="userMenuOpen"></ion-icon>
+        </button>
+
+        <div class="user-dropdown" *ngIf="userMenuOpen">
+          <div class="user-dropdown-header">
+            <div class="avatar-medium">{{ iniciales() }}</div>
+            <div class="user-dropdown-info">
+              <strong>{{ usuario()?.nombre || 'Usuario' }}</strong>
+              <span>{{ usuario()?.rol }}</span>
+            </div>
+          </div>
+          <button class="dropdown-item logout" (click)="cerrarSesion()">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span>Cerrar sesión</span>
+          </button>
         </div>
-        <span class="user-name">{{ (usuario()?.nombre || 'Usuario').split(' ')[0] }}</span>
       </div>
-      <button class="btn-logout" (click)="cerrarSesion()">
-        <ion-icon name="log-out-outline"></ion-icon>
-      </button>
     </div>
   </div>
 </nav>
 
-<!-- CONTENIDO DEL MENÚ LATERAL (Móvil) - Se muestra dentro del ion-menu -->
-<div class="menu-container-mobile" *ngIf="isMobile">
-  <div class="user-info" *ngIf="usuario() as u">
-    <div class="avatar">
-      {{ iniciales() }}
+<!-- ============================================ -->
+<!-- MENÚ LATERAL (Móvil) - ion-menu real -->
+<!-- ============================================ -->
+<ion-menu contentId="main-content" side="start" menuId="main-menu" type="overlay" class="mobile-menu">
+  <ion-header class="mobile-menu-header">
+    <ion-toolbar>
+      <div class="mobile-brand">
+        <span class="logo-text">Sistema</span>
+        <span class="logo-badge">UPSE</span>
+      </div>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="mobile-menu-content">
+    <div class="user-info" *ngIf="usuario() as u">
+      <div class="avatar">{{ iniciales() }}</div>
+      <div class="user-data">
+        <strong>{{ u.nombre }}</strong>
+        <span>{{ u.rol }}</span>
+      </div>
     </div>
-    <div class="user-data">
-      <strong>{{ u.nombre }}</strong>
-      <span>{{ u.rol }}</span>
+
+    <ion-list lines="none">
+      <ng-container *ngIf="usuario()?.rol === 'admin'">
+        <ion-item *ngFor="let item of adminMenuItems"
+                  [routerLink]="item.route"
+                  routerLinkActive="active"
+                  #rla="routerLinkActive"
+                  (click)="cerrarMenu()"
+                  button
+                  detail="false">
+          <ion-icon [name]="rla.isActive ? item.iconActive : item.icon" slot="start"></ion-icon>
+          {{ item.label }}
+        </ion-item>
+      </ng-container>
+
+      <ng-container *ngIf="usuario()?.rol === 'evaluador'">
+        <ion-item *ngFor="let item of evaluadorMenuItems"
+                  [routerLink]="item.route"
+                  routerLinkActive="active"
+                  #rla="routerLinkActive"
+                  (click)="cerrarMenu()"
+                  button
+                  detail="false">
+          <ion-icon [name]="rla.isActive ? item.iconActive : item.icon" slot="start"></ion-icon>
+          {{ item.label }}
+        </ion-item>
+      </ng-container>
+    </ion-list>
+
+    <div class="logout">
+      <ion-button expand="block" fill="outline" color="danger" (click)="cerrarSesion()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Cerrar sesión
+      </ion-button>
     </div>
-  </div>
-
-  <ion-list lines="none">
-    <ng-container *ngIf="usuario()?.rol === 'admin'">
-      <ion-item routerLink="/admin/dashboard" routerLinkActive="active">
-        <ion-icon name="grid-outline" slot="start"></ion-icon>
-        Dashboard
-      </ion-item>
-      <ion-item routerLink="/admin/usuarios" routerLinkActive="active">
-        <ion-icon name="people-outline" slot="start"></ion-icon>
-        Usuarios
-      </ion-item>
-      <ion-item routerLink="/admin/concursos" routerLinkActive="active">
-        <ion-icon name="trophy-outline" slot="start"></ion-icon>
-        Concursos
-      </ion-item>
-      <ion-item routerLink="/admin/proyectos" routerLinkActive="active">
-        <ion-icon name="folder-open-outline" slot="start"></ion-icon>
-        Proyectos
-      </ion-item>
-      <ion-item routerLink="/admin/reportes" routerLinkActive="active">
-        <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
-        Reportes
-      </ion-item>
-      <ion-item routerLink="/admin/rubricas" routerLinkActive="active">
-        <ion-icon name="checkbox-outline" slot="start"></ion-icon>
-        Rúbricas
-      </ion-item>
-      <ion-item routerLink="/admin/asignaciones" routerLinkActive="active">
-        <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
-        Asignaciones
-      </ion-item>
-    </ng-container>
-
-    <ng-container *ngIf="usuario()?.rol === 'evaluador'">
-      <ion-item routerLink="/evaluador/dashboard" routerLinkActive="active">
-        <ion-icon name="grid-outline" slot="start"></ion-icon>
-        Dashboard
-      </ion-item>
-      <ion-item routerLink="/evaluador/proyectos-asignados" routerLinkActive="active">
-        <ion-icon name="clipboard-outline" slot="start"></ion-icon>
-        Proyectos
-      </ion-item>
-      <ion-item routerLink="/evaluador/mis-resultados" routerLinkActive="active">
-        <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
-        Resultados
-      </ion-item>
-    </ng-container>
-  </ion-list>
-
-  <div class="logout">
-    <ion-button expand="block" (click)="cerrarSesion()">
-      <ion-icon name="log-out-outline" slot="start"></ion-icon>
-      Cerrar sesión
-    </ion-button>
-  </div>
-</div>
+  </ion-content>
+</ion-menu>

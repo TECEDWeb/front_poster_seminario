@@ -23,9 +23,7 @@ import {
   IonItem,
   IonInput,
   IonTextarea,
-  IonToggle,
-  IonSpinner,
-  IonDatetime
+  IonToggle
 } from '@ionic/angular/standalone';
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { Proyecto, Participante } from '../../../core/models/proyecto.model';
@@ -49,8 +47,7 @@ import {
   pricetagOutline,
   calendarOutline,
   starOutline,
-  folderOutline
-} from 'ionicons/icons';
+  folderOutline, personOutline, toggleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-proyectos',
@@ -79,9 +76,7 @@ import {
     IonItem,
     IonInput,
     IonTextarea,
-    IonToggle,
-    IonSpinner,
-    IonDatetime
+    IonToggle
   ],
   templateUrl: './proyectos.page.html',
   styleUrls: ['./proyectos.page.scss']
@@ -98,7 +93,6 @@ export class ProyectosPage implements OnInit {
   filtroNivel: string = 'todos';
   filtroEstado: string = 'todos';
 
-  // Modal
   modalAbierto = false;
   editando = false;
   guardando = false;
@@ -119,26 +113,7 @@ export class ProyectosPage implements OnInit {
     private proyectoService: ProyectoService,
     private concursoService: ConcursoService
   ) {
-    addIcons({
-      addOutline,
-      documentTextOutline,
-      createOutline,
-      trashOutline,
-      folderOpenOutline,
-      eyeOutline,
-      peopleOutline,
-      businessOutline,
-      barChartOutline,
-      searchOutline,
-      trophyOutline,
-      closeOutline,
-      checkmarkOutline,
-      refreshOutline,
-      pricetagOutline,
-      calendarOutline,
-      starOutline,
-      folderOutline
-    });
+    addIcons({refreshOutline,addOutline,searchOutline,documentTextOutline,businessOutline,barChartOutline,peopleOutline,trophyOutline,eyeOutline,createOutline,trashOutline,folderOpenOutline,closeOutline,pricetagOutline,personOutline,toggleOutline,checkmarkOutline,calendarOutline,starOutline,folderOutline});
   }
 
   ngOnInit(): void {
@@ -213,9 +188,6 @@ export class ProyectosPage implements OnInit {
     this.proyectosFiltrados = filtered;
   }
 
-  // =========================
-  // MODAL - ABRIR CREAR
-  // =========================
   abrirCrear(): void {
     this.editando = false;
     this.form = {
@@ -223,7 +195,7 @@ export class ProyectosPage implements OnInit {
       nombre: '',
       descripcion: '',
       concursoId: null,
-      estudianteNombre: '', // ← AÑADIR
+      estudianteNombre: '',
       nivel: '',
       area: '',
       activo: true,
@@ -232,21 +204,14 @@ export class ProyectosPage implements OnInit {
     this.modalAbierto = true;
   }
 
-  // =========================
-  // MODAL - CERRAR
-  // =========================
   cerrarModal(): void {
     this.modalAbierto = false;
   }
 
-  // =========================
-  // MODAL - EDITAR
-  // =========================
   editar(proyecto: Proyecto): void {
     this.editando = true;
-    // Buscar el estudiante (si existe en participantes)
-    const estudiante = proyecto.participantes && proyecto.participantes.length > 0 
-      ? proyecto.participantes[0].nombre 
+    const estudiante = proyecto.participantes && proyecto.participantes.length > 0
+      ? proyecto.participantes[0].nombre
       : '';
 
     this.form = {
@@ -254,20 +219,16 @@ export class ProyectosPage implements OnInit {
       nombre: proyecto.nombre || '',
       descripcion: proyecto.descripcion || '',
       concursoId: proyecto.concursoId || null,
-      estudianteNombre: estudiante, // ← AÑADIR
+      estudianteNombre: estudiante,
       nivel: proyecto.nivel || '',
       area: proyecto.area || '',
       activo: proyecto.activo ?? true,
       participantes: proyecto.participantes || []
     };
     this.modalAbierto = true;
-}
+  }
 
-  // =========================
-  // MODAL - GUARDAR
-  // =========================
   guardar(): void {
-    // Validar que tenga nombre
     if (!this.form.nombre || this.form.nombre.trim() === '') {
       alert('Por favor ingrese el nombre del proyecto');
       return;
@@ -284,7 +245,7 @@ export class ProyectosPage implements OnInit {
       nombre: this.form.nombre.trim(),
       descripcion: this.form.descripcion || null,
       concursoId: this.form.concursoId || null,
-      estudiante_nombre: this.form.estudianteNombre.trim(), 
+      estudiante_nombre: this.form.estudianteNombre.trim(),
       nivel: this.form.nivel || null,
       area: this.form.area || null,
       activo: this.form.activo ?? true
@@ -311,11 +272,6 @@ export class ProyectosPage implements OnInit {
     });
   }
 
-  
-
-  // =========================
-  // VER DETALLE
-  // =========================
   verDetalle(id: number): void {
     console.log('Ver detalle del proyecto:', id);
     alert(`Ver detalle del proyecto #${id}`);

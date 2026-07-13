@@ -12,15 +12,11 @@ import {
   IonIcon,
   IonContent,
   IonSkeletonText,
-  IonChip,
-  IonLabel,
   IonSpinner,
   IonSearchbar,
   IonSelect,
   IonSelectOption,
-  IonModal,
-  IonItem,
-  IonBadge
+  IonModal
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -48,7 +44,6 @@ import {
   closeCircleOutline,
   checkmarkCircleOutline,
   alertCircleOutline,
-  // pdfOutline NO existe en ionicons, usar documentOutline
   addOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
@@ -87,15 +82,11 @@ interface DetalleProyecto {
     IonIcon,
     IonContent,
     IonSkeletonText,
-    IonChip,
-    IonLabel,
     IonSpinner,
     IonSearchbar,
     IonSelect,
     IonSelectOption,
-    IonModal,
-    IonItem,
-    IonBadge
+    IonModal
   ],
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss']
@@ -116,11 +107,9 @@ export class ReportesPage implements OnInit {
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
 
-  // Filtros
   filtroBusqueda: string = '';
   filtroStatus: string = 'todos';
 
-  // Modal de detalle
   modalAbierto = false;
   proyectoSeleccionado: DetalleProyecto | null = null;
   cargandoDetalle: boolean = false;
@@ -180,15 +169,15 @@ export class ReportesPage implements OnInit {
     this.reporteService.getReporteProyectos().subscribe({
       next: (res: any) => {
         console.log('PROYECTOS:', res);
-        
+
         let data = res?.data ?? res ?? [];
-        
+
         this.proyectos = data.map((item: any, index: number) => ({
           ...item,
           id: item.id || item.proyecto_id || index + 1,
           nombre: item.proyecto || item.nombre || 'Proyecto sin nombre'
         }));
-        
+
         this.aplicarFiltros();
         this.cargando = false;
       },
@@ -258,10 +247,6 @@ export class ReportesPage implements OnInit {
     this.cargarDatos();
   }
 
-  // =========================
-  // EXPORTAR FUNCIONES
-  // =========================
-
   exportar(): void {
     this.reporteService.exportar().subscribe({
       next: (archivo: Blob) => {
@@ -324,10 +309,6 @@ export class ReportesPage implements OnInit {
     });
   }
 
-  // =========================
-  // DESCARGA DE ARCHIVOS
-  // =========================
-
   private descargarArchivo(archivo: Blob, nombreArchivo: string): void {
     const url = window.URL.createObjectURL(archivo);
     const enlace = document.createElement('a');
@@ -339,13 +320,9 @@ export class ReportesPage implements OnInit {
     window.URL.revokeObjectURL(url);
   }
 
-  // =========================
-  // VER DETALLE
-  // =========================
-
   async verDetalle(proyecto: any): Promise<void> {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
-    
+
     if (!id) {
       alert('No se puede ver detalle: ID del proyecto no encontrado');
       return;
@@ -358,7 +335,7 @@ export class ReportesPage implements OnInit {
     this.reporteService.getDetalleProyecto(id).subscribe({
       next: (res: any) => {
         const data = res?.data ?? res;
-        
+
         this.proyectoSeleccionado = {
           id: data.id || id,
           nombre: data.nombre || data.proyecto || proyecto.proyecto || proyecto.nombre || 'Proyecto',
@@ -373,7 +350,7 @@ export class ReportesPage implements OnInit {
       error: (err) => {
         console.error('Error cargando detalle:', err);
         this.cargandoDetalle = false;
-        
+
         this.proyectoSeleccionado = {
           id: id,
           nombre: proyecto.proyecto || proyecto.nombre || 'Proyecto',
@@ -391,10 +368,6 @@ export class ReportesPage implements OnInit {
     this.modalAbierto = false;
     this.proyectoSeleccionado = null;
   }
-
-  // =========================
-  // UTILITIES
-  // =========================
 
   toggleFilter(): void {
     this.aplicarFiltros();

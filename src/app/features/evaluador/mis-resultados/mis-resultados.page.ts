@@ -13,7 +13,6 @@ import {
   IonButton,
   IonChip,
   IonLabel,
-  IonSpinner,
   IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -56,7 +55,6 @@ import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
     IonButton,
     IonChip,
     IonLabel,
-    IonSpinner,
     IonBadge
   ],
   templateUrl: './mis-resultados.page.html',
@@ -69,12 +67,10 @@ export class MisResultadosPage implements OnInit {
   loading = true;
   error: string | null = null;
 
-  // Estadísticas
   totalEvaluaciones: number = 0;
   promedioGeneral: number = 0;
   evaluacionesRecientes: number = 0;
 
-  // Filtros
   filtroEstado: string = 'todos';
 
   constructor(
@@ -114,16 +110,11 @@ export class MisResultadosPage implements OnInit {
       next: (res: any) => {
         console.log('RESUMEN API:', res);
 
-        // Normalizar respuesta - soportar diferentes formatos
         let data = res?.data ?? res ?? [];
 
-        // Asegurar que sea un array
         this.evaluaciones = Array.isArray(data) ? data : data ? [data] : [];
 
-        // Calcular estadísticas
         this.calcularEstadisticas();
-
-        // Aplicar filtros
         this.aplicarFiltros();
 
         this.loading = false;
@@ -141,7 +132,6 @@ export class MisResultadosPage implements OnInit {
   calcularEstadisticas(): void {
     this.totalEvaluaciones = this.evaluaciones.length;
 
-    // Calcular promedio general
     if (this.totalEvaluaciones > 0) {
       const sum = this.evaluaciones.reduce((acc, e) => acc + (e.porcentaje || 0), 0);
       this.promedioGeneral = Math.round(sum / this.totalEvaluaciones);
@@ -149,7 +139,6 @@ export class MisResultadosPage implements OnInit {
       this.promedioGeneral = 0;
     }
 
-    // Evaluaciones de los últimos 7 días
     const hace7Dias = new Date();
     hace7Dias.setDate(hace7Dias.getDate() - 7);
     this.evaluacionesRecientes = this.evaluaciones.filter(e => {
@@ -161,7 +150,6 @@ export class MisResultadosPage implements OnInit {
   aplicarFiltros(): void {
     let filtered = [...this.evaluaciones];
 
-    // Filtrar por estado (porcentaje)
     if (this.filtroEstado === 'alto') {
       filtered = filtered.filter(e => (e.porcentaje || 0) >= 70);
     } else if (this.filtroEstado === 'medio') {
@@ -170,7 +158,6 @@ export class MisResultadosPage implements OnInit {
       filtered = filtered.filter(e => (e.porcentaje || 0) < 50);
     }
 
-    // Ordenar por fecha (más reciente primero)
     filtered.sort((a, b) => {
       if (!a.fecha) return 1;
       if (!b.fecha) return -1;
@@ -217,29 +204,18 @@ export class MisResultadosPage implements OnInit {
     return '#ef4444';
   }
 
-  /**
-   * Navegar al detalle de la evaluación
-   * Usa el formulario de evaluación en modo solo lectura
-   */
   verDetalle(id: number): void {
     console.log('Ver detalle de evaluación ID:', id);
-    
-    // Buscar la evaluación en la lista para obtener información adicional
+
     const evaluacion = this.evaluaciones.find(e => e.id === id);
-    
+
     if (evaluacion) {
-      // Navegar al formulario de evaluación con el ID
-      // El formulario mostrará los datos en modo solo lectura
       this.router.navigate(['/evaluador/formulario-evaluacion', id]);
     } else {
-      // Si no se encuentra, intentar navegar de todas formas
       this.router.navigate(['/evaluador/formulario-evaluacion', id]);
     }
   }
 
-  /**
-   * Exportar resultado como PDF (opcional)
-   */
   exportarResultado(id: number): void {
     console.log('Exportar resultado ID:', id);
     alert('Función de exportación en desarrollo');

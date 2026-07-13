@@ -24,8 +24,7 @@ import {
   IonTextarea,
   IonDatetime,
   IonToggle,
-  IonItem,
-  IonSpinner
+  IonItem
 } from '@ionic/angular/standalone';
 import { ConcursoService } from '../../../core/services/concurso.service';
 import { Concurso } from '../../../core/models/concurso.model';
@@ -79,8 +78,7 @@ import {
     IonTextarea,
     IonDatetime,
     IonToggle,
-    IonItem,
-    IonSpinner
+    IonItem
   ],
   templateUrl: './concursos.page.html',
   styleUrls: ['./concursos.page.scss']
@@ -95,7 +93,6 @@ export class ConcursosPage implements OnInit {
   filtroTexto: string = '';
   filtroEstado: string = 'todos';
 
-  // Modal
   modalAbierto = false;
   editando = false;
   guardando = false;
@@ -140,11 +137,9 @@ export class ConcursosPage implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
-    
-    // Escuchar parámetros de la URL para abrir el modal desde el dashboard
+
     this.route.queryParams.subscribe(params => {
       if (params['openModal'] === 'true') {
-        // Esperar a que los datos se carguen antes de abrir el modal
         if (!this.cargando) {
           setTimeout(() => {
             this.abrirCrear();
@@ -217,9 +212,6 @@ export class ConcursosPage implements OnInit {
     return diff;
   }
 
-  // =========================
-  // MODAL
-  // =========================
   abrirCrear(): void {
     this.editando = false;
     this.form = {
@@ -237,7 +229,6 @@ export class ConcursosPage implements OnInit {
 
   cerrarModal(): void {
     this.modalAbierto = false;
-    // Limpiar parámetros de la URL
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {},
@@ -288,7 +279,6 @@ export class ConcursosPage implements OnInit {
         this.modalAbierto = false;
         this.cargar();
         alert(this.editando ? 'Concurso actualizado correctamente' : 'Concurso creado correctamente');
-        // Limpiar parámetros de la URL
         this.router.navigate([], {
           relativeTo: this.route,
           queryParams: {},
@@ -305,8 +295,6 @@ export class ConcursosPage implements OnInit {
 
   verConcurso(id: number): void {
     console.log('Ver concurso ID:', id);
-    // Navegar a detalle del concurso
-    // this.router.navigate(['/admin/concursos', id]);
     alert(`Ver detalle del concurso #${id}`);
   }
 

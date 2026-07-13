@@ -9,7 +9,6 @@
       <span class="title-badge">Evaluación</span>
     </ion-title>
 
-    <!-- ⚠️ ELIMINADO: Botón "Nueva rúbrica" del toolbar -->
     <ion-buttons slot="end">
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
@@ -21,14 +20,12 @@
 <ion-content class="rubricas-content">
   <div class="page-container">
 
-    <!-- HEADER CON ESTILO UPSE -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de rúbricas</h1>
         <p>Administra las rúbricas de evaluación para concursos</p>
       </div>
       <div class="header-right">
-        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE) -->
         <ion-button class="btn-add-desktop" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           <span>Nueva rúbrica</span>
@@ -53,7 +50,6 @@
       </div>
     </div>
 
-    <!-- FILTROS -->
     <div class="filter-bar" *ngIf="!cargando && rubricas.length > 0">
       <div class="filter-group search-group">
         <ion-searchbar
@@ -85,7 +81,6 @@
       </ion-button>
     </div>
 
-    <!-- LOADING -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="rubrica-skeleton" *ngFor="let i of [1,2,3,4]">
         <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
@@ -99,7 +94,6 @@
       </div>
     </div>
 
-    <!-- ERROR -->
     <div class="error-container" *ngIf="!cargando && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los datos</h3>
@@ -110,10 +104,8 @@
       </ion-button>
     </div>
 
-    <!-- LISTA DE RÚBRICAS -->
     <div class="rubricas-grid" *ngIf="!cargando && !error">
       <div class="rubrica-card" *ngFor="let r of rubricasFiltradas || []; trackBy: trackById">
-        <!-- Card Header -->
         <div class="card-header">
           <div class="card-icon">
             <ion-icon name="checkbox-outline"></ion-icon>
@@ -123,8 +115,8 @@
             <span class="card-subtitle">Concurso ID: {{ r.concursoId }}</span>
           </div>
           <div class="card-status">
-            <span class="status-badge" [class]="getStatusClass(r.secciones?.length || 0)">
-              {{ getStatusText(r.secciones?.length || 0) }}
+            <span class="status-badge" [class]="getStatusClass(r.secciones.length || 0)">
+              {{ getStatusText(r.secciones.length || 0) }}
             </span>
           </div>
           <div class="card-actions-header">
@@ -140,20 +132,19 @@
           </div>
         </div>
 
-        <!-- Card Stats -->
         <div class="card-stats">
           <div class="stat-item">
             <ion-icon name="layers-outline"></ion-icon>
             <div class="stat-content">
               <span class="stat-label">Secciones</span>
-              <span class="stat-value">{{ r.secciones?.length || 0 }}</span>
+              <span class="stat-value">{{ r.secciones.length || 0 }}</span>
             </div>
           </div>
           <div class="stat-item">
             <ion-icon name="list-outline"></ion-icon>
             <div class="stat-content">
               <span class="stat-label">Niveles</span>
-              <span class="stat-value">{{ r.niveles?.length || 0 }}</span>
+              <span class="stat-value">{{ r.niveles.length || 0 }}</span>
             </div>
           </div>
           <div class="stat-item">
@@ -165,7 +156,6 @@
           </div>
         </div>
 
-        <!-- Secciones -->
         <div class="secciones-section" *ngIf="r.secciones?.length">
           <div class="secciones-header">
             <ion-icon name="layers-outline"></ion-icon>
@@ -174,7 +164,7 @@
           <div class="secciones-list">
             <div class="seccion-item" *ngFor="let s of r.secciones.slice(0, 3)">
               <span class="seccion-nombre">{{ s.nombre }}</span>
-              <span class="seccion-criterios">{{ s.criterios?.length || 0 }} criterios</span>
+              <span class="seccion-criterios">{{ s.criterios.length || 0 }} criterios</span>
             </div>
             <div class="seccion-more" *ngIf="r.secciones.length > 3">
               +{{ r.secciones.length - 3 }} secciones más
@@ -182,7 +172,6 @@
           </div>
         </div>
 
-        <!-- Niveles -->
         <div class="niveles-section" *ngIf="r.niveles?.length">
           <div class="niveles-header">
             <ion-icon name="list-outline"></ion-icon>
@@ -199,7 +188,6 @@
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="card-actions">
           <ion-button fill="outline" size="small" class="action-btn" (click)="verDetalle(r)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
@@ -216,7 +204,6 @@
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="rubricasFiltradas?.length === 0 && rubricas.length > 0">
         <div class="empty-icon">
           <ion-icon name="filter-outline"></ion-icon>
@@ -244,14 +231,12 @@
 
   </div>
 
-  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE) -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- MODAL DE RÚBRICA -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -268,7 +253,6 @@
       <ion-content class="modal-content">
         <div class="modal-container">
           <form (ngSubmit)="guardar()" #rubricaForm="ngForm">
-            <!-- Concurso -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="trophy-outline"></ion-icon>
@@ -288,7 +272,6 @@
               </ion-item>
             </div>
 
-            <!-- Nombre -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>
@@ -305,7 +288,6 @@
               </ion-item>
             </div>
 
-            <!-- Descripción -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="document-text-outline"></ion-icon>
@@ -321,7 +303,6 @@
               </ion-item>
             </div>
 
-            <!-- Puntaje Máximo -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="star-outline"></ion-icon>
@@ -337,7 +318,6 @@
               </ion-item>
             </div>
 
-            <!-- Botones -->
             <div class="form-actions">
               <ion-button
                 type="button"

@@ -20,8 +20,7 @@ import {
   IonInput,
   IonToggle,
   IonItem,
-  IonSkeletonText,
-  IonSpinner
+  IonSkeletonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -72,8 +71,7 @@ import { Usuario, Rol } from '../../../core/models/usuario.model';
     IonInput,
     IonToggle,
     IonItem,
-    IonSkeletonText,
-    IonSpinner
+    IonSkeletonText
   ],
   templateUrl: './usuarios.page.html',
   styleUrls: ['./usuarios.page.scss']
@@ -135,7 +133,6 @@ export class UsuariosPage implements OnInit {
     this.usuarioService.listar().subscribe({
       next: (res: any) => {
         console.log('Usuarios cargados:', res);
-        // Normalizar respuesta
         this.usuarios = res?.usuarios ?? res?.data ?? res ?? [];
         this.filtrarUsuarios();
         this.cargando = false;
@@ -152,7 +149,6 @@ export class UsuariosPage implements OnInit {
   filtrarUsuarios(): void {
     let filtered = [...this.usuarios];
 
-    // Filtro por búsqueda
     if (this.busqueda.trim()) {
       const texto = this.busqueda.toLowerCase().trim();
       filtered = filtered.filter(u =>
@@ -162,12 +158,10 @@ export class UsuariosPage implements OnInit {
       );
     }
 
-    // Filtro por rol
     if (this.filtroRol !== 'todos') {
       filtered = filtered.filter(u => u.rol === this.filtroRol);
     }
 
-    // Filtro por estado
     if (this.filtroEstado === 'activo') {
       filtered = filtered.filter(u => u.activo);
     } else if (this.filtroEstado === 'inactivo') {
@@ -203,7 +197,6 @@ export class UsuariosPage implements OnInit {
   }
 
   guardar(): void {
-    // Validaciones
     if (!this.form.cedula || !this.form.nombre || !this.form.rol) {
       alert('Por favor complete los campos requeridos');
       return;
@@ -258,7 +251,7 @@ export class UsuariosPage implements OnInit {
   cambiarEstado(u: Usuario): void {
     const nuevoEstado = !u.activo;
     const mensaje = nuevoEstado ? 'activar' : 'desactivar';
-    
+
     if (confirm(`¿Estás seguro de ${mensaje} al usuario "${u.nombre}"?`)) {
       this.usuarioService.cambiarEstado(u.id).subscribe({
         next: () => {

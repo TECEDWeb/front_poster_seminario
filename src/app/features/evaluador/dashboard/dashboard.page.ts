@@ -10,7 +10,6 @@ import {
   IonContent,
   IonIcon,
   IonButton,
-  IonSpinner,
   IonSkeletonText
 } from '@ionic/angular/standalone';
 
@@ -57,7 +56,6 @@ interface Activity {
     IonContent,
     IonIcon,
     IonButton,
-    IonSpinner,
     IonSkeletonText,
     StatsCardComponent
   ],
@@ -73,7 +71,6 @@ export class DashboardPage implements OnInit {
   isLoading: boolean = true;
   error: string | null = null;
 
-  // Actividades recientes
   actividadesRecientes: Activity[] = [];
 
   constructor(
@@ -114,23 +111,20 @@ export class DashboardPage implements OnInit {
         this.pendientes = data.pendientes ?? 0;
         this.completados = data.completados ?? 0;
         this.isLoading = false;
-        // Cargar actividades reales
         this.cargarActividadesRecientes();
       },
       error: (err) => {
         console.error('Error cargando estadísticas:', err);
         this.error = err.error?.mensaje || 'Error al cargar los datos';
         this.isLoading = false;
-        // Si hay error, mostrar actividades vacías
         this.actividadesRecientes = [];
       }
     });
   }
 
   cargarActividadesRecientes(): void {
-    // Siempre asegurar que sea un array
     this.actividadesRecientes = [];
-    
+
     this.evaluadorService.getActividadesRecientes().subscribe({
       next: (res: any) => {
         console.log('Actividades recientes:', res);
@@ -167,14 +161,9 @@ export class DashboardPage implements OnInit {
   cerrarSesion(): void {
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
       this.authService.logout();
-      // Redirigir al login
-      // this.router.navigate(['/login']);
     }
   }
 
-  // =========================
-  // HELPERS
-  // =========================
   get porcentaje(): number {
     if (this.asignados === 0) return 0;
     return Math.round((this.completados / this.asignados) * 100);
@@ -194,9 +183,6 @@ export class DashboardPage implements OnInit {
     return 'No tienes proyectos asignados actualmente';
   }
 
-  // =========================
-  // PRIVATE HELPERS
-  // =========================
   private getIconForActivity(tipo: string): string {
     const icons: Record<string, string> = {
       'evaluacion': 'checkmark-circle-outline',
@@ -221,7 +207,7 @@ export class DashboardPage implements OnInit {
 
   private formatTimeAgo(fecha: string): string {
     if (!fecha) return 'Recientemente';
-    
+
     try {
       const now = new Date();
       const date = new Date(fecha);

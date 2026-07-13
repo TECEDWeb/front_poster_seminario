@@ -1,25 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-import {
-  IonApp,
-  IonMenu,
-  IonContent,
-  IonRouterOutlet
-} from '@ionic/angular/standalone';
-
+import { IonRouterOutlet, IonApp, IonContent } from '@ionic/angular/standalone';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-evaluador-layout',
   standalone: true,
-  imports: [
+  imports: [IonContent, IonApp, 
     CommonModule,
     RouterModule,
-    IonApp,
-    IonMenu,
-    IonContent,
     IonRouterOutlet,
     SidebarComponent
   ],

@@ -3,10 +3,14 @@
   height: 100%;
 }
 
-ion-app {
+#main-content {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 }
 
 ion-router-outlet {
-  height: 100%;
+  flex: 1;
+  display: block;
 }
