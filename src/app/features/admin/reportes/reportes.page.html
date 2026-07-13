@@ -13,7 +13,6 @@
       <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
-      <!-- ⚠️ ELIMINADO: Botones de Excel y PDF del toolbar para evitar duplicación -->
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -21,7 +20,6 @@
 <ion-content class="reportes-content">
   <div class="page-container">
 
-    <!-- HEADER CON ESTILO UPSE -->
     <div class="page-header">
       <div class="header-left">
         <h1>Reportes y estadísticas</h1>
@@ -32,7 +30,6 @@
           <ion-icon name="time-outline"></ion-icon>
           <span>Última actualización: {{ fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
-        <!-- ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE) -->
         <ion-button class="btn-export-desktop" (click)="exportar()" [disabled]="cargando">
           <ion-icon name="download-outline" slot="start"></ion-icon>
           Exportar reportes
@@ -40,7 +37,6 @@
       </div>
     </div>
 
-    <!-- STATS CARDS -->
     <div class="stats-grid">
       <div class="stat-card" [class]="'stat-' + stat.color" *ngFor="let stat of statsCards">
         <div class="stat-icon">
@@ -53,8 +49,26 @@
       </div>
     </div>
 
-    <!-- FILTROS -->
-    <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0">
+    <!-- TOGGLE DE VISTA -->
+    <div class="vista-toggle" *ngIf="!cargando">
+      <button
+        class="toggle-btn"
+        [class.active]="vistaActual === 'proyectos'"
+        (click)="cambiarVista('proyectos')">
+        <ion-icon name="grid-outline"></ion-icon>
+        Por proyecto
+      </button>
+      <button
+        class="toggle-btn"
+        [class.active]="vistaActual === 'evaluadores'"
+        (click)="cambiarVista('evaluadores')">
+        <ion-icon name="people-outline"></ion-icon>
+        Por evaluador
+      </button>
+    </div>
+
+    <!-- FILTROS (solo aplican a la vista de proyectos) -->
+    <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0 && vistaActual === 'proyectos'">
       <div class="filter-group search-group">
         <ion-searchbar
           [(ngModel)]="filtroBusqueda"
@@ -80,18 +94,31 @@
         </ion-select>
       </div>
 
+      <div class="filter-group" *ngIf="nombresEvaluadores.length > 0">
+        <ion-select
+          [(ngModel)]="filtroEvaluador"
+          (ionChange)="aplicarFiltros()"
+          placeholder="Filtrar por evaluador"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los evaluadores</ion-select-option>
+          <ion-select-option *ngFor="let nombre of nombresEvaluadores" [value]="nombre">
+            {{ nombre }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+
       <ion-button 
         fill="clear" 
         size="small" 
         class="btn-clear-filters" 
         (click)="limpiarFiltros()" 
-        *ngIf="filtroBusqueda || filtroStatus !== 'todos'">
+        *ngIf="filtroBusqueda || filtroStatus !== 'todos' || filtroEvaluador !== 'todos'">
         <ion-icon name="close-outline"></ion-icon>
         Limpiar
       </ion-button>
     </div>
 
-    <!-- LOADING -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="report-skeleton" *ngFor="let i of [1,2,3]">
         <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
@@ -100,7 +127,6 @@
       </div>
     </div>
 
-    <!-- ERROR -->
     <div class="error-container" *ngIf="!cargando && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los datos</h3>
@@ -111,19 +137,16 @@
       </ion-button>
     </div>
 
-    <!-- REPORTES POR PROYECTO -->
-    <div class="proyectos-section" *ngIf="!cargando && !error">
+    <!-- ============================================ -->
+    <!-- VISTA: POR PROYECTO -->
+    <!-- ============================================ -->
+    <div class="proyectos-section" *ngIf="!cargando && !error && vistaActual === 'proyectos'">
       <div class="section-header">
         <div class="section-header-left">
           <h2>Reportes por proyecto</h2>
           <span class="section-count">{{ proyectosFiltrados.length }} de {{ proyectos.length }} proyectos</span>
         </div>
         <div class="section-header-right">
-          <ion-button fill="outline" size="small" class="filter-btn" (click)="toggleFilter()">
-            <ion-icon name="funnel-outline"></ion-icon>
-            Filtrar
-          </ion-button>
-          <!-- ✅ BOTÓN EXPORTAR MÓVIL -->
           <ion-button fill="outline" size="small" class="export-mobile-btn" (click)="exportar()" [disabled]="cargando">
             <ion-icon name="download-outline"></ion-icon>
             Exportar
@@ -133,7 +156,6 @@
 
       <div class="proyectos-grid">
         <div class="proyecto-card" *ngFor="let p of proyectosFiltrados || []; trackBy: trackById">
-          <!-- Card Header -->
           <div class="card-header">
             <div class="card-title-group">
               <div class="card-icon" [class]="getRandomColor(p.proyecto)">
@@ -149,7 +171,6 @@
             </div>
           </div>
 
-          <!-- Stats -->
           <div class="card-stats">
             <div class="stat-item">
               <span class="stat-item-label">Evaluaciones</span>
@@ -165,7 +186,6 @@
             </div>
           </div>
 
-          <!-- Progress Bar -->
           <div class="progress-bar-container">
             <div class="progress-bar">
               <div class="progress-fill" [style.width]="getPorcentaje(p.promedio, p.puntajeMaximo) + '%'"></div>
@@ -173,7 +193,6 @@
             <span class="progress-label">{{ getPorcentaje(p.promedio, p.puntajeMaximo) }}%</span>
           </div>
 
-          <!-- Evaluadores -->
           <div class="evaluadores-section">
             <div class="evaluadores-header">
               <ion-icon name="people-outline"></ion-icon>
@@ -197,18 +216,15 @@
             </div>
           </div>
 
-          <!-- Actions -->
           <div class="card-actions">
             <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyectoExcel(p)">
               <ion-icon name="download-outline" slot="start"></ion-icon>
               Excel
             </ion-button>
-            
             <ion-button fill="clear" size="small" class="action-btn" (click)="exportarProyectoPDF(p)">
               <ion-icon name="document-outline" slot="start"></ion-icon>
               PDF
             </ion-button>
-            
             <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(p)">
               <ion-icon name="eye-outline" slot="start"></ion-icon>
               Ver detalle
@@ -217,7 +233,6 @@
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="proyectosFiltrados.length === 0 && proyectos.length > 0">
         <div class="empty-icon">
           <ion-icon name="filter-outline"></ion-icon>
@@ -239,9 +254,60 @@
       </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- VISTA: POR EVALUADOR (nueva) -->
+    <!-- ============================================ -->
+    <div class="evaluadores-resumen-section" *ngIf="!cargando && !error && vistaActual === 'evaluadores'">
+      <div class="section-header">
+        <div class="section-header-left">
+          <h2>Rendimiento por evaluador</h2>
+          <span class="section-count">{{ evaluadoresResumen.length }} evaluadores activos</span>
+        </div>
+      </div>
+
+      <div class="evaluadores-resumen-grid">
+        <div class="evaluador-resumen-card" *ngFor="let e of evaluadoresResumen; trackBy: trackByNombre">
+          <div class="er-header">
+            <div class="er-avatar">{{ e.nombre.charAt(0) }}</div>
+            <div class="er-info">
+              <h3>{{ e.nombre }}</h3>
+              <span class="er-rol">{{ e.rol }}</span>
+            </div>
+          </div>
+
+          <div class="er-stats">
+            <div class="er-stat">
+              <span class="er-stat-value">{{ e.proyectosEvaluados }}</span>
+              <span class="er-stat-label">Proyectos evaluados</span>
+            </div>
+            <div class="er-stat">
+              <span class="er-stat-value" [class]="getColorClass(e.promedioOtorgado)">
+                {{ e.promedioOtorgado | number:'1.1-2' }}
+              </span>
+              <span class="er-stat-label">Promedio otorgado</span>
+            </div>
+          </div>
+
+          <button class="er-ver-btn" (click)="verProyectosDeEvaluador(e.nombre)">
+            <ion-icon name="folder-outline"></ion-icon>
+            Ver sus proyectos
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="evaluadoresResumen.length === 0">
+        <div class="empty-icon">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <h3>Sin evaluadores con datos</h3>
+        <p>Aún no hay evaluaciones registradas para mostrar por evaluador</p>
+      </div>
+    </div>
+
   </div>
 
-  <!-- MODAL DE DETALLE -->
+  <!-- MODAL DE DETALLE (sin cambios) -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -257,7 +323,6 @@
 
       <ion-content class="modal-content">
         <div class="modal-container" *ngIf="!cargandoDetalle && proyectoSeleccionado">
-          <!-- Cabecera -->
           <div class="detalle-header">
             <div class="detalle-titulo">
               <h2>{{ proyectoSeleccionado.nombre }}</h2>
@@ -277,7 +342,6 @@
             </div>
           </div>
 
-          <!-- Evaluadores -->
           <div class="detalle-evaluadores">
             <h3>Evaluadores</h3>
             <div class="evaluadores-grid">
@@ -294,7 +358,6 @@
             </div>
           </div>
 
-          <!-- Acciones -->
           <div class="detalle-actions">
             <ion-button fill="outline" size="small" (click)="exportarProyectoExcel(proyectoSeleccionado)">
               <ion-icon name="download-outline" slot="start"></ion-icon>
@@ -311,7 +374,6 @@
           </div>
         </div>
 
-        <!-- Loading del modal -->
         <div class="modal-loading" *ngIf="cargandoDetalle">
           <ion-spinner name="crescent"></ion-spinner>
           <p>Cargando detalle del proyecto...</p>

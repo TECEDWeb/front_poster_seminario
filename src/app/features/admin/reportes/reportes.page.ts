@@ -28,15 +28,11 @@ import {
   documentOutline,
   timeOutline,
   funnelOutline,
-  arrowUpOutline,
-  arrowDownOutline,
   peopleOutline,
   eyeOutline,
   refreshOutline,
   closeOutline,
   filterOutline,
-  searchOutline,
-  printOutline,
   documentTextOutline,
   personOutline,
   barChartOutline,
@@ -44,8 +40,8 @@ import {
   closeCircleOutline,
   checkmarkCircleOutline,
   alertCircleOutline,
-  addOutline
-} from 'ionicons/icons';
+  gridOutline,
+  listOutline, chevronForwardOutline } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 
 interface StatCard {
@@ -53,7 +49,6 @@ interface StatCard {
   label: string;
   value: number | string;
   color: string;
-  change?: number;
 }
 
 interface DetalleProyecto {
@@ -64,6 +59,14 @@ interface DetalleProyecto {
   promedio: number;
   evaluadores: any[];
   puntajeMaximo: number;
+}
+
+interface EvaluadorResumen {
+  nombre: string;
+  rol: string;
+  proyectosEvaluados: number;
+  promedioOtorgado: number;
+  puntajes: number[];
 }
 
 @Component({
@@ -102,46 +105,28 @@ export class ReportesPage implements OnInit {
 
   proyectos: any[] = [];
   proyectosFiltrados: any[] = [];
+  evaluadoresResumen: EvaluadorResumen[] = [];
+  nombresEvaluadores: string[] = [];
+
   cargando: boolean = false;
   error: string | null = null;
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
 
+  // Vista: 'proyectos' | 'evaluadores'
+  vistaActual: 'proyectos' | 'evaluadores' = 'proyectos';
+
+  // Filtros
   filtroBusqueda: string = '';
   filtroStatus: string = 'todos';
+  filtroEvaluador: string = 'todos';
 
   modalAbierto = false;
   proyectoSeleccionado: DetalleProyecto | null = null;
   cargandoDetalle: boolean = false;
 
   constructor(private reporteService: ReporteService) {
-    addIcons({
-      downloadOutline,
-      statsChartOutline,
-      folderOutline,
-      checkmarkDoneOutline,
-      trophyOutline,
-      documentOutline,
-      timeOutline,
-      funnelOutline,
-      arrowUpOutline,
-      arrowDownOutline,
-      peopleOutline,
-      eyeOutline,
-      refreshOutline,
-      closeOutline,
-      filterOutline,
-      searchOutline,
-      printOutline,
-      documentTextOutline,
-      personOutline,
-      barChartOutline,
-      calendarOutline,
-      closeCircleOutline,
-      checkmarkCircleOutline,
-      alertCircleOutline,
-      addOutline
-    });
+    addIcons({refreshOutline,timeOutline,downloadOutline,gridOutline,peopleOutline,closeOutline,alertCircleOutline,documentOutline,eyeOutline,filterOutline,statsChartOutline,folderOutline,chevronForwardOutline,checkmarkDoneOutline,trophyOutline,funnelOutline,documentTextOutline,personOutline,barChartOutline,calendarOutline,closeCircleOutline,checkmarkCircleOutline,listOutline});
   }
 
   ngOnInit(): void {
@@ -154,7 +139,6 @@ export class ReportesPage implements OnInit {
 
     this.reporteService.getStats().subscribe({
       next: (res: any) => {
-        console.log('STATS:', res);
         this.reportes = res?.data ?? res ?? this.reportes;
         this.actualizarStatsCards();
         this.fechaActualizacion = new Date();
@@ -168,8 +152,6 @@ export class ReportesPage implements OnInit {
 
     this.reporteService.getReporteProyectos().subscribe({
       next: (res: any) => {
-        console.log('PROYECTOS:', res);
-
         let data = res?.data ?? res ?? [];
 
         this.proyectos = data.map((item: any, index: number) => ({
@@ -178,6 +160,7 @@ export class ReportesPage implements OnInit {
           nombre: item.proyecto || item.nombre || 'Proyecto sin nombre'
         }));
 
+        this.construirResumenEvaluadores();
         this.aplicarFiltros();
         this.cargando = false;
       },
@@ -193,24 +176,9 @@ export class ReportesPage implements OnInit {
 
   actualizarStatsCards(): void {
     this.statsCards = [
-      {
-        icon: 'folder-outline',
-        label: 'Proyectos',
-        value: this.reportes.proyectos || 0,
-        color: 'blue'
-      },
-      {
-        icon: 'checkmark-done-outline',
-        label: 'Evaluaciones',
-        value: this.reportes.evaluaciones || 0,
-        color: 'green'
-      },
-      {
-        icon: 'stats-chart-outline',
-        label: 'Completadas',
-        value: this.reportes.completadas || 0,
-        color: 'orange'
-      },
+      { icon: 'folder-outline', label: 'Proyectos', value: this.reportes.proyectos || 0, color: 'blue' },
+      { icon: 'checkmark-done-outline', label: 'Evaluaciones', value: this.reportes.evaluaciones || 0, color: 'green' },
+      { icon: 'stats-chart-outline', label: 'Completadas', value: this.reportes.completadas || 0, color: 'orange' },
       {
         icon: 'trophy-outline',
         label: 'Promedio general',
@@ -218,6 +186,48 @@ export class ReportesPage implements OnInit {
         color: 'purple'
       }
     ];
+  }
+
+  /**
+   * Agrega, a partir de los evaluadores embebidos en cada proyecto,
+   * un resumen por evaluador: cuántos proyectos calificó y su
+   * promedio otorgado a lo largo de todos ellos.
+   */
+  construirResumenEvaluadores(): void {
+    const mapa = new Map<string, EvaluadorResumen>();
+
+    this.proyectos.forEach(p => {
+      (p.evaluadores || []).forEach((e: any) => {
+        const nombre = e.nombre || 'Evaluador sin nombre';
+        if (!mapa.has(nombre)) {
+          mapa.set(nombre, {
+            nombre,
+            rol: e.rol || 'Evaluador',
+            proyectosEvaluados: 0,
+            promedioOtorgado: 0,
+            puntajes: []
+          });
+        }
+        const entry = mapa.get(nombre)!;
+        entry.proyectosEvaluados++;
+        if (e.puntaje != null) {
+          entry.puntajes.push(Number(e.puntaje));
+        }
+      });
+    });
+
+    this.evaluadoresResumen = Array.from(mapa.values()).map(e => ({
+      ...e,
+      promedioOtorgado: e.puntajes.length
+        ? e.puntajes.reduce((a, b) => a + b, 0) / e.puntajes.length
+        : 0
+    })).sort((a, b) => b.proyectosEvaluados - a.proyectosEvaluados);
+
+    this.nombresEvaluadores = this.evaluadoresResumen.map(e => e.nombre);
+  }
+
+  cambiarVista(vista: 'proyectos' | 'evaluadores'): void {
+    this.vistaActual = vista;
   }
 
   aplicarFiltros(): void {
@@ -238,6 +248,12 @@ export class ReportesPage implements OnInit {
       filtered = filtered.filter(p => (p.promedio || 0) >= 4 && (p.promedio || 0) < 6);
     } else if (this.filtroStatus === 'bajo') {
       filtered = filtered.filter(p => (p.promedio || 0) < 4);
+    }
+
+    if (this.filtroEvaluador !== 'todos') {
+      filtered = filtered.filter(p =>
+        (p.evaluadores || []).some((e: any) => e.nombre === this.filtroEvaluador)
+      );
     }
 
     this.proyectosFiltrados = filtered;
@@ -277,7 +293,6 @@ export class ReportesPage implements OnInit {
       alert('No se puede exportar: ID del proyecto no encontrado');
       return;
     }
-
     const nombre = proyecto.proyecto || proyecto.nombre || 'proyecto';
     this.reporteService.exportarProyecto(id).subscribe({
       next: (archivo: Blob) => {
@@ -296,7 +311,6 @@ export class ReportesPage implements OnInit {
       alert('No se puede exportar: ID del proyecto no encontrado');
       return;
     }
-
     const nombre = proyecto.proyecto || proyecto.nombre || 'proyecto';
     this.reporteService.exportarPDFProyecto(id).subscribe({
       next: (archivo: Blob) => {
@@ -322,7 +336,6 @@ export class ReportesPage implements OnInit {
 
   async verDetalle(proyecto: any): Promise<void> {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
-
     if (!id) {
       alert('No se puede ver detalle: ID del proyecto no encontrado');
       return;
@@ -335,7 +348,6 @@ export class ReportesPage implements OnInit {
     this.reporteService.getDetalleProyecto(id).subscribe({
       next: (res: any) => {
         const data = res?.data ?? res;
-
         this.proyectoSeleccionado = {
           id: data.id || id,
           nombre: data.nombre || data.proyecto || proyecto.proyecto || proyecto.nombre || 'Proyecto',
@@ -350,7 +362,6 @@ export class ReportesPage implements OnInit {
       error: (err) => {
         console.error('Error cargando detalle:', err);
         this.cargandoDetalle = false;
-
         this.proyectoSeleccionado = {
           id: id,
           nombre: proyecto.proyecto || proyecto.nombre || 'Proyecto',
@@ -362,6 +373,16 @@ export class ReportesPage implements OnInit {
         };
       }
     });
+  }
+
+  /**
+   * Ver todos los proyectos calificados por un evaluador específico,
+   * saltando desde la vista de evaluadores a la vista de proyectos filtrada.
+   */
+  verProyectosDeEvaluador(nombreEvaluador: string): void {
+    this.filtroEvaluador = nombreEvaluador;
+    this.vistaActual = 'proyectos';
+    this.aplicarFiltros();
   }
 
   cerrarModal(): void {
@@ -376,6 +397,7 @@ export class ReportesPage implements OnInit {
   limpiarFiltros(): void {
     this.filtroBusqueda = '';
     this.filtroStatus = 'todos';
+    this.filtroEvaluador = 'todos';
     this.aplicarFiltros();
   }
 
@@ -424,5 +446,9 @@ export class ReportesPage implements OnInit {
 
   trackById(index: number, item: any): number {
     return item?.id ?? item?.proyecto_id ?? index;
+  }
+
+  trackByNombre(index: number, item: EvaluadorResumen): string {
+    return item?.nombre ?? index.toString();
   }
 }
