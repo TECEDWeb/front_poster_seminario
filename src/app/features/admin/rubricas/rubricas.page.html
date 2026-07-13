@@ -264,7 +264,13 @@
 <!-- ========== MODALES FUERA DEL ION-CONTENT ========== -->
 
 <!-- MODAL 1: Editar datos generales -->
-<ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()" [backdropDismiss]="false">
+<ion-modal 
+  [isOpen]="modalAbierto" 
+  (didDismiss)="cerrarModal()" 
+  [backdropDismiss]="false"
+  [initialBreakpoint]="1"
+  [breakpoints]="[0, 1]"
+  [handle]="false">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -277,7 +283,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="modal-content">
+    <ion-content class="modal-content" scroll-y="true">
       <div class="modal-container">
         <form (ngSubmit)="guardar()" #rubricaForm="ngForm">
           
@@ -378,8 +384,15 @@
   </ng-template>
 </ion-modal>
 
-<!-- MODAL 2: Constructor de rúbrica (FUERA del ion-content) -->
-<ion-modal [isOpen]="builderAbierto" (didDismiss)="cerrarBuilder()" [backdropDismiss]="false">
+<!-- MODAL 2: Constructor de rúbrica (con dimensiones completas) -->
+<ion-modal 
+  [isOpen]="builderAbierto" 
+  (didDismiss)="cerrarBuilder()" 
+  [backdropDismiss]="false"
+  [initialBreakpoint]="1"
+  [breakpoints]="[0, 1]"
+  [handle]="false"
+  class="builder-modal">
   <ng-template>
     <app-rubrica-builder
       *ngIf="concursoSeleccionadoBuilder"

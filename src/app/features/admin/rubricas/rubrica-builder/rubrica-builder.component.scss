@@ -1,35 +1,64 @@
 @use 'upse-variables' as *;
 @use 'upse-mixins' as *;
 
+// Asegurar que el componente ocupe todo el espacio disponible
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
 .builder-content {
   --background: #f0f4fb;
+  height: 100%;
+  width: 100%;
 }
 
 .builder-container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 16px 60px;
+  padding: 16px 16px 80px;
+  height: 100%;
+  overflow-y: auto;
+
+  @media (min-width: 576px) {
+    padding: 20px 24px 80px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 24px 32px 80px;
+  }
 }
 
-.subtitle {
-  display: block;
-  font-size: 12px;
-  font-weight: 400;
-  color: #64748b;
-}
-
+// Estados de carga y error
 .loading-state, .error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   padding: 60px 20px;
   text-align: center;
   color: #64748b;
+  min-height: 300px;
 
-  ion-icon { font-size: 40px; color: #ef4444; }
+  ion-icon { 
+    font-size: 48px; 
+    color: #ef4444; 
+  }
+  
+  ion-spinner {
+    --color: #{$upse-blue};
+  }
+  
+  ion-button {
+    margin-top: 8px;
+    --border-color: #{$upse-blue};
+    --color: #{$upse-blue};
+  }
 }
 
+// Paneles
 .panel {
   background: white;
   border-radius: $radius;
@@ -46,8 +75,17 @@
       align-items: center;
       gap: 8px;
 
-      ion-icon { font-size: 20px; color: $upse-blue; }
-      h2 { margin: 0; font-size: 16px; font-weight: 700; color: $upse-blue; }
+      ion-icon { 
+        font-size: 20px; 
+        color: $upse-blue; 
+      }
+      
+      h2 { 
+        margin: 0; 
+        font-size: 16px; 
+        font-weight: 700; 
+        color: $upse-blue; 
+      }
     }
 
     .panel-hint {
@@ -59,6 +97,7 @@
   }
 }
 
+// Listas
 .niveles-list, .secciones-list {
   display: flex;
   flex-direction: column;
@@ -66,6 +105,7 @@
   margin-bottom: 12px;
 }
 
+// Filas de niveles
 .nivel-row, .add-row {
   display: flex;
   align-items: center;
@@ -76,13 +116,34 @@
   border: 1px solid #f1f5f9;
   flex-wrap: wrap;
 
-  &.small { padding: 6px 10px; background: #fff; }
+  &.small { 
+    padding: 6px 10px; 
+    background: #fff; 
+  }
 
-  .nivel-nombre { font-weight: 600; font-size: 13px; color: #0f172a; }
-  .nivel-puntaje { font-size: 12px; font-weight: 700; color: $upse-blue; background: $upse-blue-light; padding: 2px 8px; border-radius: 10px; }
-  .nivel-desc { font-size: 12px; color: #94a3b8; flex: 1; }
+  .nivel-nombre { 
+    font-weight: 600; 
+    font-size: 13px; 
+    color: #0f172a; 
+  }
+  
+  .nivel-puntaje { 
+    font-size: 12px; 
+    font-weight: 700; 
+    color: $upse-blue; 
+    background: $upse-blue-light; 
+    padding: 2px 8px; 
+    border-radius: 10px; 
+  }
+  
+  .nivel-desc { 
+    font-size: 12px; 
+    color: #94a3b8; 
+    flex: 1; 
+  }
 }
 
+// Acciones
 .row-actions {
   display: flex;
   gap: 4px;
@@ -104,12 +165,27 @@
 
   ion-icon { font-size: 16px; }
 
-  &:hover { background: #e2e8f0; color: $upse-blue; }
-  &.success { color: $upse-green; }
-  &.danger:hover { color: #ef4444; background: #fef2f2; }
-  &.active { color: $upse-blue; background: $upse-blue-light; }
+  &:hover { 
+    background: #e2e8f0; 
+    color: $upse-blue; 
+  }
+  
+  &.success { 
+    color: $upse-green; 
+  }
+  
+  &.danger:hover { 
+    color: #ef4444; 
+    background: #fef2f2; 
+  }
+  
+  &.active { 
+    color: $upse-blue; 
+    background: $upse-blue-light; 
+  }
 }
 
+// Inputs inline
 .inline-input {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -118,109 +194,22 @@
   flex: 1;
   min-width: 100px;
 
-  &.small { flex: 0 0 60px; min-width: 60px; }
-  &.wide { flex: 2; }
+  &.small { 
+    flex: 0 0 60px; 
+    min-width: 60px; 
+  }
+  
+  &.wide { 
+    flex: 2; 
+  }
 
-  &:focus { outline: none; border-color: $upse-blue; }
-}
-
-.empty-mini {
-  font-size: 12px;
-  color: #94a3b8;
-  font-style: italic;
-  padding: 8px 4px;
-}
-
-.add-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: $upse-blue-light;
-  color: $upse-blue;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: $transition;
-
-  &.small { font-size: 12px; padding: 6px 12px; }
-
-  ion-icon { font-size: 16px; }
-
-  &:hover { background: $upse-blue; color: white; }
-}
-
-.seccion-card {
-  border: 1px solid #eef2f7;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.seccion-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  background: $upse-blue-light;
-  cursor: pointer;
-
-  .chevron { font-size: 16px; color: $upse-blue; flex-shrink: 0; }
-
-  .seccion-titulo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-
-    strong { font-size: 14px; color: #0f172a; }
-    .seccion-count { font-size: 11px; color: #64748b; }
-
-    &.edit-mode { flex-direction: column; align-items: stretch; gap: 6px; }
+  &:focus { 
+    outline: none; 
+    border-color: $upse-blue; 
   }
 }
 
-.seccion-body {
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.criterio-row {
-  border: 1px solid #f1f5f9;
-  border-radius: 10px;
-  padding: 10px 12px;
-}
-
-.criterio-main {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-
-  .criterio-texto { font-size: 13.5px; color: #0f172a; flex: 1; }
-}
-
-.niveles-criterio {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  .niveles-criterio-hint { font-size: 11px; color: #94a3b8; margin: 0 0 4px; }
-}
-
-.loading-mini {
-  display: flex;
-  justify-content: center;
-  padding: 8px;
-}
-// Agregar al final de rubrica-builder.component.scss
-
+// Estados vacíos
 .empty-mini {
   display: flex;
   align-items: center;
@@ -237,12 +226,136 @@
   }
 }
 
+// Botones de agregar
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: $upse-blue-light;
+  color: $upse-blue;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+
+  &.small { 
+    font-size: 12px; 
+    padding: 6px 12px; 
+  }
+
+  ion-icon { font-size: 16px; }
+
+  &:hover { 
+    background: $upse-blue; 
+    color: white; 
+  }
+}
+
+// Tarjetas de sección
+.seccion-card {
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.seccion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: $upse-blue-light;
+  cursor: pointer;
+
+  .chevron { 
+    font-size: 16px; 
+    color: $upse-blue; 
+    flex-shrink: 0; 
+  }
+
+  .seccion-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+
+    strong { 
+      font-size: 14px; 
+      color: #0f172a; 
+    }
+    
+    .seccion-count { 
+      font-size: 11px; 
+      color: #64748b; 
+      background: white;
+      padding: 1px 10px;
+      border-radius: 12px;
+    }
+
+    .seccion-desc {
+      font-size: 11px;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    &.edit-mode { 
+      flex-direction: column; 
+      align-items: stretch; 
+      gap: 6px; 
+    }
+  }
+}
+
+.seccion-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// Criterios
+.criterio-row {
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.criterio-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .criterio-texto { 
+    font-size: 13.5px; 
+    color: #0f172a; 
+    flex: 1; 
+  }
+  
+  .criterio-actions {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+  }
+}
+
+// Niveles personalizados
 .niveles-criterio {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
   .niveles-header {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 
     .niveles-criterio-hint {
       display: flex;
@@ -261,6 +374,66 @@
         opacity: 0.7;
         font-style: italic;
       }
+    }
+  }
+}
+
+// Carga mini
+.loading-mini {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+
+  ion-spinner {
+    --color: #{$upse-blue};
+  }
+}
+
+// Fila de agregar sección
+.add-row {
+  &.seccion-add {
+    background: $upse-blue-light;
+    border-color: $upse-blue;
+    padding: 12px 14px;
+  }
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .builder-container {
+    padding: 12px 8px 40px;
+  }
+
+  .panel {
+    padding: 14px 12px;
+  }
+
+  .nivel-row, .add-row {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .inline-input {
+    min-width: 60px;
+    font-size: 12px;
+    padding: 4px 6px;
+
+    &.small {
+      flex: 0 0 50px;
+      min-width: 50px;
+    }
+  }
+
+  .icon-btn {
+    width: 24px;
+    height: 24px;
+
+    ion-icon {
+      font-size: 14px;
     }
   }
 }
