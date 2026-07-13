@@ -25,14 +25,6 @@ export const PUBLIC_ROUTES: Routes = [
           import('./consulta-certificados/consulta-certificados.page')
             .then(m => m.ConsultaCertificadosPage)
       },
-
-      {
-        path: 'reportes',
-        loadComponent: () =>
-          import('../reportes/reportes.page')
-            .then(m => m.ReportesPage)
-      }
-
     ]
 
   }
