@@ -4,6 +4,7 @@ export interface Nivel {
   nombre: string;
   puntaje: number;
   descripcion?: string | null;
+  criterioId?: number | null; // si viene, es un override específico de ese criterio
 }
 
 export interface Criterio {
@@ -22,7 +23,6 @@ export interface Seccion {
   criterios: Criterio[];
 }
 
-/** Forma que entrega el backend al pedir la "configuración" completa de un concurso. */
 export interface RubricaConcurso {
   concursoId: number;
   secciones: Seccion[];

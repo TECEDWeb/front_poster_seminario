@@ -1,0 +1,225 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Constructor de rúbrica
+      <span class="subtitle" *ngIf="concursoNombre">{{ concursoNombre }}</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="builder-content">
+  <div class="builder-container">
+
+    <div class="loading-state" *ngIf="cargando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando estructura de la rúbrica...</p>
+    </div>
+
+    <div class="error-state" *ngIf="!cargando && error">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error }}</p>
+    </div>
+
+    <ng-container *ngIf="!cargando && !error">
+
+      <!-- ESCALA GLOBAL DE NIVELES -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <ion-icon name="list-outline"></ion-icon>
+            <h2>Escala global de niveles</h2>
+          </div>
+          <span class="panel-hint">Se aplica a todos los criterios, salvo que tengan niveles propios</span>
+        </div>
+
+        <div class="niveles-list">
+          <div class="nivel-row" *ngFor="let n of nivelesGlobales; trackBy: trackById">
+            <ng-container *ngIf="!n.editando; else editNivelGlobal">
+              <span class="nivel-nombre">{{ n.nombre }}</span>
+              <span class="nivel-puntaje">{{ n.puntaje }} pts</span>
+              <span class="nivel-desc" *ngIf="n.descripcion">{{ n.descripcion }}</span>
+              <div class="row-actions">
+                <button class="icon-btn" (click)="editarNivel(n)"><ion-icon name="create-outline"></ion-icon></button>
+                <button class="icon-btn danger" (click)="eliminarNivel(n, nivelesGlobales)"><ion-icon name="trash-outline"></ion-icon></button>
+              </div>
+            </ng-container>
+            <ng-template #editNivelGlobal>
+              <input class="inline-input" [(ngModel)]="n.nombreTemp" placeholder="Nombre" />
+              <input class="inline-input small" type="number" [(ngModel)]="n.puntajeTemp" placeholder="Pts" />
+              <input class="inline-input" [(ngModel)]="n.descripcionTemp" placeholder="Descripción (opcional)" />
+              <div class="row-actions">
+                <button class="icon-btn success" (click)="guardarNivel(n, nivelesGlobales)"><ion-icon name="checkmark-outline"></ion-icon></button>
+                <button class="icon-btn" (click)="n.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="empty-mini" *ngIf="nivelesGlobales.length === 0 && !agregandoNivelGlobal">
+            Sin niveles definidos aún
+          </div>
+        </div>
+
+        <div class="add-row" *ngIf="agregandoNivelGlobal">
+          <input class="inline-input" [(ngModel)]="nuevoNivelGlobal.nombre" placeholder="Nombre (ej: Excelente)" />
+          <input class="inline-input small" type="number" [(ngModel)]="nuevoNivelGlobal.puntaje" placeholder="Pts" />
+          <input class="inline-input" [(ngModel)]="nuevoNivelGlobal.descripcion" placeholder="Descripción (opcional)" />
+          <div class="row-actions">
+            <button class="icon-btn success" (click)="guardarNuevoNivelGlobal()"><ion-icon name="checkmark-outline"></ion-icon></button>
+            <button class="icon-btn" (click)="agregandoNivelGlobal = false"><ion-icon name="close-outline"></ion-icon></button>
+          </div>
+        </div>
+
+        <button class="add-btn" *ngIf="!agregandoNivelGlobal" (click)="abrirNuevoNivelGlobal()">
+          <ion-icon name="add-outline"></ion-icon>
+          Agregar nivel
+        </button>
+      </section>
+
+      <!-- SECCIONES Y CRITERIOS -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <ion-icon name="layers-outline"></ion-icon>
+            <h2>Secciones y criterios</h2>
+          </div>
+        </div>
+
+        <div class="secciones-list">
+          <div class="seccion-card" *ngFor="let s of secciones; trackBy: trackById">
+            <div class="seccion-header" (click)="toggleSeccion(s)">
+              <ion-icon [name]="s.expandida ? 'chevron-down-outline' : 'chevron-forward-outline'" class="chevron"></ion-icon>
+
+              <ng-container *ngIf="!s.editando; else editSeccion">
+                <div class="seccion-titulo" (click)="$event.stopPropagation()">
+                  <strong>{{ s.nombre }}</strong>
+                  <span class="seccion-count">{{ s.criterios.length }} criterio(s)</span>
+                </div>
+                <div class="row-actions" (click)="$event.stopPropagation()">
+                  <button class="icon-btn" (click)="editarSeccion(s)"><ion-icon name="create-outline"></ion-icon></button>
+                  <button class="icon-btn danger" (click)="eliminarSeccion(s)"><ion-icon name="trash-outline"></ion-icon></button>
+                </div>
+              </ng-container>
+
+              <ng-template #editSeccion>
+                <div class="seccion-titulo edit-mode" (click)="$event.stopPropagation()">
+                  <input class="inline-input" [(ngModel)]="s.nombreTemp" placeholder="Nombre de la sección" />
+                  <input class="inline-input" [(ngModel)]="s.descripcionTemp" placeholder="Descripción (opcional)" />
+                </div>
+                <div class="row-actions" (click)="$event.stopPropagation()">
+                  <button class="icon-btn success" (click)="guardarSeccion(s)"><ion-icon name="checkmark-outline"></ion-icon></button>
+                  <button class="icon-btn" (click)="s.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="seccion-body" *ngIf="s.expandida">
+
+              <div class="loading-mini" *ngIf="s.cargandoCriterios">
+                <ion-spinner name="dots"></ion-spinner>
+              </div>
+
+              <div class="criterio-row" *ngFor="let c of s.criterios; trackBy: trackById">
+                <div class="criterio-main">
+                  <ng-container *ngIf="!c.editando; else editCriterio">
+                    <span class="criterio-texto">{{ c.texto }}</span>
+                    <div class="row-actions">
+                      <button class="icon-btn" (click)="toggleNivelesPersonalizados(c)" [class.active]="c.mostrarNiveles">
+                        <ion-icon name="options-outline"></ion-icon>
+                      </button>
+                      <button class="icon-btn" (click)="editarCriterio(c)"><ion-icon name="create-outline"></ion-icon></button>
+                      <button class="icon-btn danger" (click)="eliminarCriterio(s, c)"><ion-icon name="trash-outline"></ion-icon></button>
+                    </div>
+                  </ng-container>
+                  <ng-template #editCriterio>
+                    <input class="inline-input wide" [(ngModel)]="c.textoTemp" placeholder="Texto del criterio" />
+                    <div class="row-actions">
+                      <button class="icon-btn success" (click)="guardarCriterio(c)"><ion-icon name="checkmark-outline"></ion-icon></button>
+                      <button class="icon-btn" (click)="c.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+                    </div>
+                  </ng-template>
+                </div>
+
+                <!-- Niveles personalizados de este criterio -->
+                <div class="niveles-criterio" *ngIf="c.mostrarNiveles">
+                  <div class="loading-mini" *ngIf="c.cargandoNiveles">
+                    <ion-spinner name="dots"></ion-spinner>
+                  </div>
+
+                  <p class="niveles-criterio-hint" *ngIf="!c.cargandoNiveles">
+                    Niveles propios de este criterio (si no agregas ninguno, se usa la escala global)
+                  </p>
+
+                  <div class="nivel-row small" *ngFor="let n of c.nivelesPersonalizados; trackBy: trackById">
+                    <ng-container *ngIf="!n.editando; else editNivelCrit">
+                      <span class="nivel-nombre">{{ n.nombre }}</span>
+                      <span class="nivel-puntaje">{{ n.puntaje }} pts</span>
+                      <div class="row-actions">
+                        <button class="icon-btn" (click)="editarNivel(n)"><ion-icon name="create-outline"></ion-icon></button>
+                        <button class="icon-btn danger" (click)="eliminarNivel(n, c.nivelesPersonalizados!)"><ion-icon name="trash-outline"></ion-icon></button>
+                      </div>
+                    </ng-container>
+                    <ng-template #editNivelCrit>
+                      <input class="inline-input" [(ngModel)]="n.nombreTemp" placeholder="Nombre" />
+                      <input class="inline-input small" type="number" [(ngModel)]="n.puntajeTemp" placeholder="Pts" />
+                      <div class="row-actions">
+                        <button class="icon-btn success" (click)="guardarNivel(n, c.nivelesPersonalizados!)"><ion-icon name="checkmark-outline"></ion-icon></button>
+                        <button class="icon-btn" (click)="n.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+                      </div>
+                    </ng-template>
+                  </div>
+
+                  <div class="add-row" *ngIf="c.agregandoNivel">
+                    <input class="inline-input" [(ngModel)]="c.nuevoNivel!.nombre" placeholder="Nombre" />
+                    <input class="inline-input small" type="number" [(ngModel)]="c.nuevoNivel!.puntaje" placeholder="Pts" />
+                    <div class="row-actions">
+                      <button class="icon-btn success" (click)="guardarNuevoNivelCriterio(c)"><ion-icon name="checkmark-outline"></ion-icon></button>
+                      <button class="icon-btn" (click)="c.agregandoNivel = false"><ion-icon name="close-outline"></ion-icon></button>
+                    </div>
+                  </div>
+
+                  <button class="add-btn small" *ngIf="!c.agregandoNivel" (click)="abrirNuevoNivelCriterio(c)">
+                    <ion-icon name="add-outline"></ion-icon>
+                    Agregar nivel propio
+                  </button>
+                </div>
+              </div>
+
+              <div class="add-row" *ngIf="s.agregandoCriterio">
+                <input class="inline-input wide" [(ngModel)]="s.nuevoCriterioTexto" placeholder="Texto del criterio" />
+                <div class="row-actions">
+                  <button class="icon-btn success" (click)="guardarNuevoCriterio(s)"><ion-icon name="checkmark-outline"></ion-icon></button>
+                  <button class="icon-btn" (click)="s.agregandoCriterio = false"><ion-icon name="close-outline"></ion-icon></button>
+                </div>
+              </div>
+
+              <button class="add-btn" *ngIf="!s.agregandoCriterio" (click)="abrirNuevoCriterio(s)">
+                <ion-icon name="add-outline"></ion-icon>
+                Agregar criterio
+              </button>
+            </div>
+          </div>
+
+          <div class="add-row" *ngIf="agregandoSeccion">
+            <input class="inline-input" [(ngModel)]="nuevaSeccionNombre" placeholder="Nombre de la sección" />
+            <input class="inline-input" [(ngModel)]="nuevaSeccionDescripcion" placeholder="Descripción (opcional)" />
+            <div class="row-actions">
+              <button class="icon-btn success" (click)="guardarNuevaSeccion()"><ion-icon name="checkmark-outline"></ion-icon></button>
+              <button class="icon-btn" (click)="agregandoSeccion = false"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+          </div>
+
+          <button class="add-btn" *ngIf="!agregandoSeccion" (click)="abrirNuevaSeccion()">
+            <ion-icon name="add-outline"></ion-icon>
+            Agregar sección
+          </button>
+        </div>
+      </section>
+
+    </ng-container>
+  </div>
+</ion-content>

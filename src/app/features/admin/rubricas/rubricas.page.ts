@@ -25,6 +25,8 @@ import {
 import { RubricaService } from '../../../core/services/rubrica.service';
 import { RubricaConcurso } from '../../../core/models/rubrica.model';
 import { addIcons } from 'ionicons';
+import { RubricaBuilderComponent } from './rubrica-builder/rubrica-builder.component';
+
 import {
   addOutline,
   checkboxOutline,
@@ -101,6 +103,10 @@ export class RubricasPage implements OnInit {
     descripcion: '',
     puntajeMaximo: 100
   };
+
+  builderAbierto = false;
+  concursoSeleccionadoBuilder: number | null = null;
+  concursoNombreBuilder = '';
 
   constructor(private rubricaService: RubricaService) {
     addIcons({refreshOutline,addOutline,closeOutline,alertCircleOutline,checkboxOutline,eyeOutline,createOutline,trashOutline,layersOutline,listOutline,checkmarkCircleOutline,downloadOutline,filterOutline,trophyOutline,pricetagOutline,documentTextOutline,starOutline,searchOutline,funnelOutline,checkmarkOutline,folderOutline});
@@ -407,5 +413,17 @@ export class RubricasPage implements OnInit {
 
   trackById(index: number, item: RubricaConcurso): number {
     return item?.concursoId ?? index;
+  }
+
+  abrirBuilder(rubrica: RubricaConcurso): void {
+    const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
+    this.concursoSeleccionadoBuilder = rubrica.concursoId;
+    this.concursoNombreBuilder = concurso?.nombre || `Concurso #${rubrica.concursoId}`;
+    this.builderAbierto = true;
+  }
+  cerrarBuilder(): void {
+    this.builderAbierto = false;
+    this.concursoSeleccionadoBuilder = null;
+    this.cargarRubricas(); // refresca contadores de secciones/criterios/niveles
   }
 }

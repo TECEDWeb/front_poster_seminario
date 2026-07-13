@@ -1,0 +1,221 @@
+@use 'upse-variables' as *;
+@use 'upse-mixins' as *;
+
+.builder-content {
+  --background: #f0f4fb;
+}
+
+.builder-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+.subtitle {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.loading-state, .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  text-align: center;
+  color: #64748b;
+
+  ion-icon { font-size: 40px; color: #ef4444; }
+}
+
+.panel {
+  background: white;
+  border-radius: $radius;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  .panel-header {
+    margin-bottom: 14px;
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      ion-icon { font-size: 20px; color: $upse-blue; }
+      h2 { margin: 0; font-size: 16px; font-weight: 700; color: $upse-blue; }
+    }
+
+    .panel-hint {
+      display: block;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+  }
+}
+
+.niveles-list, .secciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.nivel-row, .add-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+
+  &.small { padding: 6px 10px; background: #fff; }
+
+  .nivel-nombre { font-weight: 600; font-size: 13px; color: #0f172a; }
+  .nivel-puntaje { font-size: 12px; font-weight: 700; color: $upse-blue; background: $upse-blue-light; padding: 2px 8px; border-radius: 10px; }
+  .nivel-desc { font-size: 12px; color: #94a3b8; flex: 1; }
+}
+
+.row-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: $transition;
+
+  ion-icon { font-size: 16px; }
+
+  &:hover { background: #e2e8f0; color: $upse-blue; }
+  &.success { color: $upse-green; }
+  &.danger:hover { color: #ef4444; background: #fef2f2; }
+  &.active { color: $upse-blue; background: $upse-blue-light; }
+}
+
+.inline-input {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  flex: 1;
+  min-width: 100px;
+
+  &.small { flex: 0 0 60px; min-width: 60px; }
+  &.wide { flex: 2; }
+
+  &:focus { outline: none; border-color: $upse-blue; }
+}
+
+.empty-mini {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 8px 4px;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: $upse-blue-light;
+  color: $upse-blue;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+
+  &.small { font-size: 12px; padding: 6px 12px; }
+
+  ion-icon { font-size: 16px; }
+
+  &:hover { background: $upse-blue; color: white; }
+}
+
+.seccion-card {
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.seccion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: $upse-blue-light;
+  cursor: pointer;
+
+  .chevron { font-size: 16px; color: $upse-blue; flex-shrink: 0; }
+
+  .seccion-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+
+    strong { font-size: 14px; color: #0f172a; }
+    .seccion-count { font-size: 11px; color: #64748b; }
+
+    &.edit-mode { flex-direction: column; align-items: stretch; gap: 6px; }
+  }
+}
+
+.seccion-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.criterio-row {
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.criterio-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .criterio-texto { font-size: 13.5px; color: #0f172a; flex: 1; }
+}
+
+.niveles-criterio {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .niveles-criterio-hint { font-size: 11px; color: #94a3b8; margin: 0 0 4px; }
+}
+
+.loading-mini {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+}

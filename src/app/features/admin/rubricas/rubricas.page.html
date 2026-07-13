@@ -189,6 +189,10 @@
         </div>
 
         <div class="card-actions">
+          <ion-button fill="outline" size="small" class="action-btn" (click)="abrirBuilder(r)">
+            <ion-icon name="options-outline" slot="start"></ion-icon>
+            Configurar
+          </ion-button>
           <ion-button fill="outline" size="small" class="action-btn" (click)="verDetalle(r)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
             Ver detalle
@@ -249,6 +253,17 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
+
+      <ion-modal [isOpen]="builderAbierto" (didDismiss)="cerrarBuilder()">
+        <ng-template>
+          <app-rubrica-builder
+            *ngIf="concursoSeleccionadoBuilder"
+            [concursoId]="concursoSeleccionadoBuilder"
+            [concursoNombre]="concursoNombreBuilder"
+            (cerrar)="cerrarBuilder()">
+          </app-rubrica-builder>
+        </ng-template>
+      </ion-modal>
 
       <ion-content class="modal-content">
         <div class="modal-container">
