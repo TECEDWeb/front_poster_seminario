@@ -73,7 +73,8 @@ import {
     IonModal,
     IonItem,
     IonInput,
-    IonTextarea
+    IonTextarea,
+    RubricaBuilderComponent   
   ],
   templateUrl: './rubricas.page.html',
   styleUrls: ['./rubricas.page.scss']
