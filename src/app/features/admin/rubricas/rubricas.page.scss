@@ -50,7 +50,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TOOLBAR - ESTILO INSTITUCIONAL UPSE
+// TOOLBAR
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
@@ -64,7 +64,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    
+
     .title-text {
       font-size: 16px;
       color: #0f172a;
@@ -74,7 +74,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 20px;
       }
     }
-    
+
     .title-badge {
       font-size: 9px;
       background: $upse-blue-light;
@@ -103,7 +103,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --padding-end: 8px;
     --color: #64748b;
     --border-radius: 50%;
-    
+
     ion-icon {
       font-size: 18px;
       transition: $transition;
@@ -112,10 +112,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 20px;
       }
     }
-    
+
     &:hover {
-      --color: $upse-blue;
-      
+      --color: #{$upse-blue};
+
       ion-icon {
         transform: rotate(45deg);
       }
@@ -124,7 +124,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// PAGE HEADER - CON BOTÓN ÚNICO PARA ESCRITORIO
+// PAGE HEADER
 // ============================================
 .page-header {
   display: flex;
@@ -172,9 +172,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     gap: 12px;
     flex-wrap: wrap;
 
-    // ✅ BOTÓN ÚNICO - SOLO ESCRITORIO (ESTILO UPSE)
     .btn-add-desktop {
-      --background: $upse-blue;
+      --background: #{$upse-blue};
       --color: #ffffff;
       --border-radius: 12px;
       font-weight: 600;
@@ -183,13 +182,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       --padding-end: 20px;
       height: 44px;
       font-size: 14px;
-      
+
       ion-icon {
         font-size: 20px;
         margin-right: 8px;
       }
 
-      // ❌ OCULTO EN MÓVIL (el FAB toma el control)
       @media (max-width: 768px) {
         display: none !important;
       }
@@ -198,7 +196,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
         transform: translateY(-2px);
         transition: $transition;
-        --background: $upse-blue-dark;
+        --background: #{$upse-blue-dark};
       }
     }
 
@@ -240,7 +238,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// FILTER BAR - ESTILO UPSE
+// FILTER BAR
 // ============================================
 .filter-bar {
   display: flex;
@@ -305,7 +303,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         &:focus-within {
-          --border-color: $upse-blue;
+          --border-color: #{$upse-blue};
           border-color: $upse-blue;
           box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
         }
@@ -448,7 +446,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// RÚBRICA CARD - ESTILO UPSE
+// RÚBRICA CARD
 // ============================================
 .rubrica-card {
   background: white;
@@ -459,6 +457,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
 
   &:hover {
     transform: translateY(-4px);
@@ -470,11 +469,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 14px 14px 12px;
-    flex-wrap: wrap;
+    padding: 16px 16px 4px;
 
     @media (min-width: 768px) {
-      padding: 20px 20px 16px;
+      padding: 20px 20px 6px;
       gap: 14px;
     }
 
@@ -526,7 +524,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .card-status {
       flex-shrink: 0;
-      margin-left: auto;
 
       .status-badge {
         font-size: 9px;
@@ -535,6 +532,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 20px;
         text-transform: uppercase;
         letter-spacing: 0.3px;
+        white-space: nowrap;
 
         @media (min-width: 768px) {
           font-size: 11px;
@@ -559,49 +557,67 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
       }
     }
+  }
 
-    .card-actions-header {
+  // Fila de acciones rápidas (íconos): ver / editar / eliminar
+  .card-actions-header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    padding: 4px 16px 12px;
+
+    @media (min-width: 768px) {
+      padding: 4px 20px 14px;
+      gap: 6px;
+    }
+
+    .icon-action {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: none;
+      background: #f8fafc;
+      color: #64748b;
       display: flex;
-      gap: 2px;
-      flex-shrink: 0;
-      width: 100%;
-      justify-content: flex-end;
-      margin-top: 4px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: $transition;
+      -webkit-tap-highlight-color: transparent;
 
-      @media (min-width: 480px) {
-        width: auto;
-        margin-top: 0;
-        gap: 4px;
-      }
-
-      .action-icon-btn {
-        --padding-start: 3px;
-        --padding-end: 3px;
-        height: 28px;
-        --color: #94a3b8;
-        transition: $transition;
+      ion-icon {
+        font-size: 16px;
 
         @media (min-width: 768px) {
-          --padding-start: 4px;
-          --padding-end: 4px;
-          height: 32px;
+          font-size: 17px;
         }
+      }
 
-        ion-icon {
-          font-size: 16px;
+      @media (min-width: 768px) {
+        width: 32px;
+        height: 32px;
+      }
 
-          @media (min-width: 768px) {
-            font-size: 18px;
-          }
-        }
+      // Foco accesible en vez del outline negro del navegador
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.18);
+      }
 
+      @media (hover: hover) and (pointer: fine) {
         &:hover {
-          --color: $upse-blue;
+          background: $upse-blue-light;
+          color: $upse-blue;
         }
 
         &.danger:hover {
-          --color: #ef4444;
+          background: #fef2f2;
+          color: #ef4444;
         }
+      }
+
+      &:active {
+        transform: scale(0.92);
       }
     }
   }
@@ -610,7 +626,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 6px;
-    padding: 0 14px 12px;
+    padding: 0 16px 12px;
 
     @media (min-width: 768px) {
       padding: 0 20px 16px;
@@ -669,7 +685,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .secciones-section {
-    padding: 0 14px 10px;
+    padding: 0 16px 10px;
 
     @media (min-width: 768px) {
       padding: 0 20px 12px;
@@ -690,9 +706,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         margin-bottom: 8px;
       }
 
-      ion-icon {
-        font-size: 12px;
-      }
+      ion-icon { font-size: 12px; }
     }
 
     .secciones-list {
@@ -711,18 +725,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 13px;
         }
 
-        .seccion-nombre {
-          color: #0f172a;
-          font-weight: 500;
-        }
+        .seccion-nombre { color: #0f172a; font-weight: 500; }
 
         .seccion-criterios {
           color: #94a3b8;
           font-size: 9px;
 
-          @media (min-width: 768px) {
-            font-size: 11px;
-          }
+          @media (min-width: 768px) { font-size: 11px; }
         }
       }
 
@@ -742,7 +751,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .niveles-section {
-    padding: 0 14px 12px;
+    padding: 0 16px 12px;
 
     @media (min-width: 768px) {
       padding: 0 20px 16px;
@@ -763,9 +772,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         margin-bottom: 8px;
       }
 
-      ion-icon {
-        font-size: 12px;
-      }
+      ion-icon { font-size: 12px; }
     }
 
     .niveles-list {
@@ -773,9 +780,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-wrap: wrap;
       gap: 4px;
 
-      @media (min-width: 768px) {
-        gap: 6px;
-      }
+      @media (min-width: 768px) { gap: 6px; }
 
       .nivel-item {
         display: flex;
@@ -794,10 +799,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           border-radius: 12px;
         }
 
-        .nivel-nombre {
-          color: #0f172a;
-          font-weight: 500;
-        }
+        .nivel-nombre { color: #0f172a; font-weight: 500; }
 
         .nivel-puntaje {
           color: $upse-blue;
@@ -829,59 +831,97 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  .card-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 10px 14px;
-    border-top: 1px solid #f1f5f9;
-
-    @media (min-width: 480px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  // Aviso cuando una rúbrica todavía no tiene nada configurado
+  .empty-content-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 16px 14px;
+    padding: 10px 12px;
+    background: $upse-gold-light;
+    border-radius: 10px;
+    font-size: 11.5px;
+    color: #92660f;
 
     @media (min-width: 768px) {
-      gap: 8px;
-      padding: 12px 20px;
+      margin: 0 20px 16px;
+      font-size: 12.5px;
     }
 
-    .action-btn {
-      --border-radius: 6px;
-      --padding-start: 4px;
-      --padding-end: 4px;
-      height: 30px;
-      font-size: 10px;
-      font-weight: 500;
-      --color: #64748b;
-      --border-color: #e2e8f0;
+    ion-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      color: $upse-gold;
+    }
+  }
+
+  // Footer: acción principal + secundaria
+  .card-actions {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px 16px;
+    border-top: 1px solid #f1f5f9;
+
+    @media (min-width: 768px) {
+      padding: 14px 20px 20px;
+    }
+
+    .action-btn-primary {
+      --background: #{$upse-blue};
+      --border-radius: 10px;
+      --box-shadow: 0 3px 10px rgba(0, 27, 76, 0.25);
+      font-weight: 600;
+      height: 40px;
+      font-size: 13px;
       transition: $transition;
 
       @media (min-width: 768px) {
-        --border-radius: 8px;
-        --padding-start: 8px;
-        --padding-end: 8px;
-        height: 34px;
-        font-size: 12px;
+        height: 42px;
+        font-size: 14px;
       }
 
-      ion-icon {
-        font-size: 12px;
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.2);
+      }
 
-        @media (min-width: 768px) {
-          font-size: 14px;
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          --background: #{$upse-blue-dark};
+          --box-shadow: 0 5px 16px rgba(0, 27, 76, 0.35);
+          transform: translateY(-1px);
         }
       }
+    }
 
-      &:hover {
-        --color: $upse-blue;
-        --border-color: $upse-blue;
+    .action-btn-secondary {
+      --border-radius: 10px;
+      --color: #64748b;
+      --border-color: #e2e8f0;
+      font-weight: 500;
+      font-size: 12px;
+      height: 34px;
+      transition: $transition;
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.15);
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          --color: #{$upse-blue};
+          --border-color: #{$upse-blue};
+        }
       }
     }
   }
 }
 
 // ============================================
-// EMPTY STATE - ESTILO UPSE
+// EMPTY STATE
 // ============================================
 .empty-state {
   grid-column: 1 / -1;
@@ -912,9 +952,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-size: 30px;
       color: $upse-blue;
 
-      @media (min-width: 768px) {
-        font-size: 40px;
-      }
+      @media (min-width: 768px) { font-size: 40px; }
     }
   }
 
@@ -942,7 +980,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-primary {
-    --background: $upse-blue;
+    --background: #{$upse-blue};
     --border-radius: 10px;
     font-weight: 600;
     --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
@@ -958,13 +996,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     ion-icon {
       font-size: 16px;
 
-      @media (min-width: 768px) {
-        font-size: 18px;
-      }
+      @media (min-width: 768px) { font-size: 18px; }
     }
 
     &:hover {
-      --background: $upse-blue-dark;
+      --background: #{$upse-blue-dark};
       --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
     }
   }
@@ -983,14 +1019,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     &:hover {
-      --border-color: $upse-blue;
-      --color: $upse-blue;
+      --border-color: #{$upse-blue};
+      --color: #{$upse-blue};
     }
   }
 }
 
 // ============================================
-// ERROR CONTAINER - ESTILO UPSE
+// ERROR CONTAINER
 // ============================================
 .error-container {
   display: flex;
@@ -1011,9 +1047,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 36px;
     color: #ef4444;
 
-    @media (min-width: 768px) {
-      font-size: 48px;
-    }
+    @media (min-width: 768px) { font-size: 48px; }
   }
 
   h3 {
@@ -1021,9 +1055,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 17px;
     color: #0f172a;
 
-    @media (min-width: 768px) {
-      font-size: 20px;
-    }
+    @media (min-width: 768px) { font-size: 20px; }
   }
 
   p {
@@ -1038,7 +1070,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-retry {
-    --background: $upse-blue;
+    --background: #{$upse-blue};
     --border-radius: 10px;
     font-weight: 600;
     height: 36px;
@@ -1052,14 +1084,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     &:hover {
-      --background: $upse-blue-dark;
+      --background: #{$upse-blue-dark};
       --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
     }
   }
 }
 
 // ============================================
-// ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE)
+// FAB - SOLO MÓVIL
 // ============================================
 .fab-mobile {
   display: block;
@@ -1070,20 +1102,18 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ion-fab-button {
-  --background: $upse-blue;
+  --background: #{$upse-blue};
   --box-shadow: 0 8px 24px rgba(0, 27, 76, 0.45);
 
-  ion-icon {
-    font-size: 24px;
-  }
+  ion-icon { font-size: 24px; }
 
   &:hover {
-    --background: $upse-blue-dark;
+    --background: #{$upse-blue-dark};
   }
 }
 
 // ============================================
-// MODAL - ESTILO UPSE
+// MODAL (edición de datos generales)
 // ============================================
 .modal-content {
   --background: #f8fafc;
@@ -1106,9 +1136,7 @@ ion-fab-button {
   .form-field {
     margin-bottom: 14px;
 
-    @media (min-width: 768px) {
-      margin-bottom: 18px;
-    }
+    @media (min-width: 768px) { margin-bottom: 18px; }
 
     .field-label {
       display: flex;
@@ -1129,9 +1157,7 @@ ion-fab-button {
         color: $upse-blue;
         font-size: 14px;
 
-        @media (min-width: 768px) {
-          font-size: 16px;
-        }
+        @media (min-width: 768px) { font-size: 16px; }
       }
 
       .required {
@@ -1169,9 +1195,7 @@ ion-fab-button {
         --padding-start: 0;
         font-size: 13px;
 
-        @media (min-width: 768px) {
-          font-size: 14px;
-        }
+        @media (min-width: 768px) { font-size: 14px; }
       }
     }
   }
@@ -1187,9 +1211,7 @@ ion-fab-button {
       gap: 12px;
     }
 
-    @media (min-width: 768px) {
-      margin-top: 16px;
-    }
+    @media (min-width: 768px) { margin-top: 16px; }
 
     .cancel-btn {
       --border-color: #e2e8f0;
@@ -1206,13 +1228,13 @@ ion-fab-button {
       }
 
       &:hover {
-        --border-color: $upse-blue;
-        --color: $upse-blue;
+        --border-color: #{$upse-blue};
+        --color: #{$upse-blue};
       }
     }
 
     .submit-btn {
-      --background: $upse-blue;
+      --background: #{$upse-blue};
       --border-radius: 8px;
       font-weight: 600;
       height: 38px;
@@ -1230,7 +1252,7 @@ ion-fab-button {
       }
 
       &:hover:not(:disabled) {
-        --background: $upse-blue-dark;
+        --background: #{$upse-blue-dark};
         --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
       }
 
@@ -1254,7 +1276,7 @@ ion-fab-button {
 }
 
 // ============================================
-// SCROLLBAR PERSONALIZADA
+// SCROLLBAR
 // ============================================
 ::-webkit-scrollbar {
   width: 6px;
