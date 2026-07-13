@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 import {
   IonHeader,
@@ -17,8 +17,6 @@ import {
   IonBadge
 } from '@ionic/angular/standalone';
 
-import { Router } from '@angular/router';
-
 import { addIcons } from 'ionicons';
 
 import {
@@ -26,10 +24,12 @@ import {
   peopleOutline,
   clipboardOutline,
   checkmarkCircleOutline,
+  checkmarkCircle,
   timeOutline,
   alertCircleOutline,
   refreshOutline,
   folderOpenOutline,
+  folderOutline,
   trophyOutline,
   starOutline,
   calendarOutline,
@@ -85,10 +85,12 @@ export class ProyectosAsignadosPage implements OnInit {
       peopleOutline,
       clipboardOutline,
       checkmarkCircleOutline,
+      checkmarkCircle,
       timeOutline,
       alertCircleOutline,
       refreshOutline,
       folderOpenOutline,
+      folderOutline,
       trophyOutline,
       starOutline,
       calendarOutline,
