@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import { Evaluacion, ResumenEvaluacion } from '../models/evaluacion.model';
@@ -47,7 +48,16 @@ export class EvaluacionService {
   }
 
   getAsignados(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/asignados`);
+    return this.http.get(`${this.apiUrl}/asignados`).pipe(
+      map((res: any) => {
+        const data = res?.data ?? res ?? [];
+        const lista = Array.isArray(data) ? data : (data ? [data] : []);
+        return {
+          ...res,
+          data: lista.map((item: any) => this.normalizarAsignado(item))
+        };
+      })
+    );
   }
 
   getReporteAdmin(): Observable<any> {
@@ -60,5 +70,23 @@ export class EvaluacionService {
 
   guardar(id: number, payload: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${id}/guardar`, payload);
+  }
+
+  /**
+   * Garantiza que el objeto "proyecto" embebido en cada asignación
+   * siempre tenga sus arrays (participantes, etc.) definidos,
+   * evitando errores en templates que acceden a .length directo.
+   */
+  private normalizarAsignado(item: any): any {
+    if (!item) return item;
+    return {
+      ...item,
+      proyecto: item.proyecto
+        ? {
+            ...item.proyecto,
+            participantes: item.proyecto.participantes || []
+          }
+        : item.proyecto
+    };
   }
 }
