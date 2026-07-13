@@ -20,7 +20,6 @@
 <ion-content class="resultados-content">
   <div class="page-container">
 
-    <!-- HEADER -->
     <div class="page-header">
       <div class="header-left">
         <h1>Mis evaluaciones</h1>
@@ -44,7 +43,6 @@
       </div>
     </div>
 
-    <!-- FILTROS -->
     <div class="filter-bar" *ngIf="!loading && evaluaciones.length > 0">
       <div class="filter-group">
         <span class="filter-label">Filtrar por:</span>
@@ -74,7 +72,6 @@
       </div>
     </div>
 
-    <!-- LOADING -->
     <div class="loading-grid" *ngIf="loading">
       <div class="resultado-skeleton" *ngFor="let i of [1,2,3,4]">
         <div class="skeleton-header">
@@ -92,7 +89,6 @@
       </div>
     </div>
 
-    <!-- ERROR -->
     <div class="error-container" *ngIf="!loading && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los resultados</h3>
@@ -103,10 +99,8 @@
       </ion-button>
     </div>
 
-    <!-- LISTA DE RESULTADOS -->
     <div class="resultados-list" *ngIf="!loading && !error">
       <div class="resultado-card" *ngFor="let e of evaluacionesFiltradas || []; trackBy: trackByEvaluacionId">
-        <!-- Card Header -->
         <div class="card-header">
           <div class="card-icon" [class]="getEstadoClase(e.porcentaje || 0)">
             <ion-icon [name]="getEstadoIcono(e.porcentaje || 0)"></ion-icon>
@@ -119,7 +113,7 @@
                 <ion-icon name="trophy-outline"></ion-icon>
                 {{ e.concursoNombre }}
               </span>
-              <span class="subtitle-item">
+              <span class="subtitle-item" *ngIf="e.fecha">
                 <ion-icon name="calendar-outline"></ion-icon>
                 {{ e.fecha | date:'dd/MM/yyyy' }}
               </span>
@@ -137,7 +131,6 @@
           </div>
         </div>
 
-        <!-- Progress Bar -->
         <div class="progress-container">
           <div class="progress-bar">
             <div class="progress-fill" 
@@ -146,12 +139,11 @@
           </div>
         </div>
 
-        <!-- Card Body -->
         <div class="card-body">
           <div class="card-meta">
-            <div class="meta-item">
+            <div class="meta-item" *ngIf="e.evaluadorNombre">
               <ion-icon name="person-outline"></ion-icon>
-              <span>{{ e.evaluadorNombre || 'Evaluador' }}</span>
+              <span>{{ e.evaluadorNombre }}</span>
             </div>
             <div class="meta-item" *ngIf="e.fecha">
               <ion-icon name="time-outline"></ion-icon>
@@ -170,7 +162,6 @@
           </div>
         </div>
 
-        <!-- Actions - BOTÓN VER DETALLE FUNCIONANDO -->
         <div class="card-actions" *ngIf="e.id">
           <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(e.id)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
@@ -183,7 +174,6 @@
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="evaluacionesFiltradas.length === 0 && !loading">
         <div class="empty-icon" *ngIf="evaluaciones.length === 0">
           <ion-icon name="stats-chart-outline"></ion-icon>
@@ -220,4 +210,77 @@
     </div>
 
   </div>
+
+  <!-- MODAL DE DETALLE (SOLO LECTURA) -->
+  <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Detalle de evaluación</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="modal-container">
+
+          <div class="modal-loading" *ngIf="cargandoDetalle">
+            <ion-spinner name="crescent"></ion-spinner>
+            <p>Cargando detalle...</p>
+          </div>
+
+          <div class="modal-error" *ngIf="!cargandoDetalle && errorDetalle">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <p>{{ errorDetalle }}</p>
+          </div>
+
+          <ng-container *ngIf="!cargandoDetalle && !errorDetalle && detalle">
+            <div class="detalle-header">
+              <h2>{{ detalle.proyectoNombre }}</h2>
+              <p *ngIf="detalle.concursoNombre">{{ detalle.concursoNombre }}</p>
+              <span class="detalle-rubrica">{{ detalle.rubricaNombre }}</span>
+            </div>
+
+            <div class="detalle-secciones">
+              <div class="detalle-seccion" *ngFor="let seccion of detalle.secciones; let i = index">
+                <div class="detalle-seccion-titulo">
+                  <span class="num">{{ i + 1 }}</span>
+                  {{ seccion.nombre }}
+                </div>
+
+                <div class="detalle-criterio" *ngFor="let criterio of seccion.criterios">
+                  <p class="criterio-texto">{{ criterio.texto }}</p>
+                  <div class="detalle-niveles">
+                    <div
+                      class="detalle-nivel"
+                      *ngFor="let nivel of criterio.niveles"
+                      [class.seleccionado]="nivelEstaSeleccionado(criterio.id, nivel.id)">
+                      <ion-icon
+                        [name]="nivelEstaSeleccionado(criterio.id, nivel.id) ? 'checkmark-circle-outline' : 'ellipse-outline'">
+                      </ion-icon>
+                      <span class="nivel-nombre">{{ nivel.nombre }}</span>
+                      <span class="nivel-puntaje">{{ nivel.puntaje }} pts</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detalle-observacion" *ngIf="detalle.observacion">
+              <div class="obs-header">
+                <ion-icon name="chatbubble-outline"></ion-icon>
+                <span>Observaciones</span>
+              </div>
+              <p>{{ detalle.observacion }}</p>
+            </div>
+          </ng-container>
+
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

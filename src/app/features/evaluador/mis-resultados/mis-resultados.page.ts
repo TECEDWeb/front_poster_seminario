@@ -13,7 +13,9 @@ import {
   IonButton,
   IonChip,
   IonLabel,
-  IonBadge
+  IonBadge,
+  IonModal,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -33,7 +35,8 @@ import {
   clipboardOutline,
   arrowForwardOutline,
   downloadOutline,
-  printOutline
+  printOutline,
+  chatbubbleOutline
 } from 'ionicons/icons';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
@@ -55,7 +58,9 @@ import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
     IonButton,
     IonChip,
     IonLabel,
-    IonBadge
+    IonBadge,
+    IonModal,
+    IonSpinner
   ],
   templateUrl: './mis-resultados.page.html',
   styleUrls: ['./mis-resultados.page.scss']
@@ -72,6 +77,12 @@ export class MisResultadosPage implements OnInit {
   evaluacionesRecientes: number = 0;
 
   filtroEstado: string = 'todos';
+
+  // Modal de detalle (solo lectura)
+  modalAbierto = false;
+  cargandoDetalle = false;
+  errorDetalle: string | null = null;
+  detalle: any = null;
 
   constructor(
     private evaluacionService: EvaluacionService,
@@ -94,7 +105,8 @@ export class MisResultadosPage implements OnInit {
       clipboardOutline,
       arrowForwardOutline,
       downloadOutline,
-      printOutline
+      printOutline,
+      chatbubbleOutline
     });
   }
 
@@ -106,13 +118,12 @@ export class MisResultadosPage implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.evaluacionService.listarResumen().subscribe({
+    this.evaluacionService.getMisResultados().subscribe({
       next: (res: any) => {
-        console.log('RESUMEN API:', res);
+        console.log('MIS RESULTADOS API:', res);
 
-        let data = res?.data ?? res ?? [];
-
-        this.evaluaciones = Array.isArray(data) ? data : data ? [data] : [];
+        const data = res?.data ?? res ?? [];
+        this.evaluaciones = Array.isArray(data) ? data : (data ? [data] : []);
 
         this.calcularEstadisticas();
         this.aplicarFiltros();
@@ -204,16 +215,81 @@ export class MisResultadosPage implements OnInit {
     return '#ef4444';
   }
 
+  /**
+   * Abre el modal de detalle en modo solo lectura, reutilizando
+   * el mismo endpoint /formulario que usa la pantalla de evaluación.
+   */
   verDetalle(id: number): void {
-    console.log('Ver detalle de evaluación ID:', id);
+    if (!id) return;
 
-    const evaluacion = this.evaluaciones.find(e => e.id === id);
+    this.modalAbierto = true;
+    this.cargandoDetalle = true;
+    this.errorDetalle = null;
+    this.detalle = null;
 
-    if (evaluacion) {
-      this.router.navigate(['/evaluador/formulario-evaluacion', id]);
-    } else {
-      this.router.navigate(['/evaluador/formulario-evaluacion', id]);
-    }
+    this.evaluacionService.getFormulario(id).subscribe({
+      next: (res: any) => {
+        console.log('DETALLE FORMULARIO (solo lectura):', res);
+
+        const data = res?.data?.data || res?.data || res || {};
+
+        if (!data || !data.secciones) {
+          this.errorDetalle = 'No se pudo cargar el detalle de esta evaluación';
+          this.cargandoDetalle = false;
+          return;
+        }
+
+        // Extraer las respuestas ya guardadas, probando estructuras posibles.
+        const respuestasMap: { [criterioId: number]: number } = {};
+        const detalles = data.detalles || data.respuestas || [];
+        if (Array.isArray(detalles)) {
+          detalles.forEach((d: any) => {
+            const critId = d.criterio_id ?? d.criterioId;
+            const nivId = d.nivel_id ?? d.nivelId;
+            if (critId != null && nivId != null) {
+              respuestasMap[critId] = nivId;
+            }
+          });
+        }
+
+        // Fallback: si cada criterio ya trae el nivel elegido embebido
+        data.secciones.forEach((seccion: any) => {
+          seccion.criterios?.forEach((criterio: any) => {
+            const nivelEmbebido = criterio.nivelSeleccionado ?? criterio.nivel_seleccionado ?? criterio.respuesta;
+            if (nivelEmbebido != null && respuestasMap[criterio.id] === undefined) {
+              const nivelId = typeof nivelEmbebido === 'object' ? nivelEmbebido.id : nivelEmbebido;
+              respuestasMap[criterio.id] = nivelId;
+            }
+          });
+        });
+
+        this.detalle = {
+          rubricaNombre: data.rubrica?.nombre || 'Rúbrica de evaluación',
+          proyectoNombre: data.proyecto?.nombre || 'Proyecto',
+          concursoNombre: data.concurso?.nombre || '',
+          observacion: data.observacion || data.observaciones || '',
+          secciones: data.secciones,
+          respuestas: respuestasMap
+        };
+
+        this.cargandoDetalle = false;
+      },
+      error: (err) => {
+        console.error('Error cargando detalle:', err);
+        this.errorDetalle = err.error?.mensaje || 'Error al cargar el detalle';
+        this.cargandoDetalle = false;
+      }
+    });
+  }
+
+  cerrarModal(): void {
+    this.modalAbierto = false;
+    this.detalle = null;
+    this.errorDetalle = null;
+  }
+
+  nivelEstaSeleccionado(criterioId: number, nivelId: number): boolean {
+    return this.detalle?.respuestas?.[criterioId] === nivelId;
   }
 
   exportarResultado(id: number): void {
