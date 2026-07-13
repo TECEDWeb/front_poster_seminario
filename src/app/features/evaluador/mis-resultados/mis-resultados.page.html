@@ -252,19 +252,12 @@
                   {{ seccion.nombre }}
                 </div>
 
-                <div class="detalle-criterio" *ngFor="let criterio of seccion.criterios">
-                  <p class="criterio-texto">{{ criterio.texto }}</p>
-                  <div class="detalle-niveles">
-                    <div
-                      class="detalle-nivel"
-                      *ngFor="let nivel of criterio.niveles"
-                      [class.seleccionado]="nivelEstaSeleccionado(criterio.id, nivel.id)">
-                      <ion-icon
-                        [name]="nivelEstaSeleccionado(criterio.id, nivel.id) ? 'checkmark-circle-outline' : 'ellipse-outline'">
-                      </ion-icon>
-                      <span class="nivel-nombre">{{ nivel.nombre }}</span>
-                      <span class="nivel-puntaje">{{ nivel.puntaje }} pts</span>
-                    </div>
+                <div class="detalle-criterio" *ngFor="let item of seccion.items">
+                  <p class="criterio-texto">{{ item.criterio }}</p>
+                  <div class="detalle-nivel-elegido">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <span class="nivel-nombre">{{ item.nivel }}</span>
+                    <span class="nivel-puntaje">{{ item.puntaje }} pts</span>
                   </div>
                 </div>
               </div>

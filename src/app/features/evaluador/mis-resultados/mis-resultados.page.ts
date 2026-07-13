@@ -36,7 +36,8 @@ import {
   arrowForwardOutline,
   downloadOutline,
   printOutline,
-  chatbubbleOutline
+  chatbubbleOutline,
+  listOutline
 } from 'ionicons/icons';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
@@ -78,7 +79,7 @@ export class MisResultadosPage implements OnInit {
 
   filtroEstado: string = 'todos';
 
-  // Modal de detalle (solo lectura)
+  // Modal de detalle
   modalAbierto = false;
   cargandoDetalle = false;
   errorDetalle: string | null = null;
@@ -106,7 +107,8 @@ export class MisResultadosPage implements OnInit {
       arrowForwardOutline,
       downloadOutline,
       printOutline,
-      chatbubbleOutline
+      chatbubbleOutline,
+      listOutline
     });
   }
 
@@ -216,8 +218,9 @@ export class MisResultadosPage implements OnInit {
   }
 
   /**
-   * Abre el modal de detalle en modo solo lectura, reutilizando
-   * el mismo endpoint /formulario que usa la pantalla de evaluación.
+   * Abre el modal de detalle usando /api/evaluador/resultado/:id,
+   * que devuelve el desglose sección → criterio → nivel elegido
+   * como una lista plana en `detalles`.
    */
   verDetalle(id: number): void {
     if (!id) return;
@@ -227,49 +230,38 @@ export class MisResultadosPage implements OnInit {
     this.errorDetalle = null;
     this.detalle = null;
 
-    this.evaluacionService.getFormulario(id).subscribe({
+    this.evaluacionService.getResultadoDetalle(id).subscribe({
       next: (res: any) => {
-        console.log('DETALLE FORMULARIO (solo lectura):', res);
+        console.log('DETALLE RESULTADO:', res);
 
-        const data = res?.data?.data || res?.data || res || {};
-
-        if (!data || !data.secciones) {
-          this.errorDetalle = 'No se pudo cargar el detalle de esta evaluación';
+        if (res?.ok === false) {
+          this.errorDetalle = res.mensaje || 'No se pudo cargar el detalle';
           this.cargandoDetalle = false;
           return;
         }
 
-        // Extraer las respuestas ya guardadas, probando estructuras posibles.
-        const respuestasMap: { [criterioId: number]: number } = {};
-        const detalles = data.detalles || data.respuestas || [];
-        if (Array.isArray(detalles)) {
-          detalles.forEach((d: any) => {
-            const critId = d.criterio_id ?? d.criterioId;
-            const nivId = d.nivel_id ?? d.nivelId;
-            if (critId != null && nivId != null) {
-              respuestasMap[critId] = nivId;
-            }
-          });
-        }
+        const data = res?.data ?? res;
 
-        // Fallback: si cada criterio ya trae el nivel elegido embebido
-        data.secciones.forEach((seccion: any) => {
-          seccion.criterios?.forEach((criterio: any) => {
-            const nivelEmbebido = criterio.nivelSeleccionado ?? criterio.nivel_seleccionado ?? criterio.respuesta;
-            if (nivelEmbebido != null && respuestasMap[criterio.id] === undefined) {
-              const nivelId = typeof nivelEmbebido === 'object' ? nivelEmbebido.id : nivelEmbebido;
-              respuestasMap[criterio.id] = nivelId;
-            }
-          });
+        // Agrupar la lista plana de detalles por sección
+        const seccionesMap: { [nombre: string]: any[] } = {};
+        (data.detalles || []).forEach((d: any) => {
+          if (!seccionesMap[d.seccion]) {
+            seccionesMap[d.seccion] = [];
+          }
+          seccionesMap[d.seccion].push(d);
         });
 
         this.detalle = {
-          rubricaNombre: data.rubrica?.nombre || 'Rúbrica de evaluación',
-          proyectoNombre: data.proyecto?.nombre || 'Proyecto',
-          concursoNombre: data.concurso?.nombre || '',
-          observacion: data.observacion || data.observaciones || '',
-          secciones: data.secciones,
-          respuestas: respuestasMap
+          rubricaNombre: data.rubricaNombre || 'Rúbrica de evaluación',
+          proyectoNombre: data.proyectoNombre || 'Proyecto',
+          concursoNombre: data.concursoNombre || '',
+          observacion: data.observaciones || '',
+          puntajeMaximo: data.puntajeMaximo,
+          fecha: data.fecha,
+          secciones: Object.keys(seccionesMap).map(nombre => ({
+            nombre,
+            items: seccionesMap[nombre]
+          }))
         };
 
         this.cargandoDetalle = false;
@@ -286,10 +278,6 @@ export class MisResultadosPage implements OnInit {
     this.modalAbierto = false;
     this.detalle = null;
     this.errorDetalle = null;
-  }
-
-  nivelEstaSeleccionado(criterioId: number, nivelId: number): boolean {
-    return this.detalle?.respuestas?.[criterioId] === nivelId;
   }
 
   exportarResultado(id: number): void {
