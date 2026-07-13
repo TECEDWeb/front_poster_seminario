@@ -430,7 +430,6 @@ export class RubricaBuilderComponent implements OnChanges {
     });
   }
 
-  // ---------- NIVELES GLOBALES (escala del concurso) ----------
 
   abrirNuevoNivelGlobal(): void {
     this.agregandoNivelGlobal = true;
