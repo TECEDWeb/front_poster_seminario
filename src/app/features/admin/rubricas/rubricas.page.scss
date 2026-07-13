@@ -1297,3 +1297,141 @@ ion-fab-button {
 ::-webkit-scrollbar-thumb:hover {
   background: $upse-blue-dark;
 }
+// Mejoras adicionales para el builder
+
+// Estados de carga y error mejorados
+.loading-state, .error-state {
+  ion-button {
+    margin-top: 8px;
+    --border-color: #{$upse-blue};
+    --color: #{$upse-blue};
+  }
+}
+
+// Mejoras para niveles personalizados
+.niveles-criterio {
+  .niveles-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+
+    .niveles-criterio-hint {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #94a3b8;
+
+      .hint-light {
+        opacity: 0.7;
+        font-style: italic;
+      }
+
+      ion-icon {
+        font-size: 14px;
+        color: $upse-blue;
+      }
+    }
+  }
+}
+
+// Mejoras para secciones
+.seccion-card {
+  .seccion-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-left: 8px;
+    font-style: italic;
+  }
+
+  .seccion-titulo {
+    flex-wrap: wrap;
+
+    .seccion-count {
+      background: $upse-blue-light;
+      padding: 1px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      color: $upse-blue;
+    }
+  }
+}
+
+// Botones de acción en criterios
+.criterio-main {
+  .criterio-actions {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+  }
+}
+
+// Mejoras para filas de adición
+.add-row {
+  &.seccion-add {
+    background: $upse-blue-light;
+    border-color: $upse-blue;
+    padding: 12px 14px;
+  }
+}
+
+// Mejoras para el panel de estadísticas en el header
+.stats-mini {
+  transition: $transition;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+    border-color: $upse-blue;
+  }
+}
+
+// Responsive mejorado
+@media (max-width: 576px) {
+  .builder-container {
+    padding: 12px 8px 40px;
+  }
+
+  .panel {
+    padding: 14px 12px;
+  }
+
+  .nivel-row, .add-row {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .inline-input {
+    min-width: 60px;
+    font-size: 12px;
+    padding: 4px 6px;
+
+    &.small {
+      flex: 0 0 50px;
+      min-width: 50px;
+    }
+  }
+
+  .icon-btn {
+    width: 24px;
+    height: 24px;
+
+    ion-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+// Ajustes para el modal
+.modal-content {
+  .modal-container {
+    .form-field {
+      .field-input {
+        ion-select {
+          --placeholder-color: #94a3b8;
+        }
+      }
+    }
+  }
+}

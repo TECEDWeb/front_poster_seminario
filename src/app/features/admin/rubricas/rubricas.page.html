@@ -20,6 +20,7 @@
 <ion-content class="rubricas-content">
   <div class="page-container">
 
+    <!-- ========== HEADER ========== -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de rúbricas</h1>
@@ -50,6 +51,7 @@
       </div>
     </div>
 
+    <!-- ========== FILTROS ========== -->
     <div class="filter-bar" *ngIf="!cargando && rubricas.length > 0">
       <div class="filter-group search-group">
         <ion-searchbar
@@ -75,12 +77,15 @@
         </ion-select>
       </div>
 
-      <ion-button fill="clear" size="small" class="btn-clear-filters" (click)="limpiarFiltros()" *ngIf="filtroBusqueda || filtroSecciones !== 'todos'">
+      <ion-button fill="clear" size="small" class="btn-clear-filters" 
+                  (click)="limpiarFiltros()" 
+                  *ngIf="filtroBusqueda || filtroSecciones !== 'todos'">
         <ion-icon name="close-outline"></ion-icon>
         Limpiar
       </ion-button>
     </div>
 
+    <!-- ========== LOADING ========== -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="rubrica-skeleton" *ngFor="let i of [1,2,3,4]">
         <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
@@ -94,6 +99,7 @@
       </div>
     </div>
 
+    <!-- ========== ERROR ========== -->
     <div class="error-container" *ngIf="!cargando && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los datos</h3>
@@ -104,10 +110,13 @@
       </ion-button>
     </div>
 
+    <!-- ========== GRID DE RÚBRICAS ========== -->
     <div class="rubricas-grid" *ngIf="!cargando && !error">
+      
+      <!-- Tarjeta de rúbrica -->
       <div class="rubrica-card" *ngFor="let r of rubricasFiltradas || []; trackBy: trackById">
 
-        <!-- Header: identidad + estado + acciones rápidas -->
+        <!-- Header -->
         <div class="card-header">
           <div class="card-icon">
             <ion-icon name="checkbox-outline"></ion-icon>
@@ -117,12 +126,13 @@
             <span class="card-subtitle">Concurso ID: {{ r.concursoId }}</span>
           </div>
           <div class="card-status">
-            <span class="status-badge" [class]="getStatusClass(r.secciones.length || 0)">
-              {{ getStatusText(r.secciones.length || 0) }}
+            <span class="status-badge" [class]="getStatusClass(r.secciones?.length || 0)">
+              {{ getStatusText(r.secciones?.length || 0) }}
             </span>
           </div>
         </div>
 
+        <!-- Acciones rápidas -->
         <div class="card-actions-header">
           <button class="icon-action" (click)="verDetalle(r)" title="Ver detalle">
             <ion-icon name="eye-outline"></ion-icon>
@@ -135,20 +145,20 @@
           </button>
         </div>
 
-        <!-- Stats -->
+        <!-- Estadísticas -->
         <div class="card-stats">
           <div class="stat-item">
             <ion-icon name="layers-outline"></ion-icon>
             <div class="stat-content">
               <span class="stat-label">Secciones</span>
-              <span class="stat-value">{{ r.secciones.length || 0 }}</span>
+              <span class="stat-value">{{ r.secciones?.length || 0 }}</span>
             </div>
           </div>
           <div class="stat-item">
             <ion-icon name="list-outline"></ion-icon>
             <div class="stat-content">
               <span class="stat-label">Niveles</span>
-              <span class="stat-value">{{ r.niveles.length || 0 }}</span>
+              <span class="stat-value">{{ r.niveles?.length || 0 }}</span>
             </div>
           </div>
           <div class="stat-item">
@@ -161,7 +171,7 @@
         </div>
 
         <!-- Secciones preview -->
-        <div class="secciones-section" *ngIf="r.secciones.length">
+        <div class="secciones-section" *ngIf="r.secciones?.length">
           <div class="secciones-header">
             <ion-icon name="layers-outline"></ion-icon>
             <span>Secciones</span>
@@ -169,7 +179,7 @@
           <div class="secciones-list">
             <div class="seccion-item" *ngFor="let s of r.secciones.slice(0, 3)">
               <span class="seccion-nombre">{{ s.nombre }}</span>
-              <span class="seccion-criterios">{{ s.criterios.length || 0 }} criterios</span>
+              <span class="seccion-criterios">{{ s.criterios?.length || 0 }} criterios</span>
             </div>
             <div class="seccion-more" *ngIf="r.secciones.length > 3">
               +{{ r.secciones.length - 3 }} secciones más
@@ -178,7 +188,7 @@
         </div>
 
         <!-- Niveles preview -->
-        <div class="niveles-section" *ngIf="r.niveles.length">
+        <div class="niveles-section" *ngIf="r.niveles?.length">
           <div class="niveles-header">
             <ion-icon name="list-outline"></ion-icon>
             <span>Niveles de desempeño</span>
@@ -194,13 +204,13 @@
           </div>
         </div>
 
-        <!-- Empty state cuando la rúbrica todavía no tiene contenido -->
-        <div class="empty-content-hint" *ngIf="!r.secciones.length && !r.niveles.length">
+        <!-- Empty state de contenido -->
+        <div class="empty-content-hint" *ngIf="!r.secciones?.length && !r.niveles?.length">
           <ion-icon name="alert-circle-outline"></ion-icon>
           <span>Esta rúbrica aún no tiene secciones ni niveles configurados</span>
         </div>
 
-        <!-- Footer: acción principal + secundaria -->
+        <!-- Acciones principales -->
         <div class="card-actions">
           <ion-button expand="block" class="action-btn-primary" (click)="abrirBuilder(r)">
             <ion-icon name="options-outline" slot="start"></ion-icon>
@@ -213,6 +223,7 @@
         </div>
       </div>
 
+      <!-- Estado: sin resultados de filtro -->
       <div class="empty-state" *ngIf="rubricasFiltradas.length === 0 && rubricas.length > 0">
         <div class="empty-icon">
           <ion-icon name="filter-outline"></ion-icon>
@@ -225,6 +236,7 @@
         </ion-button>
       </div>
 
+      <!-- Estado: sin rúbricas -->
       <div class="empty-state" *ngIf="rubricas.length === 0">
         <div class="empty-icon">
           <ion-icon name="checkbox-outline"></ion-icon>
@@ -240,13 +252,14 @@
 
   </div>
 
+  <!-- ========== FAB MÓVIL ========== -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- MODAL: editar datos generales de la rúbrica -->
+  <!-- ========== MODAL: Editar datos generales ========== -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -263,6 +276,8 @@
       <ion-content class="modal-content">
         <div class="modal-container">
           <form (ngSubmit)="guardar()" #rubricaForm="ngForm">
+            
+            <!-- Selección de concurso -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="trophy-outline"></ion-icon>
@@ -282,6 +297,7 @@
               </ion-item>
             </div>
 
+            <!-- Nombre de la rúbrica -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>
@@ -298,6 +314,7 @@
               </ion-item>
             </div>
 
+            <!-- Descripción -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="document-text-outline"></ion-icon>
@@ -313,6 +330,7 @@
               </ion-item>
             </div>
 
+            <!-- Puntaje máximo -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="star-outline"></ion-icon>
@@ -328,6 +346,7 @@
               </ion-item>
             </div>
 
+            <!-- Acciones del formulario -->
             <div class="form-actions">
               <ion-button
                 type="button"
@@ -355,8 +374,7 @@
     </ng-template>
   </ion-modal>
 
-  <!-- MODAL: constructor de secciones/criterios/niveles -->
-  <!-- Ahora es HERMANO del modal de edición, no anidado dentro -->
+  <!-- ========== MODAL: Constructor de rúbrica ========== -->
   <ion-modal [isOpen]="builderAbierto" (didDismiss)="cerrarBuilder()">
     <ng-template>
       <app-rubrica-builder

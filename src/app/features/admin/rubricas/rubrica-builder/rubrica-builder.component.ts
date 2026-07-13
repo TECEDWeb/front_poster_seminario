@@ -17,6 +17,7 @@ import { CriterioService } from 'src/app/core/services/cirterio.service';
 import { NivelService } from '../../../../core/services/nivel.service';
 import { Seccion, Criterio, Nivel } from '../../../../core/models/rubrica.model';
 
+// Interfaces extendidas con propiedades UI
 interface NivelUI extends Nivel {
   editando?: boolean;
   nombreTemp?: string;
@@ -97,9 +98,18 @@ export class RubricaBuilderComponent implements OnChanges {
     this.cargando = true;
     this.error = null;
 
+    // Cargar secciones
     this.seccionService.listarPorConcurso(this.concursoId).subscribe({
       next: (secciones) => {
-        this.secciones = secciones.map(s => ({ ...s, criterios: [], expandida: true }));
+        this.secciones = secciones.map(s => ({ 
+          ...s, 
+          criterios: [], 
+          expandida: true,
+          cargandoCriterios: false,
+          agregandoCriterio: false,
+          nuevoCriterioTexto: ''
+        }));
+        // Cargar criterios para cada sección
         this.secciones.forEach(s => this.cargarCriterios(s));
       },
       error: (err) => {
@@ -108,9 +118,10 @@ export class RubricaBuilderComponent implements OnChanges {
       }
     });
 
+    // Cargar niveles globales
     this.nivelService.listarGlobales(this.concursoId).subscribe({
       next: (niveles) => {
-        this.nivelesGlobales = niveles;
+        this.nivelesGlobales = niveles.map(n => ({ ...n }));
         this.cargando = false;
       },
       error: () => {
@@ -126,7 +137,14 @@ export class RubricaBuilderComponent implements OnChanges {
     seccion.cargandoCriterios = true;
     this.criterioService.listarPorSeccion(seccion.id).subscribe({
       next: (criterios) => {
-        seccion.criterios = criterios.map(c => ({ ...c }));
+        seccion.criterios = criterios.map(c => ({ 
+          ...c,
+          mostrarNiveles: false,
+          cargandoNiveles: false,
+          agregandoNivel: false,
+          nivelesPersonalizados: [],
+          nuevoNivel: { nombre: '', puntaje: null, descripcion: '' }
+        }));
         seccion.cargandoCriterios = false;
       },
       error: () => {
@@ -159,10 +177,22 @@ export class RubricaBuilderComponent implements OnChanges {
       descripcion: this.nuevaSeccionDescripcion.trim() || null
     }).subscribe({
       next: (seccion) => {
-        this.secciones.push({ ...seccion, criterios: [], expandida: true });
+        const nuevaSeccion: SeccionUI = {
+          ...seccion,
+          criterios: [],
+          expandida: true,
+          cargandoCriterios: false,
+          agregandoCriterio: false,
+          nuevoCriterioTexto: ''
+        };
+        this.secciones.push(nuevaSeccion);
         this.agregandoSeccion = false;
+        // Recargar para asegurar consistencia
+        this.cargarCriterios(nuevaSeccion);
       },
-      error: (err) => alert(err.error?.mensaje || 'Error al crear la sección')
+      error: (err) => {
+        alert(err.error?.mensaje || 'Error al crear la sección');
+      }
     });
   }
 
@@ -219,7 +249,15 @@ export class RubricaBuilderComponent implements OnChanges {
 
     this.criterioService.crear({ seccionId: seccion.id, texto }).subscribe({
       next: (criterio) => {
-        seccion.criterios.push({ ...criterio });
+        const nuevoCriterio: CriterioUI = {
+          ...criterio,
+          mostrarNiveles: false,
+          cargandoNiveles: false,
+          agregandoNivel: false,
+          nivelesPersonalizados: [],
+          nuevoNivel: { nombre: '', puntaje: null, descripcion: '' }
+        };
+        seccion.criterios.push(nuevoCriterio);
         seccion.agregandoCriterio = false;
       },
       error: (err) => alert(err.error?.mensaje || 'Error al crear el criterio')
@@ -263,11 +301,11 @@ export class RubricaBuilderComponent implements OnChanges {
   toggleNivelesPersonalizados(criterio: CriterioUI): void {
     criterio.mostrarNiveles = !criterio.mostrarNiveles;
 
-    if (criterio.mostrarNiveles && !criterio.nivelesPersonalizados) {
+    if (criterio.mostrarNiveles && !criterio.nivelesPersonalizados?.length) {
       criterio.cargandoNiveles = true;
       this.nivelService.listarPorCriterio(criterio.id).subscribe({
         next: (niveles) => {
-          criterio.nivelesPersonalizados = niveles;
+          criterio.nivelesPersonalizados = niveles.map(n => ({ ...n }));
           criterio.cargandoNiveles = false;
         },
         error: () => {
@@ -298,8 +336,12 @@ export class RubricaBuilderComponent implements OnChanges {
       criterioId: criterio.id
     }).subscribe({
       next: (nivel) => {
-        criterio.nivelesPersonalizados = [...(criterio.nivelesPersonalizados || []), nivel];
+        if (!criterio.nivelesPersonalizados) {
+          criterio.nivelesPersonalizados = [];
+        }
+        criterio.nivelesPersonalizados.push({ ...nivel });
         criterio.agregandoNivel = false;
+        criterio.nuevoNivel = { nombre: '', puntaje: null, descripcion: '' };
       },
       error: (err) => alert(err.error?.mensaje || 'Error al crear el nivel')
     });
@@ -366,8 +408,9 @@ export class RubricaBuilderComponent implements OnChanges {
       descripcion: this.nuevoNivelGlobal.descripcion.trim() || null
     }).subscribe({
       next: (nivel) => {
-        this.nivelesGlobales.push(nivel);
+        this.nivelesGlobales.push({ ...nivel });
         this.agregandoNivelGlobal = false;
+        this.nuevoNivelGlobal = { nombre: '', puntaje: null, descripcion: '' };
       },
       error: (err) => alert(err.error?.mensaje || 'Error al crear el nivel')
     });

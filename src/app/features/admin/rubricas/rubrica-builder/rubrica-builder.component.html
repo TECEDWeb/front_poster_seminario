@@ -15,19 +15,25 @@
 <ion-content class="builder-content">
   <div class="builder-container">
 
+    <!-- Estado de carga -->
     <div class="loading-state" *ngIf="cargando">
       <ion-spinner name="crescent"></ion-spinner>
       <p>Cargando estructura de la rúbrica...</p>
     </div>
 
+    <!-- Estado de error -->
     <div class="error-state" *ngIf="!cargando && error">
       <ion-icon name="alert-circle-outline"></ion-icon>
       <p>{{ error }}</p>
+      <ion-button (click)="cargarTodo()" fill="outline" size="small">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
     </div>
 
     <ng-container *ngIf="!cargando && !error">
 
-      <!-- ESCALA GLOBAL DE NIVELES -->
+      <!-- ========== ESCALA GLOBAL DE NIVELES ========== -->
       <section class="panel">
         <div class="panel-header">
           <div class="panel-title">
@@ -37,151 +43,229 @@
           <span class="panel-hint">Se aplica a todos los criterios, salvo que tengan niveles propios</span>
         </div>
 
+        <!-- Lista de niveles globales -->
         <div class="niveles-list">
           <div class="nivel-row" *ngFor="let n of nivelesGlobales; trackBy: trackById">
+            <!-- Modo vista -->
             <ng-container *ngIf="!n.editando; else editNivelGlobal">
               <span class="nivel-nombre">{{ n.nombre }}</span>
               <span class="nivel-puntaje">{{ n.puntaje }} pts</span>
               <span class="nivel-desc" *ngIf="n.descripcion">{{ n.descripcion }}</span>
               <div class="row-actions">
-                <button class="icon-btn" (click)="editarNivel(n)"><ion-icon name="create-outline"></ion-icon></button>
-                <button class="icon-btn danger" (click)="eliminarNivel(n, nivelesGlobales)"><ion-icon name="trash-outline"></ion-icon></button>
+                <button class="icon-btn" (click)="editarNivel(n)" title="Editar nivel">
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button class="icon-btn danger" (click)="eliminarNivel(n, nivelesGlobales)" title="Eliminar nivel">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
               </div>
             </ng-container>
+
+            <!-- Modo edición -->
             <ng-template #editNivelGlobal>
               <input class="inline-input" [(ngModel)]="n.nombreTemp" placeholder="Nombre" />
               <input class="inline-input small" type="number" [(ngModel)]="n.puntajeTemp" placeholder="Pts" />
               <input class="inline-input" [(ngModel)]="n.descripcionTemp" placeholder="Descripción (opcional)" />
               <div class="row-actions">
-                <button class="icon-btn success" (click)="guardarNivel(n, nivelesGlobales)"><ion-icon name="checkmark-outline"></ion-icon></button>
-                <button class="icon-btn" (click)="n.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+                <button class="icon-btn success" (click)="guardarNivel(n, nivelesGlobales)" title="Guardar">
+                  <ion-icon name="checkmark-outline"></ion-icon>
+                </button>
+                <button class="icon-btn" (click)="n.editando = false" title="Cancelar">
+                  <ion-icon name="close-outline"></ion-icon>
+                </button>
               </div>
             </ng-template>
           </div>
 
+          <!-- Estado vacío -->
           <div class="empty-mini" *ngIf="nivelesGlobales.length === 0 && !agregandoNivelGlobal">
+            <ion-icon name="information-circle-outline"></ion-icon>
             Sin niveles definidos aún
           </div>
         </div>
 
+        <!-- Formulario agregar nivel global -->
         <div class="add-row" *ngIf="agregandoNivelGlobal">
           <input class="inline-input" [(ngModel)]="nuevoNivelGlobal.nombre" placeholder="Nombre (ej: Excelente)" />
           <input class="inline-input small" type="number" [(ngModel)]="nuevoNivelGlobal.puntaje" placeholder="Pts" />
           <input class="inline-input" [(ngModel)]="nuevoNivelGlobal.descripcion" placeholder="Descripción (opcional)" />
           <div class="row-actions">
-            <button class="icon-btn success" (click)="guardarNuevoNivelGlobal()"><ion-icon name="checkmark-outline"></ion-icon></button>
-            <button class="icon-btn" (click)="agregandoNivelGlobal = false"><ion-icon name="close-outline"></ion-icon></button>
+            <button class="icon-btn success" (click)="guardarNuevoNivelGlobal()" title="Guardar">
+              <ion-icon name="checkmark-outline"></ion-icon>
+            </button>
+            <button class="icon-btn" (click)="agregandoNivelGlobal = false" title="Cancelar">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
           </div>
         </div>
 
+        <!-- Botón agregar nivel -->
         <button class="add-btn" *ngIf="!agregandoNivelGlobal" (click)="abrirNuevoNivelGlobal()">
           <ion-icon name="add-outline"></ion-icon>
           Agregar nivel
         </button>
       </section>
 
-      <!-- SECCIONES Y CRITERIOS -->
+      <!-- ========== SECCIONES Y CRITERIOS ========== -->
       <section class="panel">
         <div class="panel-header">
           <div class="panel-title">
             <ion-icon name="layers-outline"></ion-icon>
             <h2>Secciones y criterios</h2>
           </div>
+          <span class="panel-hint">Organiza los criterios en secciones para una mejor estructura</span>
         </div>
 
         <div class="secciones-list">
+          <!-- Tarjeta de cada sección -->
           <div class="seccion-card" *ngFor="let s of secciones; trackBy: trackById">
+            <!-- Header de la sección -->
             <div class="seccion-header" (click)="toggleSeccion(s)">
               <ion-icon [name]="s.expandida ? 'chevron-down-outline' : 'chevron-forward-outline'" class="chevron"></ion-icon>
 
+              <!-- Modo vista -->
               <ng-container *ngIf="!s.editando; else editSeccion">
                 <div class="seccion-titulo" (click)="$event.stopPropagation()">
                   <strong>{{ s.nombre }}</strong>
-                  <span class="seccion-count">{{ s.criterios.length }} criterio(s)</span>
+                  <span class="seccion-count">{{ s.criterios?.length || 0 }} criterio(s)</span>
+                  <span class="seccion-desc" *ngIf="s.descripcion">{{ s.descripcion }}</span>
                 </div>
                 <div class="row-actions" (click)="$event.stopPropagation()">
-                  <button class="icon-btn" (click)="editarSeccion(s)"><ion-icon name="create-outline"></ion-icon></button>
-                  <button class="icon-btn danger" (click)="eliminarSeccion(s)"><ion-icon name="trash-outline"></ion-icon></button>
+                  <button class="icon-btn" (click)="editarSeccion(s)" title="Editar sección">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </button>
+                  <button class="icon-btn danger" (click)="eliminarSeccion(s)" title="Eliminar sección">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
                 </div>
               </ng-container>
 
+              <!-- Modo edición sección -->
               <ng-template #editSeccion>
                 <div class="seccion-titulo edit-mode" (click)="$event.stopPropagation()">
                   <input class="inline-input" [(ngModel)]="s.nombreTemp" placeholder="Nombre de la sección" />
                   <input class="inline-input" [(ngModel)]="s.descripcionTemp" placeholder="Descripción (opcional)" />
                 </div>
                 <div class="row-actions" (click)="$event.stopPropagation()">
-                  <button class="icon-btn success" (click)="guardarSeccion(s)"><ion-icon name="checkmark-outline"></ion-icon></button>
-                  <button class="icon-btn" (click)="s.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+                  <button class="icon-btn success" (click)="guardarSeccion(s)" title="Guardar">
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                  </button>
+                  <button class="icon-btn" (click)="s.editando = false" title="Cancelar">
+                    <ion-icon name="close-outline"></ion-icon>
+                  </button>
                 </div>
               </ng-template>
             </div>
 
+            <!-- Body de la sección (expandible) -->
             <div class="seccion-body" *ngIf="s.expandida">
 
+              <!-- Cargando criterios -->
               <div class="loading-mini" *ngIf="s.cargandoCriterios">
                 <ion-spinner name="dots"></ion-spinner>
+                <span>Cargando criterios...</span>
               </div>
 
+              <!-- Lista de criterios -->
               <div class="criterio-row" *ngFor="let c of s.criterios; trackBy: trackById">
                 <div class="criterio-main">
+                  <!-- Modo vista criterio -->
                   <ng-container *ngIf="!c.editando; else editCriterio">
                     <span class="criterio-texto">{{ c.texto }}</span>
-                    <div class="row-actions">
-                      <button class="icon-btn" (click)="toggleNivelesPersonalizados(c)" [class.active]="c.mostrarNiveles">
+                    <div class="criterio-actions">
+                      <button class="icon-btn" (click)="toggleNivelesPersonalizados(c)" 
+                              [class.active]="c.mostrarNiveles" title="Niveles personalizados">
                         <ion-icon name="options-outline"></ion-icon>
                       </button>
-                      <button class="icon-btn" (click)="editarCriterio(c)"><ion-icon name="create-outline"></ion-icon></button>
-                      <button class="icon-btn danger" (click)="eliminarCriterio(s, c)"><ion-icon name="trash-outline"></ion-icon></button>
+                      <button class="icon-btn" (click)="editarCriterio(c)" title="Editar criterio">
+                        <ion-icon name="create-outline"></ion-icon>
+                      </button>
+                      <button class="icon-btn danger" (click)="eliminarCriterio(s, c)" title="Eliminar criterio">
+                        <ion-icon name="trash-outline"></ion-icon>
+                      </button>
                     </div>
                   </ng-container>
+
+                  <!-- Modo edición criterio -->
                   <ng-template #editCriterio>
                     <input class="inline-input wide" [(ngModel)]="c.textoTemp" placeholder="Texto del criterio" />
                     <div class="row-actions">
-                      <button class="icon-btn success" (click)="guardarCriterio(c)"><ion-icon name="checkmark-outline"></ion-icon></button>
-                      <button class="icon-btn" (click)="c.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+                      <button class="icon-btn success" (click)="guardarCriterio(c)" title="Guardar">
+                        <ion-icon name="checkmark-outline"></ion-icon>
+                      </button>
+                      <button class="icon-btn" (click)="c.editando = false" title="Cancelar">
+                        <ion-icon name="close-outline"></ion-icon>
+                      </button>
                     </div>
                   </ng-template>
                 </div>
 
-                <!-- Niveles personalizados de este criterio -->
+                <!-- Niveles personalizados del criterio -->
                 <div class="niveles-criterio" *ngIf="c.mostrarNiveles">
                   <div class="loading-mini" *ngIf="c.cargandoNiveles">
                     <ion-spinner name="dots"></ion-spinner>
+                    <span>Cargando niveles...</span>
                   </div>
 
-                  <p class="niveles-criterio-hint" *ngIf="!c.cargandoNiveles">
-                    Niveles propios de este criterio (si no agregas ninguno, se usa la escala global)
-                  </p>
+                  <div class="niveles-header" *ngIf="!c.cargandoNiveles">
+                    <span class="niveles-criterio-hint">
+                      <ion-icon name="information-circle-outline"></ion-icon>
+                      Niveles propios de este criterio 
+                      <span class="hint-light">(si no agregas ninguno, se usa la escala global)</span>
+                    </span>
+                  </div>
 
+                  <!-- Lista de niveles personalizados -->
                   <div class="nivel-row small" *ngFor="let n of c.nivelesPersonalizados; trackBy: trackById">
+                    <!-- Modo vista -->
                     <ng-container *ngIf="!n.editando; else editNivelCrit">
                       <span class="nivel-nombre">{{ n.nombre }}</span>
                       <span class="nivel-puntaje">{{ n.puntaje }} pts</span>
                       <div class="row-actions">
-                        <button class="icon-btn" (click)="editarNivel(n)"><ion-icon name="create-outline"></ion-icon></button>
-                        <button class="icon-btn danger" (click)="eliminarNivel(n, c.nivelesPersonalizados!)"><ion-icon name="trash-outline"></ion-icon></button>
+                        <button class="icon-btn" (click)="editarNivel(n)" title="Editar nivel">
+                          <ion-icon name="create-outline"></ion-icon>
+                        </button>
+                        <button class="icon-btn danger" (click)="eliminarNivel(n, c.nivelesPersonalizados!)" title="Eliminar nivel">
+                          <ion-icon name="trash-outline"></ion-icon>
+                        </button>
                       </div>
                     </ng-container>
+
+                    <!-- Modo edición nivel personalizado -->
                     <ng-template #editNivelCrit>
                       <input class="inline-input" [(ngModel)]="n.nombreTemp" placeholder="Nombre" />
                       <input class="inline-input small" type="number" [(ngModel)]="n.puntajeTemp" placeholder="Pts" />
                       <div class="row-actions">
-                        <button class="icon-btn success" (click)="guardarNivel(n, c.nivelesPersonalizados!)"><ion-icon name="checkmark-outline"></ion-icon></button>
-                        <button class="icon-btn" (click)="n.editando = false"><ion-icon name="close-outline"></ion-icon></button>
+                        <button class="icon-btn success" (click)="guardarNivel(n, c.nivelesPersonalizados!)" title="Guardar">
+                          <ion-icon name="checkmark-outline"></ion-icon>
+                        </button>
+                        <button class="icon-btn" (click)="n.editando = false" title="Cancelar">
+                          <ion-icon name="close-outline"></ion-icon>
+                        </button>
                       </div>
                     </ng-template>
                   </div>
 
+                  <!-- Estado vacío niveles personalizados -->
+                  <div class="empty-mini" *ngIf="c.nivelesPersonalizados?.length === 0 && !c.agregandoNivel">
+                    <span>No tiene niveles personalizados</span>
+                  </div>
+
+                  <!-- Formulario agregar nivel personalizado -->
                   <div class="add-row" *ngIf="c.agregandoNivel">
                     <input class="inline-input" [(ngModel)]="c.nuevoNivel!.nombre" placeholder="Nombre" />
                     <input class="inline-input small" type="number" [(ngModel)]="c.nuevoNivel!.puntaje" placeholder="Pts" />
                     <div class="row-actions">
-                      <button class="icon-btn success" (click)="guardarNuevoNivelCriterio(c)"><ion-icon name="checkmark-outline"></ion-icon></button>
-                      <button class="icon-btn" (click)="c.agregandoNivel = false"><ion-icon name="close-outline"></ion-icon></button>
+                      <button class="icon-btn success" (click)="guardarNuevoNivelCriterio(c)" title="Guardar">
+                        <ion-icon name="checkmark-outline"></ion-icon>
+                      </button>
+                      <button class="icon-btn" (click)="c.agregandoNivel = false" title="Cancelar">
+                        <ion-icon name="close-outline"></ion-icon>
+                      </button>
                     </div>
                   </div>
 
+                  <!-- Botón agregar nivel personalizado -->
                   <button class="add-btn small" *ngIf="!c.agregandoNivel" (click)="abrirNuevoNivelCriterio(c)">
                     <ion-icon name="add-outline"></ion-icon>
                     Agregar nivel propio
@@ -189,14 +273,20 @@
                 </div>
               </div>
 
+              <!-- Formulario agregar criterio -->
               <div class="add-row" *ngIf="s.agregandoCriterio">
                 <input class="inline-input wide" [(ngModel)]="s.nuevoCriterioTexto" placeholder="Texto del criterio" />
                 <div class="row-actions">
-                  <button class="icon-btn success" (click)="guardarNuevoCriterio(s)"><ion-icon name="checkmark-outline"></ion-icon></button>
-                  <button class="icon-btn" (click)="s.agregandoCriterio = false"><ion-icon name="close-outline"></ion-icon></button>
+                  <button class="icon-btn success" (click)="guardarNuevoCriterio(s)" title="Guardar">
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                  </button>
+                  <button class="icon-btn" (click)="s.agregandoCriterio = false" title="Cancelar">
+                    <ion-icon name="close-outline"></ion-icon>
+                  </button>
                 </div>
               </div>
 
+              <!-- Botón agregar criterio -->
               <button class="add-btn" *ngIf="!s.agregandoCriterio" (click)="abrirNuevoCriterio(s)">
                 <ion-icon name="add-outline"></ion-icon>
                 Agregar criterio
@@ -204,15 +294,21 @@
             </div>
           </div>
 
-          <div class="add-row" *ngIf="agregandoSeccion">
+          <!-- Formulario agregar sección -->
+          <div class="add-row seccion-add" *ngIf="agregandoSeccion">
             <input class="inline-input" [(ngModel)]="nuevaSeccionNombre" placeholder="Nombre de la sección" />
             <input class="inline-input" [(ngModel)]="nuevaSeccionDescripcion" placeholder="Descripción (opcional)" />
             <div class="row-actions">
-              <button class="icon-btn success" (click)="guardarNuevaSeccion()"><ion-icon name="checkmark-outline"></ion-icon></button>
-              <button class="icon-btn" (click)="agregandoSeccion = false"><ion-icon name="close-outline"></ion-icon></button>
+              <button class="icon-btn success" (click)="guardarNuevaSeccion()" title="Guardar">
+                <ion-icon name="checkmark-outline"></ion-icon>
+              </button>
+              <button class="icon-btn" (click)="agregandoSeccion = false" title="Cancelar">
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
             </div>
           </div>
 
+          <!-- Botón agregar sección -->
           <button class="add-btn" *ngIf="!agregandoSeccion" (click)="abrirNuevaSeccion()">
             <ion-icon name="add-outline"></ion-icon>
             Agregar sección

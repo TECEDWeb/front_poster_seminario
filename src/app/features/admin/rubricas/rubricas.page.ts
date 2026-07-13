@@ -44,10 +44,18 @@ import {
   alertCircleOutline,
   checkmarkOutline,
   documentTextOutline,
-  folderOutline,
   pricetagOutline,
   starOutline,
-  trophyOutline, filterOutline } from 'ionicons/icons';
+  trophyOutline,
+  filterOutline
+} from 'ionicons/icons';
+
+// Definir la interfaz Concurso para mejor tipado
+interface Concurso {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+}
 
 @Component({
   selector: 'app-rubricas',
@@ -74,7 +82,7 @@ import {
     IonItem,
     IonInput,
     IonTextarea,
-    RubricaBuilderComponent   
+    RubricaBuilderComponent
   ],
   templateUrl: './rubricas.page.html',
   styleUrls: ['./rubricas.page.scss']
@@ -95,9 +103,16 @@ export class RubricasPage implements OnInit {
   modalAbierto = false;
   editando = false;
   guardando = false;
-  concursosDisponibles: any[] = [];
+  concursosDisponibles: Concurso[] = [];
 
-  form: any = {
+  // Formulario de rúbrica
+  form: {
+    id: number | null;
+    concursoId: number | null;
+    nombre: string;
+    descripcion: string;
+    puntajeMaximo: number;
+  } = {
     id: null,
     concursoId: null,
     nombre: '',
@@ -110,7 +125,28 @@ export class RubricasPage implements OnInit {
   concursoNombreBuilder = '';
 
   constructor(private rubricaService: RubricaService) {
-    addIcons({refreshOutline,addOutline,closeOutline,alertCircleOutline,checkboxOutline,eyeOutline,createOutline,trashOutline,layersOutline,listOutline,checkmarkCircleOutline,downloadOutline,filterOutline,trophyOutline,pricetagOutline,documentTextOutline,starOutline,searchOutline,funnelOutline,checkmarkOutline,folderOutline});
+    addIcons({
+      refreshOutline,
+      addOutline,
+      closeOutline,
+      alertCircleOutline,
+      checkboxOutline,
+      eyeOutline,
+      createOutline,
+      trashOutline,
+      layersOutline,
+      listOutline,
+      checkmarkCircleOutline,
+      downloadOutline,
+      filterOutline,
+      trophyOutline,
+      pricetagOutline,
+      documentTextOutline,
+      starOutline,
+      searchOutline,
+      funnelOutline,
+      checkmarkOutline
+    });
   }
 
   ngOnInit(): void {
@@ -217,6 +253,7 @@ export class RubricasPage implements OnInit {
 
   cerrarModal(): void {
     this.modalAbierto = false;
+    this.guardando = false;
   }
 
   editar(rubrica: RubricaConcurso): void {
@@ -226,12 +263,13 @@ export class RubricasPage implements OnInit {
 
     const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
 
+    // Si no encuentra el concurso, buscar en las rúbricas cargadas
     const nombreRubrica = concurso?.nombre
       ? `Rúbrica: ${concurso.nombre}`
       : `Rúbrica del concurso #${rubrica.concursoId}`;
 
     this.form = {
-      id: rubrica.concursoId,
+      id: rubrica.concursoId, // Usamos concursoId como ID de la rúbrica
       concursoId: rubrica.concursoId,
       nombre: nombreRubrica,
       descripcion: concurso?.descripcion || '',
@@ -239,7 +277,6 @@ export class RubricasPage implements OnInit {
     };
 
     console.log('📝 Formulario después de editar:', this.form);
-
     this.modalAbierto = true;
   }
 
@@ -256,7 +293,6 @@ export class RubricasPage implements OnInit {
 
     if (!this.form.nombre || this.form.nombre.trim() === '') {
       console.log('❌ Error: Nombre vacío');
-      console.log('❌ Valor actual de form.nombre:', this.form.nombre);
       alert('Por favor ingrese el nombre de la rúbrica');
       return;
     }
@@ -274,7 +310,8 @@ export class RubricasPage implements OnInit {
 
     console.log('📤 PAYLOAD COMPLETO:', JSON.stringify(payload, null, 2));
 
-    const req = this.editando
+    // Determinar si es creación o actualización
+    const req = this.editando && this.form.id
       ? this.rubricaService.actualizar(this.form.id, payload)
       : this.rubricaService.crear(payload);
 
@@ -290,10 +327,17 @@ export class RubricasPage implements OnInit {
       },
       error: (err) => {
         console.error('❌ Error guardando rúbrica:', err);
-        console.error('❌ Detalles del error:', err.error);
         this.guardando = false;
 
-        const mensaje = err.error?.mensaje || 'Error al guardar la rúbrica';
+        let mensaje = 'Error al guardar la rúbrica';
+        if (err.error?.mensaje) {
+          mensaje = err.error.mensaje;
+        } else if (err.error?.error) {
+          mensaje = err.error.error;
+        } else if (err.message) {
+          mensaje = err.message;
+        }
+        
         alert(mensaje);
       }
     });
@@ -422,9 +466,11 @@ export class RubricasPage implements OnInit {
     this.concursoNombreBuilder = concurso?.nombre || `Concurso #${rubrica.concursoId}`;
     this.builderAbierto = true;
   }
+
   cerrarBuilder(): void {
     this.builderAbierto = false;
     this.concursoSeleccionadoBuilder = null;
-    this.cargarRubricas(); // refresca contadores de secciones/criterios/niveles
+    // Recargar para actualizar contadores después de cambios
+    this.cargarRubricas();
   }
 }
