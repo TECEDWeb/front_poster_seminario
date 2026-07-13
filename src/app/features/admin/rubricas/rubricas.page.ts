@@ -50,7 +50,6 @@ import {
   filterOutline
 } from 'ionicons/icons';
 
-// Definir la interfaz Concurso para mejor tipado
 interface Concurso {
   id: number;
   nombre: string;
@@ -105,7 +104,6 @@ export class RubricasPage implements OnInit {
   guardando = false;
   concursosDisponibles: Concurso[] = [];
 
-  // Formulario de rúbrica
   form: {
     id: number | null;
     concursoId: number | null;
@@ -239,7 +237,13 @@ export class RubricasPage implements OnInit {
     this.aplicarFiltros();
   }
 
+  // ========== MODAL DE EDICIÓN ==========
   abrirCrear(): void {
+    // Cerrar cualquier otro modal abierto
+    if (this.builderAbierto) {
+      this.cerrarBuilder();
+    }
+    
     this.editando = false;
     this.form = {
       id: null,
@@ -257,19 +261,23 @@ export class RubricasPage implements OnInit {
   }
 
   editar(rubrica: RubricaConcurso): void {
+    // Cerrar cualquier otro modal abierto
+    if (this.builderAbierto) {
+      this.cerrarBuilder();
+    }
+
     console.log('📝 Editando rúbrica:', rubrica);
 
     this.editando = true;
 
     const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
 
-    // Si no encuentra el concurso, buscar en las rúbricas cargadas
     const nombreRubrica = concurso?.nombre
       ? `Rúbrica: ${concurso.nombre}`
       : `Rúbrica del concurso #${rubrica.concursoId}`;
 
     this.form = {
-      id: rubrica.concursoId, // Usamos concursoId como ID de la rúbrica
+      id: rubrica.concursoId,
       concursoId: rubrica.concursoId,
       nombre: nombreRubrica,
       descripcion: concurso?.descripcion || '',
@@ -310,7 +318,6 @@ export class RubricasPage implements OnInit {
 
     console.log('📤 PAYLOAD COMPLETO:', JSON.stringify(payload, null, 2));
 
-    // Determinar si es creación o actualización
     const req = this.editando && this.form.id
       ? this.rubricaService.actualizar(this.form.id, payload)
       : this.rubricaService.crear(payload);
@@ -460,17 +467,29 @@ export class RubricasPage implements OnInit {
     return item?.concursoId ?? index;
   }
 
+  // ========== MODAL DEL BUILDER ==========
   abrirBuilder(rubrica: RubricaConcurso): void {
+    // Cerrar el modal de edición si está abierto
+    if (this.modalAbierto) {
+      this.cerrarModal();
+    }
+
     const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
     this.concursoSeleccionadoBuilder = rubrica.concursoId;
     this.concursoNombreBuilder = concurso?.nombre || `Concurso #${rubrica.concursoId}`;
-    this.builderAbierto = true;
+    
+    // Pequeño retraso para asegurar que el modal anterior se cerró
+    setTimeout(() => {
+      this.builderAbierto = true;
+    }, 100);
   }
 
   cerrarBuilder(): void {
     this.builderAbierto = false;
     this.concursoSeleccionadoBuilder = null;
     // Recargar para actualizar contadores después de cambios
-    this.cargarRubricas();
+    setTimeout(() => {
+      this.cargarRubricas();
+    }, 300);
   }
 }
