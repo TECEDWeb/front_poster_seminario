@@ -206,21 +206,20 @@ export class FormularioEvaluacionPage implements OnInit {
     }
   }
 
+  /**
+   * Se dispara vía (ionChange) en el ion-radio-group.
+   * ngModel ya asignó respuestas[criterioId] = nivelId mediante el
+   * two-way binding antes de que este método se ejecute; aquí solo
+   * confirmamos el valor (por claridad) y recalculamos el progreso.
+   * IMPORTANTE: no implementar lógica de "toggle" aquí — ion-radio
+   * dentro de un ion-radio-group no permite deseleccionar haciendo
+   * clic en el mismo radio, así que un toggle manual solo causaba
+   * que la respuesta se borrara justo después de asignarse.
+   */
   seleccionar(criterioId: number, nivelId: number): void {
     console.log('Respuesta seleccionada', { criterioId, nivelId });
 
-    if (this.respuestas[criterioId] !== undefined) {
-      if (this.respuestas[criterioId] === nivelId) {
-        delete this.respuestas[criterioId];
-        console.log('🗑️ Respuesta removida para criterio:', criterioId);
-      } else {
-        this.respuestas[criterioId] = nivelId;
-        console.log('🔄 Respuesta cambiada para criterio:', criterioId);
-      }
-    } else {
-      this.respuestas[criterioId] = nivelId;
-      console.log('✅ Nueva respuesta para criterio:', criterioId);
-    }
+    this.respuestas[criterioId] = nivelId;
 
     this.actualizarProgreso();
     console.log('📊 Criterios respondidos:', this.criteriosRespondidos);
