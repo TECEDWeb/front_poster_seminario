@@ -1,62 +1,51 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonItem,
-  IonInput,
-  IonButton,
-  IonText,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent
-} from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonInput, IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { searchOutline, checkmarkCircleOutline, closeCircleOutline, ribbonOutline } from 'ionicons/icons';
+
 import { CertificadoService } from '../../../core/services/certificado.service';
 
 @Component({
   selector: 'app-consulta-certificados',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonContent,
-    IonItem,
-    IonInput,
-    IonButton,
-    IonText,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent
-  ],
+  imports: [CommonModule, FormsModule, IonContent, IonItem, IonInput, IonButton, IonIcon, IonSpinner],
   templateUrl: './consulta-certificados.page.html',
   styleUrls: ['./consulta-certificados.page.scss']
 })
 export class ConsultaCertificadosPage {
 
   codigo = '';
-  resultado: any = null;
-  error = '';
+  buscando = false;
+  buscado = false;
+  valido = false;
+  data: any = null;
 
-  constructor(private certificadoService: CertificadoService) {}
+  constructor(private certificadoService: CertificadoService) {
+    addIcons({ searchOutline, checkmarkCircleOutline, closeCircleOutline, ribbonOutline });
+  }
 
-  buscar() {
+  validar(): void {
+    if (!this.codigo.trim()) return;
 
-    this.resultado = null;
-    this.error = '';
+    this.buscando = true;
+    this.buscado = false;
+    this.data = null;
 
-    this.certificadoService.validar(this.codigo).subscribe({
-
+    this.certificadoService.validar(this.codigo.trim()).subscribe({
       next: (res) => {
-        this.resultado = res;
+        this.valido = res.valido;
+        this.data = res.data || null;
+        this.buscando = false;
+        this.buscado = true;
       },
-
       error: () => {
-        this.error = 'Certificado no encontrado';
+        this.valido = false;
+        this.data = null;
+        this.buscando = false;
+        this.buscado = true;
       }
-
     });
-
   }
 }

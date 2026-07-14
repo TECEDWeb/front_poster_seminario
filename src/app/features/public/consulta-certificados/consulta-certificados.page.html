@@ -1,37 +1,47 @@
-<ion-content class="ion-padding">
+<ion-content class="consulta-content">
+  <div class="consulta-container">
 
-  <h2>Consulta de Certificados</h2>
+    <div class="consulta-header">
+      <ion-icon name="ribbon-outline"></ion-icon>
+      <h1>Validación de certificados</h1>
+      <p>Ingresa el código impreso en tu certificado para verificar su autenticidad</p>
+    </div>
 
-  <ion-item>
-    <ion-input
-      label="Código de certificado"
-      labelPlacement="stacked"
-      [(ngModel)]="codigo">
-    </ion-input>
-  </ion-item>
+    <div class="search-box">
+      <ion-item lines="none" class="search-input">
+        <ion-input
+          [(ngModel)]="codigo"
+          placeholder="Ej: UPSE-2026-A3F9K2"
+          (keyup.enter)="validar()">
+        </ion-input>
+      </ion-item>
+      <ion-button class="search-btn" [disabled]="buscando || !codigo.trim()" (click)="validar()">
+        <ion-icon [name]="buscando ? 'search-outline' : 'search-outline'" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
 
-  <ion-button expand="block" (click)="buscar()">
-    Consultar
-  </ion-button>
+    <div class="loading-box" *ngIf="buscando">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
 
-  <ion-text color="danger" *ngIf="error">
-    {{ error }}
-  </ion-text>
+    <div class="result-box valid" *ngIf="buscado && !buscando && valido && data">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <h2>Certificado válido</h2>
+      <div class="result-details">
+        <div class="detail-row"><span>Nombre</span><strong>{{ data.nombre }}</strong></div>
+        <div class="detail-row"><span>Tipo</span><strong>{{ data.tipoCertificado }}</strong></div>
+        <div class="detail-row"><span>Entidad</span><strong>{{ data.entidadCertifica }}</strong></div>
+        <div class="detail-row"><span>Fecha de emisión</span><strong>{{ data.fechaEmision | date:'dd/MM/yyyy' }}</strong></div>
+        <div class="detail-row"><span>Código</span><strong>{{ data.codigo }}</strong></div>
+      </div>
+      <p class="contenido-text">{{ data.contenido }}</p>
+    </div>
 
-  <ion-card *ngIf="resultado">
+    <div class="result-box invalid" *ngIf="buscado && !buscando && !valido">
+      <ion-icon name="close-circle-outline"></ion-icon>
+      <h2>Código no encontrado</h2>
+      <p>No existe ningún certificado registrado con ese código. Verifica que esté escrito correctamente.</p>
+    </div>
 
-    <ion-card-header>
-      <ion-card-title>Certificado válido</ion-card-title>
-    </ion-card-header>
-
-    <ion-card-content>
-
-      <p><strong>Nombre:</strong> {{ resultado.nombre }}</p>
-      <p><strong>Proyecto:</strong> {{ resultado.proyecto }}</p>
-      <p><strong>Fecha:</strong> {{ resultado.fecha }}</p>
-
-    </ion-card-content>
-
-  </ion-card>
-
+  </div>
 </ion-content>

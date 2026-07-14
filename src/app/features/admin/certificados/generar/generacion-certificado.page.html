@@ -1,0 +1,115 @@
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Certificados</span>
+      <span class="title-badge">Generación</span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="cert-content">
+  <div class="page-container">
+
+    <div class="page-header">
+      <h1>Generar certificado</h1>
+      <p>Emite certificados para participantes de proyectos evaluados</p>
+    </div>
+
+    <div class="generator-card">
+      <div class="form-field">
+        <label><ion-icon name="trophy-outline"></ion-icon> Proyecto</label>
+        <ion-item lines="none" class="field-input">
+          <ion-select
+            [(ngModel)]="proyectoSeleccionadoId"
+            (ionChange)="onProyectoSeleccionado()"
+            placeholder="Selecciona un proyecto"
+            interface="popover">
+            <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
+              {{ p.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label><ion-icon name="person-outline"></ion-icon> Nombre del participante</label>
+          <ion-item lines="none" class="field-input">
+            <ion-input [(ngModel)]="participanteNombre" placeholder="Nombre completo"></ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-field">
+          <label><ion-icon name="card-outline"></ion-icon> Cédula</label>
+          <ion-item lines="none" class="field-input">
+            <ion-input [(ngModel)]="participanteCedula" placeholder="Número de cédula"></ion-input>
+          </ion-item>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label><ion-icon name="ribbon-outline"></ion-icon> Tipo de certificado</label>
+        <ion-item lines="none" class="field-input">
+          <ion-select [(ngModel)]="tipoCertificado" interface="popover">
+            <ion-select-option value="Participación">Participación</ion-select-option>
+            <ion-select-option value="Reconocimiento">Reconocimiento</ion-select-option>
+            <ion-select-option value="Primer lugar">Primer lugar</ion-select-option>
+            <ion-select-option value="Segundo lugar">Segundo lugar</ion-select-option>
+            <ion-select-option value="Tercer lugar">Tercer lugar</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        {{ error }}
+      </div>
+
+      <ion-button expand="block" class="generate-btn" [disabled]="generando" (click)="generarCertificado()">
+        <ion-icon [name]="generando ? 'refresh-outline' : 'ribbon-outline'" slot="start" [class.spinning]="generando"></ion-icon>
+        {{ generando ? 'Generando...' : 'Generar certificado' }}
+      </ion-button>
+
+      <div class="success-box" *ngIf="certificadoGenerado">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <div>
+          <strong>Certificado generado</strong>
+          <p>Código: {{ certificadoGenerado.codigo }}</p>
+        </div>
+        <ion-button fill="clear" size="small" (click)="descargar(certificadoGenerado)">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          Descargar
+        </ion-button>
+      </div>
+    </div>
+
+    <div class="lista-section">
+      <h2>Certificados emitidos</h2>
+
+      <div class="cert-list" *ngIf="!cargandoLista">
+        <div class="cert-item" *ngFor="let c of certificados; trackBy: trackById">
+          <div class="cert-info">
+            <strong>{{ c.nombre }}</strong>
+            <span>{{ c.tipoCertificado }} · {{ c.codigo }}</span>
+            <span class="cert-fecha">{{ c.fechaEmision | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <ion-button fill="clear" size="small" (click)="descargar(c)">
+            <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div class="empty-mini" *ngIf="certificados.length === 0">
+          Aún no se han emitido certificados
+        </div>
+      </div>
+
+      <div class="loading-mini" *ngIf="cargandoLista">
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

@@ -18,7 +18,7 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./dasboard/dashboard.page')
+          import('./dashboard/dashboard.page')
             .then(m => m.DashboardPage)
       },
 
