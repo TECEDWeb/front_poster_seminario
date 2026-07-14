@@ -56,11 +56,35 @@ export const ADMIN_ROUTES: Routes = [
           import('./reportes/reportes.page')
             .then(m => m.ReportesPage)
       },
+
       {
         path: 'asignaciones',
         loadComponent: () =>
           import('./asignaciones/asignaciones.page')
             .then(m => m.AsignacionesPage)
+      },
+
+      {
+        path: 'certificados',
+        children: [
+          {
+            path: '',
+            redirectTo: 'gestion',
+            pathMatch: 'full'
+          },
+          {
+            path: 'gestion',
+            loadComponent: () =>
+              import('./certificados/gestion/gestion-certificados.page')
+                .then(m => m.GestionCertificadosPage)
+          },
+          {
+            path: 'generar',
+            loadComponent: () =>
+              import('./certificados/generar/generacion-certificado.page')
+                .then(m => m.GeneracionCertificadoPage)
+          }
+        ]
       }
 
     ]

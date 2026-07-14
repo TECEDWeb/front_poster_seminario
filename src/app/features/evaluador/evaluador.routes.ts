@@ -42,6 +42,13 @@ export const EVALUADOR_ROUTES: Routes = [
         loadComponent: () =>
           import('./mis-resultados/mis-resultados.page')
             .then(m => m.MisResultadosPage)
+      },
+
+      {
+        path: 'mis-certificados',
+        loadComponent: () =>
+          import('./mis-certificados/mis-certificados.page')
+            .then(m => m.MisCertificadosPage)
       }
 
     ]

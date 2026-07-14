@@ -25,6 +25,7 @@ import {
   swapHorizontal, swapHorizontalOutline,
   clipboard, clipboardOutline,
   statsChart, statsChartOutline,
+  ribbon, ribbonOutline,
   logOutOutline,
   chevronDownOutline
 } from 'ionicons/icons';
@@ -73,12 +74,16 @@ export class SidebarComponent {
     { label: 'Reportes', route: '/admin/reportes', icon: 'bar-chart-outline', iconActive: 'bar-chart' },
     { label: 'Rúbricas', route: '/admin/rubricas', icon: 'checkbox-outline', iconActive: 'checkbox' },
     { label: 'Asignaciones', route: '/admin/asignaciones', icon: 'swap-horizontal-outline', iconActive: 'swap-horizontal' },
+    { label: 'Certificados', route: '/admin/certificados', icon: 'ribbon-outline', iconActive: 'ribbon' },
+
   ];
 
   evaluadorMenuItems: MenuItem[] = [
     { label: 'Dashboard', route: '/evaluador/dashboard', icon: 'grid-outline', iconActive: 'grid' },
     { label: 'Proyectos', route: '/evaluador/proyectos-asignados', icon: 'clipboard-outline', iconActive: 'clipboard' },
     { label: 'Resultados', route: '/evaluador/mis-resultados', icon: 'stats-chart-outline', iconActive: 'stats-chart' },
+    { label: 'Certificados', route: '/evaluador/mis-certificados', icon: 'ribbon-outline', iconActive: 'ribbon' },
+
   ];
 
   constructor() {
@@ -92,6 +97,7 @@ export class SidebarComponent {
       'swap-horizontal': swapHorizontal, 'swap-horizontal-outline': swapHorizontalOutline,
       clipboard, 'clipboard-outline': clipboardOutline,
       'stats-chart': statsChart, 'stats-chart-outline': statsChartOutline,
+      ribbon, 'ribbon-outline': ribbonOutline,
       'log-out-outline': logOutOutline,
       'chevron-down-outline': chevronDownOutline
     });
