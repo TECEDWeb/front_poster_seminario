@@ -54,27 +54,19 @@
   .hero-actions {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
 
     .cta-primary {
-      --background: $upse-gold;
-      --color: $upse-blue-dark;
-      --border-radius: 12px;
-      font-weight: 700;
-      height: 48px;
-
-      &:hover { --background: #d4b45a; }
-    }
-
-    .cta-secondary {
       --border-color: rgba(255,255,255,0.4);
       --color: white;
       --border-radius: 12px;
       font-weight: 600;
       height: 48px;
+      --background: transparent;
 
-      &:hover { --border-color: white; }
+      &:hover {
+        --border-color: white;
+        --background: rgba(255,255,255,0.08);
+      }
     }
   }
 }
