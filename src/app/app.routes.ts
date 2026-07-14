@@ -4,9 +4,12 @@ export const routes: Routes = [
 
   {
     path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
+    loadChildren: () =>
+      import('./features/public/public.routes').then(
+        m => m.PUBLIC_ROUTES
+      )
   },
+
   {
     path: 'login',
     loadComponent: () =>
@@ -32,16 +35,8 @@ export const routes: Routes = [
   },
 
   {
-    path: 'public',
-    loadChildren: () =>
-      import('./features/public/public.routes').then(
-        m => m.PUBLIC_ROUTES
-      )
-  },
-
-  {
     path: '**',
-    redirectTo: 'login'
+    redirectTo: ''
   }
 
 ];

@@ -4,6 +4,10 @@ export const PUBLIC_ROUTES: Routes = [
 
   {
     path: '',
+    loadComponent: () =>
+      import('../layouts/public-layout/public-layout.page')
+        .then(m => m.PublicLayoutPage),
+
     children: [
 
       {
@@ -25,8 +29,8 @@ export const PUBLIC_ROUTES: Routes = [
           import('./consulta-certificados/consulta-certificados.page')
             .then(m => m.ConsultaCertificadosPage)
       },
-    ]
 
+    ]
   }
 
 ];

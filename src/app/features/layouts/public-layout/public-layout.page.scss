@@ -1,0 +1,115 @@
+@use 'upse-variables' as *;
+@use 'upse-mixins' as *;
+
+.public-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.public-header {
+  background: white;
+  border-bottom: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .header-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    @media (max-width: 640px) {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+
+    ion-icon {
+      font-size: 28px;
+      color: $upse-blue;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+
+      .brand-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: $upse-blue;
+      }
+
+      .brand-subtitle {
+        font-size: 10px;
+        font-weight: 600;
+        color: $upse-gold;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+
+    @media (max-width: 640px) {
+      order: 3;
+      width: 100%;
+      justify-content: center;
+    }
+
+    a {
+      font-size: 14px;
+      font-weight: 500;
+      color: #64748b;
+      text-decoration: none;
+      padding: 6px 4px;
+      border-bottom: 2px solid transparent;
+      transition: $transition;
+
+      &:hover, &.active {
+        color: $upse-blue;
+        border-bottom-color: $upse-gold;
+      }
+    }
+  }
+
+  .login-btn {
+    --background: $upse-blue;
+    --border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    height: 38px;
+
+    &:hover { --background: $upse-blue-dark; }
+  }
+}
+
+.public-main {
+  flex: 1;
+}
+
+.public-footer {
+  background: $upse-blue;
+  padding: 16px 20px;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: rgba(255,255,255,0.75);
+    font-size: 12px;
+  }
+}

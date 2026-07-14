@@ -1,1 +1,33 @@
-<ion-router-outlet></ion-router-outlet>
+<div class="public-shell">
+
+  <header class="public-header">
+    <div class="header-container">
+      <a routerLink="/inicio" class="brand">
+        <ion-icon name="school-outline"></ion-icon>
+        <div class="brand-text">
+          <span class="brand-title">Sistema de Evaluación</span>
+          <span class="brand-subtitle">UPSE</span>
+        </div>
+      </a>
+
+      <nav class="header-nav">
+        <a routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+        <a routerLink="/consulta-certificados" routerLinkActive="active">Consultar certificado</a>
+      </nav>
+
+      <ion-button class="login-btn" routerLink="/login">
+        <ion-icon name="log-in-outline" slot="start"></ion-icon>
+        Iniciar sesión
+      </ion-button>
+    </div>
+  </header>
+
+  <main class="public-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="public-footer">
+    <p>© {{ currentYear }} Universidad Estatal Península de Santa Elena — Sistema de Evaluación de Proyectos</p>
+  </footer>
+
+</div>

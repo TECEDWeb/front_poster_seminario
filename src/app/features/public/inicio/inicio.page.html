@@ -1,17 +1,40 @@
-<ion-content class="ion-padding">
-
+<ion-content class="inicio-content">
   <div class="hero">
+    <div class="hero-container">
+      <ion-icon name="trophy-outline" class="hero-icon"></ion-icon>
+      <h1>Sistema de Evaluación de Proyectos</h1>
+      <p>Plataforma institucional de la Universidad Estatal Península de Santa Elena para la gestión y evaluación de concursos de proyectos científicos y tecnológicos.</p>
 
-    <h1>STEMLAB</h1>
-
-    <p>
-      Plataforma de gestión de concursos científicos y evaluación de proyectos
-    </p>
-
-    <ion-button routerLink="/public/consulta-certificados">
-      Validar Certificado
-    </ion-button>
-
+      <div class="hero-actions">
+        <ion-button class="cta-primary" routerLink="/login">
+          <ion-icon name="log-in-outline" slot="start"></ion-icon>
+          Iniciar sesión
+        </ion-button>
+        <ion-button class="cta-secondary" fill="outline" routerLink="/consulta-certificados">
+          <ion-icon name="search-outline" slot="start"></ion-icon>
+          Consultar certificado
+        </ion-button>
+      </div>
+    </div>
   </div>
 
+  <div class="features">
+    <div class="features-container">
+      <div class="feature-card">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <h3>Evaluación rigurosa</h3>
+        <p>Rúbricas configurables por concurso, con secciones, criterios y niveles de desempeño.</p>
+      </div>
+      <div class="feature-card">
+        <ion-icon name="people-outline"></ion-icon>
+        <h3>Gestión de evaluadores</h3>
+        <p>Asignación de proyectos a evaluadores especializados con seguimiento en tiempo real.</p>
+      </div>
+      <div class="feature-card">
+        <ion-icon name="ribbon-outline"></ion-icon>
+        <h3>Certificados verificables</h3>
+        <p>Cada certificado emitido cuenta con un código único de validación pública.</p>
+      </div>
+    </div>
+  </div>
 </ion-content>
