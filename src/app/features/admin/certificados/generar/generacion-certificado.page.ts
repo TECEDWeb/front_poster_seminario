@@ -1,27 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
-  IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle,
+  IonHeader, IonToolbar, IonButtons, IonMenuButton, IonBackButton, IonTitle,
   IonContent, IonButton, IonIcon, IonItem, IonSelect, IonSelectOption,
   IonInput, IonSpinner
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   ribbonOutline, personOutline, cardOutline, trophyOutline,
-  downloadOutline, checkmarkCircleOutline, alertCircleOutline, refreshOutline
+  downloadOutline, checkmarkCircleOutline, alertCircleOutline, refreshOutline,
+  arrowBackOutline
 } from 'ionicons/icons';
 
-import { CertificadoService } from 'src/app/core/services/certificado.service'; 
-import { ProyectoService } from 'src/app/core/services/proyecto.service'; 
-import { Certificado } from 'src/app/core/models/certificado.model'; 
+import { CertificadoService } from '../../../../core/services/certificado.service';
+import { ProyectoService } from '../../../../core/services/proyecto.service';
+import { Certificado } from '../../../../core/models/certificado.model';
 
 @Component({
   selector: 'app-generacion-certificado',
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle,
+    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonBackButton, IonTitle,
     IonContent, IonButton, IonIcon, IonItem, IonSelect, IonSelectOption,
     IonInput, IonSpinner
   ],
@@ -42,22 +44,20 @@ export class GeneracionCertificadoPage implements OnInit {
   certificadoGenerado: Certificado | null = null;
   error: string | null = null;
 
-  certificados: Certificado[] = [];
-  cargandoLista = true;
-
   constructor(
     private certificadoService: CertificadoService,
-    private proyectoService: ProyectoService
+    private proyectoService: ProyectoService,
+    private router: Router
   ) {
     addIcons({
       ribbonOutline, personOutline, cardOutline, trophyOutline,
-      downloadOutline, checkmarkCircleOutline, alertCircleOutline, refreshOutline
+      downloadOutline, checkmarkCircleOutline, alertCircleOutline, refreshOutline,
+      arrowBackOutline
     });
   }
 
   ngOnInit(): void {
     this.cargarProyectos();
-    this.cargarCertificados();
   }
 
   cargarProyectos(): void {
@@ -74,23 +74,8 @@ export class GeneracionCertificadoPage implements OnInit {
     });
   }
 
-  cargarCertificados(): void {
-    this.cargandoLista = true;
-    this.certificadoService.listar().subscribe({
-      next: (data) => {
-        this.certificados = data;
-        this.cargandoLista = false;
-      },
-      error: () => {
-        this.certificados = [];
-        this.cargandoLista = false;
-      }
-    });
-  }
-
   onProyectoSeleccionado(): void {
     const proyecto = this.proyectos.find(p => p.id === this.proyectoSeleccionadoId);
-    // Si el proyecto ya trae un participante principal, lo precargamos
     if (proyecto?.participantes?.length) {
       this.participanteNombre = proyecto.participantes[0].nombre || '';
       this.participanteCedula = proyecto.participantes[0].cedula || '';
@@ -121,8 +106,6 @@ export class GeneracionCertificadoPage implements OnInit {
       next: (certificado) => {
         this.certificadoGenerado = certificado;
         this.generando = false;
-        this.cargarCertificados();
-        this.resetForm();
       },
       error: (err) => {
         this.error = err.error?.mensaje || 'Error al generar el certificado';
@@ -136,6 +119,7 @@ export class GeneracionCertificadoPage implements OnInit {
     this.participanteNombre = '';
     this.participanteCedula = '';
     this.tipoCertificado = 'Participación';
+    this.certificadoGenerado = null;
   }
 
   descargar(certificado: Certificado): void {
@@ -154,7 +138,7 @@ export class GeneracionCertificadoPage implements OnInit {
     });
   }
 
-  trackById(index: number, item: any): number {
-    return item?.id ?? index;
+  irAGestion(): void {
+    this.router.navigate(['/admin/certificados/gestion']);
   }
 }

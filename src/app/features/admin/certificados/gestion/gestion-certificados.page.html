@@ -1,23 +1,98 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Gestión de Certificados</ion-title>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Certificados</span>
+      <span class="title-badge">Gestión</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="container">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Administrar Certificados</ion-card-title>
-        <ion-card-subtitle>Gestión completa de certificados</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <p>Aquí podrás gestionar todos los certificados del sistema.</p>
-        <ion-button expand="block" routerLink="/admin/certificados/generar">
+<ion-content class="cert-content">
+  <div class="page-container">
+
+    <div class="page-header">
+      <div class="header-left">
+        <h1>Gestión de certificados</h1>
+        <p>{{ certificados.length }} certificados emitidos en el sistema</p>
+      </div>
+      <ion-button class="btn-add" routerLink="/admin/certificados/generar">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Generar certificado
+      </ion-button>
+    </div>
+
+    <div class="filter-bar" *ngIf="!cargando && certificados.length > 0">
+      <ion-searchbar
+        [(ngModel)]="filtroBusqueda"
+        (ionInput)="aplicarFiltros()"
+        placeholder="Buscar por nombre, código o cédula..."
+        class="filter-search">
+      </ion-searchbar>
+
+      <ion-select
+        [(ngModel)]="filtroTipo"
+        (ionChange)="aplicarFiltros()"
+        interface="popover"
+        placeholder="Tipo"
+        class="filter-select">
+        <ion-select-option value="todos">Todos los tipos</ion-select-option>
+        <ion-select-option *ngFor="let t of tiposUnicos" [value]="t">{{ t }}</ion-select-option>
+      </ion-select>
+
+      <ion-button fill="clear" size="small" *ngIf="filtroBusqueda || filtroTipo !== 'todos'" (click)="limpiarFiltros()">
+        Limpiar
+      </ion-button>
+    </div>
+
+    <div class="loading-list" *ngIf="cargando">
+      <div class="cert-skeleton" *ngFor="let i of [1,2,3,4]">
+        <ion-skeleton-text animated class="skeleton-line" style="width: 60%"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-line" style="width: 40%"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <div class="error-box" *ngIf="!cargando && error">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error }}</p>
+      <ion-button size="small" (click)="recargar()">Reintentar</ion-button>
+    </div>
+
+    <div class="cert-list" *ngIf="!cargando && !error">
+      <div class="cert-item" *ngFor="let c of filtrados; trackBy: trackById">
+        <div class="cert-icon"><ion-icon name="ribbon-outline"></ion-icon></div>
+        <div class="cert-info">
+          <strong>{{ c.nombre }}</strong>
+          <span class="cert-meta">{{ c.tipoCertificado }} · {{ c.codigo }} · CI {{ c.cedula }}</span>
+          <span class="cert-fecha">Emitido: {{ c.fechaEmision | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="cert-actions">
+          <ion-button fill="clear" size="small" (click)="descargar(c)">
+            <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" (click)="eliminar(c)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="filtrados.length === 0">
+        <ion-icon name="ribbon-outline"></ion-icon>
+        <h3 *ngIf="certificados.length === 0">Aún no se han emitido certificados</h3>
+        <h3 *ngIf="certificados.length > 0">No hay coincidencias con este filtro</h3>
+        <ion-button *ngIf="certificados.length === 0" routerLink="/admin/certificados/generar">
           <ion-icon name="add-outline" slot="start"></ion-icon>
-          Generar Nuevo Certificado
+          Generar el primero
         </ion-button>
-      </ion-card-content>
-    </ion-card>
+      </div>
+    </div>
+
   </div>
 </ion-content>

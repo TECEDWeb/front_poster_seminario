@@ -1,20 +1,58 @@
-<!-- src/app/features/evaluador/mis-certificados/mis-certificados.page.html -->
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Mis Certificados</ion-title>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Mis certificados</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="container">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Certificados Emitidos</ion-card-title>
-        <ion-card-subtitle>Certificados que has generado</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <p>Aquí verás los certificados que has emitido como evaluador.</p>
-      </ion-card-content>
-    </ion-card>
+<ion-content class="cert-content">
+  <div class="page-container">
+
+    <div class="page-header">
+      <h1>Mis certificados</h1>
+      <p>Certificados emitidos a tu nombre en el sistema</p>
+    </div>
+
+    <div class="loading-list" *ngIf="cargando">
+      <div class="cert-skeleton" *ngFor="let i of [1,2]">
+        <ion-skeleton-text animated style="width: 60%; height: 14px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <div class="error-box" *ngIf="!cargando && error">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error }}</p>
+    </div>
+
+    <div class="cert-list" *ngIf="!cargando && !error">
+      <div class="cert-item" *ngFor="let c of certificados; trackBy: trackById">
+        <div class="cert-icon"><ion-icon name="ribbon-outline"></ion-icon></div>
+        <div class="cert-info">
+          <strong>{{ c.tipoCertificado }}</strong>
+          <span>{{ c.codigo }}</span>
+          <span class="cert-fecha">{{ c.fechaEmision | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <ion-button fill="clear" size="small" (click)="descargar(c)">
+          <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="empty-state" *ngIf="certificados.length === 0">
+        <ion-icon name="ribbon-outline"></ion-icon>
+        <h3>Aún no tienes certificados</h3>
+        <p>Cuando el administrador emita uno a tu nombre, aparecerá aquí</p>
+      </div>
+    </div>
+
   </div>
 </ion-content>

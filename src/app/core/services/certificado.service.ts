@@ -63,4 +63,14 @@ export class CertificadoService {
       createdAt: c.createdAt ?? c.created_at
     };
   }
+  misCertificados(): Observable<Certificado[]> {
+    return this.http.get<any>(`${this.apiUrl}/mios`).pipe(
+      map(res => (res?.data ?? []).map((c: any) => this.mapear(c)))
+    );
+  }
+
+  eliminar(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+  
 }

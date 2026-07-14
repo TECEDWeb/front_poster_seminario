@@ -37,7 +37,7 @@ import {
   downloadOutline,
   printOutline,
   chatbubbleOutline,
-  listOutline
+  ellipseOutline
 } from 'ionicons/icons';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
@@ -79,7 +79,6 @@ export class MisResultadosPage implements OnInit {
 
   filtroEstado: string = 'todos';
 
-  // Modal de detalle
   modalAbierto = false;
   cargandoDetalle = false;
   errorDetalle: string | null = null;
@@ -108,7 +107,7 @@ export class MisResultadosPage implements OnInit {
       downloadOutline,
       printOutline,
       chatbubbleOutline,
-      listOutline
+      ellipseOutline
     });
   }
 
@@ -217,11 +216,6 @@ export class MisResultadosPage implements OnInit {
     return '#ef4444';
   }
 
-  /**
-   * Abre el modal de detalle usando /api/evaluador/resultado/:id,
-   * que devuelve el desglose sección → criterio → nivel elegido
-   * como una lista plana en `detalles`.
-   */
   verDetalle(id: number): void {
     if (!id) return;
 
@@ -242,7 +236,6 @@ export class MisResultadosPage implements OnInit {
 
         const data = res?.data ?? res;
 
-        // Agrupar la lista plana de detalles por sección
         const seccionesMap: { [nombre: string]: any[] } = {};
         (data.detalles || []).forEach((d: any) => {
           if (!seccionesMap[d.seccion]) {
