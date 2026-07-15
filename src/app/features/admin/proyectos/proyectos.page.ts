@@ -47,7 +47,10 @@ import {
   pricetagOutline,
   calendarOutline,
   starOutline,
-  folderOutline, personOutline, toggleOutline } from 'ionicons/icons';
+  folderOutline,
+  personOutline,
+  toggleOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-proyectos',
@@ -88,6 +91,7 @@ export class ProyectosPage implements OnInit {
   proyectosActivos: number = 0;
   totalParticipantes: number = 0;
   cargando: boolean = false;
+  cargandoConcursos: boolean = false;
 
   busqueda: string = '';
   filtroNivel: string = 'todos';
@@ -103,6 +107,7 @@ export class ProyectosPage implements OnInit {
     nombre: '',
     descripcion: '',
     concursoId: null,
+    estudianteNombre: '',
     nivel: '',
     area: '',
     activo: true,
@@ -113,7 +118,13 @@ export class ProyectosPage implements OnInit {
     private proyectoService: ProyectoService,
     private concursoService: ConcursoService
   ) {
-    addIcons({refreshOutline,addOutline,searchOutline,documentTextOutline,businessOutline,barChartOutline,peopleOutline,trophyOutline,eyeOutline,createOutline,trashOutline,folderOpenOutline,closeOutline,pricetagOutline,personOutline,toggleOutline,checkmarkOutline,calendarOutline,starOutline,folderOutline});
+    addIcons({
+      refreshOutline, addOutline, searchOutline, documentTextOutline,
+      businessOutline, barChartOutline, peopleOutline, trophyOutline,
+      eyeOutline, createOutline, trashOutline, folderOpenOutline,
+      closeOutline, pricetagOutline, personOutline, toggleOutline,
+      checkmarkOutline, calendarOutline, starOutline, folderOutline
+    });
   }
 
   ngOnInit(): void {
@@ -126,7 +137,6 @@ export class ProyectosPage implements OnInit {
 
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
-        console.log('PROYECTOS:', res);
         this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
         this.calcularEstadisticas();
         this.filtrarProyectos();
@@ -142,14 +152,16 @@ export class ProyectosPage implements OnInit {
   }
 
   cargarConcursos(): void {
+    this.cargandoConcursos = true;
     this.concursoService.listar().subscribe({
       next: (res: any) => {
         this.concursosDisponibles = res?.data ?? res ?? [];
-        console.log('Concursos disponibles:', this.concursosDisponibles);
+        this.cargandoConcursos = false;
       },
       error: (err) => {
         console.error('Error cargando concursos:', err);
         this.concursosDisponibles = [];
+        this.cargandoConcursos = false;
       }
     });
   }
@@ -209,24 +221,40 @@ export class ProyectosPage implements OnInit {
   }
 
   editar(proyecto: Proyecto): void {
+    console.log('🔍 PROYECTO ORIGINAL (para diagnosticar campos vacíos):', proyecto);
+
     this.editando = true;
-    const estudiante = proyecto.participantes && proyecto.participantes.length > 0
-      ? proyecto.participantes[0].nombre
-      : '';
+
+    // Fallback defensivo: probamos varios nombres posibles del campo
+    const primerParticipante = proyecto.participantes?.[0] as any;
+    const estudianteNombre =
+      primerParticipante?.nombre ||
+      primerParticipante?.nombre_completo ||
+      (proyecto as any).estudianteNombre ||
+      (proyecto as any).estudiante_nombre ||
+      '';
 
     this.form = {
       id: proyecto.id,
       nombre: proyecto.nombre || '',
       descripcion: proyecto.descripcion || '',
-      concursoId: proyecto.concursoId || null,
-      estudianteNombre: estudiante,
+      concursoId: proyecto.concursoId != null ? Number(proyecto.concursoId) : null,
+      estudianteNombre,
       nivel: proyecto.nivel || '',
       area: proyecto.area || '',
       activo: proyecto.activo ?? true,
       participantes: proyecto.participantes || []
     };
+
+    console.log('📝 FORM PRECARGADO PARA EDITAR:', this.form);
+
     this.modalAbierto = true;
   }
+
+  /** Evita que el ion-select falle por comparar tipos distintos (string vs number) */
+  compararConcurso = (c1: any, c2: any): boolean => {
+    return c1 != null && c2 != null ? Number(c1) === Number(c2) : c1 === c2;
+  };
 
   guardar(): void {
     if (!this.form.nombre || this.form.nombre.trim() === '') {
@@ -250,8 +278,6 @@ export class ProyectosPage implements OnInit {
       area: this.form.area || null,
       activo: this.form.activo ?? true
     };
-
-    console.log('📤 Enviando payload:', payload);
 
     const req = this.editando
       ? this.proyectoService.actualizar(this.form.id, payload)
@@ -278,7 +304,7 @@ export class ProyectosPage implements OnInit {
   }
 
   confirmarEliminar(proyecto: Proyecto): void {
-    if (confirm(`¿Estás seguro de eliminar el proyecto "${proyecto.nombre}"?`)) {
+    if (confirm(`¿Estás seguro de eliminar el proyecto "${proyecto.nombre}"? Esta acción no se puede deshacer.`)) {
       this.eliminarProyecto(proyecto.id);
     }
   }
@@ -298,6 +324,12 @@ export class ProyectosPage implements OnInit {
 
   recargar(): void {
     this.cargar();
+  }
+
+  nombreConcurso(concursoId: number | null): string {
+    if (!concursoId) return '';
+    const concurso = this.concursosDisponibles.find(c => Number(c.id) === Number(concursoId));
+    return concurso?.nombre || '';
   }
 
   trackById(index: number, item: any): number {

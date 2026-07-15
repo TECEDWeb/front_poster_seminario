@@ -10,7 +10,7 @@
     </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando">
+      <ion-button class="btn-refresh" (click)="recargar()" [disabled]="cargando" title="Actualizar lista">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -156,29 +156,30 @@
           </div>
         </div>
 
+        <!-- Chip de concurso ahora muestra el NOMBRE real, no solo "En concurso" -->
+        <div class="card-concurso" *ngIf="p.concursoId">
+          <ion-chip class="chip-concurso">
+            <ion-icon name="trophy-outline"></ion-icon>
+            <ion-label>{{ nombreConcurso(p.concursoId) || 'Concurso #' + p.concursoId }}</ion-label>
+          </ion-chip>
+        </div>
+
+        <!-- Acciones con texto + ícono, siempre claras -->
         <div class="card-actions">
-          <div class="actions-left">
-            <ion-chip class="chip-concurso" *ngIf="p.concursoId">
-              <ion-icon name="trophy-outline"></ion-icon>
-              <ion-label>En concurso</ion-label>
-            </ion-chip>
-          </div>
+          <button class="action-item" (click)="verDetalle(p.id)" title="Ver detalle del proyecto">
+            <ion-icon name="eye-outline"></ion-icon>
+            <span>Ver</span>
+          </button>
 
-          <div class="actions-right">
-            <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(p.id)">
-              <ion-icon name="eye-outline" slot="start"></ion-icon>
-              Ver
-            </ion-button>
+          <button class="action-item" (click)="editar(p)" title="Editar información del proyecto">
+            <ion-icon name="create-outline"></ion-icon>
+            <span>Editar</span>
+          </button>
 
-            <ion-button fill="clear" size="small" class="action-btn" (click)="editar(p)">
-              <ion-icon name="create-outline" slot="start"></ion-icon>
-              Editar
-            </ion-button>
-
-            <ion-button fill="clear" size="small" class="action-btn danger" (click)="confirmarEliminar(p)">
-              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-          </div>
+          <button class="action-item danger" (click)="confirmarEliminar(p)" title="Eliminar este proyecto">
+            <ion-icon name="trash-outline"></ion-icon>
+            <span>Eliminar</span>
+          </button>
         </div>
       </div>
 
@@ -211,8 +212,13 @@
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
-        <ion-toolbar>
-          <ion-title>{{ editando ? 'Editar proyecto' : 'Nuevo proyecto' }}</ion-title>
+        <ion-toolbar class="modal-toolbar">
+          <div class="modal-title-group" slot="start">
+            <div class="modal-title-icon">
+              <ion-icon [name]="editando ? 'create-outline' : 'add-outline'"></ion-icon>
+            </div>
+            <ion-title>{{ editando ? 'Editar proyecto' : 'Nuevo proyecto' }}</ion-title>
+          </div>
           <ion-buttons slot="end">
             <ion-button (click)="cerrarModal()">
               <ion-icon name="close-outline"></ion-icon>
@@ -280,8 +286,10 @@
                 <ion-select
                   [(ngModel)]="form.concursoId"
                   name="concursoId"
+                  [compareWith]="compararConcurso"
                   placeholder="Seleccione un concurso"
-                  interface="popover">
+                  interface="popover"
+                  [disabled]="cargandoConcursos">
                   <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
                     {{ c.nombre }}
                   </ion-select-option>
@@ -322,13 +330,13 @@
                 <ion-icon name="toggle-outline"></ion-icon>
                 Estado
               </label>
-              <ion-item class="field-input" lines="none">
+              <ion-item class="field-input toggle-item" lines="none">
                 <ion-toggle
                   [(ngModel)]="form.activo"
                   name="activo"
-                  color="primary">
-                  {{ form.activo ? 'Activo' : 'Inactivo' }}
+                  color="success">
                 </ion-toggle>
+                <span class="toggle-label">{{ form.activo ? 'Activo' : 'Inactivo' }}</span>
               </ion-item>
             </div>
 
@@ -338,6 +346,7 @@
                 fill="outline"
                 class="cancel-btn"
                 (click)="cerrarModal()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
                 Cancelar
               </ion-button>
 
