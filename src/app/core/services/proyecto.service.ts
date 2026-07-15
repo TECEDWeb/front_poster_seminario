@@ -15,7 +15,7 @@ export class ProyectoService {
 
   listar(): Observable<Proyecto[]> {
     return this.http
-      .get<{ ok: boolean; data: Proyecto[] }>(this.apiUrl)
+      .get<{ ok: boolean; data: any[] }>(this.apiUrl)
       .pipe(
         map(res => (res.data ?? []).map(p => this.normalizarProyecto(p)))
       );
@@ -28,38 +28,40 @@ export class ProyectoService {
   }
 
   crear(data: any): Observable<Proyecto> {
-    console.log('📤 crear proyecto - Datos recibidos:', data);
-    if (!data.estudiante_nombre) {
-      console.error('❌ Error: estudiante_nombre es obligatorio');
-    }
     return this.http.post<any>(this.apiUrl, data).pipe(
       map(res => this.normalizarProyecto(res?.data ?? res))
     );
   }
 
   actualizar(id: number, data: any): Observable<Proyecto> {
-    console.log('📤 actualizar proyecto - ID:', id, 'Datos:', data);
     return this.http.put<any>(`${this.apiUrl}/${id}`, data).pipe(
       map(res => this.normalizarProyecto(res?.data ?? res))
     );
   }
 
   eliminar(id: number): Observable<any> {
-    console.log('🗑️ eliminar proyecto - ID:', id);
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   /**
-   * Garantiza que los arrays que el backend a veces omite
-   * (participantes, etc.) siempre lleguen como array, nunca undefined/null.
-   * Esto evita errores en tiempo de ejecución en templates que usan
-   * .length directo sin optional chaining.
+   * El backend devuelve snake_case (concurso_id, estudiante_nombre, etc.)
+   * Este mapeo lo traduce a camelCase para que el resto de la app
+   * (páginas, formularios) trabaje siempre con nombres consistentes.
    */
   private normalizarProyecto(data: any): Proyecto {
     if (!data) return data;
     return {
-      ...data,
+      id: data.id,
+      nombre: data.nombre || '',
+      descripcion: data.descripcion || '',
+      concursoId: data.concursoId ?? data.concurso_id ?? null,
+      concursoNombre: data.concursoNombre ?? data.concurso_nombre ?? '',
+      estudianteNombre: data.estudianteNombre ?? data.estudiante_nombre ?? '',
+      nivel: data.nivel || '',
+      area: data.area || '',
+      activo: data.activo === 1 || data.activo === true,
       participantes: data.participantes || [],
-    };
+      createdAt: data.createdAt ?? data.created_at ?? null
+    } as Proyecto;
   }
 }

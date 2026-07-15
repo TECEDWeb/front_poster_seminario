@@ -1,23 +1,22 @@
-export interface Participante {
-  id: number;
-  cedula: string;
-  nombre: string;
-  email?: string | null;
-  telefono?: string | null;
-  institucion?: string | null;
-
-}
-
 export interface Proyecto {
   id: number;
-  concursoId?: number | null;
   nombre: string;
-  nivel?: string | null;
-  area?: string | null;
-  descripcion?: string | null;
-  activo?: boolean;
+  descripcion?: string;
+  concursoId: number | null;
+  concursoNombre?: string;
+  estudianteNombre: string;
+  nivel?: string;
+  area?: string;
+  activo: boolean;
   participantes: Participante[];
+  createdAt?: string;
+}
 
+export interface Participante {
+  id?: number;
+  nombre: string;
+  cedula?: string;
+  email?: string;
 }
 
 

@@ -220,37 +220,23 @@ export class ProyectosPage implements OnInit {
     this.modalAbierto = false;
   }
 
-  editar(proyecto: Proyecto): void {
-    console.log('🔍 PROYECTO ORIGINAL (para diagnosticar campos vacíos):', proyecto);
-
+ editar(proyecto: Proyecto): void {
     this.editando = true;
-
-    // Fallback defensivo: probamos varios nombres posibles del campo
-    const primerParticipante = proyecto.participantes?.[0] as any;
-    const estudianteNombre =
-      primerParticipante?.nombre ||
-      primerParticipante?.nombre_completo ||
-      (proyecto as any).estudianteNombre ||
-      (proyecto as any).estudiante_nombre ||
-      '';
 
     this.form = {
       id: proyecto.id,
       nombre: proyecto.nombre || '',
       descripcion: proyecto.descripcion || '',
       concursoId: proyecto.concursoId != null ? Number(proyecto.concursoId) : null,
-      estudianteNombre,
+      estudianteNombre: proyecto.estudianteNombre || '',
       nivel: proyecto.nivel || '',
       area: proyecto.area || '',
       activo: proyecto.activo ?? true,
       participantes: proyecto.participantes || []
     };
 
-    console.log('📝 FORM PRECARGADO PARA EDITAR:', this.form);
-
     this.modalAbierto = true;
   }
-
   /** Evita que el ion-select falle por comparar tipos distintos (string vs number) */
   compararConcurso = (c1: any, c2: any): boolean => {
     return c1 != null && c2 != null ? Number(c1) === Number(c2) : c1 === c2;
@@ -326,10 +312,8 @@ export class ProyectosPage implements OnInit {
     this.cargar();
   }
 
-  nombreConcurso(concursoId: number | null): string {
-    if (!concursoId) return '';
-    const concurso = this.concursosDisponibles.find(c => Number(c.id) === Number(concursoId));
-    return concurso?.nombre || '';
+  nombreConcurso(proyecto: Proyecto): string {
+    return proyecto.concursoNombre || (proyecto.concursoId ? `Concurso #${proyecto.concursoId}` : '');
   }
 
   trackById(index: number, item: any): number {
