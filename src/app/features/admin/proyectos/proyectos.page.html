@@ -160,7 +160,7 @@
         <div class="card-concurso" *ngIf="p.concursoId">
           <ion-chip class="chip-concurso">
             <ion-icon name="trophy-outline"></ion-icon>
-            <ion-label>{{ nombreConcurso(p.concursoId) || 'Concurso #' + p.concursoId }}</ion-label>
+            <ion-label>{{ nombreConcurso(p) }}</ion-label>
           </ion-chip>
         </div>
 
