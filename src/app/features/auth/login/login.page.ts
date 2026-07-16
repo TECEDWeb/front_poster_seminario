@@ -1,6 +1,7 @@
 import { Component, signal, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { 
   IonContent, 
   IonItem, 
@@ -22,6 +23,7 @@ import { LoginPayload, LoginResponse } from 'src/app/core/models/auth-reponse.mo
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     IonContent,
     IonItem,
     IonInput,
@@ -45,38 +47,21 @@ export class LoginPage implements OnInit, AfterViewInit, OnDestroy {
     private authService: AuthService,
     private router: Router
   ) {
-    console.log("======================================");
-    console.log("LOGIN PAGE - INIT");
-    console.log("URL:", window.location.href);
-    console.log("======================================");
-
     addIcons({personOutline,lockClosedOutline,alertCircleOutline,logInOutline});
   }
 
   ngOnInit(): void {
-    console.log("LoginPage ngOnInit");
-    
-    // Redirigir si ya está autenticado
     if (this.authService.isAuthenticated()) {
       const ruta = this.authService.rutaInicioSegunRol();
       this.router.navigate([ruta], { replaceUrl: true });
     }
   }
 
-  ngAfterViewInit(): void {
-    console.log("LoginPage ngAfterViewInit");
-    console.log("ion-content:", document.querySelector("ion-content"));
-    console.log("ion-input:", document.querySelector("ion-input"));
-  }
+  ngAfterViewInit(): void {}
 
-  ngOnDestroy(): void {
-    console.log("LoginPage destruida");
-  }
+  ngOnDestroy(): void {}
 
   async onSubmit() {
-    console.log("LOGIN INICIADO");
-
-    // Validaciones
     if (!this.cedula || !this.password) {
       this.errorMensaje.set("Ingresa cédula y contraseña");
       return;
@@ -102,35 +87,17 @@ export class LoginPage implements OnInit, AfterViewInit, OnDestroy {
 
     this.authService.login(payload).subscribe({
       next: async (res: LoginResponse) => {
-        console.log("============== LOGIN RESPONSE ==============");
-        console.log(res);
-
-        // Verificar que la respuesta sea exitosa
         if (res?.ok && res?.data?.token && res?.data?.usuario) {
-          console.log("TOKEN:", res.data.token);
-          console.log("USUARIO:", res.data.usuario);
-
-          // Guardar sesión
           await this.authService.setSession(res.data.usuario, res.data.token);
-          console.log("TOKEN EN AUTH:", this.authService.obtenerToken());
-
-          const usuario = this.authService.obtenerUsuario();
           const ruta = this.authService.rutaInicioSegunRol();
-
-          console.log("Navegando a:", ruta);
-
-          // Redirigir
           await this.router.navigateByUrl(ruta, { replaceUrl: true });
-
           this.cargando.set(false);
         } else {
-          console.error("❌ Respuesta de login inválida:", res);
           this.errorMensaje.set(res?.mensaje || "Error al iniciar sesión");
           this.cargando.set(false);
         }
       },
       error: (err) => {
-        console.error("❌ ERROR LOGIN:", err);
         this.errorMensaje.set(err?.error?.mensaje || "Error al iniciar sesión. Verifica tus credenciales.");
         this.cargando.set(false);
       }

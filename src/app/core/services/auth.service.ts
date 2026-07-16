@@ -338,4 +338,12 @@ export class AuthService {
     const modulosPermitidos = permisos[usuario.rol] || [];
     return modulosPermitidos.some(m => modulo.includes(m));
   }
+
+  solicitarRecuperacion(email: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/olvide-password`, { email });
+  }
+
+  resetearPassword(token: string, nuevaPassword: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/resetear-password`, { token, nuevaPassword });
+  }
 }

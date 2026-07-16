@@ -256,3 +256,14 @@ $upse-orange: #f57c00;
     }
   }
 }
+.forgot-link {
+  display: block;
+  text-align: center;
+  color: $upse-blue;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 12px;
+
+  &:hover { text-decoration: underline; }
+}

@@ -17,7 +17,11 @@ export const routes: Routes = [
         m => m.LoginPage
       )
   },
-
+  {
+  path: 'recuperar-password',
+  loadComponent: () =>
+    import('./features/auth/recuperar-password/recuperar-password.page').then(m => m.RecuperarPasswordPage)
+  },
   {
     path: 'admin',
     loadChildren: () =>
