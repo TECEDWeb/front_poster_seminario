@@ -173,7 +173,7 @@
             {{ u.activo ? 'Desactivar' : 'Activar' }}
           </ion-button>
 
-          <ion-button fill="clear" size="small" class="action-btn" (click)="resetPass(u)">
+          <ion-button fill="clear" size="small" class="action-btn" (click)="abrirModalReset(u)">
             <ion-icon name="key-outline" slot="start"></ion-icon>
             Resetear pass
           </ion-button>
@@ -357,6 +357,97 @@
               </ion-button>
             </div>
           </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <!-- MODAL: RESETEAR CONTRASEÑA -->
+  <ion-modal [isOpen]="modalResetAbierto" (didDismiss)="cerrarModalReset()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Restablecer contraseña</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalReset()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="reset-container" *ngIf="usuarioParaReset as u">
+
+          <!-- Antes de confirmar: elegir modo -->
+          <ng-container *ngIf="!passwordResultado">
+            <p class="reset-desc">
+              Vas a restablecer la contraseña de <strong>{{ u.nombre }}</strong>. Elige cómo generarla:
+            </p>
+
+            <div class="reset-options">
+              <button class="reset-option" [class.selected]="modoReset === 'random'" (click)="modoReset = 'random'">
+                <ion-icon name="dice-outline"></ion-icon>
+                <div>
+                  <strong>Generar aleatoria</strong>
+                  <span>Contraseña segura generada automáticamente</span>
+                </div>
+              </button>
+
+              <button class="reset-option" [class.selected]="modoReset === 'manual'" (click)="modoReset = 'manual'">
+                <ion-icon name="create-outline"></ion-icon>
+                <div>
+                  <strong>Definir manualmente</strong>
+                  <span>Escribe tú la nueva contraseña</span>
+                </div>
+              </button>
+            </div>
+
+            <div class="form-field" *ngIf="modoReset === 'manual'">
+              <label class="field-label">
+                <ion-icon name="key-outline"></ion-icon>
+                Nueva contraseña
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="passwordManual"
+                  type="text"
+                  placeholder="Mínimo 6 caracteres">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <div class="form-actions">
+              <ion-button fill="outline" class="cancel-btn" (click)="cerrarModalReset()">
+                Cancelar
+              </ion-button>
+              <ion-button class="submit-btn" [disabled]="reseteando" (click)="confirmarReset()">
+                <ion-icon [name]="reseteando ? 'refresh-outline' : 'key-outline'" slot="start" [class.spinning]="reseteando"></ion-icon>
+                {{ reseteando ? 'Restableciendo...' : 'Restablecer contraseña' }}
+              </ion-button>
+            </div>
+          </ng-container>
+
+          <!-- Después de confirmar: mostrar el resultado -->
+          <ng-container *ngIf="passwordResultado">
+            <div class="reset-success">
+              <ion-icon name="checkmark-outline"></ion-icon>
+              <h3>Contraseña restablecida</h3>
+              <p>Comparte esta contraseña con <strong>{{ u.nombre }}</strong> — no podrás volver a verla después de cerrar esta ventana.</p>
+
+              <div class="password-display">
+                <span class="password-text">{{ passwordResultado }}</span>
+                <button class="copy-btn" (click)="copiarPassword()">
+                  <ion-icon [name]="copiado ? 'checkmark-outline' : 'copy-outline'"></ion-icon>
+                  {{ copiado ? 'Copiado' : 'Copiar' }}
+                </button>
+              </div>
+
+              <ion-button expand="block" class="submit-btn" (click)="cerrarModalReset()">
+                Entendido, cerrar
+              </ion-button>
+            </div>
+          </ng-container>
+
         </div>
       </ion-content>
     </ng-template>

@@ -31,10 +31,10 @@ export class UsuarioService {
     return this.http.patch(`${this.base}/${id}/estado`, {});
   }
 
-  resetPassword(id: number): Observable<{ mensaje: string }> {
-    return this.http.post<{ mensaje: string }>(
+  resetPassword(id: number, nuevaPassword?: string): Observable<{ ok: boolean; mensaje: string; data: { nuevaPassword: string } }> {
+    return this.http.post<{ ok: boolean; mensaje: string; data: { nuevaPassword: string } }>(
       `${this.base}/${id}/reset-password`,
-      {}
+      nuevaPassword ? { nuevaPassword } : {}
     );
   }
 

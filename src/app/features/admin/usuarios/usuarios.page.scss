@@ -847,3 +847,132 @@ ion-fab-button {
 ::-webkit-scrollbar-thumb:hover {
   background: $upse-blue-dark;
 }
+// ============================================
+// MODAL: RESETEAR CONTRASEÑA
+// ============================================
+.reset-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.reset-desc {
+  font-size: 14px;
+  color: #475569;
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+.reset-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.reset-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  ion-icon {
+    font-size: 24px;
+    color: #64748b;
+    flex-shrink: 0;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+
+    strong { font-size: 14px; color: #0f172a; }
+    span { font-size: 12px; color: #64748b; }
+  }
+
+  &:hover {
+    border-color: #94a3b8;
+  }
+
+  &.selected {
+    border-color: #001b4c;
+    background: #e8f0fe;
+
+    ion-icon { color: #001b4c; }
+  }
+}
+
+.reset-success {
+  text-align: center;
+
+  ion-icon {
+    font-size: 48px;
+    color: #00a651;
+    background: #e8f5e9;
+    border-radius: 50%;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+}
+
+.password-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+
+  .password-text {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #c9a84c;
+    text-align: left;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+
+    ion-icon { font-size: 15px; }
+
+    &:hover { background: rgba(255,255,255,0.2); }
+  }
+}

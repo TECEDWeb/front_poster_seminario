@@ -24,25 +24,10 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  addOutline,
-  createOutline,
-  swapHorizontalOutline,
-  keyOutline,
-  closeOutline,
-  cardOutline,
-  mailOutline,
-  personOutline,
-  briefcaseOutline,
-  toggleOutline,
-  checkmarkOutline,
-  refreshOutline,
-  searchOutline,
-  peopleOutline,
-  timeOutline,
-  callOutline,
-  trashOutline,
-  eyeOutline,
-  shieldOutline
+  addOutline, createOutline, swapHorizontalOutline, keyOutline, closeOutline,
+  cardOutline, mailOutline, personOutline, briefcaseOutline, toggleOutline,
+  checkmarkOutline, refreshOutline, searchOutline, peopleOutline, timeOutline,
+  callOutline, trashOutline, eyeOutline, shieldOutline, copyOutline, diceOutline
 } from 'ionicons/icons';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { Usuario, Rol } from '../../../core/models/usuario.model';
@@ -87,6 +72,13 @@ export class UsuariosPage implements OnInit {
   busqueda = '';
   filtroRol: string = 'todos';
   filtroEstado: string = 'todos';
+  modalResetAbierto = false;
+  usuarioParaReset: Usuario | null = null;
+  modoReset: 'random' | 'manual' = 'random';
+  passwordManual = '';
+  reseteando = false;
+  passwordResultado: string | null = null;
+  copiado = false;
 
   form: any = {
     id: null,
@@ -101,25 +93,10 @@ export class UsuariosPage implements OnInit {
 
   constructor(private usuarioService: UsuarioService) {
     addIcons({
-      addOutline,
-      createOutline,
-      swapHorizontalOutline,
-      keyOutline,
-      closeOutline,
-      cardOutline,
-      mailOutline,
-      personOutline,
-      briefcaseOutline,
-      toggleOutline,
-      checkmarkOutline,
-      refreshOutline,
-      searchOutline,
-      peopleOutline,
-      timeOutline,
-      callOutline,
-      trashOutline,
-      eyeOutline,
-      shieldOutline
+      addOutline, createOutline, swapHorizontalOutline, keyOutline, closeOutline,
+      cardOutline, mailOutline, personOutline, briefcaseOutline, toggleOutline,
+      checkmarkOutline, refreshOutline, searchOutline, peopleOutline, timeOutline,
+      callOutline, trashOutline, eyeOutline, shieldOutline, copyOutline, diceOutline
     });
   }
 
@@ -266,18 +243,54 @@ export class UsuariosPage implements OnInit {
     }
   }
 
-  resetPass(u: Usuario): void {
-    if (confirm(`¿Resetear la contraseña de "${u.nombre}"?`)) {
-      this.usuarioService.resetPassword(u.id).subscribe({
-        next: () => {
-          alert('Contraseña reseteada correctamente');
-        },
-        error: (err) => {
-          console.error('Error resetando password:', err);
-          alert(err.error?.mensaje || 'Error al resetear la contraseña');
-        }
-      });
+  abrirModalReset(u: Usuario): void {
+    this.usuarioParaReset = u;
+    this.modoReset = 'random';
+    this.passwordManual = '';
+    this.passwordResultado = null;
+    this.copiado = false;
+    this.modalResetAbierto = true;
+  }
+
+  cerrarModalReset(): void {
+    this.modalResetAbierto = false;
+    this.usuarioParaReset = null;
+    this.passwordResultado = null;
+  }
+
+  confirmarReset(): void {
+    if (!this.usuarioParaReset) return;
+
+    if (this.modoReset === 'manual') {
+      if (!this.passwordManual || this.passwordManual.length < 6) {
+        alert('La contraseña manual debe tener al menos 6 caracteres');
+        return;
+      }
     }
+
+    this.reseteando = true;
+
+    const passwordAEnviar = this.modoReset === 'manual' ? this.passwordManual : undefined;
+
+    this.usuarioService.resetPassword(this.usuarioParaReset.id, passwordAEnviar).subscribe({
+      next: (res) => {
+        this.reseteando = false;
+        this.passwordResultado = res.data.nuevaPassword;
+      },
+      error: (err) => {
+        this.reseteando = false;
+        console.error('Error resetando password:', err);
+        alert(err.error?.mensaje || 'Error al resetear la contraseña');
+      }
+    });
+  }
+
+  copiarPassword(): void {
+    if (!this.passwordResultado) return;
+    navigator.clipboard.writeText(this.passwordResultado).then(() => {
+      this.copiado = true;
+      setTimeout(() => this.copiado = false, 2000);
+    });
   }
 
   confirmarEliminar(u: Usuario): void {
