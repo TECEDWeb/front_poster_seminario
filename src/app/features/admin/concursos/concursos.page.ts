@@ -24,7 +24,8 @@ import {
   IonTextarea,
   IonDatetime,
   IonToggle,
-  IonItem
+  IonItem,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { ConcursoService } from '../../../core/services/concurso.service';
 import { Concurso } from '../../../core/models/concurso.model';
@@ -81,7 +82,8 @@ import {
     IonTextarea,
     IonDatetime,
     IonToggle,
-    IonItem
+    IonItem,
+    IonSpinner
   ],
   templateUrl: './concursos.page.html',
   styleUrls: ['./concursos.page.scss']

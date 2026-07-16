@@ -23,7 +23,8 @@ import {
   IonItem,
   IonInput,
   IonTextarea,
-  IonToggle
+  IonToggle,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { Proyecto, Participante } from '../../../core/models/proyecto.model';
@@ -80,7 +81,8 @@ import {
     IonItem,
     IonInput,
     IonTextarea,
-    IonToggle
+    IonToggle,
+    IonSpinner
   ],
   templateUrl: './proyectos.page.html',
   styleUrls: ['./proyectos.page.scss']
