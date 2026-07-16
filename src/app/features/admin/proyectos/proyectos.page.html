@@ -20,6 +20,7 @@
 <ion-content class="proyectos-content">
   <div class="page-container">
 
+    <!-- HEADER -->
     <div class="page-header">
       <div class="header-left">
         <h1>Gestión de proyectos</h1>
@@ -46,12 +47,13 @@
       </div>
     </div>
 
+    <!-- FILTROS -->
     <div class="filter-bar">
       <div class="search-group">
         <ion-searchbar
           [(ngModel)]="busqueda"
           (ionInput)="filtrarProyectos()"
-          placeholder="Buscar por nombre, área o nivel..."
+          placeholder="Buscar por nombre, área, nivel o participante..."
           class="filter-search"
           animated>
           <ion-icon name="search-outline" slot="start"></ion-icon>
@@ -86,6 +88,7 @@
       </div>
     </div>
 
+    <!-- SKELETON LOADING -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="proyecto-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
         <div class="skeleton-header">
@@ -102,12 +105,14 @@
       </div>
     </div>
 
+    <!-- GRID DE PROYECTOS -->
     <div class="proyectos-grid" *ngIf="!cargando">
       <div class="proyecto-card" 
            *ngFor="let p of proyectosFiltrados || []; trackBy: trackById"
            [class.card-active]="p.activo"
            [class.card-inactive]="!p.activo">
 
+        <!-- HEADER DE LA TARJETA -->
         <div class="card-header">
           <div class="card-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
             <ion-icon name="document-text-outline"></ion-icon>
@@ -122,7 +127,11 @@
               </span>
               <span class="tag tag-nivel" *ngIf="p.nivel">
                 <ion-icon name="bar-chart-outline"></ion-icon>
-                Nivel {{ p.nivel }}
+                {{ p.nivel }}
+              </span>
+              <span class="tag tag-participantes" *ngIf="p.participantes?.length">
+                <ion-icon name="people-outline"></ion-icon>
+                {{ p.participantes.length }}
               </span>
             </div>
           </div>
@@ -135,28 +144,29 @@
           </div>
         </div>
 
+        <!-- CUERPO DE LA TARJETA -->
         <div class="card-body">
           <p class="card-description" *ngIf="p.descripcion">
-            {{ p.descripcion | slice:0:100 }}{{ p.descripcion.length > 100 ? '...' : '' }}
+            {{ p.descripcion | slice:0:120 }}{{ p.descripcion.length > 120 ? '...' : '' }}
           </p>
 
           <div class="card-participants">
             <div class="participants-header">
               <ion-icon name="people-outline"></ion-icon>
-              <span>Participantes ({{ (p.participantes || []).length || 0 }})</span>
+              <span>Participantes ({{ (p.participantes || []).length }})</span>
             </div>
             <div class="participants-list">
-              <div class="participant-chip" *ngFor="let part of (p.participantes || []).slice(0, 3)">
+              <div class="participant-chip" *ngFor="let part of (p.participantes || []).slice(0, 4)">
                 {{ part.nombre }}
               </div>
-              <div class="participant-more" *ngIf="(p.participantes?.length || 0) > 3">
-                +{{ (p.participantes?.length || 0) - 3 }} más
+              <div class="participant-more" *ngIf="(p.participantes?.length || 0) > 4">
+                +{{ (p.participantes?.length || 0) - 4 }} más
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Chip de concurso ahora muestra el NOMBRE real, no solo "En concurso" -->
+        <!-- CONCURSO ASOCIADO -->
         <div class="card-concurso" *ngIf="p.concursoId">
           <ion-chip class="chip-concurso">
             <ion-icon name="trophy-outline"></ion-icon>
@@ -164,9 +174,10 @@
           </ion-chip>
         </div>
 
-        <!-- Acciones con texto + ícono, siempre claras -->
+        <!-- ACCIONES -->
         <div class="card-actions">
-          <button class="action-item" (click)="verDetalle(p)" title="Ver detalle del proyecto">            <ion-icon name="eye-outline"></ion-icon>
+          <button class="action-item" (click)="verDetalle(p)" title="Ver detalle del proyecto">
+            <ion-icon name="eye-outline"></ion-icon>
             <span>Ver</span>
           </button>
 
@@ -182,6 +193,7 @@
         </div>
       </div>
 
+      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0">
         <div class="empty-icon">
           <ion-icon name="folder-open-outline"></ion-icon>
@@ -202,12 +214,16 @@
 
   </div>
 
+  <!-- FAB MOBILE -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
+  <!-- ============================================ -->
+  <!-- MODAL: CREAR / EDITAR PROYECTO               -->
+  <!-- ============================================ -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -229,6 +245,8 @@
       <ion-content class="modal-content">
         <div class="modal-container">
           <form (ngSubmit)="guardar()" #proyectoForm="ngForm">
+
+            <!-- NOMBRE DEL PROYECTO -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>
@@ -245,28 +263,7 @@
               </ion-item>
             </div>
 
-            <div class="form-field">
-              <label class="field-label">
-                <ion-icon name="people-outline"></ion-icon>
-                Participantes
-                <span class="required">*</span>
-                <span class="field-hint">(Separados por coma)</span>
-              </label>
-              <ion-item class="field-input" lines="none">
-                <ion-input
-                  [(ngModel)]="form.participantesTexto"
-                  name="participantesTexto"
-                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz"
-                  required>
-                </ion-input>
-              </ion-item>
-              <div class="field-help" *ngIf="form.participantesTexto">
-                <span class="participant-count">
-                  {{ contarParticipantes(form.participantesTexto) }} participantes
-                </span>
-              </div>
-            </div>
-
+            <!-- DESCRIPCIÓN -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="document-text-outline"></ion-icon>
@@ -282,6 +279,7 @@
               </ion-item>
             </div>
 
+            <!-- CONCURSO ASOCIADO -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="trophy-outline"></ion-icon>
@@ -302,6 +300,7 @@
               </ion-item>
             </div>
 
+            <!-- NIVEL (COMBOBOX) -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="bar-chart-outline"></ion-icon>
@@ -322,6 +321,7 @@
               </ion-item>
             </div>
 
+            <!-- ÁREA (COMBOBOX) -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="business-outline"></ion-icon>
@@ -341,10 +341,42 @@
                   <ion-select-option value="Humanidades">Humanidades</ion-select-option>
                   <ion-select-option value="Ingeniería">Ingeniería</ion-select-option>
                   <ion-select-option value="Salud">Salud</ion-select-option>
+                  <ion-select-option value="Artes">Artes</ion-select-option>
+                  <ion-select-option value="Deportes">Deportes</ion-select-option>
                 </ion-select>
               </ion-item>
             </div>
 
+            <!-- PARTICIPANTES -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="people-outline"></ion-icon>
+                Participantes
+                <span class="required">*</span>
+                <span class="field-hint">(Separados por coma)</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.participantesTexto"
+                  name="participantesTexto"
+                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz"
+                  required>
+                </ion-input>
+              </ion-item>
+              <div class="field-help" *ngIf="form.participantesTexto">
+                <span class="participant-count">
+                  {{ contarParticipantes(form.participantesTexto) }} participantes
+                </span>
+                <span class="participant-warning" *ngIf="contarParticipantes(form.participantesTexto) < 2">
+                  ⚠️ Mínimo 2 participantes
+                </span>
+                <span class="participant-success" *ngIf="contarParticipantes(form.participantesTexto) >= 2">
+                  ✅ Listo
+                </span>
+              </div>
+            </div>
+
+            <!-- ESTADO -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="toggle-outline"></ion-icon>
@@ -360,6 +392,7 @@
               </ion-item>
             </div>
 
+            <!-- BOTONES -->
             <div class="form-actions">
               <ion-button
                 type="button"
@@ -382,12 +415,16 @@
                 {{ guardando ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear proyecto') }}
               </ion-button>
             </div>
+
           </form>
         </div>
       </ion-content>
     </ng-template>
   </ion-modal>
-  <!-- MODAL: VER DETALLE (solo lectura) -->
+
+  <!-- ============================================ -->
+  <!-- MODAL: VER DETALLE (SOLO LECTURA)            -->
+  <!-- ============================================ -->
   <ion-modal [isOpen]="modalDetalleAbierto" (didDismiss)="cerrarModalDetalle()">
     <ng-template>
       <ion-header>
@@ -409,7 +446,7 @@
       <ion-content class="modal-content">
         <div class="detalle-container" *ngIf="proyectoSeleccionado as p">
 
-          <!-- Info general -->
+          <!-- INFO GENERAL -->
           <div class="detalle-section">
             <div class="detalle-header">
               <div class="detalle-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
@@ -428,13 +465,6 @@
             <p class="detalle-descripcion empty" *ngIf="!p.descripcion">Sin descripción registrada</p>
 
             <div class="detalle-meta-grid">
-              <div class="meta-item">
-                <ion-icon name="person-outline"></ion-icon>
-                <div>
-                  <span class="meta-label">Estudiante</span>
-                  <span class="meta-value">{{ p.estudianteNombre || 'No registrado' }}</span>
-                </div>
-              </div>
               <div class="meta-item">
                 <ion-icon name="business-outline"></ion-icon>
                 <div>
@@ -459,7 +489,7 @@
             </div>
           </div>
 
-          <!-- Participantes completos -->
+          <!-- PARTICIPANTES COMPLETOS -->
           <div class="detalle-section">
             <div class="section-title">
               <ion-icon name="people-outline"></ion-icon>
@@ -482,7 +512,7 @@
             </p>
           </div>
 
-          <!-- Evaluaciones -->
+          <!-- EVALUACIONES -->
           <div class="detalle-section">
             <div class="section-title">
               <ion-icon name="checkmark-done-outline"></ion-icon>
@@ -526,6 +556,7 @@
             </ng-container>
           </div>
 
+          <!-- ACCIÓN EDITAR DESDE DETALLE -->
           <div class="detalle-actions">
             <ion-button expand="block" class="edit-from-detail-btn" (click)="editarDesdeDetalle()">
               <ion-icon name="create-outline" slot="start"></ion-icon>
@@ -537,4 +568,5 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
 </ion-content>
