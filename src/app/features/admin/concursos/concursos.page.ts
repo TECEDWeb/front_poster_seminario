@@ -28,6 +28,9 @@ import {
 } from '@ionic/angular/standalone';
 import { ConcursoService } from '../../../core/services/concurso.service';
 import { Concurso } from '../../../core/models/concurso.model';
+import { ProyectoService } from '../../../core/services/proyecto.service';
+import { RubricaService } from '../../../core/services/rubrica.service';
+import { getEstadoConcurso, getEstadoColor } from '../../../core/models/concurso.model';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -107,11 +110,21 @@ export class ConcursosPage implements OnInit {
     puntajeMaximo: null,
     activo: true
   };
+  // Modal "Ver detalle" (solo lectura)
+  modalDetalleAbierto = false;
+  cargandoDetalle = false;
+  concursoSeleccionado: Concurso | null = null;
+  proyectosDelConcurso: any[] = [];
+  rubricaDelConcurso: any = null;
+  tieneRubricaConfigurada = false;
 
   constructor(
     private concursoService: ConcursoService,
+    private proyectoService: ProyectoService,
+    private rubricaService: RubricaService,
     private route: ActivatedRoute,
     private router: Router
+
   ) {
     addIcons({
       addOutline,
@@ -293,9 +306,76 @@ export class ConcursosPage implements OnInit {
     });
   }
 
-  verConcurso(id: number): void {
-    console.log('Ver concurso ID:', id);
-    alert(`Ver detalle del concurso #${id}`);
+  /**
+   * Abre un modal de solo lectura con el detalle completo del concurso:
+   * datos generales, proyectos inscritos y estado de su rúbrica.
+   */
+  verConcurso(concurso: Concurso): void {
+    this.concursoSeleccionado = concurso;
+    this.modalDetalleAbierto = true;
+    this.cargandoDetalle = true;
+    this.proyectosDelConcurso = [];
+    this.rubricaDelConcurso = null;
+    this.tieneRubricaConfigurada = false;
+
+    // Proyectos inscritos en este concurso
+    this.proyectoService.listar().subscribe({
+      next: (proyectos: any) => {
+        const lista = Array.isArray(proyectos) ? proyectos : [];
+        this.proyectosDelConcurso = lista.filter(p => Number(p.concursoId) === Number(concurso.id));
+      },
+      error: () => {
+        this.proyectosDelConcurso = [];
+      }
+    });
+
+    // Estado de la rúbrica de este concurso
+    this.rubricaService.obtenerPorConcurso(concurso.id).subscribe({
+      next: (rubrica) => {
+        this.rubricaDelConcurso = rubrica;
+        this.tieneRubricaConfigurada = (rubrica?.secciones?.length || 0) > 0;
+        this.cargandoDetalle = false;
+      },
+      error: () => {
+        this.rubricaDelConcurso = null;
+        this.tieneRubricaConfigurada = false;
+        this.cargandoDetalle = false;
+      }
+    });
+  }
+
+  cerrarModalDetalle(): void {
+    this.modalDetalleAbierto = false;
+    this.concursoSeleccionado = null;
+    this.proyectosDelConcurso = [];
+    this.rubricaDelConcurso = null;
+  }
+
+  editarDesdeDetalle(): void {
+    if (!this.concursoSeleccionado) return;
+    const concurso = this.concursoSeleccionado;
+    this.cerrarModalDetalle();
+    this.editar(concurso);
+  }
+
+  irARubricaDesdeDetalle(): void {
+    this.cerrarModalDetalle();
+    this.router.navigate(['/admin/rubricas']);
+  }
+
+  getEstadoConcursoTexto(concurso: Concurso): string {
+    return getEstadoConcurso(concurso);
+  }
+
+  getEstadoConcursoColor(concurso: Concurso): string {
+    return getEstadoColor(concurso);
+  }
+
+  totalCriteriosRubrica(): number {
+    if (!this.rubricaDelConcurso?.secciones) return 0;
+    return this.rubricaDelConcurso.secciones.reduce(
+      (total: number, s: any) => total + (s.criterios?.length || 0), 0
+    );
   }
 
   confirmarEliminar(concurso: Concurso): void {

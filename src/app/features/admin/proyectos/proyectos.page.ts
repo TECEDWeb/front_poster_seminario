@@ -28,6 +28,7 @@ import {
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { Proyecto, Participante } from '../../../core/models/proyecto.model';
 import { ConcursoService } from '../../../core/services/concurso.service';
+import { ReporteService } from '../../../core/services/reporte.service';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -114,9 +115,16 @@ export class ProyectosPage implements OnInit {
     participantes: []
   };
 
+  modalDetalleAbierto = false;
+  cargandoDetalle = false;
+  errorDetalle: string | null = null;
+  proyectoSeleccionado: Proyecto | null = null;
+  detalleEvaluaciones: any = null;
+
   constructor(
     private proyectoService: ProyectoService,
-    private concursoService: ConcursoService
+    private concursoService: ConcursoService,
+    private reporteService: ReporteService
   ) {
     addIcons({
       refreshOutline, addOutline, searchOutline, documentTextOutline,
@@ -284,9 +292,50 @@ export class ProyectosPage implements OnInit {
     });
   }
 
-  verDetalle(id: number): void {
-    console.log('Ver detalle del proyecto:', id);
-    alert(`Ver detalle del proyecto #${id}`);
+  verDetalle(proyecto: Proyecto): void {
+    this.proyectoSeleccionado = proyecto;
+    this.modalDetalleAbierto = true;
+    this.cargandoDetalle = true;
+    this.errorDetalle = null;
+    this.detalleEvaluaciones = null;
+
+    this.reporteService.getDetalleProyecto(proyecto.id).subscribe({
+      next: (res: any) => {
+        const data = res?.data ?? res;
+        this.detalleEvaluaciones = {
+          evaluaciones: data.evaluaciones || [],
+          evaluadores: data.evaluadores || [],
+          promedio: data.promedio || 0,
+          totalEvaluaciones: data.totalEvaluaciones || 0
+        };
+        this.cargandoDetalle = false;
+      },
+      error: (err) => {
+        console.error('Error cargando detalle de evaluaciones:', err);
+        this.errorDetalle = 'No se pudieron cargar las evaluaciones de este proyecto';
+        this.detalleEvaluaciones = { evaluaciones: [], evaluadores: [], promedio: 0, totalEvaluaciones: 0 };
+        this.cargandoDetalle = false;
+      }
+    });
+  }
+
+  cerrarModalDetalle(): void {
+    this.modalDetalleAbierto = false;
+    this.proyectoSeleccionado = null;
+    this.detalleEvaluaciones = null;
+    this.errorDetalle = null;
+  }
+
+  /** Desde el modal de solo lectura, saltar directo a editar */
+  editarDesdeDetalle(): void {
+    if (!this.proyectoSeleccionado) return;
+    const proyecto = this.proyectoSeleccionado;
+    this.cerrarModalDetalle();
+    this.editar(proyecto);
+  }
+
+  getEstadoEvaluacion(estado: string): string {
+    return estado === 'evaluado' ? 'status-excellent' : 'status-regular';
   }
 
   confirmarEliminar(proyecto: Proyecto): void {

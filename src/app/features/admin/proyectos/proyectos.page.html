@@ -166,8 +166,7 @@
 
         <!-- Acciones con texto + ícono, siempre claras -->
         <div class="card-actions">
-          <button class="action-item" (click)="verDetalle(p.id)" title="Ver detalle del proyecto">
-            <ion-icon name="eye-outline"></ion-icon>
+          <button class="action-item" (click)="verDetalle(p)" title="Ver detalle del proyecto">            <ion-icon name="eye-outline"></ion-icon>
             <span>Ver</span>
           </button>
 
@@ -363,6 +362,156 @@
               </ion-button>
             </div>
           </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <!-- MODAL: VER DETALLE (solo lectura) -->
+  <ion-modal [isOpen]="modalDetalleAbierto" (didDismiss)="cerrarModalDetalle()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar class="modal-toolbar">
+          <div class="modal-title-group" slot="start">
+            <div class="modal-title-icon">
+              <ion-icon name="eye-outline"></ion-icon>
+            </div>
+            <ion-title>Detalle del proyecto</ion-title>
+          </div>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalDetalle()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="detalle-container" *ngIf="proyectoSeleccionado as p">
+
+          <!-- Info general -->
+          <div class="detalle-section">
+            <div class="detalle-header">
+              <div class="detalle-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
+                <ion-icon name="document-text-outline"></ion-icon>
+              </div>
+              <div>
+                <h2>{{ p.nombre }}</h2>
+                <span class="status-badge" [class]="p.activo ? 'status-active' : 'status-inactive'">
+                  <span class="status-dot"></span>
+                  {{ p.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+            </div>
+
+            <p class="detalle-descripcion" *ngIf="p.descripcion">{{ p.descripcion }}</p>
+            <p class="detalle-descripcion empty" *ngIf="!p.descripcion">Sin descripción registrada</p>
+
+            <div class="detalle-meta-grid">
+              <div class="meta-item">
+                <ion-icon name="person-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Estudiante</span>
+                  <span class="meta-value">{{ p.estudianteNombre || 'No registrado' }}</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <ion-icon name="business-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Área</span>
+                  <span class="meta-value">{{ p.area || '—' }}</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Nivel</span>
+                  <span class="meta-value">{{ p.nivel || '—' }}</span>
+                </div>
+              </div>
+              <div class="meta-item" *ngIf="p.concursoNombre">
+                <ion-icon name="trophy-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Concurso</span>
+                  <span class="meta-value">{{ p.concursoNombre }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Participantes completos -->
+          <div class="detalle-section">
+            <div class="section-title">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>Participantes ({{ (p.participantes || []).length }})</span>
+            </div>
+
+            <div class="participantes-full-list" *ngIf="(p.participantes || []).length > 0">
+              <div class="participante-row" *ngFor="let part of p.participantes">
+                <div class="participante-avatar">{{ part.nombre?.charAt(0) || '?' }}</div>
+                <div class="participante-info">
+                  <strong>{{ part.nombre }}</strong>
+                  <span *ngIf="part.cedula">CI: {{ part.cedula }}</span>
+                  <span *ngIf="part.email">{{ part.email }}</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="empty-mini" *ngIf="(p.participantes || []).length === 0">
+              No hay participantes registrados para este proyecto
+            </p>
+          </div>
+
+          <!-- Evaluaciones -->
+          <div class="detalle-section">
+            <div class="section-title">
+              <ion-icon name="checkmark-done-outline"></ion-icon>
+              <span>Evaluaciones</span>
+            </div>
+
+            <div class="loading-mini" *ngIf="cargandoDetalle">
+              <ion-spinner name="crescent"></ion-spinner>
+            </div>
+
+            <div class="error-mini" *ngIf="!cargandoDetalle && errorDetalle">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              {{ errorDetalle }}
+            </div>
+
+            <ng-container *ngIf="!cargandoDetalle && detalleEvaluaciones">
+              <div class="evaluaciones-summary" *ngIf="detalleEvaluaciones.totalEvaluaciones > 0">
+                <div class="summary-stat">
+                  <span class="summary-value">{{ detalleEvaluaciones.totalEvaluaciones }}</span>
+                  <span class="summary-label">Evaluaciones</span>
+                </div>
+                <div class="summary-stat">
+                  <span class="summary-value">{{ detalleEvaluaciones.promedio | number:'1.1-2' }}</span>
+                  <span class="summary-label">Promedio</span>
+                </div>
+              </div>
+
+              <div class="evaluacion-row" *ngFor="let ev of detalleEvaluaciones.evaluaciones">
+                <div class="ev-info">
+                  <strong>{{ ev.evaluador }}</strong>
+                  <span class="ev-estado" [class]="getEstadoEvaluacion(ev.estado)">
+                    {{ ev.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
+                  </span>
+                </div>
+                <span class="ev-puntaje" *ngIf="ev.puntaje_total">{{ ev.puntaje_total }} pts</span>
+              </div>
+
+              <p class="empty-mini" *ngIf="detalleEvaluaciones.totalEvaluaciones === 0">
+                Este proyecto aún no tiene evaluaciones asignadas
+              </p>
+            </ng-container>
+          </div>
+
+          <div class="detalle-actions">
+            <ion-button expand="block" class="edit-from-detail-btn" (click)="editarDesdeDetalle()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar este proyecto
+            </ion-button>
+          </div>
+
         </div>
       </ion-content>
     </ng-template>

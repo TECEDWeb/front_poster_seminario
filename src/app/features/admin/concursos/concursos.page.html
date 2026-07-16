@@ -9,7 +9,6 @@
       <span class="title-badge">Científicos</span>
     </ion-title>
 
-    <!-- ⚠️ ELIMINADO: Botón duplicado en toolbar -->
   </ion-toolbar>
 </ion-header>
 
@@ -160,7 +159,7 @@
           </div>
 
           <div class="actions-right">
-            <ion-button fill="clear" size="small" class="action-btn" (click)="verConcurso(c.id)">
+            <ion-button fill="clear" size="small" class="action-btn" (click)="verConcurso(c)">
               <ion-icon name="eye-outline" slot="start"></ion-icon>
               Ver
             </ion-button>
@@ -203,14 +202,12 @@
 
   </div>
 
-  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL (ESTILO UPSE) -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- MODAL DE CONCURSO -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -244,7 +241,6 @@
               </ion-item>
             </div>
 
-            <!-- Descripción -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="document-text-outline"></ion-icon>
@@ -260,7 +256,6 @@
               </ion-item>
             </div>
 
-            <!-- Tipo -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="folder-outline"></ion-icon>
@@ -362,6 +357,152 @@
               </ion-button>
             </div>
           </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <!-- MODAL: VER DETALLE (solo lectura) -->
+  <ion-modal [isOpen]="modalDetalleAbierto" (didDismiss)="cerrarModalDetalle()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar class="modal-toolbar">
+          <div class="modal-title-group" slot="start">
+            <div class="modal-title-icon">
+              <ion-icon name="eye-outline"></ion-icon>
+            </div>
+            <ion-title>Detalle del concurso</ion-title>
+          </div>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalDetalle()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="detalle-container" *ngIf="concursoSeleccionado as c">
+
+          <!-- Info general -->
+          <div class="detalle-section">
+            <div class="detalle-header">
+              <div class="detalle-icon" [class]="c.activo ? 'icon-upse' : 'icon-slate'">
+                <ion-icon name="trophy-outline"></ion-icon>
+              </div>
+              <div>
+                <h2>{{ c.nombre }}</h2>
+                <span class="status-badge" [class]="'status-' + getEstadoConcursoColor(c)">
+                  {{ getEstadoConcursoTexto(c) }}
+                </span>
+              </div>
+            </div>
+
+            <p class="detalle-descripcion" *ngIf="c.descripcion">{{ c.descripcion }}</p>
+            <p class="detalle-descripcion empty" *ngIf="!c.descripcion">Sin descripción registrada</p>
+
+            <div class="detalle-meta-grid">
+              <div class="meta-item" *ngIf="c.tipo">
+                <ion-icon name="folder-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Tipo</span>
+                  <span class="meta-value">{{ c.tipo }}</span>
+                </div>
+              </div>
+              <div class="meta-item" *ngIf="c.puntajeMaximo">
+                <ion-icon name="star-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Puntaje máximo</span>
+                  <span class="meta-value">{{ c.puntajeMaximo }}</span>
+                </div>
+              </div>
+              <div class="meta-item" *ngIf="c.fechaInicio">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Fecha inicio</span>
+                  <span class="meta-value">{{ c.fechaInicio | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+              <div class="meta-item" *ngIf="c.fechaFin">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Fecha fin</span>
+                  <span class="meta-value">{{ c.fechaFin | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyectos inscritos -->
+          <div class="detalle-section">
+            <div class="section-title">
+              <ion-icon name="folder-open-outline"></ion-icon>
+              <span>Proyectos inscritos ({{ proyectosDelConcurso.length }})</span>
+            </div>
+
+            <div class="loading-mini" *ngIf="cargandoDetalle">
+              <ion-spinner name="crescent"></ion-spinner>
+            </div>
+
+            <div class="proyectos-mini-list" *ngIf="!cargandoDetalle && proyectosDelConcurso.length > 0">
+              <div class="proyecto-mini-row" *ngFor="let p of proyectosDelConcurso">
+                <div class="proyecto-mini-icon">
+                  <ion-icon name="document-text-outline"></ion-icon>
+                </div>
+                <div class="proyecto-mini-info">
+                  <strong>{{ p.nombre }}</strong>
+                  <span *ngIf="p.estudianteNombre">{{ p.estudianteNombre }}</span>
+                </div>
+                <span class="proyecto-mini-status" [class.active]="p.activo">
+                  {{ p.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+            </div>
+
+            <p class="empty-mini" *ngIf="!cargandoDetalle && proyectosDelConcurso.length === 0">
+              Aún no hay proyectos inscritos en este concurso
+            </p>
+          </div>
+
+          <!-- Estado de la rúbrica -->
+          <div class="detalle-section">
+            <div class="section-title">
+              <ion-icon name="checkbox-outline"></ion-icon>
+              <span>Rúbrica de evaluación</span>
+            </div>
+
+            <div class="loading-mini" *ngIf="cargandoDetalle">
+              <ion-spinner name="crescent"></ion-spinner>
+            </div>
+
+            <ng-container *ngIf="!cargandoDetalle">
+              <div class="rubrica-status-box" [class.configured]="tieneRubricaConfigurada">
+                <ion-icon [name]="tieneRubricaConfigurada ? 'checkmark-circle-outline' : 'alert-circle-outline'"></ion-icon>
+                <div>
+                  <strong *ngIf="tieneRubricaConfigurada">Rúbrica configurada</strong>
+                  <strong *ngIf="!tieneRubricaConfigurada">Rúbrica sin configurar</strong>
+                  <span *ngIf="tieneRubricaConfigurada">
+                    {{ rubricaDelConcurso.secciones.length }} secciones · {{ totalCriteriosRubrica() }} criterios
+                  </span>
+                  <span *ngIf="!tieneRubricaConfigurada">
+                    Este concurso aún no tiene secciones ni criterios de evaluación
+                  </span>
+                </div>
+              </div>
+
+              <ion-button expand="block" fill="outline" class="rubrica-link-btn" (click)="irARubricaDesdeDetalle()">
+                <ion-icon name="list-outline" slot="start"></ion-icon>
+                {{ tieneRubricaConfigurada ? 'Ver rúbrica' : 'Configurar rúbrica' }}
+              </ion-button>
+            </ng-container>
+          </div>
+
+          <div class="detalle-actions">
+            <ion-button expand="block" class="edit-from-detail-btn" (click)="editarDesdeDetalle()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar este concurso
+            </ion-button>
+          </div>
+
         </div>
       </ion-content>
     </ng-template>
