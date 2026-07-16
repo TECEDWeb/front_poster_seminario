@@ -6,7 +6,8 @@ import { IonContent, IonItem, IonInput, IonButton, IonIcon, IonSpinner } from '@
 import { addIcons } from 'ionicons';
 import {
   mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline,
-  arrowBackOutline, checkmarkCircleOutline, alertCircleOutline
+  arrowBackOutline, checkmarkCircleOutline, alertCircleOutline,
+  paperPlaneOutline, checkmarkOutline, informationCircleOutline
 } from 'ionicons/icons';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -44,8 +45,9 @@ export class RecuperarPasswordPage implements OnInit {
     private authService: AuthService
   ) {
     addIcons({
-      mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline,
-      arrowBackOutline, checkmarkCircleOutline, alertCircleOutline
+        mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline,
+        arrowBackOutline, checkmarkCircleOutline, alertCircleOutline,
+        paperPlaneOutline, checkmarkOutline, informationCircleOutline
     });
   }
 
