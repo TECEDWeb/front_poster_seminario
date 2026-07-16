@@ -124,6 +124,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+// ============================================
+// PAGE HEADER
+// ============================================
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -230,6 +233,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+// ============================================
+// FILTER BAR
+// ============================================
 .filter-bar {
   display: flex;
   gap: 12px;
@@ -281,8 +287,19 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .search-group, .filter-group {
+      min-width: 100%;
+    }
+  }
 }
 
+// ============================================
+// LOADING SKELETON
+// ============================================
 .loading-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -344,6 +361,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+// ============================================
+// PROYECTOS GRID
+// ============================================
 .proyectos-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -358,6 +378,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+// ============================================
+// PROYECTO CARD
+// ============================================
 .proyecto-card {
   background: white;
   border-radius: $radius;
@@ -420,6 +443,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-weight: 700;
         color: #0f172a;
         line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
       .card-meta-tags {
@@ -449,6 +476,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           &.tag-nivel {
             background: $upse-gold-light;
             color: $upse-gold;
+          }
+
+          &.tag-estudiante {
+            background: #e0f2fe;
+            color: #0369a1;
           }
         }
       }
@@ -506,6 +538,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-size: 14px;
       color: #475569;
       line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .card-participants {
@@ -552,63 +588,91 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
+  .card-concurso {
+    padding: 0 20px 8px;
+
+    .chip-concurso {
+      height: 24px;
+      font-size: 11px;
+      background: $upse-gold-light;
+      color: $upse-gold;
+      margin: 0;
+      max-width: 100%;
+
+      ion-icon {
+        font-size: 12px;
+        color: $upse-gold;
+      }
+      ion-label {
+        font-size: 11px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
   .card-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 8px 12px;
     border-top: 1px solid #f1f5f9;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 4px;
 
-    .actions-left {
-      .chip-concurso {
-        height: 24px;
-        font-size: 11px;
-        background: $upse-gold-light;
-        color: $upse-gold;
-        margin: 0;
-
-        ion-icon {
-          font-size: 12px;
-          color: $upse-gold;
-        }
-        ion-label {
-          font-size: 11px;
-          font-weight: 500;
-        }
-      }
-    }
-
-    .actions-right {
+    .action-item {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 4px;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: $transition;
+      color: #64748b;
+      -webkit-tap-highlight-color: transparent;
+      flex: 1;
+      min-width: 50px;
 
-      .action-btn {
-        --border-radius: 8px;
-        --padding-start: 8px;
-        --padding-end: 8px;
-        height: 32px;
-        font-size: 12px;
-        font-weight: 500;
-        --color: #64748b;
+      ion-icon {
+        font-size: 18px;
+      }
 
-        ion-icon {
-          font-size: 16px;
-        }
+      span {
+        font-size: 11px;
+        font-weight: 600;
+      }
 
+      @media (hover: hover) and (pointer: fine) {
         &:hover {
-          --color: $upse-blue;
+          background: $upse-blue-light;
+          color: $upse-blue;
         }
 
         &.danger:hover {
-          --color: #ef4444;
+          background: #fef2f2;
+          color: #ef4444;
         }
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+
+      &.danger {
+        color: #dc2626;
       }
     }
   }
 }
 
+// ============================================
+// EMPTY STATE
+// ============================================
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
@@ -660,6 +724,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+// ============================================
+// FAB MOBILE
+// ============================================
 .fab-mobile {
   display: block;
 
@@ -681,6 +748,9 @@ ion-fab-button {
   }
 }
 
+// ============================================
+// MODAL CONTENT
+// ============================================
 .modal-content {
   --background: #f8fafc;
 }
@@ -712,6 +782,13 @@ ion-fab-button {
         font-weight: 700;
         margin-left: 2px;
       }
+
+      .field-hint {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 400;
+        margin-left: auto;
+      }
     }
 
     .field-input {
@@ -733,6 +810,24 @@ ion-fab-button {
       ion-input, ion-textarea, ion-select, ion-toggle {
         --padding-start: 0;
         font-size: 14px;
+      }
+
+      ion-select {
+        --placeholder-opacity: 0.7;
+      }
+    }
+
+    .field-help {
+      margin-top: 4px;
+      font-size: 12px;
+      
+      .participant-count {
+        color: $upse-blue;
+        font-weight: 600;
+        background: $upse-blue-light;
+        padding: 2px 12px;
+        border-radius: 12px;
+        display: inline-block;
       }
     }
   }
@@ -779,11 +874,25 @@ ion-fab-button {
       }
     }
   }
-}
 
-@media (max-width: 480px) {
-  .modal-container {
-    padding: 16px;
+  @media (max-width: 480px) {
+    padding: 12px;
+
+    .form-field {
+      margin-bottom: 14px;
+
+      .field-label {
+        font-size: 12px;
+      }
+
+      .field-input {
+        min-height: 38px;
+
+        ion-input, ion-select, ion-textarea {
+          font-size: 13px;
+        }
+      }
+    }
 
     .form-actions {
       flex-direction: column;
@@ -796,184 +905,8 @@ ion-fab-button {
   }
 }
 
-@keyframes pulse-dot {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 0.7;
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    .header-right {
-      width: 100%;
-      justify-content: flex-start;
-
-      .stats-mini {
-        padding: 6px 12px;
-
-        .stat-count {
-          font-size: 17px;
-        }
-      }
-    }
-  }
-
-  .filter-bar {
-    flex-direction: column;
-
-    .search-group, .filter-group {
-      min-width: 100%;
-    }
-  }
-
-  .proyecto-card {
-    .card-header {
-      flex-wrap: wrap;
-    }
-
-    .card-concurso {
-      padding: 0 20px 4px;
-
-      .chip-concurso {
-        height: 26px;
-        font-size: 12px;
-        background: $upse-gold-light;
-        color: $upse-gold;
-        margin: 0;
-        max-width: 100%;
-
-        ion-icon {
-          font-size: 13px;
-          color: $upse-gold;
-        }
-        ion-label {
-          font-size: 12px;
-          font-weight: 500;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-      }
-    }
-
-    .card-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      border-top: 1px solid #f1f5f9;
-      margin-top: 4px;
-
-      .action-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        padding: 12px 8px;
-        background: none;
-        border: none;
-        border-right: 1px solid #f1f5f9;
-        cursor: pointer;
-        transition: $transition;
-        color: #64748b;
-        -webkit-tap-highlight-color: transparent;
-
-        &:last-child {
-          border-right: none;
-        }
-
-        ion-icon {
-          font-size: 18px;
-        }
-
-        span {
-          font-size: 11px;
-          font-weight: 600;
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-          &:hover {
-            background: $upse-blue-light;
-            color: $upse-blue;
-          }
-
-          &.danger:hover {
-            background: #fef2f2;
-            color: #ef4444;
-          }
-        }
-
-        &:active {
-          transform: scale(0.96);
-        }
-
-        &.danger {
-          color: #dc2626;
-        }
-      }
-    }
-  }
-  }
-
-
-@media (max-width: 480px) {
-  .page-header {
-    .header-left h1 {
-      font-size: 20px;
-    }
-
-    .header-right .stats-mini {
-      padding: 4px 10px;
-      min-width: 50px;
-
-      .stat-count {
-        font-size: 15px;
-      }
-      .stat-label {
-        font-size: 9px;
-      }
-    }
-  }
-
-  .proyecto-card .card-body .card-participants {
-    padding: 10px 12px;
-  }
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: $upse-blue;
-  border-radius: 3px;
-  transition: $transition;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: $upse-blue-dark;
-}
-
 // ============================================
-// MODAL — HEADER CON ÍCONO
+// MODAL TOOLBAR
 // ============================================
 .modal-toolbar {
   --background: #{$upse-blue};
@@ -1013,6 +946,9 @@ ion-fab-button {
   }
 }
 
+// ============================================
+// TOGGLE ITEM
+// ============================================
 .toggle-item {
   display: flex;
   align-items: center;
@@ -1024,8 +960,9 @@ ion-fab-button {
     color: #0f172a;
   }
 }
+
 // ============================================
-// MODAL DE DETALLE (solo lectura)
+// MODAL DE DETALLE
 // ============================================
 .detalle-container {
   max-width: 600px;
@@ -1240,4 +1177,50 @@ ion-fab-button {
 
     &:hover { --background: $upse-blue-dark; }
   }
+}
+
+// ============================================
+// ANIMACIONES
+// ============================================
+@keyframes pulse-dot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================
+// SCROLLBAR
+// ============================================
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $upse-blue;
+  border-radius: 3px;
+  transition: $transition;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $upse-blue-dark;
 }

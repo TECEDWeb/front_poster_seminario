@@ -247,18 +247,24 @@
 
             <div class="form-field">
               <label class="field-label">
-                <ion-icon name="person-outline"></ion-icon>
-                Nombre del estudiante
+                <ion-icon name="people-outline"></ion-icon>
+                Participantes
                 <span class="required">*</span>
+                <span class="field-hint">(Separados por coma)</span>
               </label>
               <ion-item class="field-input" lines="none">
                 <ion-input
-                  [(ngModel)]="form.estudianteNombre"
-                  name="estudianteNombre"
-                  placeholder="Ingrese el nombre del estudiante"
+                  [(ngModel)]="form.participantesTexto"
+                  name="participantesTexto"
+                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz"
                   required>
                 </ion-input>
               </ion-item>
+              <div class="field-help" *ngIf="form.participantesTexto">
+                <span class="participant-count">
+                  {{ contarParticipantes(form.participantesTexto) }} participantes
+                </span>
+              </div>
             </div>
 
             <div class="form-field">
@@ -300,13 +306,19 @@
               <label class="field-label">
                 <ion-icon name="bar-chart-outline"></ion-icon>
                 Nivel
+                <span class="required">*</span>
               </label>
               <ion-item class="field-input" lines="none">
-                <ion-input
+                <ion-select
                   [(ngModel)]="form.nivel"
                   name="nivel"
-                  placeholder="Ej: Básico, Intermedio, Avanzado">
-                </ion-input>
+                  placeholder="Seleccione un nivel"
+                  interface="popover"
+                  required>
+                  <ion-select-option value="Básico">Básico</ion-select-option>
+                  <ion-select-option value="Intermedio">Intermedio</ion-select-option>
+                  <ion-select-option value="Avanzado">Avanzado</ion-select-option>
+                </ion-select>
               </ion-item>
             </div>
 
@@ -314,13 +326,22 @@
               <label class="field-label">
                 <ion-icon name="business-outline"></ion-icon>
                 Área
+                <span class="required">*</span>
               </label>
               <ion-item class="field-input" lines="none">
-                <ion-input
+                <ion-select
                   [(ngModel)]="form.area"
                   name="area"
-                  placeholder="Ej: Ciencias, Tecnología, Sociales">
-                </ion-input>
+                  placeholder="Seleccione un área"
+                  interface="popover"
+                  required>
+                  <ion-select-option value="Ciencias">Ciencias</ion-select-option>
+                  <ion-select-option value="Tecnología">Tecnología</ion-select-option>
+                  <ion-select-option value="Sociales">Sociales</ion-select-option>
+                  <ion-select-option value="Humanidades">Humanidades</ion-select-option>
+                  <ion-select-option value="Ingeniería">Ingeniería</ion-select-option>
+                  <ion-select-option value="Salud">Salud</ion-select-option>
+                </ion-select>
               </ion-item>
             </div>
 
