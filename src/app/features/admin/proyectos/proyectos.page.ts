@@ -27,7 +27,7 @@ import {
   IonSpinner
 } from '@ionic/angular/standalone';
 import { ProyectoService } from '../../../core/services/proyecto.service';
-import { Proyecto, Participante } from '../../../core/models/proyecto.model';
+import { Proyecto } from '../../../core/models/proyecto.model';
 import { ConcursoService } from '../../../core/services/concurso.service';
 import { ReporteService } from '../../../core/services/reporte.service';
 import { addIcons } from 'ionicons';
@@ -47,12 +47,11 @@ import {
   checkmarkOutline,
   refreshOutline,
   pricetagOutline,
-  calendarOutline,
-  starOutline,
-  folderOutline,
-  personOutline,
   toggleOutline,
-  warningOutline
+  schoolOutline,
+  star,
+  checkmarkDoneOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -90,7 +89,9 @@ import {
 })
 export class ProyectosPage implements OnInit {
 
-  // Propiedades principales
+  // ============================================
+  // ESTADO PRINCIPAL
+  // ============================================
   proyectos: Proyecto[] = [];
   proyectosFiltrados: Proyecto[] = [];
   proyectosActivos: number = 0;
@@ -98,41 +99,50 @@ export class ProyectosPage implements OnInit {
   cargando: boolean = false;
   cargandoConcursos: boolean = false;
 
-  // Filtros
+  // ============================================
+  // FILTROS
+  // ============================================
   busqueda: string = '';
   filtroNivel: string = 'todos';
   filtroEstado: string = 'todos';
 
-  // Modal de creación/edición
+  // ============================================
+  // MODAL CREAR/EDITAR
+  // ============================================
   modalAbierto = false;
   editando = false;
   guardando = false;
   concursosDisponibles: any[] = [];
 
-  // Opciones para combobox
-  niveles = ['Básico', 'Intermedio', 'Avanzado'];
-  areas = ['Ciencias', 'Tecnología', 'Sociales', 'Humanidades', 'Ingeniería', 'Salud', 'Artes', 'Deportes'];
-
-  // Formulario
   form: any = {
     id: null,
     nombre: '',
     descripcion: '',
     concursoId: null,
-    estudianteNombre: '',
     participantesTexto: '',
+    tutorEncargado: '',
+    tutor2: '',
+    tutor3: '',
+    tutor4: '',
     nivel: '',
     area: '',
-    activo: true,
-    participantes: []
+    activo: true
   };
 
-  // Modal de detalle
+  // ============================================
+  // MODAL DETALLE
+  // ============================================
   modalDetalleAbierto = false;
   cargandoDetalle = false;
   errorDetalle: string | null = null;
   proyectoSeleccionado: Proyecto | null = null;
   detalleEvaluaciones: any = null;
+
+  // ============================================
+  // NOTIFICACIÓN (toast propio)
+  // ============================================
+  notificacion: { mensaje: string; tipo: 'success' | 'danger' | 'warning' } | null = null;
+  private notiTimeout: any;
 
   constructor(
     private proyectoService: ProyectoService,
@@ -143,9 +153,8 @@ export class ProyectosPage implements OnInit {
       refreshOutline, addOutline, searchOutline, documentTextOutline,
       businessOutline, barChartOutline, peopleOutline, trophyOutline,
       eyeOutline, createOutline, trashOutline, folderOpenOutline,
-      closeOutline, pricetagOutline, personOutline, toggleOutline,
-      checkmarkOutline, calendarOutline, starOutline, folderOutline,
-      warningOutline
+      closeOutline, pricetagOutline, toggleOutline, checkmarkOutline,
+      schoolOutline, star, checkmarkDoneOutline, alertCircleOutline
     });
   }
 
@@ -155,15 +164,14 @@ export class ProyectosPage implements OnInit {
   }
 
   // ============================================
-  // MÉTODOS PRINCIPALES
+  // CARGA DE DATOS
   // ============================================
-
   cargar(): void {
     this.cargando = true;
 
     this.proyectoService.listar().subscribe({
-      next: (res: any) => {
-        this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
+      next: (proyectos) => {
+        this.proyectos = proyectos;
         this.calcularEstadisticas();
         this.filtrarProyectos();
         this.cargando = false;
@@ -199,12 +207,10 @@ export class ProyectosPage implements OnInit {
   // ============================================
   // ESTADÍSTICAS Y FILTROS
   // ============================================
-
   calcularEstadisticas(): void {
     this.proyectosActivos = this.proyectos.filter(p => p.activo).length;
     this.totalParticipantes = this.proyectos.reduce(
-      (total, p) => total + (p.participantes?.length || 0),
-      0
+      (total, p) => total + (p.participantes?.length || 0), 0
     );
   }
 
@@ -218,7 +224,8 @@ export class ProyectosPage implements OnInit {
         p.area?.toLowerCase().includes(texto) ||
         p.nivel?.toLowerCase().includes(texto) ||
         p.descripcion?.toLowerCase().includes(texto) ||
-        p.estudianteNombre?.toLowerCase().includes(texto)
+        (p.participantes || []).some(part => part.nombre?.toLowerCase().includes(texto)) ||
+        (p.tutores || []).some(t => t.nombre?.toLowerCase().includes(texto))
       );
     }
 
@@ -236,9 +243,8 @@ export class ProyectosPage implements OnInit {
   }
 
   // ============================================
-  // GESTIÓN DE PARTICIPANTES
+  // PARTICIPANTES (texto <-> arreglo)
   // ============================================
-
   contarParticipantes(texto: string): number {
     if (!texto || texto.trim() === '') return 0;
     return texto.split(',').filter(p => p.trim() !== '').length;
@@ -255,9 +261,8 @@ export class ProyectosPage implements OnInit {
   }
 
   // ============================================
-  // CRUD - ABRIR MODALES
+  // MODAL CREAR / EDITAR
   // ============================================
-
   abrirCrear(): void {
     this.editando = false;
     this.form = {
@@ -265,12 +270,14 @@ export class ProyectosPage implements OnInit {
       nombre: '',
       descripcion: '',
       concursoId: null,
-      estudianteNombre: '',
       participantesTexto: '',
+      tutorEncargado: '',
+      tutor2: '',
+      tutor3: '',
+      tutor4: '',
       nivel: '',
       area: '',
-      activo: true,
-      participantes: []
+      activo: true
     };
     this.modalAbierto = true;
   }
@@ -278,20 +285,22 @@ export class ProyectosPage implements OnInit {
   editar(proyecto: Proyecto): void {
     this.editando = true;
 
-    // Convertir participantes a texto separado por comas
     const participantesTexto = this.obtenerParticipantesTexto(proyecto.participantes || []);
+    const tutores = proyecto.tutores || [];
 
     this.form = {
       id: proyecto.id,
       nombre: proyecto.nombre || '',
       descripcion: proyecto.descripcion || '',
       concursoId: proyecto.concursoId != null ? Number(proyecto.concursoId) : null,
-      estudianteNombre: proyecto.estudianteNombre || '',
-      participantesTexto: participantesTexto,
+      participantesTexto,
+      tutorEncargado: tutores[0]?.nombre || '',
+      tutor2: tutores[1]?.nombre || '',
+      tutor3: tutores[2]?.nombre || '',
+      tutor4: tutores[3]?.nombre || '',
       nivel: proyecto.nivel || '',
       area: proyecto.area || '',
-      activo: proyecto.activo ?? true,
-      participantes: proyecto.participantes || []
+      activo: proyecto.activo ?? true
     };
 
     this.modalAbierto = true;
@@ -301,38 +310,35 @@ export class ProyectosPage implements OnInit {
     this.modalAbierto = false;
   }
 
-  // ============================================
-  // CRUD - GUARDAR
-  // ============================================
-
   guardar(): void {
-    // Validaciones
     if (!this.form.nombre || this.form.nombre.trim() === '') {
-      alert('Por favor ingrese el nombre del proyecto');
+      this.mostrarNotificacion('Ingresa el nombre del proyecto', 'warning');
       return;
     }
 
-    if (!this.form.estudianteNombre || this.form.estudianteNombre.trim() === '') {
-      alert('Por favor ingrese el nombre del estudiante principal');
+    if (!this.form.tutorEncargado || this.form.tutorEncargado.trim() === '') {
+      this.mostrarNotificacion('El tutor encargado es obligatorio', 'warning');
       return;
     }
 
     if (!this.form.nivel) {
-      alert('Por favor seleccione un nivel');
+      this.mostrarNotificacion('Selecciona un nivel', 'warning');
       return;
     }
 
     if (!this.form.area) {
-      alert('Por favor seleccione un área');
+      this.mostrarNotificacion('Selecciona un área', 'warning');
       return;
     }
 
-    // Procesar participantes
     const participantes = this.procesarParticipantes(this.form.participantesTexto);
     if (participantes.length === 0) {
-      alert('Por favor ingrese al menos un participante');
+      this.mostrarNotificacion('Ingresa al menos un participante', 'warning');
       return;
     }
+
+    const tutores = [this.form.tutorEncargado, this.form.tutor2, this.form.tutor3, this.form.tutor4]
+      .filter(t => t && t.trim() !== '');
 
     this.guardando = true;
 
@@ -340,8 +346,8 @@ export class ProyectosPage implements OnInit {
       nombre: this.form.nombre.trim(),
       descripcion: this.form.descripcion || null,
       concursoId: this.form.concursoId || null,
-      estudiante_nombre: this.form.estudianteNombre.trim(),
-      participantes: participantes,
+      participantes,
+      tutores,
       nivel: this.form.nivel,
       area: this.form.area,
       activo: this.form.activo ?? true
@@ -352,27 +358,26 @@ export class ProyectosPage implements OnInit {
       : this.proyectoService.crear(payload);
 
     req.subscribe({
-      next: (res: any) => {
+      next: () => {
         this.guardando = false;
         this.modalAbierto = false;
         this.cargar();
-        const mensaje = this.editando ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente';
-        // Mostrar notificación de éxito
-        this.mostrarNotificacion(mensaje, 'success');
+        this.mostrarNotificacion(
+          this.editando ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente',
+          'success'
+        );
       },
       error: (err) => {
         this.guardando = false;
         console.error('Error guardando proyecto:', err);
-        const mensaje = err.error?.mensaje || 'Error al guardar el proyecto';
-        this.mostrarNotificacion(mensaje, 'danger');
+        this.mostrarNotificacion(err.error?.mensaje || 'Error al guardar el proyecto', 'danger');
       }
     });
   }
 
   // ============================================
-  // CRUD - ELIMINAR
+  // ELIMINAR
   // ============================================
-
   confirmarEliminar(proyecto: Proyecto): void {
     if (confirm(`¿Estás seguro de eliminar el proyecto "${proyecto.nombre}"? Esta acción no se puede deshacer.`)) {
       this.eliminarProyecto(proyecto.id);
@@ -387,16 +392,14 @@ export class ProyectosPage implements OnInit {
       },
       error: (err) => {
         console.error('Error eliminando proyecto:', err);
-        const mensaje = err.error?.mensaje || 'Error al eliminar el proyecto';
-        this.mostrarNotificacion(mensaje, 'danger');
+        this.mostrarNotificacion(err.error?.mensaje || 'Error al eliminar el proyecto', 'danger');
       }
     });
   }
 
   // ============================================
-  // DETALLE DEL PROYECTO
+  // DETALLE (solo lectura)
   // ============================================
-
   verDetalle(proyecto: Proyecto): void {
     this.proyectoSeleccionado = proyecto;
     this.modalDetalleAbierto = true;
@@ -441,7 +444,6 @@ export class ProyectosPage implements OnInit {
   // ============================================
   // UTILIDADES
   // ============================================
-
   compararConcurso = (c1: any, c2: any): boolean => {
     return c1 != null && c2 != null ? Number(c1) === Number(c2) : c1 === c2;
   };
@@ -454,19 +456,20 @@ export class ProyectosPage implements OnInit {
     return proyecto.concursoNombre || (proyecto.concursoId ? `Concurso #${proyecto.concursoId}` : 'Sin concurso');
   }
 
+  tutorEncargado(proyecto: Proyecto): string | null {
+    return proyecto.tutores?.find(t => t.encargado)?.nombre || proyecto.tutores?.[0]?.nombre || null;
+  }
+
   trackById(index: number, item: any): number {
     return item?.id ?? index;
   }
 
-  // Notificación simple (puedes reemplazar con ToastController)
+  // ============================================
+  // NOTIFICACIÓN INLINE (reemplaza alert())
+  // ============================================
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'danger' | 'warning' = 'success'): void {
-    // Por ahora usamos alert, pero recomiendo implementar Toast
-    alert(mensaje);
-  }
-
-  // Obtener iniciales del nombre
-  getInitials(nombre: string): string {
-    if (!nombre) return '?';
-    return nombre.charAt(0).toUpperCase();
+    clearTimeout(this.notiTimeout);
+    this.notificacion = { mensaje, tipo };
+    this.notiTimeout = setTimeout(() => this.notificacion = null, 3500);
   }
 }

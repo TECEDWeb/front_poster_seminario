@@ -18,6 +18,13 @@
 </ion-header>
 
 <ion-content class="proyectos-content">
+
+  <!-- NOTIFICACIÓN FLOTANTE (reemplaza alert) -->
+  <div class="toast-notification" *ngIf="notificacion" [class]="'toast-' + notificacion.tipo">
+    <ion-icon [name]="notificacion.tipo === 'success' ? 'checkmark-done-outline' : 'alert-circle-outline'"></ion-icon>
+    <span>{{ notificacion.mensaje }}</span>
+  </div>
+
   <div class="page-container">
 
     <!-- HEADER -->
@@ -53,7 +60,7 @@
         <ion-searchbar
           [(ngModel)]="busqueda"
           (ionInput)="filtrarProyectos()"
-          placeholder="Buscar por nombre, área, nivel o participante..."
+          placeholder="Buscar por nombre, área, nivel, participante o tutor..."
           class="filter-search"
           animated>
           <ion-icon name="search-outline" slot="start"></ion-icon>
@@ -107,10 +114,11 @@
 
     <!-- GRID DE PROYECTOS -->
     <div class="proyectos-grid" *ngIf="!cargando">
-      <div class="proyecto-card" 
-           *ngFor="let p of proyectosFiltrados || []; trackBy: trackById"
+      <div class="proyecto-card"
+           *ngFor="let p of proyectosFiltrados || []; let i = index; trackBy: trackById"
            [class.card-active]="p.activo"
-           [class.card-inactive]="!p.activo">
+           [class.card-inactive]="!p.activo"
+           [style.animation-delay.ms]="i * 40">
 
         <!-- HEADER DE LA TARJETA -->
         <div class="card-header">
@@ -129,9 +137,9 @@
                 <ion-icon name="bar-chart-outline"></ion-icon>
                 {{ p.nivel }}
               </span>
-              <span class="tag tag-participantes" *ngIf="p.participantes?.length">
-                <ion-icon name="people-outline"></ion-icon>
-                {{ p.participantes.length }}
+              <span class="tag tag-tutor" *ngIf="tutorEncargado(p)">
+                <ion-icon name="school-outline"></ion-icon>
+                {{ tutorEncargado(p) }}
               </span>
             </div>
           </div>
@@ -222,7 +230,7 @@
   </ion-fab>
 
   <!-- ============================================ -->
-  <!-- MODAL: CREAR / EDITAR PROYECTO               -->
+  <!-- MODAL: CREAR / EDITAR PROYECTO -->
   <!-- ============================================ -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
@@ -246,7 +254,7 @@
         <div class="modal-container">
           <form (ngSubmit)="guardar()" #proyectoForm="ngForm">
 
-            <!-- NOMBRE DEL PROYECTO -->
+            <!-- NOMBRE -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="pricetag-outline"></ion-icon>
@@ -300,51 +308,52 @@
               </ion-item>
             </div>
 
-            <!-- NIVEL (COMBOBOX) -->
-            <div class="form-field">
-              <label class="field-label">
-                <ion-icon name="bar-chart-outline"></ion-icon>
-                Nivel
-                <span class="required">*</span>
-              </label>
-              <ion-item class="field-input" lines="none">
-                <ion-select
-                  [(ngModel)]="form.nivel"
-                  name="nivel"
-                  placeholder="Seleccione un nivel"
-                  interface="popover"
-                  required>
-                  <ion-select-option value="Básico">Básico</ion-select-option>
-                  <ion-select-option value="Intermedio">Intermedio</ion-select-option>
-                  <ion-select-option value="Avanzado">Avanzado</ion-select-option>
-                </ion-select>
-              </ion-item>
-            </div>
+            <!-- NIVEL + ÁREA (2 columnas) -->
+            <div class="form-row-2">
+              <div class="form-field">
+                <label class="field-label">
+                  <ion-icon name="bar-chart-outline"></ion-icon>
+                  Nivel
+                  <span class="required">*</span>
+                </label>
+                <ion-item class="field-input" lines="none">
+                  <ion-select
+                    [(ngModel)]="form.nivel"
+                    name="nivel"
+                    placeholder="Seleccione un nivel"
+                    interface="popover"
+                    required>
+                    <ion-select-option value="Básico">Básico</ion-select-option>
+                    <ion-select-option value="Intermedio">Intermedio</ion-select-option>
+                    <ion-select-option value="Avanzado">Avanzado</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
 
-            <!-- ÁREA (COMBOBOX) -->
-            <div class="form-field">
-              <label class="field-label">
-                <ion-icon name="business-outline"></ion-icon>
-                Área
-                <span class="required">*</span>
-              </label>
-              <ion-item class="field-input" lines="none">
-                <ion-select
-                  [(ngModel)]="form.area"
-                  name="area"
-                  placeholder="Seleccione un área"
-                  interface="popover"
-                  required>
-                  <ion-select-option value="Ciencias">Ciencias</ion-select-option>
-                  <ion-select-option value="Tecnología">Tecnología</ion-select-option>
-                  <ion-select-option value="Sociales">Sociales</ion-select-option>
-                  <ion-select-option value="Humanidades">Humanidades</ion-select-option>
-                  <ion-select-option value="Ingeniería">Ingeniería</ion-select-option>
-                  <ion-select-option value="Salud">Salud</ion-select-option>
-                  <ion-select-option value="Artes">Artes</ion-select-option>
-                  <ion-select-option value="Deportes">Deportes</ion-select-option>
-                </ion-select>
-              </ion-item>
+              <div class="form-field">
+                <label class="field-label">
+                  <ion-icon name="business-outline"></ion-icon>
+                  Área
+                  <span class="required">*</span>
+                </label>
+                <ion-item class="field-input" lines="none">
+                  <ion-select
+                    [(ngModel)]="form.area"
+                    name="area"
+                    placeholder="Seleccione un área"
+                    interface="popover"
+                    required>
+                    <ion-select-option value="Ciencias">Ciencias</ion-select-option>
+                    <ion-select-option value="Tecnología">Tecnología</ion-select-option>
+                    <ion-select-option value="Sociales">Sociales</ion-select-option>
+                    <ion-select-option value="Humanidades">Humanidades</ion-select-option>
+                    <ion-select-option value="Ingeniería">Ingeniería</ion-select-option>
+                    <ion-select-option value="Salud">Salud</ion-select-option>
+                    <ion-select-option value="Artes">Artes</ion-select-option>
+                    <ion-select-option value="Deportes">Deportes</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
             </div>
 
             <!-- PARTICIPANTES -->
@@ -353,26 +362,67 @@
                 <ion-icon name="people-outline"></ion-icon>
                 Participantes
                 <span class="required">*</span>
-                <span class="field-hint">(Separados por coma)</span>
+                <span class="field-hint">(separados por coma, sin límite)</span>
               </label>
               <ion-item class="field-input" lines="none">
-                <ion-input
+                <ion-textarea
                   [(ngModel)]="form.participantesTexto"
                   name="participantesTexto"
-                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz"
+                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz, Ana Torres..."
+                  rows="2"
                   required>
-                </ion-input>
+                </ion-textarea>
               </ion-item>
               <div class="field-help" *ngIf="form.participantesTexto">
                 <span class="participant-count">
-                  {{ contarParticipantes(form.participantesTexto) }} participantes
+                  <ion-icon name="checkmark-done-outline"></ion-icon>
+                  {{ contarParticipantes(form.participantesTexto) }} participante(s)
                 </span>
-                <span class="participant-warning" *ngIf="contarParticipantes(form.participantesTexto) < 2">
-                  ⚠️ Mínimo 2 participantes
-                </span>
-                <span class="participant-success" *ngIf="contarParticipantes(form.participantesTexto) >= 2">
-                  ✅ Listo
-                </span>
+              </div>
+            </div>
+
+            <!-- TUTORES -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="school-outline"></ion-icon>
+                Tutores del proyecto
+                <span class="field-hint">(hasta 4, el primero es el tutor encargado)</span>
+              </label>
+
+              <div class="tutores-grid">
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutorEncargado"
+                    name="tutorEncargado"
+                    placeholder="Tutor encargado *"
+                    required>
+                  </ion-input>
+                  <ion-icon name="star" slot="end" class="tutor-star" title="Tutor encargado"></ion-icon>
+                </ion-item>
+
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutor2"
+                    name="tutor2"
+                    placeholder="Tutor adicional (opcional)">
+                  </ion-input>
+                </ion-item>
+
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutor3"
+                    name="tutor3"
+                    placeholder="Tutor adicional (opcional)">
+                  </ion-input>
+                </ion-item>
+
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutor4"
+                    name="tutor4"
+                    placeholder="Tutor adicional (opcional)">
+                  </ion-input>
+                </ion-item>
               </div>
             </div>
 
@@ -423,7 +473,7 @@
   </ion-modal>
 
   <!-- ============================================ -->
-  <!-- MODAL: VER DETALLE (SOLO LECTURA)            -->
+  <!-- MODAL: VER DETALLE (SOLO LECTURA) -->
   <!-- ============================================ -->
   <ion-modal [isOpen]="modalDetalleAbierto" (didDismiss)="cerrarModalDetalle()">
     <ng-template>
@@ -484,6 +534,27 @@
                 <div>
                   <span class="meta-label">Concurso</span>
                   <span class="meta-value">{{ p.concursoNombre }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TUTORES -->
+          <div class="detalle-section" *ngIf="p.tutores?.length">
+            <div class="section-title">
+              <ion-icon name="school-outline"></ion-icon>
+              <span>Tutores ({{ p.tutores.length }})</span>
+            </div>
+
+            <div class="participantes-full-list">
+              <div class="participante-row" *ngFor="let t of p.tutores">
+                <div class="participante-avatar tutor-avatar">{{ t.nombre.charAt(0) }}</div>
+                <div class="participante-info">
+                  <strong>{{ t.nombre }}</strong>
+                  <span class="tutor-badge" *ngIf="t.encargado">
+                    <ion-icon name="star"></ion-icon>
+                    Tutor encargado
+                  </span>
                 </div>
               </div>
             </div>
