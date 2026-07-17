@@ -33,7 +33,8 @@ import {
   documentOutline,
   folderOutline,
   trophyOutline,
-  saveOutline
+  saveOutline,
+  eyeOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -104,7 +105,8 @@ export class FormularioEvaluacionPage implements OnInit {
       documentOutline,
       folderOutline,
       trophyOutline,
-      saveOutline
+      saveOutline,
+      eyeOutline
     });
   }
 
@@ -316,7 +318,6 @@ export class FormularioEvaluacionPage implements OnInit {
         this.guardando = false;
         this.evaluacionGuardada = true;
         this.mostrarMensaje('Borrador guardado correctamente', 'success');
-        // Guardar copia de las respuestas
         this.respuestasGuardadas = { ...this.respuestas };
       },
       error: (err) => {
@@ -350,7 +351,6 @@ export class FormularioEvaluacionPage implements OnInit {
 
     this.guardando = true;
 
-    // Primero guardar el borrador
     const payload = {
       observacion: this.observacion || '',
       detalles: detalles
@@ -358,7 +358,6 @@ export class FormularioEvaluacionPage implements OnInit {
 
     this.evaluacionService.actualizarEvaluacion(this.evaluacionId, payload).subscribe({
       next: () => {
-        // Luego finalizar
         this.evaluacionService.finalizarEvaluacion(this.evaluacionId).subscribe({
           next: (res) => {
             console.log('✅ EVALUACIÓN FINALIZADA:', res);
@@ -386,11 +385,10 @@ export class FormularioEvaluacionPage implements OnInit {
   }
 
   // ============================================
-  // MÉTODO ORIGINAL (DEPRECATED - mantiene compatibilidad)
+  // VER RESULTADOS (cuando ya está finalizada)
   // ============================================
-  guardar(): void {
-    // Redirigir al nuevo método
-    this.finalizar();
+  verResultados(): void {
+    this.router.navigate(['/evaluador/mis-resultados']);
   }
 
   // ============================================
@@ -511,13 +509,5 @@ export class FormularioEvaluacionPage implements OnInit {
     if (this.criteriosRespondidos === 0) return 'Sin respuestas';
     if (this.criteriosRespondidos === this.totalCriterios) return 'Completo';
     return `${this.criteriosRespondidos} de ${this.totalCriterios}`;
-  }
-  // Agrega este método al final de la clase
-
-/**
- * Ver resultados de la evaluación ya finalizada
- */
-  verResultados(): void {
-    this.router.navigate(['/evaluador/mis-resultados']);
   }
 }

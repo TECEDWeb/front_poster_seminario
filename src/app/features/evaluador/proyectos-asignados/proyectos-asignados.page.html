@@ -115,7 +115,8 @@
       <div class="proyecto-card" 
            *ngFor="let p of proyectosFiltrados || []"
            [class.card-pending]="!p.yaEvaluado"
-           [class.card-completed]="p.yaEvaluado">
+           [class.card-completed]="p.yaEvaluado"
+           [class.card-reabierto]="p.reabierto">
 
         <div class="card-header">
           <div class="card-icon" [class]="p.yaEvaluado ? 'icon-completed' : 'icon-pending'">
@@ -137,6 +138,11 @@
           </div>
 
           <div class="card-status">
+            <!-- Mostrar badge de "Reabierto" si corresponde -->
+            <span class="status-badge status-reabierto" *ngIf="p.reabierto">
+              <ion-icon name="refresh-outline"></ion-icon>
+              Reabierto
+            </span>
             <span class="status-badge" [class]="p.yaEvaluado ? 'status-completed' : 'status-pending'">
               <span class="status-dot"></span>
               {{ p.yaEvaluado ? 'Evaluado' : 'Pendiente' }}
@@ -166,24 +172,38 @@
         </div>
 
         <div class="card-actions">
+          <!-- Si está evaluado y reabierto -> mostrar "Re-evaluar" -->
           <ion-button 
+            *ngIf="p.yaEvaluado && p.reabierto"
+            expand="block"
+            class="btn-re-evaluar"
+            (click)="evaluar(p.evaluacionId)">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Re-evaluar
+          </ion-button>
+
+          <!-- Si está evaluado y NO reabierto -> mostrar "Evaluación completada" (deshabilitado) -->
+          <ion-button 
+            *ngIf="p.yaEvaluado && !p.reabierto"
+            expand="block"
+            class="btn-completed"
+            disabled>
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            Evaluación completada
+          </ion-button>
+
+          <!-- Si está pendiente -> mostrar "Evaluar proyecto" -->
+          <ion-button 
+            *ngIf="!p.yaEvaluado"
             expand="block"
             class="btn-evaluar"
-            [class.btn-completed]="p.yaEvaluado"
-            [disabled]="p.yaEvaluado"
             (click)="evaluar(p.evaluacionId)">
-
-            <ion-icon 
-              [name]="p.yaEvaluado ? 'checkmark-circle-outline' : 'clipboard-outline'"
-              slot="start">
-            </ion-icon>
-
-            {{ p.yaEvaluado ? 'Evaluación completada' : 'Evaluar proyecto' }}
-
+            <ion-icon name="clipboard-outline" slot="start"></ion-icon>
+            Evaluar proyecto
           </ion-button>
         </div>
 
-        <div class="completed-overlay" *ngIf="p.yaEvaluado">
+        <div class="completed-overlay" *ngIf="p.yaEvaluado && !p.reabierto">
           <ion-icon name="checkmark-circle"></ion-icon>
           <span>Completado</span>
         </div>

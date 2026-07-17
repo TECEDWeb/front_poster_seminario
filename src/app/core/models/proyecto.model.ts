@@ -38,17 +38,22 @@ export interface Proyecto {
 export interface ProyectoAsignado {
   evaluacionId: number;
   yaEvaluado: boolean;
-  puedeEditar: boolean;
   fechaAsignacion?: string;
+  fechaEvaluacion?: string;
+  estado?: string; // 'asignado' | 'evaluado' | 'reabierto'
+  reabierto?: boolean; // 🔥 NUEVA PROPIEDAD
   proyecto: {
     id: number;
     nombre: string;
-    descripcion?: string | null;
-    participantes: Participante[];
-    tutores?: Tutor[];
-    tipo?: string | null;
-    puntajeMaximo?: number | null;
-    concursoNombre?: string | null;
-    concursoId?: number | null;
+    descripcion?: string;
+    tipo?: string;
+    concursoNombre?: string;
+    puntajeMaximo?: number;
+    participantes: Array<{
+      id: number;
+      nombre: string;
+      cedula?: string;
+      email?: string;
+    }>;
   };
 }

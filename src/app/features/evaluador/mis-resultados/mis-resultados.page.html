@@ -163,10 +163,22 @@
         </div>
 
         <div class="card-actions" *ngIf="e.id">
+          <!-- ✏️ BOTÓN EDITAR - Solo si la evaluación NO está completada/finalizada -->
+          <ion-button 
+            *ngIf="e.estado !== 'evaluado' && e.estado !== 'completado' && e.estado !== 'finalizado'"
+            fill="clear" 
+            size="small" 
+            class="action-btn" 
+            (click)="editarEvaluacion(e)">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+          
           <ion-button fill="clear" size="small" class="action-btn" (click)="verDetalle(e.id)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
             Ver detalle
           </ion-button>
+          
           <ion-button fill="clear" size="small" class="action-btn" (click)="exportarResultado(e.id)">
             <ion-icon name="download-outline" slot="start"></ion-icon>
             Exportar

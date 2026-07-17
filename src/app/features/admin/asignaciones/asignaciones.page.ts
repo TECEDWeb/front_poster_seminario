@@ -44,7 +44,8 @@ import {
   eyeOutline,
   informationCircleOutline,
   closeOutline,
-  trashOutline
+  trashOutline,
+  createOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -131,7 +132,8 @@ export class AsignacionesPage implements OnInit {
       eyeOutline,
       informationCircleOutline,
       closeOutline,
-      trashOutline
+      trashOutline,
+      createOutline
     });
 
     // Verificar si el usuario es admin
@@ -247,8 +249,6 @@ export class AsignacionesPage implements OnInit {
   // ============================================
   onEvaluadorSeleccionado(event: any): void {
     console.log('👤 Evaluador seleccionado:', this.evaluadorId);
-    // Aquí puedes agregar lógica adicional si es necesario
-    // Por ejemplo, validar que el evaluador no tenga ya asignado este proyecto
   }
 
   // ============================================
@@ -317,6 +317,22 @@ export class AsignacionesPage implements OnInit {
   // ============================================
 
   /**
+   * EDITAR EVALUACIÓN (ADMIN)
+   * Redirige al formulario de evaluación para editar las respuestas
+   */
+  editarEvaluacionAdmin(asignacion: any): void {
+    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    
+    if (!evaluacionId) {
+      this.showError('No se encontró el ID de la evaluación');
+      return;
+    }
+
+    // Redirigir al formulario de evaluación para editar
+    this.router.navigate(['/admin/evaluaciones/formulario', evaluacionId]);
+  }
+
+  /**
    * REABRIR EVALUACIÓN (ADMIN)
    */
   async reabrirEvaluacion(asignacion: any): Promise<void> {
@@ -370,6 +386,21 @@ export class AsignacionesPage implements OnInit {
       console.error('❌ Error eliminando:', err);
       this.showError(err.error?.mensaje || 'Error al eliminar la evaluación');
     }
+  }
+
+  /**
+   * VER DETALLE DE ASIGNACIÓN (ADMIN)
+   */
+  verDetalleAsignacion(asignacion: any): void {
+    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    
+    if (!evaluacionId) {
+      this.showError('No se encontró el ID de la evaluación');
+      return;
+    }
+
+    // Redirigir al detalle de la evaluación
+    this.router.navigate(['/admin/evaluaciones', evaluacionId]);
   }
 
   // ============================================
@@ -436,20 +467,4 @@ export class AsignacionesPage implements OnInit {
     console.error('❌', message);
     alert('❌ ' + message);
   }
-  // Agrega este método al final de la clase, antes de las llaves de cierre
-
-/**
- * VER DETALLE DE ASIGNACIÓN (ADMIN)
- */
-verDetalleAsignacion(asignacion: any): void {
-  const evaluacionId = asignacion.id || asignacion.evaluacion_id;
-  
-  if (!evaluacionId) {
-    this.showError('No se encontró el ID de la evaluación');
-    return;
-  }
-
-  // Redirigir al detalle de la evaluación
-  this.router.navigate(['/admin/evaluaciones', evaluacionId]);
-}
 }

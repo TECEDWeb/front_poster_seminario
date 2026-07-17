@@ -37,7 +37,8 @@ import {
   downloadOutline,
   printOutline,
   chatbubbleOutline,
-  ellipseOutline
+  ellipseOutline,
+  createOutline
 } from 'ionicons/icons';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ResumenEvaluacion } from '../../../core/models/evaluacion.model';
@@ -107,7 +108,8 @@ export class MisResultadosPage implements OnInit {
       downloadOutline,
       printOutline,
       chatbubbleOutline,
-      ellipseOutline
+      ellipseOutline,
+      createOutline
     });
   }
 
@@ -182,6 +184,28 @@ export class MisResultadosPage implements OnInit {
   cambiarFiltro(estado: string): void {
     this.filtroEstado = estado;
     this.aplicarFiltros();
+  }
+
+  /**
+   * ✏️ EDITAR EVALUACIÓN (EVALUADOR)
+   * Solo si la evaluación NO está finalizada (estado !== 'evaluado')
+   */
+  editarEvaluacion(evaluacion: any): void {
+    const id = evaluacion.id || evaluacion.evaluacionId;
+    
+    if (!id) {
+      alert('No se encontró el ID de la evaluación');
+      return;
+    }
+
+    // Verificar que la evaluación no esté finalizada
+    if (evaluacion.estado === 'evaluado' || evaluacion.estado === 'completado' || evaluacion.estado === 'finalizado') {
+      alert('Esta evaluación ya fue finalizada y no puede ser editada');
+      return;
+    }
+
+    // Redirigir al formulario de evaluación
+    this.router.navigate(['/evaluador/formulario-evaluacion', id]);
   }
 
   getEstadoClase(porcentaje: number): string {

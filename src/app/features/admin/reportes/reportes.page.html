@@ -287,24 +287,37 @@
                   <span>Administrar evaluación</span>
                 </div>
                 <div class="pb-admin-actions">
+                  <!-- ✏️ BOTÓN EDITAR - SIEMPRE VISIBLE PARA ADMIN -->
+                  <button class="pb-btn pb-btn-editar" 
+                          (click)="editarEvaluacionAdmin(p)"
+                          title="Editar respuestas de esta evaluación">
+                    <ion-icon name="create-outline"></ion-icon>
+                    Editar
+                  </button>
+                  
+                  <!-- 🔄 BOTÓN REABRIR - solo si está evaluado -->
                   <button class="pb-btn pb-btn-reabrir" 
                           (click)="reabrirEvaluacion(p)" 
                           *ngIf="p.estadoEvaluacion === 'evaluado' || p.estado === 'evaluado'"
                           title="Reabrir evaluación para que el evaluador pueda modificarla">
                     <ion-icon name="refresh-outline"></ion-icon>
-                    Reabrir evaluación
+                    Reabrir
                   </button>
+                  
+                  <!-- 🗑️ BOTÓN ELIMINAR - SIEMPRE VISIBLE -->
                   <button class="pb-btn pb-btn-eliminar" 
                           (click)="eliminarEvaluacion(p)"
                           title="Eliminar esta evaluación permanentemente">
                     <ion-icon name="trash-outline"></ion-icon>
-                    Eliminar evaluación
+                    Eliminar
                   </button>
+                  
+                  <!-- 👁️ BOTÓN VER - SIEMPRE VISIBLE -->
                   <button class="pb-btn pb-btn-ver" 
                           (click)="verDetalleEvaluacion(p)"
                           title="Ver detalle completo de la evaluación">
                     <ion-icon name="eye-outline"></ion-icon>
-                    Ver evaluación
+                    Ver
                   </button>
                 </div>
                 <div class="pb-admin-status" *ngIf="p.estadoEvaluacion">

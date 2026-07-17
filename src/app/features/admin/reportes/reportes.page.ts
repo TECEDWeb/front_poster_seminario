@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
   IonHeader,
@@ -47,7 +47,8 @@ import {
   chevronUpOutline,
   chevronDownOutline,
   settingsOutline,
-  trashOutline
+  trashOutline,
+  createOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
@@ -148,7 +149,8 @@ export class ReportesPage implements OnInit {
   constructor(
     private reporteService: ReporteService,
     private evaluacionService: EvaluacionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     addIcons({
       downloadOutline,
@@ -178,7 +180,8 @@ export class ReportesPage implements OnInit {
       chevronUpOutline,
       chevronDownOutline,
       settingsOutline,
-      trashOutline
+      trashOutline,
+      createOutline
     });
 
     // Verificar si el usuario es admin
@@ -433,6 +436,22 @@ export class ReportesPage implements OnInit {
   // ============================================
   // ADMIN ACTIONS
   // ============================================
+
+  /**
+   * EDITAR EVALUACIÓN (ADMIN)
+   * Redirige al formulario de evaluación para editar las respuestas
+   */
+  editarEvaluacionAdmin(proyecto: any): void {
+    const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
+    
+    if (!evaluacionId) {
+      this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
+      return;
+    }
+
+    // Redirigir al formulario de evaluación para editar
+    this.router.navigate(['/admin/evaluaciones/formulario', evaluacionId]);
+  }
 
   /**
    * REABRIR EVALUACIÓN (ADMIN)
