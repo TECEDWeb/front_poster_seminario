@@ -295,6 +295,23 @@
                   {{ getStatusText(a.status) }}
                 </span>
               </div>
+              
+              <!-- ACCIONES ADMIN -->
+              <div class="assignment-admin-actions" *ngIf="esAdmin">
+                <button class="admin-btn admin-btn-reabrir" 
+                        (click)="reabrirEvaluacion(a)" 
+                        *ngIf="a.status === 'completed' || a.status === 'completado' || a.estado === 'evaluado'"
+                        title="Reabrir evaluación">
+                  <ion-icon name="refresh-outline"></ion-icon>
+                  Reabrir
+                </button>
+                <button class="admin-btn admin-btn-eliminar" 
+                        (click)="eliminarEvaluacion(a)"
+                        title="Eliminar evaluación">
+                  <ion-icon name="trash-outline"></ion-icon>
+                  Eliminar
+                </button>
+              </div>
             </div>
           </div>
         </div>

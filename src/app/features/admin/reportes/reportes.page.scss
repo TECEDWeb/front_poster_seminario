@@ -2377,3 +2377,174 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 0.01ms !important;
   }
 }
+// ============================================
+// ADMIN ACTIONS - REPORTES
+// ============================================
+.pb-acciones-admin {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+
+  .admin-title {
+    color: #64748b;
+    ion-icon { color: #94a3b8; }
+  }
+
+  .pb-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+
+    ion-icon {
+      font-size: 14px;
+    }
+  }
+
+  .pb-admin-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .pb-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition;
+      -webkit-tap-highlight-color: transparent;
+
+      ion-icon {
+        font-size: 13px;
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+
+      &.pb-btn-reabrir {
+        background: #fef3c7;
+        color: #d97706;
+
+        &:hover {
+          background: #d97706;
+          color: white;
+        }
+      }
+
+      &.pb-btn-eliminar {
+        background: #fecaca;
+        color: #dc2626;
+
+        &:hover {
+          background: #dc2626;
+          color: white;
+        }
+      }
+
+      &.pb-btn-ver {
+        background: $upse-blue-light;
+        color: $upse-blue;
+
+        &:hover {
+          background: $upse-blue;
+          color: white;
+        }
+      }
+    }
+  }
+
+  .pb-admin-status {
+    margin-top: 8px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .status-label {
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .status-value {
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 12px;
+
+      &.estado-evaluado {
+        background: $upse-green-light;
+        color: $upse-green;
+      }
+
+      &.estado-asignado {
+        background: #fef3c7;
+        color: #d97706;
+      }
+    }
+  }
+}
+
+// ============================================
+// MODO OSCURO
+// ============================================
+@media (prefers-color-scheme: dark) {
+  .pb-acciones-admin {
+    border-top-color: #334155;
+
+    .admin-title {
+      color: #94a3b8;
+      ion-icon { color: #64748b; }
+    }
+
+    .pb-admin-actions .pb-btn {
+      &.pb-btn-reabrir {
+        background: #3a2a1a;
+        color: #fbbf24;
+
+        &:hover {
+          background: #fbbf24;
+          color: #0f172a;
+        }
+      }
+
+      &.pb-btn-eliminar {
+        background: #3a1a1a;
+        color: #f87171;
+
+        &:hover {
+          background: #f87171;
+          color: #0f172a;
+        }
+      }
+
+      &.pb-btn-ver {
+        background: #1a2a4a;
+        color: #60a5fa;
+
+        &:hover {
+          background: #60a5fa;
+          color: #0f172a;
+        }
+      }
+    }
+
+    .pb-admin-status .status-value {
+      &.estado-evaluado {
+        background: #1a3a2a;
+        color: #66bb6a;
+      }
+
+      &.estado-asignado {
+        background: #3a2a1a;
+        color: #fbbf24;
+      }
+    }
+  }
+}

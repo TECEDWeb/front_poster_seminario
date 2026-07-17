@@ -45,9 +45,13 @@ import {
   chevronForwardOutline,
   chatbubbleOutline,
   chevronUpOutline,
-  chevronDownOutline
+  chevronDownOutline,
+  settingsOutline,
+  trashOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { EvaluacionService } from '../../../core/services/evaluacion.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface StatCard {
   icon: string;
@@ -138,7 +142,14 @@ export class ReportesPage implements OnInit {
   errorRespuestas: string | null = null;
   respuestasDetalle: any = null;
 
-  constructor(private reporteService: ReporteService) {
+  // Admin
+  esAdmin: boolean = false;
+
+  constructor(
+    private reporteService: ReporteService,
+    private evaluacionService: EvaluacionService,
+    private authService: AuthService
+  ) {
     addIcons({
       downloadOutline,
       statsChartOutline,
@@ -165,8 +176,13 @@ export class ReportesPage implements OnInit {
       chevronForwardOutline,
       chatbubbleOutline,
       chevronUpOutline,
-      chevronDownOutline
+      chevronDownOutline,
+      settingsOutline,
+      trashOutline
     });
+
+    // Verificar si el usuario es admin
+    this.esAdmin = this.authService.esAdmin();
   }
 
   ngOnInit(): void {
@@ -199,7 +215,10 @@ export class ReportesPage implements OnInit {
           ...item,
           id: item.id || item.proyecto_id || index + 1,
           nombre: item.proyecto || item.nombre || 'Proyecto sin nombre',
-          _expandido: false
+          _expandido: false,
+          // Para admin actions
+          evaluacionId: item.evaluacion_id || item.evaluacionId || null,
+          estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado'
         }));
 
         // Calcular el ganador del concurso
@@ -347,7 +366,7 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error exportando:', err);
-        alert('Error al exportar el reporte general');
+        this.mostrarMensaje('Error al exportar el reporte general', 'error');
       }
     });
   }
@@ -359,7 +378,7 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error exportando PDF:', err);
-        alert('Error al exportar el PDF general');
+        this.mostrarMensaje('Error al exportar el PDF general', 'error');
       }
     });
   }
@@ -367,7 +386,7 @@ export class ReportesPage implements OnInit {
   exportarProyectoExcel(proyecto: any): void {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
     if (!id) {
-      alert('No se puede exportar: ID del proyecto no encontrado');
+      this.mostrarMensaje('No se puede exportar: ID del proyecto no encontrado', 'error');
       return;
     }
     const nombre = proyecto.proyecto || proyecto.nombre || 'proyecto';
@@ -377,7 +396,7 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error exportando proyecto:', err);
-        alert('Error al exportar el reporte del proyecto');
+        this.mostrarMensaje('Error al exportar el reporte del proyecto', 'error');
       }
     });
   }
@@ -385,7 +404,7 @@ export class ReportesPage implements OnInit {
   exportarProyectoPDF(proyecto: any): void {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
     if (!id) {
-      alert('No se puede exportar: ID del proyecto no encontrado');
+      this.mostrarMensaje('No se puede exportar: ID del proyecto no encontrado', 'error');
       return;
     }
     const nombre = proyecto.proyecto || proyecto.nombre || 'proyecto';
@@ -395,7 +414,7 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error exportando PDF proyecto:', err);
-        alert('Error al exportar el PDF del proyecto');
+        this.mostrarMensaje('Error al exportar el PDF del proyecto', 'error');
       }
     });
   }
@@ -411,10 +430,79 @@ export class ReportesPage implements OnInit {
     window.URL.revokeObjectURL(url);
   }
 
+  // ============================================
+  // ADMIN ACTIONS
+  // ============================================
+
+  /**
+   * REABRIR EVALUACIÓN (ADMIN)
+   * Permite al admin resetear una evaluación para que el evaluador pueda modificarla
+   */
+  async reabrirEvaluacion(proyecto: any): Promise<void> {
+    const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
+    
+    if (!evaluacionId) {
+      this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
+      return;
+    }
+
+    if (!confirm(`¿Estás seguro de reabrir la evaluación del proyecto "${proyecto.nombre || proyecto.proyecto}"? El evaluador podrá modificarla nuevamente.`)) {
+      return;
+    }
+
+    try {
+      const result = await this.evaluacionService.reabrirEvaluacion(evaluacionId).toPromise();
+      console.log('✅ Evaluación reabierta:', result);
+      this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" reabierta correctamente`, 'success');
+      this.recargar();
+    } catch (err: any) {
+      console.error('❌ Error reabriendo:', err);
+      this.mostrarMensaje(err.error?.mensaje || 'Error al reabrir la evaluación', 'error');
+    }
+  }
+
+  /**
+   * ELIMINAR EVALUACIÓN (ADMIN)
+   * Elimina completamente una evaluación y sus detalles
+   */
+  async eliminarEvaluacion(proyecto: any): Promise<void> {
+    const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
+    
+    if (!evaluacionId) {
+      this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
+      return;
+    }
+
+    if (!confirm(`¿Estás seguro de eliminar la evaluación del proyecto "${proyecto.nombre || proyecto.proyecto}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const result = await this.evaluacionService.eliminarEvaluacion(evaluacionId).toPromise();
+      console.log('✅ Evaluación eliminada:', result);
+      this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" eliminada correctamente`, 'success');
+      this.recargar();
+    } catch (err: any) {
+      console.error('❌ Error eliminando:', err);
+      this.mostrarMensaje(err.error?.mensaje || 'Error al eliminar la evaluación', 'error');
+    }
+  }
+
+  /**
+   * VER DETALLE DE EVALUACIÓN (ADMIN)
+   */
+  verDetalleEvaluacion(proyecto: any): void {
+    this.verDetalle(proyecto);
+  }
+
+  // ============================================
+  // DETALLE DE PROYECTO
+  // ============================================
+
   async verDetalle(proyecto: any): Promise<void> {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
     if (!id) {
-      alert('No se puede ver detalle: ID del proyecto no encontrado');
+      this.mostrarMensaje('No se puede ver detalle: ID del proyecto no encontrado', 'error');
       return;
     }
 
@@ -454,7 +542,7 @@ export class ReportesPage implements OnInit {
 
   verRespuestas(evaluacionId: number): void {
     if (!evaluacionId) {
-      alert('No se puede ver el detalle: ID de evaluación no disponible');
+      this.mostrarMensaje('No se puede ver el detalle: ID de evaluación no disponible', 'error');
       return;
     }
 
@@ -532,6 +620,15 @@ export class ReportesPage implements OnInit {
     this.filtroStatus = 'todos';
     this.filtroEvaluador = 'todos';
     this.aplicarFiltros();
+  }
+
+  // ============================================
+  // UTILIDADES
+  // ============================================
+
+  private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
+    const icono = tipo === 'success' ? '✅' : '❌';
+    alert(`${icono} ${mensaje}`);
   }
 
   getRandomColor(proyecto: string): string {

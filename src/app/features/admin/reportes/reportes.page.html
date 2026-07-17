@@ -280,7 +280,43 @@
                 </div>
               </div>
 
-              <!-- Acciones -->
+              <!-- ACCIONES PARA ADMIN -->
+              <div class="pb-acciones-admin" *ngIf="esAdmin && p.evaluacionId">
+                <div class="pb-section-title admin-title">
+                  <ion-icon name="settings-outline"></ion-icon>
+                  <span>Administrar evaluación</span>
+                </div>
+                <div class="pb-admin-actions">
+                  <button class="pb-btn pb-btn-reabrir" 
+                          (click)="reabrirEvaluacion(p)" 
+                          *ngIf="p.estadoEvaluacion === 'evaluado' || p.estado === 'evaluado'"
+                          title="Reabrir evaluación para que el evaluador pueda modificarla">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    Reabrir evaluación
+                  </button>
+                  <button class="pb-btn pb-btn-eliminar" 
+                          (click)="eliminarEvaluacion(p)"
+                          title="Eliminar esta evaluación permanentemente">
+                    <ion-icon name="trash-outline"></ion-icon>
+                    Eliminar evaluación
+                  </button>
+                  <button class="pb-btn pb-btn-ver" 
+                          (click)="verDetalleEvaluacion(p)"
+                          title="Ver detalle completo de la evaluación">
+                    <ion-icon name="eye-outline"></ion-icon>
+                    Ver evaluación
+                  </button>
+                </div>
+                <div class="pb-admin-status" *ngIf="p.estadoEvaluacion">
+                  <span class="status-label">Estado:</span>
+                  <span class="status-value" [class.estado-evaluado]="p.estadoEvaluacion === 'evaluado'"
+                                           [class.estado-asignado]="p.estadoEvaluacion === 'asignado'">
+                    {{ p.estadoEvaluacion === 'evaluado' ? '✅ Evaluado' : '⏳ En progreso' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Acciones normales -->
               <div class="pb-actions">
                 <button class="pb-btn pb-btn-excel" (click)="exportarProyectoExcel(p)">
                   <ion-icon name="download-outline"></ion-icon>

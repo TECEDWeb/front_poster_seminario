@@ -43,11 +43,13 @@ import {
   alertCircleOutline,
   eyeOutline,
   informationCircleOutline,
-  closeOutline
+  closeOutline,
+  trashOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { AsignacionService } from '../../../core/services/asignacion.service';
+import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -94,6 +96,9 @@ export class AsignacionesPage implements OnInit {
   submitting: boolean = false;
   cargando: boolean = false;
   
+  // Admin
+  esAdmin: boolean = false;
+  
   // Propiedad computada para el proyecto seleccionado
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
@@ -103,6 +108,7 @@ export class AsignacionesPage implements OnInit {
   constructor(
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
+    private evaluacionService: EvaluacionService,
     private authService: AuthService,
     private router: Router
   ) {
@@ -124,8 +130,12 @@ export class AsignacionesPage implements OnInit {
       alertCircleOutline,
       eyeOutline,
       informationCircleOutline,
-      closeOutline
+      closeOutline,
+      trashOutline
     });
+
+    // Verificar si el usuario es admin
+    this.esAdmin = this.authService.esAdmin();
   }
 
   ngOnInit(): void {
@@ -303,6 +313,66 @@ export class AsignacionesPage implements OnInit {
   }
 
   // ============================================
+  // ADMIN ACTIONS
+  // ============================================
+
+  /**
+   * REABRIR EVALUACIÓN (ADMIN)
+   */
+  async reabrirEvaluacion(asignacion: any): Promise<void> {
+    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    
+    if (!evaluacionId) {
+      this.showError('No se encontró el ID de la evaluación');
+      return;
+    }
+
+    const nombreProyecto = asignacion.proyecto_nombre || asignacion.proyecto?.nombre || 'proyecto';
+
+    if (!confirm(`¿Estás seguro de reabrir la evaluación del proyecto "${nombreProyecto}"? El evaluador podrá modificarla nuevamente.`)) {
+      return;
+    }
+
+    try {
+      const result = await this.evaluacionService.reabrirEvaluacion(evaluacionId).toPromise();
+      console.log('✅ Evaluación reabierta:', result);
+      this.showSuccess(`Evaluación de "${nombreProyecto}" reabierta correctamente`);
+      this.cargarDatos();
+    } catch (err: any) {
+      console.error('❌ Error reabriendo:', err);
+      this.showError(err.error?.mensaje || 'Error al reabrir la evaluación');
+    }
+  }
+
+  /**
+   * ELIMINAR EVALUACIÓN (ADMIN)
+   */
+  async eliminarEvaluacion(asignacion: any): Promise<void> {
+    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    
+    if (!evaluacionId) {
+      this.showError('No se encontró el ID de la evaluación');
+      return;
+    }
+
+    const nombreProyecto = asignacion.proyecto_nombre || asignacion.proyecto?.nombre || 'proyecto';
+
+    if (!confirm(`¿Estás seguro de eliminar la evaluación del proyecto "${nombreProyecto}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const result = await this.evaluacionService.eliminarEvaluacion(evaluacionId).toPromise();
+      console.log('✅ Evaluación eliminada:', result);
+      this.showSuccess(`Evaluación de "${nombreProyecto}" eliminada correctamente`);
+      this.cargarDatos();
+    } catch (err: any) {
+      console.error('❌ Error eliminando:', err);
+      this.showError(err.error?.mensaje || 'Error al eliminar la evaluación');
+    }
+  }
+
+  // ============================================
   // RESET FORM
   // ============================================
   resetForm(): void {
@@ -359,7 +429,6 @@ export class AsignacionesPage implements OnInit {
   // ============================================
   private showSuccess(message: string): void {
     console.log('✅', message);
-    // Usar alert para desarrollo, reemplazar con Toast en producción
     alert('✅ ' + message);
   }
 
