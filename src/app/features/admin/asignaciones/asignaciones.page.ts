@@ -91,14 +91,14 @@ export class AsignacionesPage implements OnInit {
   evaluadorId: number | null = null;
   fechaLimite: string | null = null;
 
+  submitting: boolean = false;
+  cargando: boolean = false;
+  
   // Propiedad computada para el proyecto seleccionado
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
     return this.proyectos.find(p => p.id === this.proyectoId) || null;
   }
-
-  submitting: boolean = false;
-  cargando: boolean = false;
   
   constructor(
     private proyectoService: ProyectoService,
@@ -227,9 +227,18 @@ export class AsignacionesPage implements OnInit {
   // ============================================
   onProyectoSeleccionado(event: any): void {
     console.log('📌 Proyecto seleccionado:', this.proyectoId);
-    // Si cambia el proyecto, reseteamos el evaluador seleccionado
+    // Resetear evaluador al cambiar de proyecto
     this.evaluadorId = null;
     console.log('🔄 Evaluador reseteado');
+  }
+
+  // ============================================
+  // MANEJO DE SELECCIÓN DE EVALUADOR
+  // ============================================
+  onEvaluadorSeleccionado(event: any): void {
+    console.log('👤 Evaluador seleccionado:', this.evaluadorId);
+    // Aquí puedes agregar lógica adicional si es necesario
+    // Por ejemplo, validar que el evaluador no tenga ya asignado este proyecto
   }
 
   // ============================================
@@ -346,21 +355,16 @@ export class AsignacionesPage implements OnInit {
   }
 
   // ============================================
-  // NOTIFICACIONES (reemplaza alert)
+  // NOTIFICACIONES
   // ============================================
   private showSuccess(message: string): void {
-    // Usar toast o alert según prefieras
     console.log('✅', message);
-    // Si quieres usar alert temporalmente:
-    // alert('✅ ' + message);
-    
-    // Recomiendo implementar un toast service
-    // this.toastService.presentSuccess(message);
+    // Usar alert para desarrollo, reemplazar con Toast en producción
+    alert('✅ ' + message);
   }
 
   private showError(message: string): void {
     console.error('❌', message);
-    // alert('❌ ' + message);
-    // this.toastService.presentError(message);
+    alert('❌ ' + message);
   }
 }

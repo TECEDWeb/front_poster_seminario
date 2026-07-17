@@ -192,8 +192,7 @@
                     name="evaluadorId"
                     interface="action-sheet"
                     placeholder="Selecciona un evaluador"
-                    [disabled]="!proyectoId || submitting"
-                    (ionChange)="onEvaluadorSeleccionado($event)">
+                    [disabled]="!proyectoId || submitting">
                     
                     <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
                       <div class="option-content">
