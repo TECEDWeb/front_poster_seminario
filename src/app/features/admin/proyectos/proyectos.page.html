@@ -19,7 +19,7 @@
 
 <ion-content class="proyectos-content">
 
-  <!-- NOTIFICACIÓN -->
+  <!-- NOTIFICACIÓN FLOTANTE -->
   <div class="toast-notification" *ngIf="notificacion" [class]="'toast-' + notificacion.tipo">
     <ion-icon [name]="notificacion.tipo === 'success' ? 'checkmark-done-outline' : 'alert-circle-outline'"></ion-icon>
     <span>{{ notificacion.mensaje }}</span>
@@ -112,130 +112,130 @@
       </div>
     </div>
 
-    <!-- TABLA DE PROYECTOS - VISTA PROFESIONAL -->
+    <!-- TABLA ESTILO EXCEL -->
     <div class="table-container" *ngIf="!cargando">
-      <div class="table-wrapper">
-        <!-- CABECERA -->
-        <div class="table-header">
-          <div class="th col-nombre">Proyecto</div>
-          <div class="th col-area">Área</div>
-          <div class="th col-nivel">Nivel</div>
-          <div class="th col-tutor">Tutor encargado</div>
-          <div class="th col-participantes">Participantes</div>
-          <div class="th col-estado">Estado</div>
-          <div class="th col-acciones">Acciones</div>
-        </div>
+      <div class="table-scroll">
+        <table class="excel-table">
+          <!-- CABECERA -->
+          <thead>
+            <tr>
+              <th class="col-proyecto">Proyecto</th>
+              <th class="col-area">Área</th>
+              <th class="col-nivel">Nivel</th>
+              <th class="col-tutor">Tutor encargado</th>
+              <th class="col-participantes">Participantes</th>
+              <th class="col-estado">Estado</th>
+              <th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
 
-        <!-- CUERPO DE LA TABLA -->
-        <div class="table-body">
-          <div class="table-row" 
-               *ngFor="let p of proyectosFiltrados || []; let i = index; trackBy: trackById"
-               [class.row-active]="p.activo"
-               [class.row-inactive]="!p.activo"
-               [style.animation-delay.ms]="i * 30">
-            
-            <!-- Columna: Nombre + descripción -->
-            <div class="td col-nombre">
-              <div class="proyecto-info">
-                <div class="proyecto-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
-                  <ion-icon name="document-text-outline"></ion-icon>
+          <!-- CUERPO -->
+          <tbody>
+            <tr *ngFor="let p of proyectosFiltrados || []; let i = index; trackBy: trackById"
+                [class.row-active]="p.activo"
+                [class.row-inactive]="!p.activo">
+              
+              <!-- Proyecto -->
+              <td class="col-proyecto">
+                <div class="cell-proyecto">
+                  <div class="proyecto-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
+                    <ion-icon name="document-text-outline"></ion-icon>
+                  </div>
+                  <div class="proyecto-text">
+                    <div class="proyecto-nombre">{{ p.nombre }}</div>
+                    <div class="proyecto-concurso" *ngIf="p.concursoId">
+                      <ion-icon name="trophy-outline"></ion-icon>
+                      {{ nombreConcurso(p) }}
+                    </div>
+                  </div>
                 </div>
-                <div class="proyecto-details">
-                  <span class="proyecto-nombre">{{ p.nombre }}</span>
-                  <span class="proyecto-descripcion" *ngIf="p.descripcion">
-                    {{ p.descripcion | slice:0:80 }}{{ p.descripcion.length > 80 ? '...' : '' }}
-                  </span>
-                  <span class="proyecto-concurso" *ngIf="p.concursoId">
-                    <ion-icon name="trophy-outline"></ion-icon>
-                    {{ nombreConcurso(p) }}
-                  </span>
-                </div>
-              </div>
-            </div>
+              </td>
 
-            <!-- Columna: Área -->
-            <div class="td col-area">
-              <span class="tag-area">{{ p.area || '—' }}</span>
-            </div>
+              <!-- Área -->
+              <td class="col-area">
+                <span class="tag-area">{{ p.area || '—' }}</span>
+              </td>
 
-            <!-- Columna: Nivel -->
-            <div class="td col-nivel">
-              <span class="tag-nivel" [class.nivel-basico]="p.nivel === 'Básico'"
-                                      [class.nivel-intermedio]="p.nivel === 'Intermedio'"
-                                      [class.nivel-avanzado]="p.nivel === 'Avanzado'">
-                {{ p.nivel || '—' }}
-              </span>
-            </div>
-
-            <!-- Columna: Tutor encargado -->
-            <div class="td col-tutor">
-              <div class="tutor-info" *ngIf="tutorEncargado(p) as tutor">
-                <div class="tutor-avatar">{{ tutor.charAt(0) }}</div>
-                <span>{{ tutor }}</span>
-              </div>
-              <span class="empty-value" *ngIf="!tutorEncargado(p)">—</span>
-            </div>
-
-            <!-- Columna: Participantes -->
-            <div class="td col-participantes">
-              <div class="participants-info">
-                <span class="participants-count">
-                  <ion-icon name="people-outline"></ion-icon>
-                  {{ (p.participantes || []).length }}
+              <!-- Nivel -->
+              <td class="col-nivel">
+                <span class="tag-nivel" [class.nivel-basico]="p.nivel === 'Básico'"
+                                        [class.nivel-intermedio]="p.nivel === 'Intermedio'"
+                                        [class.nivel-avanzado]="p.nivel === 'Avanzado'">
+                  {{ p.nivel || '—' }}
                 </span>
-                <div class="participants-avatars">
-                  <div class="mini-avatar" *ngFor="let part of (p.participantes || []).slice(0, 3)">
-                    {{ part.nombre?.charAt(0) || '?' }}
-                  </div>
-                  <div class="mini-avatar more" *ngIf="(p.participantes || []).length > 3">
-                    +{{ (p.participantes || []).length - 3 }}
+              </td>
+
+              <!-- Tutor -->
+              <td class="col-tutor">
+                <div class="cell-tutor" *ngIf="tutorEncargado(p) as tutor">
+                  <div class="tutor-avatar">{{ tutor.charAt(0) }}</div>
+                  <span class="tutor-nombre">{{ tutor }}</span>
+                </div>
+                <span class="empty-value" *ngIf="!tutorEncargado(p)">—</span>
+              </td>
+
+              <!-- Participantes -->
+              <td class="col-participantes">
+                <div class="cell-participantes">
+                  <span class="participantes-count">{{ (p.participantes || []).length }}</span>
+                  <div class="participantes-avatars">
+                    <div class="mini-avatar" *ngFor="let part of (p.participantes || []).slice(0, 2)">
+                      {{ part.nombre?.charAt(0) || '?' }}
+                    </div>
+                    <div class="mini-avatar more" *ngIf="(p.participantes || []).length > 2">
+                      +{{ (p.participantes || []).length - 2 }}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </td>
 
-            <!-- Columna: Estado -->
-            <div class="td col-estado">
-              <span class="status-indicator" [class.active]="p.activo" [class.inactive]="!p.activo">
-                <span class="status-dot"></span>
-                {{ p.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-            </div>
+              <!-- Estado -->
+              <td class="col-estado">
+                <span class="status-badge" [class]="p.activo ? 'status-active' : 'status-inactive'">
+                  <span class="status-dot"></span>
+                  {{ p.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
 
-            <!-- Columna: Acciones -->
-            <div class="td col-acciones">
-              <div class="acciones-group">
-                <button class="btn-action btn-view" (click)="verDetalle(p)" title="Ver detalle">
-                  <ion-icon name="eye-outline"></ion-icon>
-                </button>
-                <button class="btn-action btn-edit" (click)="editar(p)" title="Editar">
-                  <ion-icon name="create-outline"></ion-icon>
-                </button>
-                <button class="btn-action btn-delete" (click)="confirmarEliminar(p)" title="Eliminar">
-                  <ion-icon name="trash-outline"></ion-icon>
-                </button>
-              </div>
-            </div>
-          </div>
+              <!-- Acciones -->
+              <td class="col-acciones">
+                <div class="cell-acciones">
+                  <button class="btn-action btn-view" (click)="verDetalle(p)" title="Ver detalle">
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </button>
+                  <button class="btn-action btn-edit" (click)="editar(p)" title="Editar">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </button>
+                  <button class="btn-action btn-delete" (click)="confirmarEliminar(p)" title="Eliminar">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
 
-          <!-- EMPTY STATE -->
-          <div class="empty-state-table" *ngIf="proyectosFiltrados?.length === 0">
-            <div class="empty-icon">
-              <ion-icon name="folder-open-outline"></ion-icon>
-            </div>
-            <h3>No hay proyectos</h3>
-            <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos'">
-              Comienza creando el primer proyecto de investigación
-            </p>
-            <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos'">
-              No se encontraron proyectos con los filtros aplicados
-            </p>
-            <ion-button class="btn-primary" (click)="abrirCrear()">
-              <ion-icon name="add-outline" slot="start"></ion-icon>
-              Crear proyecto
-            </ion-button>
-          </div>
-        </div>
+            <!-- EMPTY STATE -->
+            <tr *ngIf="proyectosFiltrados?.length === 0">
+              <td colspan="7">
+                <div class="empty-state-table">
+                  <div class="empty-icon">
+                    <ion-icon name="folder-open-outline"></ion-icon>
+                  </div>
+                  <h3>No hay proyectos</h3>
+                  <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos'">
+                    Comienza creando el primer proyecto de investigación
+                  </p>
+                  <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos'">
+                    No se encontraron proyectos con los filtros aplicados
+                  </p>
+                  <ion-button class="btn-primary" (click)="abrirCrear()">
+                    <ion-icon name="add-outline" slot="start"></ion-icon>
+                    Crear proyecto
+                  </ion-button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -247,12 +247,10 @@
            [class.card-inactive]="!p.activo"
            [style.animation-delay.ms]="i * 40">
 
-        <!-- HEADER DE LA TARJETA -->
         <div class="card-header">
           <div class="card-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
             <ion-icon name="document-text-outline"></ion-icon>
           </div>
-
           <div class="card-info">
             <h3 class="card-title">{{ p.nombre }}</h3>
             <div class="card-meta-tags">
@@ -270,7 +268,6 @@
               </span>
             </div>
           </div>
-
           <div class="card-status">
             <span class="status-badge" [class]="p.activo ? 'status-active' : 'status-inactive'">
               <span class="status-dot"></span>
@@ -279,12 +276,10 @@
           </div>
         </div>
 
-        <!-- CUERPO DE LA TARJETA -->
         <div class="card-body">
           <p class="card-description" *ngIf="p.descripcion">
             {{ p.descripcion | slice:0:120 }}{{ p.descripcion.length > 120 ? '...' : '' }}
           </p>
-
           <div class="card-participants">
             <div class="participants-header">
               <ion-icon name="people-outline"></ion-icon>
@@ -301,7 +296,6 @@
           </div>
         </div>
 
-        <!-- CONCURSO ASOCIADO -->
         <div class="card-concurso" *ngIf="p.concursoId">
           <ion-chip class="chip-concurso">
             <ion-icon name="trophy-outline"></ion-icon>
@@ -309,18 +303,15 @@
           </ion-chip>
         </div>
 
-        <!-- ACCIONES -->
         <div class="card-actions">
           <button class="action-item" (click)="verDetalle(p)" title="Ver detalle del proyecto">
             <ion-icon name="eye-outline"></ion-icon>
             <span>Ver</span>
           </button>
-
           <button class="action-item" (click)="editar(p)" title="Editar información del proyecto">
             <ion-icon name="create-outline"></ion-icon>
             <span>Editar</span>
           </button>
-
           <button class="action-item danger" (click)="confirmarEliminar(p)" title="Eliminar este proyecto">
             <ion-icon name="trash-outline"></ion-icon>
             <span>Eliminar</span>
@@ -340,12 +331,383 @@
 
   <!-- MODAL CREAR/EDITAR -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
-    <!-- ... (mantén tu modal existente) ... -->
+    <ng-template>
+      <ion-header>
+        <ion-toolbar class="modal-toolbar">
+          <div class="modal-title-group" slot="start">
+            <div class="modal-title-icon">
+              <ion-icon [name]="editando ? 'create-outline' : 'add-outline'"></ion-icon>
+            </div>
+            <ion-title>{{ editando ? 'Editar proyecto' : 'Nuevo proyecto' }}</ion-title>
+          </div>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="modal-container">
+          <form (ngSubmit)="guardar()" #proyectoForm="ngForm">
+
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="pricetag-outline"></ion-icon>
+                Nombre del proyecto
+                <span class="required">*</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.nombre"
+                  name="nombre"
+                  placeholder="Ingrese el nombre del proyecto"
+                  required>
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="document-text-outline"></ion-icon>
+                Descripción
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-textarea
+                  [(ngModel)]="form.descripcion"
+                  name="descripcion"
+                  placeholder="Ingrese una descripción del proyecto"
+                  rows="3">
+                </ion-textarea>
+              </ion-item>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="trophy-outline"></ion-icon>
+                Concurso asociado
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-select
+                  [(ngModel)]="form.concursoId"
+                  name="concursoId"
+                  [compareWith]="compararConcurso"
+                  placeholder="Seleccione un concurso"
+                  interface="popover"
+                  [disabled]="cargandoConcursos">
+                  <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
+                    {{ c.nombre }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-field">
+                <label class="field-label">
+                  <ion-icon name="bar-chart-outline"></ion-icon>
+                  Nivel
+                  <span class="required">*</span>
+                </label>
+                <ion-item class="field-input" lines="none">
+                  <ion-select
+                    [(ngModel)]="form.nivel"
+                    name="nivel"
+                    placeholder="Seleccione un nivel"
+                    interface="popover"
+                    required>
+                    <ion-select-option value="Básico">Básico</ion-select-option>
+                    <ion-select-option value="Intermedio">Intermedio</ion-select-option>
+                    <ion-select-option value="Avanzado">Avanzado</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">
+                  <ion-icon name="business-outline"></ion-icon>
+                  Área
+                  <span class="required">*</span>
+                </label>
+                <ion-item class="field-input" lines="none">
+                  <ion-select
+                    [(ngModel)]="form.area"
+                    name="area"
+                    placeholder="Seleccione un área"
+                    interface="popover"
+                    required>
+                    <ion-select-option value="Ciencias">Ciencias</ion-select-option>
+                    <ion-select-option value="Tecnología">Tecnología</ion-select-option>
+                    <ion-select-option value="Sociales">Sociales</ion-select-option>
+                    <ion-select-option value="Humanidades">Humanidades</ion-select-option>
+                    <ion-select-option value="Ingeniería">Ingeniería</ion-select-option>
+                    <ion-select-option value="Salud">Salud</ion-select-option>
+                    <ion-select-option value="Artes">Artes</ion-select-option>
+                    <ion-select-option value="Deportes">Deportes</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="people-outline"></ion-icon>
+                Participantes
+                <span class="required">*</span>
+                <span class="field-hint">(separados por coma, sin límite)</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-textarea
+                  [(ngModel)]="form.participantesTexto"
+                  name="participantesTexto"
+                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz, Ana Torres..."
+                  rows="2"
+                  required>
+                </ion-textarea>
+              </ion-item>
+              <div class="field-help" *ngIf="form.participantesTexto">
+                <span class="participant-count">
+                  <ion-icon name="checkmark-done-outline"></ion-icon>
+                  {{ contarParticipantes(form.participantesTexto) }} participante(s)
+                </span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="school-outline"></ion-icon>
+                Tutores del proyecto
+                <span class="field-hint">(hasta 4, el primero es el tutor encargado)</span>
+              </label>
+              <div class="tutores-grid">
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutorEncargado"
+                    name="tutorEncargado"
+                    placeholder="Tutor encargado *"
+                    required>
+                  </ion-input>
+                  <ion-icon name="star" slot="end" class="tutor-star" title="Tutor encargado"></ion-icon>
+                </ion-item>
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutor2"
+                    name="tutor2"
+                    placeholder="Tutor adicional (opcional)">
+                  </ion-input>
+                </ion-item>
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutor3"
+                    name="tutor3"
+                    placeholder="Tutor adicional (opcional)">
+                  </ion-input>
+                </ion-item>
+                <ion-item class="field-input tutor-item" lines="none">
+                  <ion-input
+                    [(ngModel)]="form.tutor4"
+                    name="tutor4"
+                    placeholder="Tutor adicional (opcional)">
+                  </ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="toggle-outline"></ion-icon>
+                Estado
+              </label>
+              <ion-item class="field-input toggle-item" lines="none">
+                <ion-toggle
+                  [(ngModel)]="form.activo"
+                  name="activo"
+                  color="success">
+                </ion-toggle>
+                <span class="toggle-label">{{ form.activo ? 'Activo' : 'Inactivo' }}</span>
+              </ion-item>
+            </div>
+
+            <div class="form-actions">
+              <ion-button
+                type="button"
+                fill="outline"
+                class="cancel-btn"
+                (click)="cerrarModal()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+              <ion-button
+                type="submit"
+                class="submit-btn"
+                [disabled]="!proyectoForm.form.valid || guardando">
+                <ion-icon
+                  [name]="guardando ? 'refresh-outline' : 'checkmark-outline'"
+                  slot="start"
+                  [class.spinning]="guardando">
+                </ion-icon>
+                {{ guardando ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear proyecto') }}
+              </ion-button>
+            </div>
+
+          </form>
+        </div>
+      </ion-content>
+    </ng-template>
   </ion-modal>
 
   <!-- MODAL DETALLE -->
   <ion-modal [isOpen]="modalDetalleAbierto" (didDismiss)="cerrarModalDetalle()">
-    <!-- ... (mantén tu modal existente) ... -->
+    <ng-template>
+      <ion-header>
+        <ion-toolbar class="modal-toolbar">
+          <div class="modal-title-group" slot="start">
+            <div class="modal-title-icon">
+              <ion-icon name="eye-outline"></ion-icon>
+            </div>
+            <ion-title>Detalle del proyecto</ion-title>
+          </div>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalDetalle()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="detalle-container" *ngIf="proyectoSeleccionado as p">
+
+          <div class="detalle-section">
+            <div class="detalle-header">
+              <div class="detalle-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
+                <ion-icon name="document-text-outline"></ion-icon>
+              </div>
+              <div>
+                <h2>{{ p.nombre }}</h2>
+                <span class="status-badge" [class]="p.activo ? 'status-active' : 'status-inactive'">
+                  <span class="status-dot"></span>
+                  {{ p.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+            </div>
+
+            <p class="detalle-descripcion" *ngIf="p.descripcion">{{ p.descripcion }}</p>
+            <p class="detalle-descripcion empty" *ngIf="!p.descripcion">Sin descripción registrada</p>
+
+            <div class="detalle-meta-grid">
+              <div class="meta-item">
+                <ion-icon name="business-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Área</span>
+                  <span class="meta-value">{{ p.area || '—' }}</span>
+                </div>
+              </div>
+              <div class="meta-item">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Nivel</span>
+                  <span class="meta-value">{{ p.nivel || '—' }}</span>
+                </div>
+              </div>
+              <div class="meta-item" *ngIf="p.concursoNombre">
+                <ion-icon name="trophy-outline"></ion-icon>
+                <div>
+                  <span class="meta-label">Concurso</span>
+                  <span class="meta-value">{{ p.concursoNombre }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detalle-section" *ngIf="p.tutores?.length">
+            <div class="section-title">
+              <ion-icon name="school-outline"></ion-icon>
+              <span>Tutores ({{ p.tutores.length }})</span>
+            </div>
+            <div class="participantes-full-list">
+              <div class="participante-row" *ngFor="let t of p.tutores">
+                <div class="participante-avatar tutor-avatar">{{ t.nombre.charAt(0) }}</div>
+                <div class="participante-info">
+                  <strong>{{ t.nombre }}</strong>
+                  <span class="tutor-badge" *ngIf="t.encargado">
+                    <ion-icon name="star"></ion-icon>
+                    Tutor encargado
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detalle-section">
+            <div class="section-title">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>Participantes ({{ (p.participantes || []).length }})</span>
+            </div>
+            <div class="participantes-full-list" *ngIf="(p.participantes || []).length > 0">
+              <div class="participante-row" *ngFor="let part of p.participantes">
+                <div class="participante-avatar">{{ part.nombre?.charAt(0) || '?' }}</div>
+                <div class="participante-info">
+                  <strong>{{ part.nombre }}</strong>
+                  <span *ngIf="part.cedula">CI: {{ part.cedula }}</span>
+                  <span *ngIf="part.email">{{ part.email }}</span>
+                </div>
+              </div>
+            </div>
+            <p class="empty-mini" *ngIf="(p.participantes || []).length === 0">
+              No hay participantes registrados para este proyecto
+            </p>
+          </div>
+
+          <div class="detalle-section">
+            <div class="section-title">
+              <ion-icon name="checkmark-done-outline"></ion-icon>
+              <span>Evaluaciones</span>
+            </div>
+            <div class="loading-mini" *ngIf="cargandoDetalle">
+              <ion-spinner name="crescent"></ion-spinner>
+            </div>
+            <div class="error-mini" *ngIf="!cargandoDetalle && errorDetalle">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              {{ errorDetalle }}
+            </div>
+            <ng-container *ngIf="!cargandoDetalle && detalleEvaluaciones">
+              <div class="evaluaciones-summary" *ngIf="detalleEvaluaciones.totalEvaluaciones > 0">
+                <div class="summary-stat">
+                  <span class="summary-value">{{ detalleEvaluaciones.totalEvaluaciones }}</span>
+                  <span class="summary-label">Evaluaciones</span>
+                </div>
+                <div class="summary-stat">
+                  <span class="summary-value">{{ detalleEvaluaciones.promedio | number:'1.1-2' }}</span>
+                  <span class="summary-label">Promedio</span>
+                </div>
+              </div>
+              <div class="evaluacion-row" *ngFor="let ev of detalleEvaluaciones.evaluaciones">
+                <div class="ev-info">
+                  <strong>{{ ev.evaluador }}</strong>
+                  <span class="ev-estado" [class]="getEstadoEvaluacion(ev.estado)">
+                    {{ ev.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
+                  </span>
+                </div>
+                <span class="ev-puntaje" *ngIf="ev.puntaje_total">{{ ev.puntaje_total }} pts</span>
+              </div>
+              <p class="empty-mini" *ngIf="detalleEvaluaciones.totalEvaluaciones === 0">
+                Este proyecto aún no tiene evaluaciones asignadas
+              </p>
+            </ng-container>
+          </div>
+
+          <div class="detalle-actions">
+            <ion-button expand="block" class="edit-from-detail-btn" (click)="editarDesdeDetalle()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar este proyecto
+            </ion-button>
+          </div>
+
+        </div>
+      </ion-content>
+    </ng-template>
   </ion-modal>
 
 </ion-content>
