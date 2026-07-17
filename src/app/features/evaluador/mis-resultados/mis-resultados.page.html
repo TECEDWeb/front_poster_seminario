@@ -165,11 +165,11 @@
         <div class="card-actions" *ngIf="e.id">
           <!-- ✏️ BOTÓN EDITAR - Solo si la evaluación NO está completada/finalizada -->
           <ion-button 
-            *ngIf="e.estado !== 'evaluado' && e.estado !== 'completado' && e.estado !== 'finalizado'"
-            fill="clear" 
-            size="small" 
-            class="action-btn" 
-            (click)="editarEvaluacion(e)">
+              *ngIf="e.estado !== 'evaluado'"
+              fill="clear" 
+              size="small" 
+              class="action-btn" 
+              (click)="editarEvaluacion(e)">
             <ion-icon name="create-outline" slot="start"></ion-icon>
             Editar
           </ion-button>

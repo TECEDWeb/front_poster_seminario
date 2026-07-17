@@ -61,7 +61,8 @@ export interface ResumenEvaluacion {
   puntajeTotal: number;
   puntajeMaximo: number | null;
   porcentaje: number | null;
-  estado?: 'pendiente' | 'completada' | 'rechazada';
+  // Valores reales que usa la tabla `evaluaciones.estado` en el backend.
+  estado?: 'asignado' | 'evaluado';
 }
 
 // ============================================
