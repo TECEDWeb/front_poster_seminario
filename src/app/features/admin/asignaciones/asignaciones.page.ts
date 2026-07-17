@@ -91,12 +91,13 @@ export class AsignacionesPage implements OnInit {
 
   submitting: boolean = false;
   cargando: boolean = false;
-
+  
   constructor(
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    
   ) {
     addIcons({
       addOutline,
@@ -124,20 +125,34 @@ export class AsignacionesPage implements OnInit {
 
   cargarDatos(): void {
     this.cargando = true;
+    this._proyectosListos = false;
+    this._evaluadoresListos = false;
+    this._asignacionesListas = false;
+
     this.cargarProyectos();
     this.cargarEvaluadores();
     this.cargarAsignacionesRecientes();
+
+    // Red de seguridad única: si algo se cuelga, no dejar el loading para siempre
+    clearTimeout(this._loadingSafety);
+    this._loadingSafety = setTimeout(() => {
+      this.cargando = false;
+    }, 6000);
   }
+
 
   cargarProyectos(): void {
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
         this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
-        console.log('Proyectos cargados:', this.proyectos.length);
+        this._proyectosListos = true;
+        this.verificarCargaCompleta();
       },
       error: (err: any) => {
         console.error('Error cargando proyectos:', err);
         this.proyectos = [];
+        this._proyectosListos = true;
+        this.verificarCargaCompleta();
       }
     });
   }
@@ -174,13 +189,16 @@ export class AsignacionesPage implements OnInit {
     });
   }
 
+  private _proyectosListos = false;
+  private _evaluadoresListos = false;
+  private _asignacionesListas = false;
+  private _loadingSafety: any;
+
   verificarCargaCompleta(): void {
-    if (this.proyectos.length > 0 && this.evaluadores.length > 0) {
+    if (this._proyectosListos && this._evaluadoresListos && this._asignacionesListas) {
+      clearTimeout(this._loadingSafety);
       this.cargando = false;
     }
-    setTimeout(() => {
-      this.cargando = false;
-    }, 5000);
   }
 
   guardar(): void {

@@ -23,7 +23,6 @@
     <!-- SKELETON LOADING -->
     <ng-container *ngIf="cargando">
 
-      <!-- Skeleton stats -->
       <div class="stats-row">
         <div class="stat-item" *ngFor="let i of [1,2,3]">
           <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
@@ -34,7 +33,6 @@
         </div>
       </div>
 
-      <!-- Skeleton form card -->
       <ion-card class="form-card">
         <ion-card-header>
           <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
@@ -60,7 +58,6 @@
         </ion-card-content>
       </ion-card>
 
-      <!-- Skeleton lista reciente -->
       <div class="recent-assignments">
         <ion-skeleton-text animated class="skeleton-section-title"></ion-skeleton-text>
         <div class="assignments-list">
@@ -136,7 +133,7 @@
 
         <ion-card-content>
           <form (ngSubmit)="guardar()" #assignForm="ngForm">
-            <!-- PROYECTO -->
+
             <div class="field-group">
               <div class="field">
                 <label class="field-label">
@@ -164,7 +161,6 @@
                 </ion-item>
               </div>
 
-              <!-- EVALUADOR -->
               <div class="field">
                 <label class="field-label">
                   <ion-icon name="person-outline"></ion-icon>
@@ -192,7 +188,6 @@
               </div>
             </div>
 
-            <!-- FECHA LÍMITE -->
             <div class="field optional-field">
               <label class="field-label">
                 <ion-icon name="calendar-outline"></ion-icon>
@@ -210,7 +205,6 @@
               </ion-item>
             </div>
 
-            <!-- BOTONES -->
             <div class="form-actions">
               <ion-button
                 type="button"
@@ -225,8 +219,8 @@
                 class="assign-btn"
                 [disabled]="!proyectoId || !evaluadorId || submitting">
 
-                <ion-icon 
-                  [name]="submitting ? 'refresh-outline' : 'checkmark-circle-outline'" 
+                <ion-icon
+                  [name]="submitting ? 'refresh-outline' : 'checkmark-circle-outline'"
                   slot="start"
                   [class.spinning]="submitting">
                 </ion-icon>
@@ -255,7 +249,10 @@
             <div class="assignment-info">
               <div class="assignment-main">
                 <span class="assignment-project">{{ a.proyecto_nombre || a.proyecto?.nombre }}</span>
-                <span class="assignment-evaluator">{{ a.evaluador_nombre || a.evaluador?.nombre }}</span>
+                <span class="assignment-evaluator">
+                  <ion-icon name="person-outline"></ion-icon>
+                  {{ a.evaluador_nombre || a.evaluador?.nombre }}
+                </span>
               </div>
               <div class="assignment-meta">
                 <span class="assignment-date">
@@ -269,6 +266,12 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- EMPTY STATE de asignaciones recientes -->
+      <div class="empty-recent" *ngIf="!asignacionesRecientes.length">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        <p>Aún no se han realizado asignaciones</p>
       </div>
 
     </ng-container>
