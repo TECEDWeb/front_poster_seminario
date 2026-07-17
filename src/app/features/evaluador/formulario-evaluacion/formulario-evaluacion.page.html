@@ -44,7 +44,7 @@
     <!-- FORMULARIO -->
     <ng-container *ngIf="!cargando && !error && formulario">
 
-      <!-- Cabecera de evaluación tipo examen -->
+      <!-- Cabecera de evaluación -->
       <div class="evaluacion-header">
         <div class="evaluacion-titulo">
           <h1>{{ formulario.rubrica?.nombre || 'Formulario de Evaluación' }}</h1>
@@ -171,54 +171,7 @@
         </ion-item>
       </div>
 
-      <!-- Botones de acción -->
-      <div class="form-actions">
-        <ion-button
-          fill="outline"
-          class="btn-cancelar"
-          (click)="volver()">
-          <ion-icon name="close-outline" slot="start"></ion-icon>
-          Cancelar
-        </ion-button>
-
-        <ion-button
-          class="btn-guardar"
-          (click)="guardar()"
-          [disabled]="criteriosRespondidos === 0 || guardando">
-          <ion-icon [name]="guardando ? 'refresh-outline' : 'checkmark-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
-          {{ guardando ? 'Guardando...' : 'Guardar evaluación' }}
-        </ion-button>
-      </div>
-      <!-- Botones de acción -->
-      <div class="form-actions">
-        <ion-button
-          fill="outline"
-          class="btn-cancelar"
-          (click)="volver()">
-          <ion-icon name="close-outline" slot="start"></ion-icon>
-          Cancelar
-        </ion-button>
-
-        <!-- Botón: Guardar borrador (no finaliza) -->
-        <ion-button
-          class="btn-guardar-borrador"
-          (click)="guardarBorrador()"
-          [disabled]="criteriosRespondidos === 0 || guardando">
-          <ion-icon [name]="guardando ? 'refresh-outline' : 'save-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
-          {{ guardando ? 'Guardando...' : 'Guardar borrador' }}
-        </ion-button>
-
-        <!-- Botón: Finalizar evaluación -->
-        <ion-button
-          class="btn-finalizar"
-          (click)="finalizar()"
-          [disabled]="criteriosRespondidos === 0 || guardando || getPorcentajeProgreso() < 100">
-          <ion-icon [name]="guardando ? 'refresh-outline' : 'checkmark-circle-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
-          {{ guardando ? 'Finalizando...' : 'Finalizar evaluación' }}
-        </ion-button>
-      </div>
-
-      <!-- Mensaje de estado de la evaluación -->
+      <!-- ✅ ESTADO DE LA EVALUACIÓN -->
       <div class="evaluacion-status" *ngIf="!cargando && !error && formulario">
         <div class="status-info" [class.estado-asignado]="estadoEvaluacion === 'asignado'" 
                                 [class.estado-evaluado]="estadoEvaluacion === 'evaluado'">
@@ -230,6 +183,50 @@
             Finalizada el {{ fechaEvaluacion | date:'dd/MM/yyyy HH:mm' }}
           </span>
         </div>
+      </div>
+
+      <!-- ✅ BOTONES DE ACCIÓN (UN SOLO BLOQUE) -->
+      <div class="form-actions" *ngIf="estadoEvaluacion !== 'evaluado'">
+        <ion-button
+          fill="outline"
+          class="btn-cancelar"
+          (click)="volver()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Cancelar
+        </ion-button>
+
+        <ion-button
+          class="btn-guardar-borrador"
+          (click)="guardarBorrador()"
+          [disabled]="criteriosRespondidos === 0 || guardando">
+          <ion-icon [name]="guardando ? 'refresh-outline' : 'save-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
+          {{ guardando ? 'Guardando...' : 'Guardar borrador' }}
+        </ion-button>
+
+        <ion-button
+          class="btn-finalizar"
+          (click)="finalizar()"
+          [disabled]="criteriosRespondidos === 0 || guardando || getPorcentajeProgreso() < 100">
+          <ion-icon [name]="guardando ? 'refresh-outline' : 'checkmark-circle-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
+          {{ guardando ? 'Finalizando...' : 'Finalizar evaluación' }}
+        </ion-button>
+      </div>
+
+      <!-- ✅ BOTÓN PARA EVALUACIÓN YA FINALIZADA -->
+      <div class="form-actions" *ngIf="estadoEvaluacion === 'evaluado'">
+        <ion-button
+          fill="outline"
+          class="btn-cancelar"
+          (click)="volver()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
+        <ion-button
+          class="btn-ver-resultados"
+          (click)="verResultados()">
+          <ion-icon name="eye-outline" slot="start"></ion-icon>
+          Ver resultados
+        </ion-button>
       </div>
 
     </ng-container>

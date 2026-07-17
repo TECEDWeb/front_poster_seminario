@@ -1083,3 +1083,107 @@ ion-skeleton-text {
     }
   }
 }
+// ============================================
+// ADMIN ACTIONS - ASIGNACIONES
+// ============================================
+.assignment-admin-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+
+  .admin-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+    -webkit-tap-highlight-color: transparent;
+
+    ion-icon {
+      font-size: 12px;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &.admin-btn-reabrir {
+      background: #fef3c7;
+      color: #d97706;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          background: #d97706;
+          color: white;
+        }
+      }
+    }
+
+    &.admin-btn-eliminar {
+      background: #fecaca;
+      color: #dc2626;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          background: #dc2626;
+          color: white;
+        }
+      }
+    }
+
+    &.admin-btn-ver {
+      background: $upse-blue-light;
+      color: $upse-blue;
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          background: $upse-blue;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// MODO OSCURO
+// ============================================
+@media (prefers-color-scheme: dark) {
+  .assignment-admin-actions .admin-btn {
+    &.admin-btn-reabrir {
+      background: #3a2a1a;
+      color: #fbbf24;
+
+      &:hover {
+        background: #fbbf24;
+        color: #0f172a;
+      }
+    }
+
+    &.admin-btn-eliminar {
+      background: #3a1a1a;
+      color: #f87171;
+
+      &:hover {
+        background: #f87171;
+        color: #0f172a;
+      }
+    }
+
+    &.admin-btn-ver {
+      background: #1a2a4a;
+      color: #60a5fa;
+
+      &:hover {
+        background: #60a5fa;
+        color: #0f172a;
+      }
+    }
+  }
+}

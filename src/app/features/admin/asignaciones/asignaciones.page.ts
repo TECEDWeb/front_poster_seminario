@@ -436,4 +436,20 @@ export class AsignacionesPage implements OnInit {
     console.error('❌', message);
     alert('❌ ' + message);
   }
+  // Agrega este método al final de la clase, antes de las llaves de cierre
+
+/**
+ * VER DETALLE DE ASIGNACIÓN (ADMIN)
+ */
+verDetalleAsignacion(asignacion: any): void {
+  const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+  
+  if (!evaluacionId) {
+    this.showError('No se encontró el ID de la evaluación');
+    return;
+  }
+
+  // Redirigir al detalle de la evaluación
+  this.router.navigate(['/admin/evaluaciones', evaluacionId]);
+}
 }

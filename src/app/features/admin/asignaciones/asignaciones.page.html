@@ -296,20 +296,29 @@
                 </span>
               </div>
               
-              <!-- ACCIONES ADMIN -->
+              <!-- ✅ ACCIONES ADMIN - SIEMPRE VISIBLES PARA ADMIN -->
               <div class="assignment-admin-actions" *ngIf="esAdmin">
+                <!-- Botón Reabrir - solo si está completado/evaluado -->
                 <button class="admin-btn admin-btn-reabrir" 
                         (click)="reabrirEvaluacion(a)" 
-                        *ngIf="a.status === 'completed' || a.status === 'completado' || a.estado === 'evaluado'"
+                        *ngIf="a.status === 'completed' || a.status === 'completado' || a.estado === 'evaluado' || a.yaEvaluado === true"
                         title="Reabrir evaluación">
                   <ion-icon name="refresh-outline"></ion-icon>
                   Reabrir
                 </button>
+                <!-- Botón Eliminar - siempre visible para admin -->
                 <button class="admin-btn admin-btn-eliminar" 
                         (click)="eliminarEvaluacion(a)"
                         title="Eliminar evaluación">
                   <ion-icon name="trash-outline"></ion-icon>
                   Eliminar
+                </button>
+                <!-- Botón Ver detalle -->
+                <button class="admin-btn admin-btn-ver" 
+                        (click)="verDetalleAsignacion(a)"
+                        title="Ver detalle">
+                  <ion-icon name="eye-outline"></ion-icon>
+                  Ver
                 </button>
               </div>
             </div>

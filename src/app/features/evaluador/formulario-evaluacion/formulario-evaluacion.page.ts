@@ -512,4 +512,12 @@ export class FormularioEvaluacionPage implements OnInit {
     if (this.criteriosRespondidos === this.totalCriterios) return 'Completo';
     return `${this.criteriosRespondidos} de ${this.totalCriterios}`;
   }
+  // Agrega este método al final de la clase
+
+/**
+ * Ver resultados de la evaluación ya finalizada
+ */
+  verResultados(): void {
+    this.router.navigate(['/evaluador/mis-resultados']);
+  }
 }
