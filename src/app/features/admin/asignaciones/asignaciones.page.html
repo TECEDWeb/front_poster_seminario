@@ -132,91 +132,92 @@
         <ion-card-content>
           <form (ngSubmit)="guardar()" #assignForm="ngForm">
 
-            <div class="field-group">
-              <!-- CAMPO: PROYECTO -->
-              <div class="field">
-                <label class="field-label">
-                  <ion-icon name="folder-outline"></ion-icon>
-                  Proyecto a asignar
-                  <span class="required">*</span>
-                </label>
+            <!-- CAMPO: PROYECTO -->
+            <div class="field">
+              <label class="field-label">
+                <ion-icon name="folder-outline"></ion-icon>
+                Proyecto a asignar
+                <span class="required">*</span>
+              </label>
 
-                <ion-item class="custom-item" lines="none" [class.has-value]="proyectoId">
-                  <ion-select
-                    [(ngModel)]="proyectoId"
-                    name="proyectoId"
-                    interface="action-sheet"
-                    placeholder="Selecciona un proyecto"
-                    (ionChange)="onProyectoSeleccionado($event)"
-                    [disabled]="submitting">
-                    
-                    <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
-                      <div class="option-content">
-                        <span class="option-title">{{ p.nombre }}</span>
-                        <span class="option-sub">{{ p.area || p.categoria || 'Sin categoría' }}</span>
-                      </div>
-                    </ion-select-option>
-                  </ion-select>
-                </ion-item>
-                
-                <!-- Información del proyecto seleccionado -->
-                <div class="proyecto-info-seleccionado" *ngIf="proyectoId && proyectoSeleccionado">
-                  <div class="info-badge">
-                    <ion-icon name="information-circle-outline"></ion-icon>
-                    <div class="info-text">
-                      <strong>{{ proyectoSeleccionado.nombre }}</strong>
-                      <div class="info-details">
-                        <span class="info-detail">{{ proyectoSeleccionado.area || 'Sin área' }}</span>
-                        <span class="info-detail">{{ proyectoSeleccionado.nivel || 'Sin nivel' }}</span>
-                        <span class="info-detail" *ngIf="proyectoSeleccionado.participantes?.length">
-                          <ion-icon name="people-outline"></ion-icon>
-                          {{ proyectoSeleccionado.participantes.length }} participante(s)
-                        </span>
-                      </div>
+              <ion-item class="custom-item" lines="none" [class.has-value]="proyectoId">
+                <ion-select
+                  [(ngModel)]="proyectoId"
+                  name="proyectoId"
+                  interface="action-sheet"
+                  placeholder="Selecciona un proyecto"
+                  (ionChange)="onProyectoSeleccionado($event)"
+                  [disabled]="submitting"
+                  class="responsive-select">
+                  
+                  <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
+                    <div class="option-content">
+                      <span class="option-title">{{ p.nombre }}</span>
+                      <span class="option-sub">{{ p.area || p.categoria || 'Sin categoría' }}</span>
+                    </div>
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              
+              <!-- Información del proyecto seleccionado -->
+              <div class="proyecto-info-seleccionado" *ngIf="proyectoId && proyectoSeleccionado">
+                <div class="info-badge">
+                  <ion-icon name="information-circle-outline"></ion-icon>
+                  <div class="info-text">
+                    <strong>{{ proyectoSeleccionado.nombre }}</strong>
+                    <div class="info-details">
+                      <span class="info-detail">{{ proyectoSeleccionado.area || 'Sin área' }}</span>
+                      <span class="info-detail">{{ proyectoSeleccionado.nivel || 'Sin nivel' }}</span>
+                      <span class="info-detail" *ngIf="proyectoSeleccionado.participantes?.length">
+                        <ion-icon name="people-outline"></ion-icon>
+                        {{ proyectoSeleccionado.participantes.length }} participante(s)
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- CAMPO: EVALUADOR -->
-              <div class="field">
-                <label class="field-label">
-                  <ion-icon name="person-outline"></ion-icon>
-                  Evaluador asignado
-                  <span class="required">*</span>
-                </label>
+            <!-- CAMPO: EVALUADOR -->
+            <div class="field">
+              <label class="field-label">
+                <ion-icon name="person-outline"></ion-icon>
+                Evaluador asignado
+                <span class="required">*</span>
+              </label>
 
-                <ion-item class="custom-item" lines="none" [class.has-value]="evaluadorId">
-                  <ion-select
-                    [(ngModel)]="evaluadorId"
-                    name="evaluadorId"
-                    interface="action-sheet"
-                    placeholder="Selecciona un evaluador"
-                    [disabled]="!proyectoId || submitting">
-                    
-                    <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
-                      <div class="option-content">
-                        <span class="option-title">{{ e.nombre }}</span>
-                        <span class="option-sub">{{ e.especialidad || e.rol || 'Evaluador' }}</span>
-                      </div>
-                    </ion-select-option>
-                  </ion-select>
-                </ion-item>
-                
-                <!-- Mensaje cuando no hay proyecto seleccionado -->
-                <div class="field-hint" *ngIf="!proyectoId">
-                  <ion-icon name="alert-circle-outline"></ion-icon>
-                  <span>Primero selecciona un proyecto</span>
-                </div>
+              <ion-item class="custom-item" lines="none" [class.has-value]="evaluadorId">
+                <ion-select
+                  [(ngModel)]="evaluadorId"
+                  name="evaluadorId"
+                  interface="action-sheet"
+                  placeholder="Selecciona un evaluador"
+                  [disabled]="!proyectoId || submitting"
+                  class="responsive-select">
+                  
+                  <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
+                    <div class="option-content">
+                      <span class="option-title">{{ e.nombre }}</span>
+                      <span class="option-sub">{{ e.especialidad || e.rol || 'Evaluador' }}</span>
+                    </div>
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              
+              <!-- Mensaje cuando no hay proyecto seleccionado -->
+              <div class="field-hint" *ngIf="!proyectoId">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <span>Primero selecciona un proyecto</span>
+              </div>
 
-                <!-- Mensaje cuando no hay evaluadores disponibles -->
-                <div class="field-hint warning" *ngIf="proyectoId && evaluadores.length === 0">
-                  <ion-icon name="alert-circle-outline"></ion-icon>
-                  <span>No hay evaluadores disponibles en el sistema</span>
-                </div>
+              <!-- Mensaje cuando no hay evaluadores disponibles -->
+              <div class="field-hint warning" *ngIf="proyectoId && evaluadores.length === 0">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <span>No hay evaluadores disponibles en el sistema</span>
               </div>
             </div>
 
+            <!-- FECHA LÍMITE -->
             <div class="field optional-field">
               <label class="field-label">
                 <ion-icon name="calendar-outline"></ion-icon>
@@ -229,11 +230,12 @@
                   name="fechaLimite"
                   presentation="date"
                   placeholder="Selecciona una fecha"
-                  class="custom-datetime">
+                  class="custom-datetime responsive-datetime">
                 </ion-datetime>
               </ion-item>
             </div>
 
+            <!-- BOTONES -->
             <div class="form-actions">
               <ion-button
                 type="button"
@@ -298,7 +300,7 @@
         </div>
       </div>
 
-      <!-- EMPTY STATE de asignaciones recientes -->
+      <!-- EMPTY STATE -->
       <div class="empty-recent" *ngIf="!asignacionesRecientes.length">
         <ion-icon name="checkmark-done-outline"></ion-icon>
         <p>Aún no se han realizado asignaciones</p>

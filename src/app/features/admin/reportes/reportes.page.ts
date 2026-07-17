@@ -43,7 +43,9 @@ import {
   gridOutline,
   listOutline,
   chevronForwardOutline,
-  chatbubbleOutline
+  chatbubbleOutline,
+  chevronUpOutline,
+  chevronDownOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 
@@ -158,7 +160,9 @@ export class ReportesPage implements OnInit {
       gridOutline,
       listOutline,
       chevronForwardOutline,
-      chatbubbleOutline
+      chatbubbleOutline,
+      chevronUpOutline,
+      chevronDownOutline
     });
   }
 
@@ -187,10 +191,12 @@ export class ReportesPage implements OnInit {
       next: (res: any) => {
         let data = res?.data ?? res ?? [];
 
+        // Inicializar proyectos con _expandido = false para el acordeón
         this.proyectos = data.map((item: any, index: number) => ({
           ...item,
           id: item.id || item.proyecto_id || index + 1,
-          nombre: item.proyecto || item.nombre || 'Proyecto sin nombre'
+          nombre: item.proyecto || item.nombre || 'Proyecto sin nombre',
+          _expandido: false // <-- Propiedad para el acordeón
         }));
 
         this.construirResumenEvaluadores();
@@ -205,6 +211,13 @@ export class ReportesPage implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  /**
+   * Toggle de acordeón para expandir/contraer un proyecto
+   */
+  toggleProyecto(proyecto: any): void {
+    proyecto._expandido = !proyecto._expandido;
   }
 
   actualizarStatsCards(): void {
