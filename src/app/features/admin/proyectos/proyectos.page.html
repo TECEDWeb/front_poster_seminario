@@ -113,110 +113,143 @@
     </div>
 
     <!-- GRID DE PROYECTOS -->
-    <div class="proyectos-grid" *ngIf="!cargando">
-      <div class="proyecto-card"
-           *ngFor="let p of proyectosFiltrados || []; let i = index; trackBy: trackById"
-           [class.card-active]="p.activo"
-           [class.card-inactive]="!p.activo"
-           [style.animation-delay.ms]="i * 40">
-
-        <!-- HEADER DE LA TARJETA -->
-        <div class="card-header">
-          <div class="card-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
-            <ion-icon name="document-text-outline"></ion-icon>
-          </div>
-
-          <div class="card-info">
-            <h3 class="card-title">{{ p.nombre }}</h3>
-            <div class="card-meta-tags">
-              <span class="tag tag-area" *ngIf="p.area">
-                <ion-icon name="business-outline"></ion-icon>
-                {{ p.area }}
-              </span>
-              <span class="tag tag-nivel" *ngIf="p.nivel">
-                <ion-icon name="bar-chart-outline"></ion-icon>
-                {{ p.nivel }}
-              </span>
-              <span class="tag tag-tutor" *ngIf="tutorEncargado(p)">
-                <ion-icon name="school-outline"></ion-icon>
-                {{ tutorEncargado(p) }}
-              </span>
-            </div>
-          </div>
-
-          <div class="card-status">
-            <span class="status-badge" [class]="p.activo ? 'status-active' : 'status-inactive'">
-              <span class="status-dot"></span>
-              {{ p.activo ? 'Activo' : 'Inactivo' }}
-            </span>
-          </div>
+    <div class="table-container" *ngIf="!cargando">
+      <div class="table-wrapper">
+        <!-- Cabecera de la tabla -->
+        <div class="table-header">
+          <div class="th col-status">Estado</div>
+          <div class="th col-nombre">Proyecto</div>
+          <div class="th col-area">Área</div>
+          <div class="th col-nivel">Nivel</div>
+          <div class="th col-tutor">Tutor encargado</div>
+          <div class="th col-participantes">Participantes</div>
+          <div class="th col-acciones">Acciones</div>
         </div>
 
-        <!-- CUERPO DE LA TARJETA -->
-        <div class="card-body">
-          <p class="card-description" *ngIf="p.descripcion">
-            {{ p.descripcion | slice:0:120 }}{{ p.descripcion.length > 120 ? '...' : '' }}
-          </p>
-
-          <div class="card-participants">
-            <div class="participants-header">
-              <ion-icon name="people-outline"></ion-icon>
-              <span>Participantes ({{ (p.participantes || []).length }})</span>
+        <!-- Filas -->
+        <div class="table-body">
+          <div class="table-row" 
+              *ngFor="let p of proyectosFiltrados || []; let i = index; trackBy: trackById"
+              [class.row-active]="p.activo"
+              [class.row-inactive]="!p.activo"
+              [style.animation-delay.ms]="i * 30">
+            
+            <!-- Columna: Estado -->
+            <div class="td col-status">
+              <span class="status-indicator" [class.active]="p.activo" [class.inactive]="!p.activo">
+                <span class="status-dot"></span>
+                {{ p.activo ? 'Activo' : 'Inactivo' }}
+              </span>
             </div>
-            <div class="participants-list">
-              <div class="participant-chip" *ngFor="let part of (p.participantes || []).slice(0, 4)">
-                {{ part.nombre }}
-              </div>
-              <div class="participant-more" *ngIf="(p.participantes?.length || 0) > 4">
-                +{{ (p.participantes?.length || 0) - 4 }} más
+
+            <!-- Columna: Nombre + descripción -->
+            <div class="td col-nombre">
+              <div class="proyecto-info">
+                <div class="proyecto-icon" [class]="p.activo ? 'icon-upse' : 'icon-slate'">
+                  <ion-icon name="document-text-outline"></ion-icon>
+                </div>
+                <div class="proyecto-details">
+                  <span class="proyecto-nombre">{{ p.nombre }}</span>
+                  <span class="proyecto-descripcion" *ngIf="p.descripcion">
+                    {{ p.descripcion | slice:0:80 }}{{ p.descripcion.length > 80 ? '...' : '' }}
+                  </span>
+                  <!-- Concurso asociado -->
+                  <span class="proyecto-concurso" *ngIf="p.concursoId">
+                    <ion-icon name="trophy-outline"></ion-icon>
+                    {{ nombreConcurso(p) }}
+                  </span>
+                </div>
               </div>
             </div>
+
+            <!-- Columna: Área -->
+            <div class="td col-area">
+              <span class="tag-area">{{ p.area || '—' }}</span>
+            </div>
+
+            <!-- Columna: Nivel -->
+            <div class="td col-nivel">
+              <span class="tag-nivel" [class.nivel-basico]="p.nivel === 'Básico'"
+                                      [class.nivel-intermedio]="p.nivel === 'Intermedio'"
+                                      [class.nivel-avanzado]="p.nivel === 'Avanzado'">
+                {{ p.nivel || '—' }}
+              </span>
+            </div>
+
+            <!-- Columna: Tutor encargado -->
+            <div class="td col-tutor">
+              <div class="tutor-info" *ngIf="tutorEncargado(p) as tutor">
+                <div class="tutor-avatar">{{ tutor.charAt(0) }}</div>
+                <span>{{ tutor }}</span>
+              </div>
+              <span class="empty-value" *ngIf="!tutorEncargado(p)">—</span>
+            </div>
+
+            <!-- Columna: Participantes -->
+            <div class="td col-participantes">
+              <div class="participants-info">
+                <span class="participants-count">
+                  <ion-icon name="people-outline"></ion-icon>
+                  {{ (p.participantes || []).length }}
+                </span>
+                <div class="participants-avatars">
+                  <div class="mini-avatar" *ngFor="let part of (p.participantes || []).slice(0, 3)">
+                    {{ part.nombre?.charAt(0) || '?' }}
+                  </div>
+                  <div class="mini-avatar more" *ngIf="(p.participantes || []).length > 3">
+                    +{{ (p.participantes || []).length - 3 }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna: Acciones -->
+            <div class="td col-acciones">
+              <div class="acciones-group">
+                <button class="btn-action btn-view" (click)="verDetalle(p)" title="Ver detalle">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </button>
+                <button class="btn-action btn-edit" (click)="editar(p)" title="Editar">
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button class="btn-action btn-delete" (click)="confirmarEliminar(p)" title="Eliminar">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <!-- CONCURSO ASOCIADO -->
-        <div class="card-concurso" *ngIf="p.concursoId">
-          <ion-chip class="chip-concurso">
-            <ion-icon name="trophy-outline"></ion-icon>
-            <ion-label>{{ nombreConcurso(p) }}</ion-label>
-          </ion-chip>
-        </div>
-
-        <!-- ACCIONES -->
-        <div class="card-actions">
-          <button class="action-item" (click)="verDetalle(p)" title="Ver detalle del proyecto">
-            <ion-icon name="eye-outline"></ion-icon>
-            <span>Ver</span>
-          </button>
-
-          <button class="action-item" (click)="editar(p)" title="Editar información del proyecto">
-            <ion-icon name="create-outline"></ion-icon>
-            <span>Editar</span>
-          </button>
-
-          <button class="action-item danger" (click)="confirmarEliminar(p)" title="Eliminar este proyecto">
-            <ion-icon name="trash-outline"></ion-icon>
-            <span>Eliminar</span>
-          </button>
+          <!-- EMPTY STATE -->
+          <div class="empty-state-table" *ngIf="proyectosFiltrados?.length === 0">
+            <div class="empty-icon">
+              <ion-icon name="folder-open-outline"></ion-icon>
+            </div>
+            <h3>No hay proyectos</h3>
+            <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos'">
+              Comienza creando el primer proyecto de investigación
+            </p>
+            <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos'">
+              No se encontraron proyectos con los filtros aplicados
+            </p>
+            <ion-button class="btn-primary" (click)="abrirCrear()">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              Crear proyecto
+            </ion-button>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- EMPTY STATE -->
-      <div class="empty-state" *ngIf="proyectosFiltrados?.length === 0">
-        <div class="empty-icon">
-          <ion-icon name="folder-open-outline"></ion-icon>
-        </div>
-        <h3>No hay proyectos</h3>
-        <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos'">
-          Comienza creando el primer proyecto de investigación
-        </p>
-        <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos'">
-          No se encontraron proyectos con los filtros aplicados
-        </p>
-        <ion-button class="btn-primary" (click)="abrirCrear()">
-          <ion-icon name="add-outline" slot="start"></ion-icon>
-          Crear proyecto
-        </ion-button>
+    <!-- SKELETON LOADING para la tabla -->
+    <div class="loading-table" *ngIf="cargando">
+      <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+        <ion-skeleton-text animated class="skeleton-cell status"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-cell nombre"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-cell area"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-cell nivel"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-cell tutor"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-cell participantes"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-cell acciones"></ion-skeleton-text>
       </div>
     </div>
 
