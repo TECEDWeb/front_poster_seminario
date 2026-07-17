@@ -124,6 +124,9 @@ export class ReportesPage implements OnInit {
   filtroStatus: string = 'todos';
   filtroEvaluador: string = 'todos';
 
+  // Ganador del concurso
+  ganador: any = null;
+
   // Modal de detalle de proyecto
   modalAbierto = false;
   proyectoSeleccionado: DetalleProyecto | null = null;
@@ -196,8 +199,11 @@ export class ReportesPage implements OnInit {
           ...item,
           id: item.id || item.proyecto_id || index + 1,
           nombre: item.proyecto || item.nombre || 'Proyecto sin nombre',
-          _expandido: false // <-- Propiedad para el acordeón
+          _expandido: false
         }));
+
+        // Calcular el ganador del concurso
+        this.calcularGanador();
 
         this.construirResumenEvaluadores();
         this.aplicarFiltros();
@@ -208,9 +214,39 @@ export class ReportesPage implements OnInit {
         this.error = err.error?.mensaje || 'Error al cargar proyectos';
         this.proyectos = [];
         this.proyectosFiltrados = [];
+        this.ganador = null;
         this.cargando = false;
       }
     });
+  }
+
+  /**
+   * Calcula el ganador del concurso basado en el promedio más alto
+   */
+  calcularGanador(): void {
+    if (!this.proyectos || this.proyectos.length === 0) {
+      this.ganador = null;
+      return;
+    }
+
+    // Filtrar solo proyectos con evaluaciones y promedio > 0
+    const proyectosConEvaluaciones = this.proyectos.filter(p => 
+      p.evaluaciones && p.evaluaciones.length > 0 && p.promedio > 0
+    );
+
+    if (proyectosConEvaluaciones.length === 0) {
+      this.ganador = null;
+      return;
+    }
+
+    // Ordenar por promedio descendente
+    const sorted = [...proyectosConEvaluaciones].sort((a, b) => 
+      (b.promedio || 0) - (a.promedio || 0)
+    );
+
+    // El ganador es el primero
+    this.ganador = sorted[0];
+    console.log('🏆 Ganador del concurso:', this.ganador.nombre, 'con promedio:', this.ganador.promedio);
   }
 
   /**
@@ -416,10 +452,6 @@ export class ReportesPage implements OnInit {
     });
   }
 
-  /**
-   * NUEVO: abre un segundo modal con el desglose completo
-   * sección → criterio → nivel elegido para una evaluación puntual.
-   */
   verRespuestas(evaluacionId: number): void {
     if (!evaluacionId) {
       alert('No se puede ver el detalle: ID de evaluación no disponible');
@@ -480,10 +512,6 @@ export class ReportesPage implements OnInit {
     this.errorRespuestas = null;
   }
 
-  /**
-   * Ver todos los proyectos calificados por un evaluador específico,
-   * saltando desde la vista de evaluadores a la vista de proyectos filtrada.
-   */
   verProyectosDeEvaluador(nombreEvaluador: string): void {
     this.filtroEvaluador = nombreEvaluador;
     this.vistaActual = 'proyectos';
@@ -507,7 +535,7 @@ export class ReportesPage implements OnInit {
   }
 
   getRandomColor(proyecto: string): string {
-    const colors = ['color-blue', 'color-green', 'color-orange', 'color-purple', 'color-pink', 'color-cyan', 'color-indigo'];
+    const colors = ['color-blue', 'color-green', 'color-gold', 'color-purple', 'color-pink', 'color-cyan', 'color-indigo'];
     const index = proyecto?.length ? proyecto.length % colors.length : 0;
     return colors[index];
   }
@@ -549,10 +577,6 @@ export class ReportesPage implements OnInit {
     return 'color-red';
   }
 
-  /**
-   * Estado visual para el estado textual de una evaluación
-   * dentro del modal de detalle del proyecto.
-   */
   getEstadoEvaluacionClass(estado: string): string {
     return estado === 'evaluado' ? 'status-excellent' : 'status-regular';
   }

@@ -51,6 +51,52 @@
       </div>
     </div>
 
+    <!-- GANADOR DEL CONCURSO -->
+    <div class="ganador-section" *ngIf="!cargando && ganador">
+      <div class="ganador-card">
+        <div class="ganador-badge">
+          <ion-icon name="trophy-outline"></ion-icon>
+          <span>🏆 GANADOR DEL CONCURSO</span>
+        </div>
+        <div class="ganador-content">
+          <div class="ganador-icon" [class]="getRandomColor(ganador.nombre)">
+            <span class="icon-letter">{{ ganador.nombre?.charAt(0) || 'P' }}</span>
+          </div>
+          <div class="ganador-info">
+            <h2>{{ ganador.nombre }}</h2>
+            <div class="ganador-meta">
+              <span class="ganador-area">{{ ganador.area || 'Sin área' }}</span>
+              <span class="ganador-nivel">{{ ganador.nivel || 'Sin nivel' }}</span>
+            </div>
+            <div class="ganador-stats">
+              <div class="ganador-stat">
+                <span class="ganador-stat-value">{{ ganador.promedio | number:'1.2-2' }}</span>
+                <span class="ganador-stat-label">Promedio</span>
+              </div>
+              <div class="ganador-stat">
+                <span class="ganador-stat-value">{{ ganador.evaluaciones || 0 }}</span>
+                <span class="ganador-stat-label">Evaluaciones</span>
+              </div>
+              <div class="ganador-stat">
+                <span class="ganador-stat-value">{{ ganador.evaluadores?.length || 0 }}</span>
+                <span class="ganador-stat-label">Evaluadores</span>
+              </div>
+            </div>
+          </div>
+          <div class="ganador-actions">
+            <button class="ganador-btn" (click)="verDetalle(ganador)">
+              <ion-icon name="eye-outline"></ion-icon>
+              Ver detalle
+            </button>
+            <button class="ganador-btn ganador-btn-excel" (click)="exportarProyectoExcel(ganador)">
+              <ion-icon name="download-outline"></ion-icon>
+              Exportar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TOGGLE DE VISTA -->
     <div class="vista-toggle" *ngIf="!cargando">
       <button
@@ -165,8 +211,8 @@
           <!-- HEADER DEL PROYECTO (SIEMPRE VISIBLE) -->
           <div class="proyecto-header" (click)="toggleProyecto(p)" [class.expanded]="p._expandido">
             <div class="ph-left">
-              <div class="ph-icon" [class]="getRandomColor(p.proyecto)">
-                <span class="icon-letter">{{ p.proyecto?.charAt(0) || 'P' }}</span>
+              <div class="ph-icon" [class]="getRandomColor(p.proyecto || p.nombre)">
+                <span class="icon-letter">{{ (p.proyecto || p.nombre)?.charAt(0) || 'P' }}</span>
               </div>
               <div class="ph-info">
                 <span class="ph-nombre">{{ p.proyecto || p.nombre }}</span>
