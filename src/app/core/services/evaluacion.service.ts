@@ -128,4 +128,44 @@ export class EvaluacionService {
       puntajeMaximo: item.puntajeMaximo != null ? Number(item.puntajeMaximo) : undefined,
     } as ResumenEvaluacion;
   }
+  /**
+   * OBTENER DETALLE DE EVALUACIÓN PARA EDICIÓN (EVALUADOR)
+   * GET /api/evaluaciones/:id/editar
+   */
+  getEvaluacionParaEditar(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}/editar`);
+  }
+
+  /**
+   * ACTUALIZAR EVALUACIÓN SIN FINALIZAR (EVALUADOR)
+   * PUT /api/evaluaciones/:id/actualizar
+   */
+  actualizarEvaluacion(id: number, payload: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/actualizar`, payload);
+  }
+
+  /**
+   * FINALIZAR EVALUACIÓN (EVALUADOR)
+   * POST /api/evaluaciones/:id/finalizar
+   */
+  finalizarEvaluacion(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/finalizar`, {});
+  }
+
+  /**
+   * REABRIR EVALUACIÓN (ADMIN)
+   * PUT /api/evaluaciones/:id/reabrir
+   */
+  reabrirEvaluacion(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/reabrir`, {});
+  }
+
+  /**
+   * ELIMINAR EVALUACIÓN (ADMIN)
+   * DELETE /api/evaluaciones/:id
+   */
+  eliminarEvaluacion(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
 }

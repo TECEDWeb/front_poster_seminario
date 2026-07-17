@@ -189,6 +189,48 @@
           {{ guardando ? 'Guardando...' : 'Guardar evaluación' }}
         </ion-button>
       </div>
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <ion-button
+          fill="outline"
+          class="btn-cancelar"
+          (click)="volver()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Cancelar
+        </ion-button>
+
+        <!-- Botón: Guardar borrador (no finaliza) -->
+        <ion-button
+          class="btn-guardar-borrador"
+          (click)="guardarBorrador()"
+          [disabled]="criteriosRespondidos === 0 || guardando">
+          <ion-icon [name]="guardando ? 'refresh-outline' : 'save-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
+          {{ guardando ? 'Guardando...' : 'Guardar borrador' }}
+        </ion-button>
+
+        <!-- Botón: Finalizar evaluación -->
+        <ion-button
+          class="btn-finalizar"
+          (click)="finalizar()"
+          [disabled]="criteriosRespondidos === 0 || guardando || getPorcentajeProgreso() < 100">
+          <ion-icon [name]="guardando ? 'refresh-outline' : 'checkmark-circle-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
+          {{ guardando ? 'Finalizando...' : 'Finalizar evaluación' }}
+        </ion-button>
+      </div>
+
+      <!-- Mensaje de estado de la evaluación -->
+      <div class="evaluacion-status" *ngIf="!cargando && !error && formulario">
+        <div class="status-info" [class.estado-asignado]="estadoEvaluacion === 'asignado'" 
+                                [class.estado-evaluado]="estadoEvaluacion === 'evaluado'">
+          <ion-icon [name]="estadoEvaluacion === 'asignado' ? 'time-outline' : 'checkmark-circle-outline'"></ion-icon>
+          <span>
+            {{ estadoEvaluacion === 'asignado' ? '⏳ Evaluación en progreso' : '✅ Evaluación completada' }}
+          </span>
+          <span class="status-sub" *ngIf="estadoEvaluacion === 'evaluado'">
+            Finalizada el {{ fechaEvaluacion | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+      </div>
 
     </ng-container>
 

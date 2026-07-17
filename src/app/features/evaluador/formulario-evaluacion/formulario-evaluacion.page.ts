@@ -32,8 +32,8 @@ import {
   chatbubbleOutline,
   documentOutline,
   folderOutline,
-  checkboxOutline,
-  trophyOutline
+  trophyOutline,
+  saveOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -62,6 +62,9 @@ import {
 })
 export class FormularioEvaluacionPage implements OnInit {
 
+  // ============================================
+  // PROPIEDADES PRINCIPALES
+  // ============================================
   evaluacionId!: number;
   formulario: any = null;
   respuestas: { [criterioId: number]: number } = {};
@@ -75,6 +78,14 @@ export class FormularioEvaluacionPage implements OnInit {
 
   totalCriterios: number = 0;
   criteriosRespondidos: number = 0;
+
+  // ============================================
+  // ESTADO DE LA EVALUACIÓN
+  // ============================================
+  estadoEvaluacion: string = 'asignado';
+  fechaEvaluacion: string | null = null;
+  evaluacionGuardada: boolean = false;
+  respuestasGuardadas: { [criterioId: number]: number } = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -92,11 +103,14 @@ export class FormularioEvaluacionPage implements OnInit {
       chatbubbleOutline,
       documentOutline,
       folderOutline,
-      checkboxOutline,
-      trophyOutline
+      trophyOutline,
+      saveOutline
     });
   }
 
+  // ============================================
+  // CICLO DE VIDA
+  // ============================================
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -109,10 +123,49 @@ export class FormularioEvaluacionPage implements OnInit {
     this.cargarFormulario();
   }
 
+  // ============================================
+  // CARGA DE DATOS
+  // ============================================
   cargarFormulario(): void {
     this.cargando = true;
     this.error = null;
 
+    // Primero intentar cargar respuestas guardadas si existen
+    this.evaluacionService.getEvaluacionParaEditar(this.evaluacionId).subscribe({
+      next: (res: any) => {
+        console.log('📝 Respuestas guardadas encontradas:', res);
+        if (res?.ok !== false && res?.data) {
+          const data = res.data;
+          this.evaluacionGuardada = true;
+          this.estadoEvaluacion = data.estado || 'asignado';
+          this.fechaEvaluacion = data.fecha_evaluacion || null;
+
+          // Cargar respuestas guardadas
+          if (data.secciones) {
+            data.secciones.forEach((seccion: any) => {
+              seccion.items?.forEach((item: any) => {
+                if (item.criterio_id && item.nivel_id) {
+                  this.respuestas[item.criterio_id] = item.nivel_id;
+                  this.respuestasGuardadas[item.criterio_id] = item.nivel_id;
+                }
+              });
+            });
+          }
+          if (data.observaciones) {
+            this.observacion = data.observaciones;
+          }
+        }
+        // Continuar cargando el formulario completo
+        this.cargarFormularioCompleto();
+      },
+      error: () => {
+        // Si no hay respuestas guardadas, cargar formulario normal
+        this.cargarFormularioCompleto();
+      }
+    });
+  }
+
+  cargarFormularioCompleto(): void {
     this.evaluacionService.getFormulario(this.evaluacionId).subscribe({
       next: (res: any) => {
         console.log('================================');
@@ -144,6 +197,15 @@ export class FormularioEvaluacionPage implements OnInit {
             this.concursoNombre = data.concurso.nombre || '';
           }
 
+          // Si ya teníamos respuestas guardadas, asegurarnos de que se muestren
+          this.formulario.secciones?.forEach((seccion: any) => {
+            seccion.criterios?.forEach((criterio: any) => {
+              if (this.respuestas[criterio.id] !== undefined) {
+                // La respuesta ya está cargada
+              }
+            });
+          });
+
           this.totalCriterios = data.secciones?.reduce(
             (total: number, seccion: any) => total + (seccion.criterios?.length || 0),
             0
@@ -152,8 +214,8 @@ export class FormularioEvaluacionPage implements OnInit {
           console.log('🟢 FORMULARIO CARGADO', this.formulario);
           console.log('🟢 SECCIONES:', data.secciones?.length);
           console.log('🟢 TOTAL CRITERIOS:', this.totalCriterios);
-          console.log('🟢 RÚBRICA:', data.rubrica);
 
+          this.actualizarProgreso();
           this.verificarNiveles();
 
         } else {
@@ -166,6 +228,7 @@ export class FormularioEvaluacionPage implements OnInit {
               0
             ) || 0;
             console.log('🟢 Usando data.data como formulario');
+            this.actualizarProgreso();
             this.verificarNiveles();
           } else {
             this.error = 'El formulario no tiene la estructura esperada';
@@ -206,21 +269,13 @@ export class FormularioEvaluacionPage implements OnInit {
     }
   }
 
-  /**
-   * Se dispara vía (ionChange) en el ion-radio-group.
-   * ngModel ya asignó respuestas[criterioId] = nivelId mediante el
-   * two-way binding antes de que este método se ejecute; aquí solo
-   * confirmamos el valor (por claridad) y recalculamos el progreso.
-   * IMPORTANTE: no implementar lógica de "toggle" aquí — ion-radio
-   * dentro de un ion-radio-group no permite deseleccionar haciendo
-   * clic en el mismo radio, así que un toggle manual solo causaba
-   * que la respuesta se borrara justo después de asignarse.
-   */
+  // ============================================
+  // MANEJO DE RESPUESTAS
+  // ============================================
   seleccionar(criterioId: number, nivelId: number): void {
     console.log('Respuesta seleccionada', { criterioId, nivelId });
 
     this.respuestas[criterioId] = nivelId;
-
     this.actualizarProgreso();
     console.log('📊 Criterios respondidos:', this.criteriosRespondidos);
     console.log('📊 Total criterios:', this.totalCriterios);
@@ -230,6 +285,122 @@ export class FormularioEvaluacionPage implements OnInit {
   actualizarProgreso(): void {
     this.criteriosRespondidos = Object.keys(this.respuestas).length;
     console.log('🔄 Progreso actualizado:', this.criteriosRespondidos);
+  }
+
+  estaRespondido(criterioId: number): boolean {
+    return this.respuestas[criterioId] !== undefined;
+  }
+
+  // ============================================
+  // GUARDAR BORRADOR
+  // ============================================
+  guardarBorrador(): void {
+    const detalles = this.obtenerDetalles();
+
+    if (detalles.length === 0) {
+      this.mostrarMensaje('Debe seleccionar al menos una respuesta', 'error');
+      return;
+    }
+
+    this.guardando = true;
+    const payload = {
+      observacion: this.observacion || '',
+      detalles: detalles
+    };
+
+    console.log('📤 GUARDANDO BORRADOR:', JSON.stringify(payload, null, 2));
+
+    this.evaluacionService.actualizarEvaluacion(this.evaluacionId, payload).subscribe({
+      next: (res) => {
+        console.log('✅ BORRADOR GUARDADO:', res);
+        this.guardando = false;
+        this.evaluacionGuardada = true;
+        this.mostrarMensaje('Borrador guardado correctamente', 'success');
+        // Guardar copia de las respuestas
+        this.respuestasGuardadas = { ...this.respuestas };
+      },
+      error: (err) => {
+        console.error('❌ ERROR GUARDANDO BORRADOR:', err);
+        this.guardando = false;
+        const mensaje = err.error?.mensaje || 'Error al guardar el borrador';
+        this.mostrarMensaje(mensaje, 'error');
+      }
+    });
+  }
+
+  // ============================================
+  // FINALIZAR EVALUACIÓN
+  // ============================================
+  finalizar(): void {
+    const detalles = this.obtenerDetalles();
+
+    if (detalles.length === 0) {
+      this.mostrarMensaje('Debe seleccionar al menos una respuesta', 'error');
+      return;
+    }
+
+    if (this.getPorcentajeProgreso() < 100) {
+      this.mostrarMensaje('Debe responder todos los criterios antes de finalizar', 'error');
+      return;
+    }
+
+    if (!confirm('¿Estás seguro de finalizar la evaluación? Una vez finalizada, no podrás modificarla.')) {
+      return;
+    }
+
+    this.guardando = true;
+
+    // Primero guardar el borrador
+    const payload = {
+      observacion: this.observacion || '',
+      detalles: detalles
+    };
+
+    this.evaluacionService.actualizarEvaluacion(this.evaluacionId, payload).subscribe({
+      next: () => {
+        // Luego finalizar
+        this.evaluacionService.finalizarEvaluacion(this.evaluacionId).subscribe({
+          next: (res) => {
+            console.log('✅ EVALUACIÓN FINALIZADA:', res);
+            this.guardando = false;
+            this.estadoEvaluacion = 'evaluado';
+            this.fechaEvaluacion = new Date().toISOString();
+            this.mostrarMensaje('Evaluación finalizada correctamente', 'success');
+            this.router.navigate(['/evaluador/proyectos-asignados']);
+          },
+          error: (err) => {
+            console.error('❌ ERROR FINALIZANDO:', err);
+            this.guardando = false;
+            const mensaje = err.error?.mensaje || 'Error al finalizar la evaluación';
+            this.mostrarMensaje(mensaje, 'error');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('❌ ERROR GUARDANDO ANTES DE FINALIZAR:', err);
+        this.guardando = false;
+        const mensaje = err.error?.mensaje || 'Error al guardar la evaluación';
+        this.mostrarMensaje(mensaje, 'error');
+      }
+    });
+  }
+
+  // ============================================
+  // MÉTODO ORIGINAL (DEPRECATED - mantiene compatibilidad)
+  // ============================================
+  guardar(): void {
+    // Redirigir al nuevo método
+    this.finalizar();
+  }
+
+  // ============================================
+  // UTILIDADES
+  // ============================================
+  private obtenerDetalles(): any[] {
+    return Object.keys(this.respuestas).map(id => ({
+      criterio_id: Number(id),
+      nivel_id: this.respuestas[Number(id)]
+    }));
   }
 
   getPorcentajeProgreso(): number {
@@ -286,67 +457,12 @@ export class FormularioEvaluacionPage implements OnInit {
     return Math.round((respondidos / total) * 100);
   }
 
-  estaRespondido(criterioId: number): boolean {
-    return this.respuestas[criterioId] !== undefined;
-  }
-
-  getNivelSeleccionado(criterioId: number): number | undefined {
-    return this.respuestas[criterioId];
-  }
-
-  guardar(): void {
-    const detalles = Object.keys(this.respuestas).map(id => ({
-      criterio_id: Number(id),
-      nivel_id: this.respuestas[Number(id)]
-    }));
-
-    if (detalles.length === 0) {
-      this.mostrarMensaje('Debe seleccionar al menos una respuesta', 'error');
-      return;
-    }
-
-    if (!confirm('¿Estás seguro de guardar la evaluación?')) {
-      return;
-    }
-
-    this.guardando = true;
-    const payload = {
-      observacion: this.observacion || '',
-      detalles: detalles
-    };
-
-    console.log('📤 ENVIANDO PAYLOAD:', JSON.stringify(payload, null, 2));
-
-    this.evaluacionService.guardar(this.evaluacionId, payload).subscribe({
-      next: (res) => {
-        console.log('✅ GUARDADO EXITOSO:', res);
-        this.guardando = false;
-        this.mostrarMensaje('Evaluación guardada correctamente', 'success');
-        this.router.navigate(['/evaluador/proyectos-asignados']);
-      },
-      error: (err) => {
-        console.error('❌ ERROR GUARDANDO:', err);
-        console.error('❌ Detalles del error:', err.error);
-        this.guardando = false;
-
-        let mensaje = err.error?.mensaje || 'Error al guardar la evaluación';
-        if (err.status === 0) {
-          mensaje = 'Error de conexión. Verifica tu conexión a internet.';
-        } else if (err.status === 401) {
-          mensaje = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
-        } else if (err.status === 403) {
-          mensaje = 'No tienes permisos para realizar esta acción.';
-        } else if (err.status === 404) {
-          mensaje = 'La evaluación no existe o ya fue completada.';
-        }
-        this.mostrarMensaje(mensaje, 'error');
-      }
-    });
-  }
-
+  // ============================================
+  // NAVEGACIÓN
+  // ============================================
   volver(): void {
     const respuestasCount = Object.keys(this.respuestas).length;
-    if (respuestasCount > 0) {
+    if (respuestasCount > 0 && !this.evaluacionGuardada) {
       if (!confirm('¿Estás seguro de salir? Los cambios no guardados se perderán.')) {
         return;
       }
@@ -354,11 +470,17 @@ export class FormularioEvaluacionPage implements OnInit {
     this.router.navigate(['/evaluador/proyectos-asignados']);
   }
 
+  // ============================================
+  // NOTIFICACIONES
+  // ============================================
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
     const icono = tipo === 'success' ? '✅' : '❌';
     alert(`${icono} ${mensaje}`);
   }
 
+  // ============================================
+  // DEBUG
+  // ============================================
   debugEstado(): void {
     console.log('🔍 DEBUG ESTADO:');
     console.log('  - Evaluación ID:', this.evaluacionId);
