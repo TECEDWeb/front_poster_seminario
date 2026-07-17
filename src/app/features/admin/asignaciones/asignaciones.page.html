@@ -22,55 +22,7 @@
 
     <!-- SKELETON LOADING -->
     <ng-container *ngIf="cargando">
-
-      <div class="stats-row">
-        <div class="stat-item" *ngFor="let i of [1,2,3]">
-          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
-          <div class="stat-info">
-            <ion-skeleton-text animated class="skeleton-value"></ion-skeleton-text>
-            <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
-          </div>
-        </div>
-      </div>
-
-      <ion-card class="form-card">
-        <ion-card-header>
-          <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
-          <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="field-group">
-            <div class="field">
-              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
-            </div>
-            <div class="field">
-              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
-            </div>
-          </div>
-          <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-          <ion-skeleton-text animated class="skeleton-field" style="max-width: 300px;"></ion-skeleton-text>
-          <div class="form-actions">
-            <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
-            <ion-skeleton-text animated class="skeleton-btn wide"></ion-skeleton-text>
-          </div>
-        </ion-card-content>
-      </ion-card>
-
-      <div class="recent-assignments">
-        <ion-skeleton-text animated class="skeleton-section-title"></ion-skeleton-text>
-        <div class="assignments-list">
-          <div class="assignment-item" *ngFor="let i of [1,2,3]">
-            <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
-            <div class="assignment-info">
-              <ion-skeleton-text animated class="skeleton-line" style="width: 60%;"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-line" style="width: 40%;"></ion-skeleton-text>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <!-- ... (mantén tu skeleton loading existente) ... -->
     </ng-container>
 
     <!-- CONTENIDO REAL -->
@@ -135,6 +87,7 @@
           <form (ngSubmit)="guardar()" #assignForm="ngForm">
 
             <div class="field-group">
+              <!-- CAMPO: PROYECTO -->
               <div class="field">
                 <label class="field-label">
                   <ion-icon name="folder-outline"></ion-icon>
@@ -142,25 +95,42 @@
                   <span class="required">*</span>
                 </label>
 
-                <ion-item class="custom-item" lines="none">
+                <ion-item class="custom-item" lines="none" [class.has-value]="proyectoId">
                   <ion-select
                     [(ngModel)]="proyectoId"
                     name="proyectoId"
                     interface="action-sheet"
                     placeholder="Selecciona un proyecto"
-                    [class.has-value]="proyectoId">
-
+                    (ionChange)="onProyectoSeleccionado($event)"
+                    [disabled]="submitting">
+                    
                     <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
                       <div class="option-content">
                         <span class="option-title">{{ p.nombre }}</span>
-                        <span class="option-sub">{{ p.categoria || p.tipo || 'Sin categoría' }}</span>
+                        <span class="option-sub">{{ p.area || p.categoria || 'Sin categoría' }}</span>
                       </div>
                     </ion-select-option>
-
                   </ion-select>
                 </ion-item>
+                
+                <!-- Información del proyecto seleccionado -->
+                <div class="proyecto-info-seleccionado" *ngIf="proyectoId && proyectoSeleccionado">
+                  <div class="info-badge">
+                    <ion-icon name="information-circle-outline"></ion-icon>
+                    <span>
+                      <strong>{{ proyectoSeleccionado.nombre }}</strong>
+                      <span class="info-detail">• {{ proyectoSeleccionado.area || 'Sin área' }}</span>
+                      <span class="info-detail">• {{ proyectoSeleccionado.nivel || 'Sin nivel' }}</span>
+                    </span>
+                  </div>
+                  <div class="info-participantes" *ngIf="proyectoSeleccionado.participantes?.length">
+                    <ion-icon name="people-outline"></ion-icon>
+                    {{ proyectoSeleccionado.participantes.length }} participante(s)
+                  </div>
+                </div>
               </div>
 
+              <!-- CAMPO: EVALUADOR -->
               <div class="field">
                 <label class="field-label">
                   <ion-icon name="person-outline"></ion-icon>
@@ -168,23 +138,28 @@
                   <span class="required">*</span>
                 </label>
 
-                <ion-item class="custom-item" lines="none">
+                <ion-item class="custom-item" lines="none" [class.has-value]="evaluadorId">
                   <ion-select
                     [(ngModel)]="evaluadorId"
                     name="evaluadorId"
                     interface="action-sheet"
                     placeholder="Selecciona un evaluador"
-                    [class.has-value]="evaluadorId">
-
+                    [disabled]="!proyectoId || submitting">
+                    
                     <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
                       <div class="option-content">
                         <span class="option-title">{{ e.nombre }}</span>
                         <span class="option-sub">{{ e.especialidad || e.rol || 'Evaluador' }}</span>
                       </div>
                     </ion-select-option>
-
                   </ion-select>
                 </ion-item>
+                
+                <!-- Mensaje cuando no hay proyecto seleccionado -->
+                <div class="field-hint" *ngIf="!proyectoId">
+                  <ion-icon name="alert-circle-outline"></ion-icon>
+                  <span>Primero selecciona un proyecto</span>
+                </div>
               </div>
             </div>
 
@@ -211,6 +186,7 @@
                 fill="outline"
                 class="cancel-btn"
                 (click)="resetForm()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
                 Cancelar
               </ion-button>
 

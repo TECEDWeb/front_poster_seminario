@@ -41,7 +41,9 @@ import {
   personAddOutline,
   closeCircleOutline,
   alertCircleOutline,
-  eyeOutline
+  eyeOutline,
+  informationCircleOutline,
+  closeOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -89,6 +91,12 @@ export class AsignacionesPage implements OnInit {
   evaluadorId: number | null = null;
   fechaLimite: string | null = null;
 
+  // Propiedad computada para el proyecto seleccionado
+  get proyectoSeleccionado(): any {
+    if (!this.proyectoId) return null;
+    return this.proyectos.find(p => p.id === this.proyectoId) || null;
+  }
+
   submitting: boolean = false;
   cargando: boolean = false;
   
@@ -96,8 +104,7 @@ export class AsignacionesPage implements OnInit {
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
     private authService: AuthService,
-    private router: Router,
-    
+    private router: Router
   ) {
     addIcons({
       addOutline,
@@ -115,7 +122,9 @@ export class AsignacionesPage implements OnInit {
       personAddOutline,
       closeCircleOutline,
       alertCircleOutline,
-      eyeOutline
+      eyeOutline,
+      informationCircleOutline,
+      closeOutline
     });
   }
 
@@ -123,6 +132,9 @@ export class AsignacionesPage implements OnInit {
     this.cargarDatos();
   }
 
+  // ============================================
+  // CARGA DE DATOS
+  // ============================================
   cargarDatos(): void {
     this.cargando = true;
     this._proyectosListos = false;
@@ -133,23 +145,26 @@ export class AsignacionesPage implements OnInit {
     this.cargarEvaluadores();
     this.cargarAsignacionesRecientes();
 
-    // Red de seguridad única: si algo se cuelga, no dejar el loading para siempre
+    // Timeout de seguridad
     clearTimeout(this._loadingSafety);
     this._loadingSafety = setTimeout(() => {
-      this.cargando = false;
-    }, 6000);
+      if (this.cargando) {
+        this.cargando = false;
+        console.warn('⏱️ Carga forzada por timeout');
+      }
+    }, 8000);
   }
-
 
   cargarProyectos(): void {
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
         this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
+        console.log('📁 Proyectos cargados:', this.proyectos.length);
         this._proyectosListos = true;
         this.verificarCargaCompleta();
       },
       error: (err: any) => {
-        console.error('Error cargando proyectos:', err);
+        console.error('❌ Error cargando proyectos:', err);
         this.proyectos = [];
         this._proyectosListos = true;
         this.verificarCargaCompleta();
@@ -161,12 +176,14 @@ export class AsignacionesPage implements OnInit {
     this.asignacionService.obtenerEvaluadores().subscribe({
       next: (res: any) => {
         this.evaluadores = res?.data ?? res?.usuarios ?? res ?? [];
-        console.log('Evaluadores cargados:', this.evaluadores.length);
+        console.log('👤 Evaluadores cargados:', this.evaluadores.length);
+        this._evaluadoresListos = true;
         this.verificarCargaCompleta();
       },
       error: (err: any) => {
-        console.error('Error cargando evaluadores:', err);
+        console.error('❌ Error cargando evaluadores:', err);
         this.evaluadores = [];
+        this._evaluadoresListos = true;
         this.verificarCargaCompleta();
       }
     });
@@ -178,12 +195,15 @@ export class AsignacionesPage implements OnInit {
         const data = res?.data ?? res ?? [];
         this.asignacionesRecientes = Array.isArray(data) ? data.slice(0, 5) : [];
         this.asignacionesCount = Array.isArray(data) ? data.length : 0;
+        console.log('📋 Asignaciones cargadas:', this.asignacionesCount);
+        this._asignacionesListas = true;
         this.verificarCargaCompleta();
       },
       error: (err: any) => {
-        console.error('Error cargando asignaciones:', err);
+        console.error('❌ Error cargando asignaciones:', err);
         this.asignacionesRecientes = [];
         this.asignacionesCount = 0;
+        this._asignacionesListas = true;
         this.verificarCargaCompleta();
       }
     });
@@ -198,12 +218,39 @@ export class AsignacionesPage implements OnInit {
     if (this._proyectosListos && this._evaluadoresListos && this._asignacionesListas) {
       clearTimeout(this._loadingSafety);
       this.cargando = false;
+      console.log('✅ Todos los datos cargados correctamente');
     }
   }
 
+  // ============================================
+  // MANEJO DE SELECCIÓN DE PROYECTO
+  // ============================================
+  onProyectoSeleccionado(event: any): void {
+    console.log('📌 Proyecto seleccionado:', this.proyectoId);
+    // Si cambia el proyecto, reseteamos el evaluador seleccionado
+    this.evaluadorId = null;
+    console.log('🔄 Evaluador reseteado');
+  }
+
+  // ============================================
+  // GUARDAR ASIGNACIÓN
+  // ============================================
   guardar(): void {
-    if (!this.proyectoId || !this.evaluadorId) {
-      this.showError('Selecciona un proyecto y un evaluador');
+    // Validaciones
+    if (!this.proyectoId) {
+      this.showError('Por favor, selecciona un proyecto');
+      return;
+    }
+
+    if (!this.evaluadorId) {
+      this.showError('Por favor, selecciona un evaluador');
+      return;
+    }
+
+    // Verificar que el proyecto tenga rúbrica
+    const proyecto = this.proyectos.find(p => p.id === this.proyectoId);
+    if (proyecto && !proyecto.rubrica_id && !proyecto.rubrica) {
+      this.showError('El proyecto no tiene una rúbrica asociada. Por favor, crea una rúbrica primero.');
       return;
     }
 
@@ -211,7 +258,8 @@ export class AsignacionesPage implements OnInit {
 
     const payload = {
       proyecto_id: this.proyectoId,
-      evaluador_id: this.evaluadorId
+      evaluador_id: this.evaluadorId,
+      fecha_limite: this.fechaLimite || null
     };
 
     console.log('📤 Enviando payload de asignación:', payload);
@@ -220,29 +268,44 @@ export class AsignacionesPage implements OnInit {
       next: (res: any) => {
         this.submitting = false;
         console.log('✅ Asignación exitosa:', res);
-        this.showSuccess('Proyecto asignado correctamente');
+        this.showSuccess('Proyecto asignado correctamente al evaluador');
         this.resetForm();
-        this.cargarDatos();
+        // Recargar datos para actualizar lista
+        setTimeout(() => this.cargarDatos(), 500);
       },
       error: (err: any) => {
         this.submitting = false;
         console.error('❌ Error asignando:', err);
 
-        let mensaje = err.error?.mensaje || 'Error al asignar el proyecto';
-        if (mensaje === 'El proyecto no tiene rúbrica') {
+        let mensaje = err.error?.mensaje || err.error?.error || 'Error al asignar el proyecto';
+        
+        // Mensajes más amigables
+        if (mensaje.includes('rúbrica')) {
           mensaje = 'El proyecto no tiene una rúbrica asociada. Por favor, crea una rúbrica primero.';
+        } else if (mensaje.includes('ya asignado')) {
+          mensaje = 'Este proyecto ya fue asignado a un evaluador.';
+        } else if (mensaje.includes('evaluador')) {
+          mensaje = 'El evaluador seleccionado no está disponible.';
         }
+        
         this.showError(mensaje);
       }
     });
   }
 
+  // ============================================
+  // RESET FORM
+  // ============================================
   resetForm(): void {
     this.proyectoId = null;
     this.evaluadorId = null;
     this.fechaLimite = null;
+    console.log('🔄 Formulario reseteado');
   }
 
+  // ============================================
+  // NAVEGACIÓN
+  // ============================================
   openNewProject(): void {
     this.router.navigate(['/admin/proyectos/nuevo']);
   }
@@ -251,15 +314,18 @@ export class AsignacionesPage implements OnInit {
     this.router.navigate(['/admin/asignaciones/todas']);
   }
 
+  // ============================================
+  // UTILIDADES PARA ESTADOS
+  // ============================================
   getStatusIcon(status: string): string {
     const icons: Record<string, string> = {
       'pending': 'time-outline',
-      'in-progress': 'refresh-outline',
-      'completed': 'checkmark-circle-outline',
-      'rejected': 'close-circle-outline',
       'pendiente': 'time-outline',
+      'in-progress': 'refresh-outline',
       'en_progreso': 'refresh-outline',
+      'completed': 'checkmark-circle-outline',
       'completado': 'checkmark-circle-outline',
+      'rejected': 'close-circle-outline',
       'rechazado': 'close-circle-outline'
     };
     return icons[status] || 'time-outline';
@@ -268,22 +334,33 @@ export class AsignacionesPage implements OnInit {
   getStatusText(status: string): string {
     const texts: Record<string, string> = {
       'pending': 'Pendiente',
-      'in-progress': 'En progreso',
-      'completed': 'Completado',
-      'rejected': 'Rechazado',
       'pendiente': 'Pendiente',
+      'in-progress': 'En progreso',
       'en_progreso': 'En progreso',
+      'completed': 'Completado',
       'completado': 'Completado',
+      'rejected': 'Rechazado',
       'rechazado': 'Rechazado'
     };
     return texts[status] || 'Pendiente';
   }
 
+  // ============================================
+  // NOTIFICACIONES (reemplaza alert)
+  // ============================================
   private showSuccess(message: string): void {
-    alert('✅ ' + message);
+    // Usar toast o alert según prefieras
+    console.log('✅', message);
+    // Si quieres usar alert temporalmente:
+    // alert('✅ ' + message);
+    
+    // Recomiendo implementar un toast service
+    // this.toastService.presentSuccess(message);
   }
 
   private showError(message: string): void {
-    alert('❌ ' + message);
+    console.error('❌', message);
+    // alert('❌ ' + message);
+    // this.toastService.presentError(message);
   }
 }
