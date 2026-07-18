@@ -52,6 +52,7 @@ import { ProyectoService } from '../../../core/services/proyecto.service';
 import { AsignacionService } from '../../../core/services/asignacion.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { UsuarioService } from '../../../core/services/usuario.service'; // ✅ Importar UsuarioService
 
 @Component({
   selector: 'app-asignaciones',
@@ -111,6 +112,7 @@ export class AsignacionesPage implements OnInit {
     private asignacionService: AsignacionService,
     private evaluacionService: EvaluacionService,
     private authService: AuthService,
+    private usuarioService: UsuarioService, // ✅ Inyectar UsuarioService
     private router: Router
   ) {
     addIcons({
@@ -154,7 +156,7 @@ export class AsignacionesPage implements OnInit {
     this._asignacionesListas = false;
 
     this.cargarProyectos();
-    this.cargarEvaluadores();
+    this.cargarEvaluadores(); // ✅ Usa el método corregido
     this.cargarAsignacionesRecientes();
 
     // Timeout de seguridad
@@ -168,10 +170,11 @@ export class AsignacionesPage implements OnInit {
   }
 
   cargarProyectos(): void {
+    console.log('📁 Cargando proyectos...');
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
         this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
-        console.log('📁 Proyectos cargados:', this.proyectos.length);
+        console.log(`📁 Proyectos cargados: ${this.proyectos.length}`);
         this._proyectosListos = true;
         this.verificarCargaCompleta();
       },
@@ -184,16 +187,39 @@ export class AsignacionesPage implements OnInit {
     });
   }
 
+  // ✅ CORREGIDO - Usa UsuarioService.getEvaluadores()
   cargarEvaluadores(): void {
-    this.asignacionService.obtenerEvaluadores().subscribe({
+    console.log('🔍 Cargando evaluadores desde /api/usuarios/evaluadores...');
+    
+    this.usuarioService.getEvaluadores().subscribe({
       next: (res: any) => {
-        this.evaluadores = res?.data ?? res?.usuarios ?? res ?? [];
-        console.log('👤 Evaluadores cargados:', this.evaluadores.length);
+        console.log('📥 Respuesta de evaluadores:', res);
+        
+        // El endpoint devuelve { ok: true, data: [...] }
+        if (res && res.ok && res.data) {
+          this.evaluadores = res.data;
+          console.log(`✅ ${this.evaluadores.length} evaluadores cargados correctamente`);
+          
+          // Mostrar los primeros 3 para depuración
+          if (this.evaluadores.length > 0) {
+            console.log('📌 Primeros evaluadores:');
+            this.evaluadores.slice(0, 3).forEach((e: any) => {
+              console.log(`   ${e.nombre} (ID: ${e.id}) - Rol: ${e.rol}`);
+            });
+          } else {
+            console.warn('⚠️ No hay evaluadores disponibles en el sistema');
+          }
+        } else {
+          console.error('❌ Respuesta sin datos:', res);
+          this.evaluadores = [];
+        }
+        
         this._evaluadoresListos = true;
         this.verificarCargaCompleta();
       },
       error: (err: any) => {
         console.error('❌ Error cargando evaluadores:', err);
+        console.error('   Detalles:', err.message || err);
         this.evaluadores = [];
         this._evaluadoresListos = true;
         this.verificarCargaCompleta();
@@ -202,12 +228,13 @@ export class AsignacionesPage implements OnInit {
   }
 
   cargarAsignacionesRecientes(): void {
+    console.log('📋 Cargando asignaciones recientes...');
     this.asignacionService.listar().subscribe({
       next: (res: any) => {
         const data = res?.data ?? res ?? [];
         this.asignacionesRecientes = Array.isArray(data) ? data.slice(0, 5) : [];
         this.asignacionesCount = Array.isArray(data) ? data.length : 0;
-        console.log('📋 Asignaciones cargadas:', this.asignacionesCount);
+        console.log(`📋 Asignaciones cargadas: ${this.asignacionesCount}`);
         this._asignacionesListas = true;
         this.verificarCargaCompleta();
       },
@@ -239,6 +266,17 @@ export class AsignacionesPage implements OnInit {
   // ============================================
   onProyectoSeleccionado(event: any): void {
     console.log('📌 Proyecto seleccionado:', this.proyectoId);
+    
+    // Verificar que el proyecto existe
+    if (this.proyectoId) {
+      const proyecto = this.proyectos.find(p => p.id === this.proyectoId);
+      if (proyecto) {
+        console.log(`✅ Proyecto: ${proyecto.nombre} (ID: ${proyecto.id})`);
+      } else {
+        console.warn(`⚠️ Proyecto ID ${this.proyectoId} no encontrado en la lista`);
+      }
+    }
+    
     // Resetear evaluador al cambiar de proyecto
     this.evaluadorId = null;
     console.log('🔄 Evaluador reseteado');
@@ -249,36 +287,72 @@ export class AsignacionesPage implements OnInit {
   // ============================================
   onEvaluadorSeleccionado(event: any): void {
     console.log('👤 Evaluador seleccionado:', this.evaluadorId);
+    
+    // Verificar que el evaluador existe
+    if (this.evaluadorId) {
+      const evaluador = this.evaluadores.find(e => e.id === this.evaluadorId);
+      if (evaluador) {
+        console.log(`✅ Evaluador: ${evaluador.nombre} (ID: ${evaluador.id})`);
+      } else {
+        console.warn(`⚠️ Evaluador ID ${this.evaluadorId} no encontrado en la lista`);
+      }
+    }
   }
 
   // ============================================
-  // GUARDAR ASIGNACIÓN
+  // GUARDAR ASIGNACIÓN - CORREGIDO
   // ============================================
   guardar(): void {
-    // Validaciones
+    console.log('========================================');
+    console.log('📝 GUARDANDO ASIGNACIÓN');
+    console.log('========================================');
+    
+    // 1. Validar proyecto
     if (!this.proyectoId) {
+      console.error('❌ No hay proyecto seleccionado');
       this.showError('Por favor, selecciona un proyecto');
       return;
     }
-
+    
+    // 2. Validar evaluador
     if (!this.evaluadorId) {
+      console.error('❌ No hay evaluador seleccionado');
       this.showError('Por favor, selecciona un evaluador');
       return;
     }
-
-    // Verificar que el proyecto tenga rúbrica
-    const proyecto = this.proyectos.find(p => p.id === this.proyectoId);
-    if (proyecto && !proyecto.rubrica_id && !proyecto.rubrica) {
-      this.showError('El proyecto no tiene una rúbrica asociada. Por favor, crea una rúbrica primero.');
+    
+    // 3. Validar que el evaluador existe en la lista
+    const evaluador = this.evaluadores.find(e => e.id === this.evaluadorId);
+    if (!evaluador) {
+      console.error(`❌ Evaluador ID ${this.evaluadorId} no encontrado en la lista`);
+      console.log('📌 Evaluadores disponibles:', this.evaluadores.map(e => `${e.id}: ${e.nombre}`));
+      this.showError('El evaluador seleccionado no es válido');
       return;
+    }
+    
+    console.log(`✅ Evaluador válido: ${evaluador.nombre} (ID: ${evaluador.id})`);
+    
+    // 4. Validar que el proyecto existe
+    const proyecto = this.proyectos.find(p => p.id === this.proyectoId);
+    if (!proyecto) {
+      console.error(`❌ Proyecto ID ${this.proyectoId} no encontrado`);
+      this.showError('El proyecto seleccionado no es válido');
+      return;
+    }
+    
+    console.log(`✅ Proyecto válido: ${proyecto.nombre} (ID: ${proyecto.id})`);
+
+    // 5. Verificar que el proyecto tenga rúbrica (solo advertencia, no bloquea)
+    if (!proyecto.rubrica_id && !proyecto.rubrica) {
+      console.warn('⚠️ El proyecto no tiene rúbrica asociada');
+      // No bloqueamos, dejamos que el backend decida
     }
 
     this.submitting = true;
 
     const payload = {
-      proyecto_id: this.proyectoId,
-      evaluador_id: this.evaluadorId,
-      fecha_limite: this.fechaLimite || null
+      proyectoId: this.proyectoId,  // ← Cambiar a proyectoId (coincide con el backend)
+      evaluadorId: this.evaluadorId // ← Cambiar a evaluadorId (coincide con el backend)
     };
 
     console.log('📤 Enviando payload de asignación:', payload);
@@ -295,16 +369,21 @@ export class AsignacionesPage implements OnInit {
       error: (err: any) => {
         this.submitting = false;
         console.error('❌ Error asignando:', err);
+        console.error('   Status:', err.status);
+        console.error('   Mensaje:', err.message);
+        console.error('   Error completo:', err);
 
         let mensaje = err.error?.mensaje || err.error?.error || 'Error al asignar el proyecto';
         
         // Mensajes más amigables
-        if (mensaje.includes('rúbrica')) {
+        if (mensaje.includes('rúbrica') || mensaje.includes('rubrica')) {
           mensaje = 'El proyecto no tiene una rúbrica asociada. Por favor, crea una rúbrica primero.';
-        } else if (mensaje.includes('ya asignado')) {
-          mensaje = 'Este proyecto ya fue asignado a un evaluador.';
-        } else if (mensaje.includes('evaluador')) {
-          mensaje = 'El evaluador seleccionado no está disponible.';
+        } else if (mensaje.includes('ya asignado') || mensaje.includes('Ya existe')) {
+          mensaje = 'Este proyecto ya fue asignado a este evaluador.';
+        } else if (mensaje.includes('evaluador') && mensaje.includes('no encontrado')) {
+          mensaje = 'El evaluador seleccionado no está disponible o no existe.';
+        } else if (mensaje.includes('secciones')) {
+          mensaje = 'La rúbrica no tiene secciones configuradas. Ve a Rúbricas → Configurar contenido primero.';
         }
         
         this.showError(mensaje);
@@ -436,7 +515,9 @@ export class AsignacionesPage implements OnInit {
       'completed': 'checkmark-circle-outline',
       'completado': 'checkmark-circle-outline',
       'rejected': 'close-circle-outline',
-      'rechazado': 'close-circle-outline'
+      'rechazado': 'close-circle-outline',
+      'asignado': 'time-outline',
+      'evaluado': 'checkmark-circle-outline'
     };
     return icons[status] || 'time-outline';
   }
@@ -450,7 +531,9 @@ export class AsignacionesPage implements OnInit {
       'completed': 'Completado',
       'completado': 'Completado',
       'rejected': 'Rechazado',
-      'rechazado': 'Rechazado'
+      'rechazado': 'Rechazado',
+      'asignado': 'Asignado',
+      'evaluado': 'Evaluado'
     };
     return texts[status] || 'Pendiente';
   }
@@ -460,11 +543,13 @@ export class AsignacionesPage implements OnInit {
   // ============================================
   private showSuccess(message: string): void {
     console.log('✅', message);
+    // Reemplaza con tu sistema de notificaciones (Toast, Alert, etc.)
     alert('✅ ' + message);
   }
 
   private showError(message: string): void {
     console.error('❌', message);
+    // Reemplaza con tu sistema de notificaciones (Toast, Alert, etc.)
     alert('❌ ' + message);
   }
 }

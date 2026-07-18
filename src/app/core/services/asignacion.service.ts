@@ -42,15 +42,36 @@ export class AsignacionService {
   }
 
   /**
-   * Obtener evaluadores disponibles
-   * Usa el endpoint de usuarios con filtro de rol
+   * ✅ CORREGIDO - Obtener evaluadores disponibles
+   * Usa el endpoint específico de evaluadores
    */
   obtenerEvaluadores(): Observable<any> {
-    // Intentar con el endpoint correcto
-    return this.http.get(`${environment.apiUrl}/usuarios?rol=evaluador`).pipe(
+    console.log('📤 AsignacionService: Solicitando evaluadores desde /usuarios/evaluadores...');
+    
+    // ✅ Usar el endpoint específico de evaluadores
+    return this.http.get(`${environment.apiUrl}/usuarios/evaluadores`).pipe(
       map((res: any) => {
-        // Normalizar respuesta
-        return res?.data ?? res?.usuarios ?? res ?? [];
+        console.log('📥 AsignacionService: Respuesta de evaluadores:', res);
+        
+        // El endpoint /usuarios/evaluadores devuelve { ok: true, data: [...] }
+        if (res && res.ok && res.data) {
+          console.log(`✅ AsignacionService: ${res.data.length} evaluadores encontrados en 'data'`);
+          return res.data;
+        }
+        
+        // Fallback por si la respuesta tiene otro formato
+        if (Array.isArray(res)) {
+          console.log(`✅ AsignacionService: ${res.length} evaluadores encontrados (array)`);
+          return res;
+        }
+        
+        if (res && res.usuarios) {
+          console.log(`✅ AsignacionService: ${res.usuarios.length} evaluadores encontrados en 'usuarios'`);
+          return res.usuarios;
+        }
+        
+        console.warn('⚠️ AsignacionService: Formato de respuesta inesperado:', res);
+        return [];
       })
     );
   }
@@ -66,6 +87,7 @@ export class AsignacionService {
    * Crear una nueva asignación
    */
   asignar(data: any): Observable<any> {
+    console.log('📤 AsignacionService: Enviando asignación:', data);
     return this.http.post(this.apiUrl, data);
   }
 
@@ -96,11 +118,18 @@ export class AsignacionService {
   listarPorProyecto(proyectoId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/proyecto/${proyectoId}`);
   }
-
+ 
   /**
    * Obtener asignaciones por evaluador
    */
   listarPorEvaluador(evaluadorId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/evaluador/${evaluadorId}`);
+  }
+
+  /**
+   * Obtener proyectos disponibles
+   */
+  getProyectos(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/proyectos`);
   }
 }

@@ -15,6 +15,14 @@ export class UsuarioService {
     return this.http.get<{ ok: boolean; usuarios: Usuario[] }>(this.base);
   }
 
+  /**
+   * ✅ Obtener solo evaluadores
+   */
+  getEvaluadores(): Observable<{ ok: boolean; data: Usuario[] }> {
+    console.log('📤 UsuarioService: Solicitando evaluadores...');
+    return this.http.get<{ ok: boolean; data: Usuario[] }>(`${this.base}/evaluadores`);
+  }
+
   crear(payload: CrearUsuarioPayload): Observable<Usuario> {
     return this.http.post<Usuario>(this.base, payload);
   }
@@ -23,10 +31,6 @@ export class UsuarioService {
     return this.http.put<Usuario>(`${this.base}/${id}`, payload);
   }
 
-  /**
-   * Cambiar estado de un usuario (activar/desactivar)
-   * Usar PATCH (más RESTful)
-   */
   cambiarEstado(id: number): Observable<any> {
     return this.http.patch(`${this.base}/${id}/estado`, {});
   }
