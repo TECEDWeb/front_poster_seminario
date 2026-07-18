@@ -31,15 +31,16 @@ export class StorageService {
         this.tokenCache = localStorage.getItem(TOKEN_KEY);
         const userRaw = localStorage.getItem(USER_KEY);
         this.userCache = userRaw ? JSON.parse(userRaw) : null;
+        console.log('✅ StorageService inicializado en WEB - Token:', this.tokenCache ? '✅ Existe' : '❌ No existe');
       } else {
         // Si es nativo, usar Capacitor Preferences
         this.tokenCache = await this.get(TOKEN_KEY);
         const userRaw = await this.get(USER_KEY);
         this.userCache = userRaw ? JSON.parse(userRaw) : null;
+        console.log('✅ StorageService inicializado en NATIVO - Token:', this.tokenCache ? '✅ Existe' : '❌ No existe');
       }
 
       this.initialized = true;
-      console.log('✅ StorageService inicializado - Token:', this.tokenCache ? '✅ Existe' : '❌ No existe');
     } catch (error) {
       console.error('❌ Error init StorageService:', error);
       this.initialized = false;
@@ -167,5 +168,36 @@ export class StorageService {
     this.tokenCache = null;
     this.userCache = null;
     await this.init();
+  }
+
+  // =========================
+  // SINCronizar TOKEN (WEB -> NATIVO)
+  // =========================
+  async sincronizarToken(): Promise<void> {
+    if (this.isWeb) {
+      // Si estamos en web, copiar token de localStorage a Capacitor
+      const token = localStorage.getItem(TOKEN_KEY);
+      const usuario = localStorage.getItem(USER_KEY);
+      if (token) {
+        await Preferences.set({ key: TOKEN_KEY, value: token });
+        console.log('✅ Token sincronizado de localStorage a Capacitor');
+      }
+      if (usuario) {
+        await Preferences.set({ key: USER_KEY, value: usuario });
+        console.log('✅ Usuario sincronizado de localStorage a Capacitor');
+      }
+    } else {
+      // Si estamos en nativo, copiar token de Capacitor a localStorage
+      const token = await Preferences.get({ key: TOKEN_KEY });
+      const usuario = await Preferences.get({ key: USER_KEY });
+      if (token && token.value) {
+        localStorage.setItem(TOKEN_KEY, token.value);
+        console.log('✅ Token sincronizado de Capacitor a localStorage');
+      }
+      if (usuario && usuario.value) {
+        localStorage.setItem(USER_KEY, usuario.value);
+        console.log('✅ Usuario sincronizado de Capacitor a localStorage');
+      }
+    }
   }
 }

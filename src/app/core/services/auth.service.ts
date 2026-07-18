@@ -28,35 +28,15 @@ export class AuthService {
   readonly inicializando = computed(() => this._inicializando());
 
   // Roles
-  readonly esAdministrador = computed(() =>
-    this._usuario()?.rol === 'admin'
-  );
-
-  readonly esEvaluador = computed(() =>
-    this._usuario()?.rol === 'evaluador'
-  );
-
-  readonly esCoordinador = computed(() =>
-    this._usuario()?.rol === 'coordinador'
-  );
-
-  readonly nombreUsuario = computed(() =>
-    this._usuario()?.nombre || 'Usuario'
-  );
-
-  readonly emailUsuario = computed(() =>
-    this._usuario()?.email || ''
-  );
-
+  readonly esAdministrador = computed(() => this._usuario()?.rol === 'admin');
+  readonly esEvaluador = computed(() => this._usuario()?.rol === 'evaluador');
+  readonly esCoordinador = computed(() => this._usuario()?.rol === 'coordinador');
+  readonly nombreUsuario = computed(() => this._usuario()?.nombre || 'Usuario');
+  readonly emailUsuario = computed(() => this._usuario()?.email || '');
   readonly inicialesUsuario = computed(() => {
     const nombre = this._usuario()?.nombre || '';
     if (!nombre) return '?';
-    return nombre
-      .split(' ')
-      .map(p => p[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return nombre.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
   });
 
   readonly rolLegible = computed(() => {
@@ -86,19 +66,25 @@ export class AuthService {
     try {
       await this.storage.init();
       
+      // Sincronizar token entre localStorage y Capacitor
+      await this.storage.sincronizarToken();
+      
       const token = await this.storage.getToken();
       const usuario = await this.storage.getUsuario<Usuario>();
 
+      console.log('🔐 Auth init - Token:', token ? '✅ Existe' : '❌ No existe');
+      console.log('🔐 Auth init - Usuario:', usuario?.nombre || '❌ No existe');
+
       if (token) {
         this._token.set(token);
+        // Guardar también en localStorage para debug
+        localStorage.setItem('token', token);
       }
 
       if (usuario) {
         this._usuario.set(usuario);
+        localStorage.setItem('usuario', JSON.stringify(usuario));
       }
-
-      console.log('🔐 Auth init - Token:', token ? '✅ Existe' : '❌ No existe');
-      console.log('🔐 Auth init - Usuario:', usuario?.nombre || '❌ No existe');
 
     } catch (error) {
       console.error('❌ Error init auth:', error);
@@ -111,23 +97,34 @@ export class AuthService {
   // =========================
   // LOGIN
   // =========================
-  // Asegurar que el método login acepte el payload correcto
   login(payload: LoginPayload): Observable<LoginResponse> {
+    console.log('🔐 Intentando login con:', payload.cedula);
+    
     return this.http.post<LoginResponse>(
       `${environment.apiUrl}/auth/login`,
       payload
     ).pipe(
       tap({
         next: async (response: LoginResponse) => {
-          // Verificar respuesta
+          console.log('📊 Respuesta login:', response);
+          
           if (response?.ok && response?.data?.token && response?.data?.usuario) {
+            console.log('✅ Login exitoso, guardando sesión...');
             await this.setSession(response.data.usuario, response.data.token);
+            
+            // Sincronizar con localStorage para debug
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('usuario', JSON.stringify(response.data.usuario));
+            
+            console.log('✅ Sesión guardada correctamente');
           } else {
             console.error('❌ Respuesta de login inválida:', response);
           }
         },
         error: (error) => {
           console.error('❌ Error en login:', error);
+          console.error('   Status:', error.status);
+          console.error('   Mensaje:', error.error?.mensaje || error.message);
         }
       })
     );
@@ -145,6 +142,10 @@ export class AuthService {
 
     await this.storage.setToken(token);
     await this.storage.setUsuario(usuario);
+    
+    // Guardar también en localStorage para debug
+    localStorage.setItem('token', token);
+    localStorage.setItem('usuario', JSON.stringify(usuario));
 
     console.log('✅ Sesión establecida correctamente');
   }
@@ -160,6 +161,9 @@ export class AuthService {
 
     await this.storage.removeToken();
     await this.storage.removeUsuario();
+    
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
 
     console.log('✅ Sesión cerrada correctamente');
   }
@@ -176,7 +180,16 @@ export class AuthService {
   }
 
   async obtenerTokenAsync(): Promise<string | null> {
-    return await this.storage.getToken();
+    // Primero intentar con el token en memoria
+    if (this._token()) {
+      return this._token();
+    }
+    // Si no, obtener del storage
+    const token = await this.storage.getToken();
+    if (token) {
+      this._token.set(token);
+    }
+    return token;
   }
 
   async obtenerUsuarioAsync(): Promise<Usuario | null> {
@@ -238,25 +251,18 @@ export class AuthService {
   // =========================
   rutaInicioSegunRol(): string {
     const usuario = this._usuario();
-
     if (!usuario) return '/login';
-
     switch (usuario.rol) {
-      case 'admin':
-        return '/admin/dashboard';
-      case 'evaluador':
-        return '/evaluador/dashboard';
-      case 'coordinador':
-        return '/coordinador/dashboard';
-      default:
-        return '/login';
+      case 'admin': return '/admin/dashboard';
+      case 'evaluador': return '/evaluador/dashboard';
+      case 'coordinador': return '/coordinador/dashboard';
+      default: return '/login';
     }
   }
 
   getRutasPermitidas(): string[] {
     const usuario = this._usuario();
     if (!usuario) return ['/login'];
-
     switch (usuario.rol) {
       case 'admin':
         return ['/admin', '/admin/dashboard', '/admin/usuarios', '/admin/concursos', '/admin/proyectos', '/admin/rubricas', '/admin/reportes', '/admin/asignaciones'];
@@ -275,12 +281,14 @@ export class AuthService {
   async actualizarUsuario(usuario: Usuario) {
     this._usuario.set(usuario);
     await this.storage.setUsuario(usuario);
+    localStorage.setItem('usuario', JSON.stringify(usuario));
     console.log('👤 Usuario actualizado:', usuario.nombre);
   }
 
   async actualizarToken(token: string) {
     this._token.set(token);
     await this.storage.setToken(token);
+    localStorage.setItem('token', token);
     console.log('🔑 Token actualizado');
   }
 
@@ -290,10 +298,12 @@ export class AuthService {
 
     if (token) {
       this._token.set(token);
+      localStorage.setItem('token', token);
     }
 
     if (usuario) {
       this._usuario.set(usuario);
+      localStorage.setItem('usuario', JSON.stringify(usuario));
     }
 
     console.log('🔄 Sesión recargada');
@@ -304,29 +314,58 @@ export class AuthService {
   }
 
   // =========================
+  // FORZAR RECARGA DE SESIÓN
+  // =========================
+  async forzarRecargaSesion(): Promise<void> {
+    console.log('🔄 Forzando recarga de sesión...');
+    
+    // Limpiar storage
+    await this.storage.clear();
+    
+    // Recargar storage
+    await this.storage.recargar();
+    
+    // Sincronizar
+    await this.storage.sincronizarToken();
+    
+    // Intentar obtener token nuevamente
+    const token = await this.storage.getToken();
+    const usuario = await this.storage.getUsuario<Usuario>();
+    
+    if (token && usuario) {
+      this._token.set(token);
+      this._usuario.set(usuario);
+      localStorage.setItem('token', token);
+      localStorage.setItem('usuario', JSON.stringify(usuario));
+      console.log('✅ Sesión recargada exitosamente');
+    } else {
+      this._token.set(null);
+      this._usuario.set(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      console.log('⚠️ No se encontró sesión para recargar');
+    }
+  }
+
+  // =========================
   // VERIFICACIÓN DE PERMISOS
   // =========================
   tienePermiso(ruta: string): boolean {
     const usuario = this._usuario();
     if (!usuario) return false;
-
     if (usuario.rol === 'admin') return true;
-
     if (usuario.rol === 'evaluador') {
       return ruta.startsWith('/evaluador');
     }
-
     if (usuario.rol === 'coordinador') {
       return ruta.startsWith('/coordinador') || ruta.startsWith('/evaluador');
     }
-
     return false;
   }
 
   puedeAcceder(modulo: string): boolean {
     const usuario = this._usuario();
     if (!usuario) return false;
-
     if (usuario.rol === 'admin') return true;
 
     const permisos: Record<Rol, string[]> = {
@@ -345,33 +384,5 @@ export class AuthService {
 
   resetearPassword(token: string, nuevaPassword: string): Observable<any> {
     return this.http.post(`${environment.apiUrl}/auth/resetear-password`, { token, nuevaPassword });
-  }
-  // Agrega este método al final de la clase AuthService
-
-// =========================
-// FORZAR RECARGA DE SESIÓN
-// =========================
-  async forzarRecargaSesion(): Promise<void> {
-    console.log('🔄 Forzando recarga de sesión...');
-    
-    // Limpiar storage
-    await this.storage.clear();
-    
-    // Recargar storage
-    await this.storage.recargar();
-    
-    // Intentar obtener token nuevamente
-    const token = await this.storage.getToken();
-    const usuario = await this.storage.getUsuario<Usuario>();
-    
-    if (token && usuario) {
-      this._token.set(token);
-      this._usuario.set(usuario);
-      console.log('✅ Sesión recargada exitosamente');
-    } else {
-      this._token.set(null);
-      this._usuario.set(null);
-      console.log('⚠️ No se encontró sesión para recargar');
-    }
   }
 }
