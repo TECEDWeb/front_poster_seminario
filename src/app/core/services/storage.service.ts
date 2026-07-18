@@ -10,29 +10,36 @@ export class StorageService {
   private tokenCache: string | null = null;
   private userCache: any = null;
   private initialized: boolean = false;
+  private isWeb: boolean = false;
 
   constructor() {
+    // Detectar si estamos en web (navegador)
+    this.isWeb = !window?.hasOwnProperty('Capacitor');
+    console.log('📌 StorageService - Modo:', this.isWeb ? 'WEB (localStorage)' : 'NATIVO (Capacitor)');
     this.init();
   }
 
   // =========================
-  // INIT (OBLIGATORIO)
+  // INIT
   // =========================
   async init(): Promise<void> {
     if (this.initialized) return;
 
     try {
-      this.tokenCache = await this.get(TOKEN_KEY);
-
-      const userRaw = await this.get(USER_KEY);
-      try {
+      // Si es web, usar localStorage
+      if (this.isWeb) {
+        this.tokenCache = localStorage.getItem(TOKEN_KEY);
+        const userRaw = localStorage.getItem(USER_KEY);
         this.userCache = userRaw ? JSON.parse(userRaw) : null;
-      } catch {
-        this.userCache = null;
+      } else {
+        // Si es nativo, usar Capacitor Preferences
+        this.tokenCache = await this.get(TOKEN_KEY);
+        const userRaw = await this.get(USER_KEY);
+        this.userCache = userRaw ? JSON.parse(userRaw) : null;
       }
 
       this.initialized = true;
-      console.log('✅ StorageService inicializado');
+      console.log('✅ StorageService inicializado - Token:', this.tokenCache ? '✅ Existe' : '❌ No existe');
     } catch (error) {
       console.error('❌ Error init StorageService:', error);
       this.initialized = false;
@@ -43,20 +50,36 @@ export class StorageService {
   // CORE
   // =========================
   async set(key: string, value: string): Promise<void> {
-    await Preferences.set({ key, value });
+    if (this.isWeb) {
+      localStorage.setItem(key, value);
+    } else {
+      await Preferences.set({ key, value });
+    }
   }
 
   async get(key: string): Promise<string | null> {
-    const { value } = await Preferences.get({ key });
-    return value || null;
+    if (this.isWeb) {
+      return localStorage.getItem(key);
+    } else {
+      const { value } = await Preferences.get({ key });
+      return value || null;
+    }
   }
 
   async remove(key: string): Promise<void> {
-    await Preferences.remove({ key });
+    if (this.isWeb) {
+      localStorage.removeItem(key);
+    } else {
+      await Preferences.remove({ key });
+    }
   }
 
   async clear(): Promise<void> {
-    await Preferences.clear();
+    if (this.isWeb) {
+      localStorage.clear();
+    } else {
+      await Preferences.clear();
+    }
     this.tokenCache = null;
     this.userCache = null;
     this.initialized = false;
@@ -134,5 +157,15 @@ export class StorageService {
 
   isInitialized(): boolean {
     return this.initialized;
+  }
+
+  // =========================
+  // MÉTODO PARA FORZAR RECARGA
+  // =========================
+  async recargar(): Promise<void> {
+    this.initialized = false;
+    this.tokenCache = null;
+    this.userCache = null;
+    await this.init();
   }
 }

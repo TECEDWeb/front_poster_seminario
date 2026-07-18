@@ -346,4 +346,32 @@ export class AuthService {
   resetearPassword(token: string, nuevaPassword: string): Observable<any> {
     return this.http.post(`${environment.apiUrl}/auth/resetear-password`, { token, nuevaPassword });
   }
+  // Agrega este método al final de la clase AuthService
+
+// =========================
+// FORZAR RECARGA DE SESIÓN
+// =========================
+  async forzarRecargaSesion(): Promise<void> {
+    console.log('🔄 Forzando recarga de sesión...');
+    
+    // Limpiar storage
+    await this.storage.clear();
+    
+    // Recargar storage
+    await this.storage.recargar();
+    
+    // Intentar obtener token nuevamente
+    const token = await this.storage.getToken();
+    const usuario = await this.storage.getUsuario<Usuario>();
+    
+    if (token && usuario) {
+      this._token.set(token);
+      this._usuario.set(usuario);
+      console.log('✅ Sesión recargada exitosamente');
+    } else {
+      this._token.set(null);
+      this._usuario.set(null);
+      console.log('⚠️ No se encontró sesión para recargar');
+    }
+  }
 }
