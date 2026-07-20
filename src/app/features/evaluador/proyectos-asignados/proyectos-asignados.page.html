@@ -58,7 +58,25 @@
       </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- 🔍 BARRA DE BÚSQUEDA Y FILTROS -->
+    <!-- ============================================ -->
     <div class="filter-bar" *ngIf="!loading && totalAsignados > 0">
+      <!-- BUSCADOR -->
+      <div class="search-container">
+        <ion-searchbar
+          [(ngModel)]="filtroBusqueda"
+          (ionInput)="aplicarFiltros()"
+          (ionClear)="aplicarFiltros()"
+          placeholder="Buscar proyecto por nombre..."
+          class="search-input"
+          animated
+          debounce="300">
+          <ion-icon name="search-outline" slot="start"></ion-icon>
+        </ion-searchbar>
+      </div>
+
+      <!-- FILTROS POR ESTADO -->
       <div class="filter-group">
         <span class="filter-label">Filtrar:</span>
         <div class="filter-chips">
@@ -82,8 +100,16 @@
           </ion-chip>
         </div>
       </div>
+
+      <!-- CONTADOR DE RESULTADOS -->
+      <div class="result-count" *ngIf="proyectosFiltrados.length !== totalAsignados">
+        <span>{{ proyectosFiltrados.length }} de {{ totalAsignados }} proyectos</span>
+      </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- LOADING -->
+    <!-- ============================================ -->
     <div class="loading-grid" *ngIf="loading">
       <div class="proyecto-skeleton" *ngFor="let i of [1,2,3]">
         <div class="skeleton-header">
@@ -101,6 +127,9 @@
       </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- ERROR -->
+    <!-- ============================================ -->
     <div class="error-container" *ngIf="!loading && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los proyectos</h3>
@@ -111,6 +140,9 @@
       </ion-button>
     </div>
 
+    <!-- ============================================ -->
+    <!-- LISTA DE PROYECTOS -->
+    <!-- ============================================ -->
     <div class="proyectos-list" *ngIf="!loading && !error">
       <div class="proyecto-card" 
            *ngFor="let p of proyectosFiltrados || []"
@@ -138,7 +170,6 @@
           </div>
 
           <div class="card-status">
-            <!-- Mostrar badge de "Reabierto" si corresponde -->
             <span class="status-badge status-reabierto" *ngIf="p.reabierto">
               <ion-icon name="refresh-outline"></ion-icon>
               Reabierto
@@ -172,7 +203,6 @@
         </div>
 
         <div class="card-actions">
-          <!-- Si está evaluado y reabierto -> mostrar "Re-evaluar" -->
           <ion-button 
             *ngIf="p.yaEvaluado && p.reabierto"
             expand="block"
@@ -182,7 +212,6 @@
             Re-evaluar
           </ion-button>
 
-          <!-- Si está evaluado y NO reabierto -> mostrar "Evaluación completada" (deshabilitado) -->
           <ion-button 
             *ngIf="p.yaEvaluado && !p.reabierto"
             expand="block"
@@ -192,7 +221,6 @@
             Evaluación completada
           </ion-button>
 
-          <!-- Si está pendiente -> mostrar "Evaluar proyecto" -->
           <ion-button 
             *ngIf="!p.yaEvaluado"
             expand="block"
@@ -209,28 +237,38 @@
         </div>
       </div>
 
+      <!-- ============================================ -->
+      <!-- EMPTY STATE CON MENSAJE SEGÚN FILTRO -->
+      <!-- ============================================ -->
       <div class="empty-state" *ngIf="proyectosFiltrados.length === 0 && !loading">
         <div class="empty-icon" *ngIf="proyectos.length === 0">
           <ion-icon name="folder-open-outline"></ion-icon>
         </div>
-        <div class="empty-icon" *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0">
+        <div class="empty-icon" *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0 && !filtroBusqueda">
           <ion-icon name="filter-outline"></ion-icon>
+        </div>
+        <div class="empty-icon" *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0 && filtroBusqueda">
+          <ion-icon name="search-outline"></ion-icon>
         </div>
 
         <h3 *ngIf="proyectos.length === 0">Sin proyectos asignados</h3>
-        <h3 *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0">No hay proyectos con este filtro</h3>
+        <h3 *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0 && !filtroBusqueda">No hay proyectos con este filtro</h3>
+        <h3 *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0 && filtroBusqueda">No se encontraron resultados</h3>
 
         <p *ngIf="proyectos.length === 0">
           El administrador aún no te ha asignado proyectos para evaluar.
         </p>
-        <p *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0">
+        <p *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0 && !filtroBusqueda">
           Prueba cambiando los filtros para ver más proyectos.
+        </p>
+        <p *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0 && filtroBusqueda">
+          No hay proyectos que coincidan con "<strong>{{ filtroBusqueda }}</strong>". Intenta con otra palabra.
         </p>
 
         <ion-button *ngIf="proyectos.length > 0 && proyectosFiltrados.length === 0"
                     fill="outline"
                     class="btn-clear-filter"
-                    (click)="cambiarFiltro('todos')">
+                    (click)="limpiarFiltros()">
           <ion-icon name="close-outline" slot="start"></ion-icon>
           Mostrar todos
         </ion-button>

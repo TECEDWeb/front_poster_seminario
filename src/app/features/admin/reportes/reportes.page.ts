@@ -48,7 +48,9 @@ import {
   chevronDownOutline,
   settingsOutline,
   trashOutline,
-  createOutline
+  createOutline,
+  ribbonOutline,
+  medalOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
@@ -77,6 +79,19 @@ interface EvaluadorResumen {
   proyectosEvaluados: number;
   promedioOtorgado: number;
   puntajes: number[];
+}
+
+interface Ganador {
+  id: number;
+  nombre: string;
+  area?: string;
+  nivel?: string;
+  promedio: number;
+  evaluaciones: number;
+  evaluadores?: any[];
+  posicion: number;
+  medalla: string;
+  clase: string;
 }
 
 @Component({
@@ -129,21 +144,17 @@ export class ReportesPage implements OnInit {
   filtroStatus: string = 'todos';
   filtroEvaluador: string = 'todos';
 
-  // Ganador del concurso
-  ganador: any = null;
+  ganadores: Ganador[] = [];
 
-  // Modal de detalle de proyecto
   modalAbierto = false;
   proyectoSeleccionado: DetalleProyecto | null = null;
   cargandoDetalle: boolean = false;
 
-  // Modal de detalle de una evaluación individual (respuestas)
   modalRespuestasAbierto = false;
   cargandoRespuestas = false;
   errorRespuestas: string | null = null;
   respuestasDetalle: any = null;
 
-  // Admin
   esAdmin: boolean = false;
 
   constructor(
@@ -181,10 +192,11 @@ export class ReportesPage implements OnInit {
       chevronDownOutline,
       settingsOutline,
       trashOutline,
-      createOutline
+      createOutline,
+      ribbonOutline,
+      medalOutline
     });
 
-    // Verificar si el usuario es admin
     this.esAdmin = this.authService.esAdmin();
   }
 
@@ -213,20 +225,16 @@ export class ReportesPage implements OnInit {
       next: (res: any) => {
         let data = res?.data ?? res ?? [];
 
-        // Inicializar proyectos con _expandido = false para el acordeón
         this.proyectos = data.map((item: any, index: number) => ({
           ...item,
           id: item.id || item.proyecto_id || index + 1,
           nombre: item.proyecto || item.nombre || 'Proyecto sin nombre',
           _expandido: false,
-          // Para admin actions
           evaluacionId: item.evaluacion_id || item.evaluacionId || null,
           estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado'
         }));
 
-        // Calcular el ganador del concurso
-        this.calcularGanador();
-
+        this.calcularGanadores();
         this.construirResumenEvaluadores();
         this.aplicarFiltros();
         this.cargando = false;
@@ -236,44 +244,74 @@ export class ReportesPage implements OnInit {
         this.error = err.error?.mensaje || 'Error al cargar proyectos';
         this.proyectos = [];
         this.proyectosFiltrados = [];
-        this.ganador = null;
+        this.ganadores = [];
         this.cargando = false;
       }
     });
   }
 
-  /**
-   * Calcula el ganador del concurso basado en el promedio más alto
-   */
-  calcularGanador(): void {
+  calcularGanadores(): void {
     if (!this.proyectos || this.proyectos.length === 0) {
-      this.ganador = null;
+      this.ganadores = [];
       return;
     }
 
-    // Filtrar solo proyectos con evaluaciones y promedio > 0
     const proyectosConEvaluaciones = this.proyectos.filter(p => 
       p.evaluaciones && p.evaluaciones.length > 0 && p.promedio > 0
     );
 
     if (proyectosConEvaluaciones.length === 0) {
-      this.ganador = null;
+      this.ganadores = [];
       return;
     }
 
-    // Ordenar por promedio descendente
     const sorted = [...proyectosConEvaluaciones].sort((a, b) => 
       (b.promedio || 0) - (a.promedio || 0)
     );
 
-    // El ganador es el primero
-    this.ganador = sorted[0];
-    console.log('🏆 Ganador del concurso:', this.ganador.nombre, 'con promedio:', this.ganador.promedio);
+    this.ganadores = sorted.slice(0, 3).map((proyecto, index) => ({
+      id: proyecto.id,
+      nombre: proyecto.nombre || proyecto.proyecto || 'Proyecto',
+      area: proyecto.area || 'Sin área',
+      nivel: proyecto.nivel || 'Sin nivel',
+      promedio: proyecto.promedio || 0,
+      evaluaciones: proyecto.evaluaciones?.length || 0,
+      evaluadores: proyecto.evaluadores || [],
+      posicion: index + 1,
+      medalla: index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉',
+      clase: index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'
+    }));
+
+    console.log('🏆 Ganadores del concurso:', this.ganadores);
   }
 
-  /**
-   * Toggle de acordeón para expandir/contraer un proyecto
-   */
+  verGanadores(): void {
+    if (!this.ganadores || this.ganadores.length === 0) {
+      this.mostrarMensaje('No hay ganadores aún', 'error');
+      return;
+    }
+
+    let mensaje = '🏆 PODIO DEL CONCURSO 🏆\n\n';
+    mensaje += '━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    
+    this.ganadores.forEach((g, index) => {
+      const medalla = g.medalla || (index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉');
+      const posicion = index === 0 ? '🥇 1er Lugar' : index === 1 ? '🥈 2do Lugar' : '🥉 3er Lugar';
+      
+      mensaje += `${medalla} ${posicion}\n`;
+      mensaje += `📌 ${g.nombre}\n`;
+      mensaje += `📊 Promedio: ${g.promedio.toFixed(2)} pts\n`;
+      mensaje += `📝 Evaluaciones: ${g.evaluaciones || 0}\n`;
+      mensaje += `🏷️ Área: ${g.area || 'Sin área'}\n`;
+      mensaje += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    });
+
+    mensaje += `📈 Total de proyectos evaluados: ${this.proyectos?.length || 0}\n`;
+    mensaje += `🏅 Promedio general: ${this.reportes?.promedio?.toFixed(2) || '0.00'}`;
+
+    alert(mensaje);
+  }
+
   toggleProyecto(proyecto: any): void {
     proyecto._expandido = !proyecto._expandido;
   }
@@ -437,29 +475,17 @@ export class ReportesPage implements OnInit {
   // ADMIN ACTIONS
   // ============================================
 
-  /**
-   * EDITAR EVALUACIÓN (ADMIN)
-   * Redirige al formulario de evaluación para editar las respuestas
-   */
   editarEvaluacionAdmin(proyecto: any): void {
     const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
-    
     if (!evaluacionId) {
       this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
       return;
     }
-
-    // Redirigir al formulario de evaluación para editar
     this.router.navigate(['/admin/evaluaciones/formulario', evaluacionId]);
   }
 
-  /**
-   * REABRIR EVALUACIÓN (ADMIN)
-   * Permite al admin resetear una evaluación para que el evaluador pueda modificarla
-   */
   async reabrirEvaluacion(proyecto: any): Promise<void> {
     const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
-    
     if (!evaluacionId) {
       this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
       return;
@@ -471,7 +497,6 @@ export class ReportesPage implements OnInit {
 
     try {
       const result = await this.evaluacionService.reabrirEvaluacion(evaluacionId).toPromise();
-      console.log('✅ Evaluación reabierta:', result);
       this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" reabierta correctamente`, 'success');
       this.recargar();
     } catch (err: any) {
@@ -480,13 +505,8 @@ export class ReportesPage implements OnInit {
     }
   }
 
-  /**
-   * ELIMINAR EVALUACIÓN (ADMIN)
-   * Elimina completamente una evaluación y sus detalles
-   */
   async eliminarEvaluacion(proyecto: any): Promise<void> {
     const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
-    
     if (!evaluacionId) {
       this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
       return;
@@ -498,7 +518,6 @@ export class ReportesPage implements OnInit {
 
     try {
       const result = await this.evaluacionService.eliminarEvaluacion(evaluacionId).toPromise();
-      console.log('✅ Evaluación eliminada:', result);
       this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" eliminada correctamente`, 'success');
       this.recargar();
     } catch (err: any) {
@@ -507,9 +526,6 @@ export class ReportesPage implements OnInit {
     }
   }
 
-  /**
-   * VER DETALLE DE EVALUACIÓN (ADMIN)
-   */
   verDetalleEvaluacion(proyecto: any): void {
     this.verDetalle(proyecto);
   }

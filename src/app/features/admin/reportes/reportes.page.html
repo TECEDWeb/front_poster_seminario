@@ -51,50 +51,88 @@
       </div>
     </div>
 
-    <!-- GANADOR DEL CONCURSO -->
-    <div class="ganador-section" *ngIf="!cargando && ganador">
-      <div class="ganador-card">
-        <div class="ganador-badge">
+    <!-- ============================================ -->
+    <!-- 🏆 PODIO: 1er, 2do y 3er LUGAR -->
+    <!-- ============================================ -->
+    <div class="podio-section" *ngIf="!cargando && ganadores && ganadores.length > 0">
+      <div class="podio-header">
+        <h2>
           <ion-icon name="trophy-outline"></ion-icon>
-          <span>🏆 GANADOR DEL CONCURSO</span>
+          Podio del Concurso
+        </h2>
+        <p>Los mejores proyectos evaluados</p>
+      </div>
+
+      <div class="podio-grid">
+        <!-- 2do Lugar (izquierda) -->
+        <div class="podio-card podio-2" *ngIf="ganadores.length >= 2">
+          <div class="podio-medalla">🥈</div>
+          <div class="podio-avatar" [class]="getRandomColor(ganadores[1].nombre)">
+            <span>{{ ganadores[1].nombre?.charAt(0) || 'P' }}</span>
+          </div>
+          <div class="podio-info">
+            <h3>{{ ganadores[1].nombre }}</h3>
+            <span class="podio-area">{{ ganadores[1].area || 'Sin área' }}</span>
+            <div class="podio-puntaje">
+              <span class="podio-promedio">{{ ganadores[1].promedio | number:'1.2-2' }}</span>
+              <span class="podio-label">Promedio</span>
+            </div>
+          </div>
+          <div class="podio-posicion">2do Lugar</div>
         </div>
-        <div class="ganador-content">
-          <div class="ganador-icon" [class]="getRandomColor(ganador.nombre)">
-            <span class="icon-letter">{{ ganador.nombre?.charAt(0) || 'P' }}</span>
+
+        <!-- 1er Lugar (centro - más grande) -->
+        <div class="podio-card podio-1" *ngIf="ganadores.length >= 1">
+          <div class="podio-corona">👑</div>
+          <div class="podio-medalla">🥇</div>
+          <div class="podio-avatar podio-avatar-grande" [class]="getRandomColor(ganadores[0].nombre)">
+            <span>{{ ganadores[0].nombre?.charAt(0) || 'P' }}</span>
           </div>
-          <div class="ganador-info">
-            <h2>{{ ganador.nombre }}</h2>
-            <div class="ganador-meta">
-              <span class="ganador-area">{{ ganador.area || 'Sin área' }}</span>
-              <span class="ganador-nivel">{{ ganador.nivel || 'Sin nivel' }}</span>
-            </div>
-            <div class="ganador-stats">
-              <div class="ganador-stat">
-                <span class="ganador-stat-value">{{ ganador.promedio | number:'1.2-2' }}</span>
-                <span class="ganador-stat-label">Promedio</span>
-              </div>
-              <div class="ganador-stat">
-                <span class="ganador-stat-value">{{ ganador.evaluaciones || 0 }}</span>
-                <span class="ganador-stat-label">Evaluaciones</span>
-              </div>
-              <div class="ganador-stat">
-                <span class="ganador-stat-value">{{ ganador.evaluadores?.length || 0 }}</span>
-                <span class="ganador-stat-label">Evaluadores</span>
-              </div>
+          <div class="podio-info">
+            <h2>{{ ganadores[0].nombre }}</h2>
+            <span class="podio-area">{{ ganadores[0].area || 'Sin área' }}</span>
+            <div class="podio-puntaje">
+              <span class="podio-promedio podio-ganador">{{ ganadores[0].promedio | number:'1.2-2' }}</span>
+              <span class="podio-label">Promedio</span>
             </div>
           </div>
-          <div class="ganador-actions">
-            <button class="ganador-btn" (click)="verDetalle(ganador)">
-              <ion-icon name="eye-outline"></ion-icon>
-              Ver detalle
-            </button>
-            <button class="ganador-btn ganador-btn-excel" (click)="exportarProyectoExcel(ganador)">
-              <ion-icon name="download-outline"></ion-icon>
-              Exportar
-            </button>
+          <div class="podio-posicion podio-posicion-1">🏆 1er Lugar</div>
+        </div>
+
+        <!-- 3er Lugar (derecha) -->
+        <div class="podio-card podio-3" *ngIf="ganadores.length >= 3">
+          <div class="podio-medalla">🥉</div>
+          <div class="podio-avatar" [class]="getRandomColor(ganadores[2].nombre)">
+            <span>{{ ganadores[2].nombre?.charAt(0) || 'P' }}</span>
           </div>
+          <div class="podio-info">
+            <h3>{{ ganadores[2].nombre }}</h3>
+            <span class="podio-area">{{ ganadores[2].area || 'Sin área' }}</span>
+            <div class="podio-puntaje">
+              <span class="podio-promedio">{{ ganadores[2].promedio | number:'1.2-2' }}</span>
+              <span class="podio-label">Promedio</span>
+            </div>
+          </div>
+          <div class="podio-posicion">3er Lugar</div>
         </div>
       </div>
+
+      <!-- Botón de acción -->
+      <div class="podio-actions">
+        <button class="podio-btn" (click)="verGanadores()">
+          <ion-icon name="trophy-outline"></ion-icon>
+          Ver todos los ganadores
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no hay ganadores -->
+    <div class="podio-empty" *ngIf="!cargando && ganadores && ganadores.length === 0">
+      <div class="empty-icon">
+        <ion-icon name="trophy-outline"></ion-icon>
+      </div>
+      <h3>No hay ganadores aún</h3>
+      <p>Espera a que se completen las evaluaciones para ver el podio</p>
     </div>
 
     <!-- TOGGLE DE VISTA -->
@@ -287,7 +325,6 @@
                   <span>Administrar evaluación</span>
                 </div>
                 <div class="pb-admin-actions">
-                  <!-- ✏️ BOTÓN EDITAR - SIEMPRE VISIBLE PARA ADMIN -->
                   <button class="pb-btn pb-btn-editar" 
                           (click)="editarEvaluacionAdmin(p)"
                           title="Editar respuestas de esta evaluación">
@@ -295,7 +332,6 @@
                     Editar
                   </button>
                   
-                  <!-- 🔄 BOTÓN REABRIR - solo si está evaluado -->
                   <button class="pb-btn pb-btn-reabrir" 
                           (click)="reabrirEvaluacion(p)" 
                           *ngIf="p.estadoEvaluacion === 'evaluado' || p.estado === 'evaluado'"
@@ -304,7 +340,6 @@
                     Reabrir
                   </button>
                   
-                  <!-- 🗑️ BOTÓN ELIMINAR - SIEMPRE VISIBLE -->
                   <button class="pb-btn pb-btn-eliminar" 
                           (click)="eliminarEvaluacion(p)"
                           title="Eliminar esta evaluación permanentemente">
@@ -312,7 +347,6 @@
                     Eliminar
                   </button>
                   
-                  <!-- 👁️ BOTÓN VER - SIEMPRE VISIBLE -->
                   <button class="pb-btn pb-btn-ver" 
                           (click)="verDetalleEvaluacion(p)"
                           title="Ver detalle completo de la evaluación">

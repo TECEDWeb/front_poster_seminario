@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import {
   IonHeader,
@@ -14,7 +15,8 @@ import {
   IonSkeletonText,
   IonChip,
   IonLabel,
-  IonBadge
+  IonBadge,
+  IonSearchbar
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -35,7 +37,8 @@ import {
   calendarOutline,
   closeOutline,
   filterOutline,
-  refresh
+  refresh,
+  searchOutline
 } from 'ionicons/icons';
 
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
@@ -47,6 +50,7 @@ import { ProyectoAsignado } from '../../../core/models/proyecto.model';
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -58,7 +62,8 @@ import { ProyectoAsignado } from '../../../core/models/proyecto.model';
     IonSkeletonText,
     IonChip,
     IonLabel,
-    IonBadge
+    IonBadge,
+    IonSearchbar
   ],
   templateUrl: './proyectos-asignados.page.html',
   styleUrls: ['./proyectos-asignados.page.scss']
@@ -97,7 +102,8 @@ export class ProyectosAsignadosPage implements OnInit {
       calendarOutline,
       closeOutline,
       filterOutline,
-      refresh
+      refresh,
+      searchOutline
     });
   }
 
@@ -115,11 +121,8 @@ export class ProyectosAsignadosPage implements OnInit {
 
         let data = res?.data ?? res ?? [];
 
-        // Mapear los datos para incluir la propiedad 'reabierto'
         this.proyectos = (Array.isArray(data) ? data : data ? [data] : []).map((item: any) => ({
           ...item,
-          // Detectar si la evaluación fue reabierta (estado 'asignado' pero ya fue evaluado antes)
-          // o si tiene algún indicador de reapertura
           reabierto: item.reabierto || item.estado === 'reabierto' || false
         }));
 
@@ -144,40 +147,50 @@ export class ProyectosAsignadosPage implements OnInit {
     this.evaluados = this.proyectos.filter(p => p.yaEvaluado).length;
   }
 
-  buscarProyectos(event: any): void {
-    this.filtroBusqueda = event?.target?.value || '';
-    this.aplicarFiltros();
-  }
-
+  /**
+   * 🔍 APLICAR FILTROS (BÚSQUEDA + ESTADO)
+   */
   aplicarFiltros(): void {
     let filtered = [...this.proyectos];
 
-    if (this.filtroBusqueda.trim()) {
+    // 🔍 FILTRO DE BÚSQUEDA POR NOMBRE
+    if (this.filtroBusqueda && this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
       filtered = filtered.filter(p =>
         p.proyecto?.nombre?.toLowerCase().includes(texto) ||
-        p.proyecto?.tipo?.toLowerCase().includes(texto)
+        p.proyecto?.tipo?.toLowerCase().includes(texto) ||
+        p.proyecto?.concursoNombre?.toLowerCase().includes(texto)
       );
     }
 
+    // 🏷️ FILTRO POR ESTADO
     if (this.filtroEstado === 'pendientes') {
       filtered = filtered.filter(p => !p.yaEvaluado);
     } else if (this.filtroEstado === 'evaluados') {
       filtered = filtered.filter(p => p.yaEvaluado);
     }
 
-    // Ordenar: primero los que están pendientes o reabiertos
+    // 📊 ORDENAR: primero reabiertos, luego pendientes, luego evaluados
     filtered.sort((a, b) => {
-      // Si uno está reabierto, va primero
+      // Reabiertos primero
       if (a.reabierto && !b.reabierto) return -1;
       if (!a.reabierto && b.reabierto) return 1;
-      // Si uno está pendiente y el otro no
+      // Pendientes antes que evaluados
       if (!a.yaEvaluado && b.yaEvaluado) return -1;
       if (a.yaEvaluado && !b.yaEvaluado) return 1;
       return 0;
     });
 
     this.proyectosFiltrados = filtered;
+  }
+
+  /**
+   * 🧹 LIMPIAR TODOS LOS FILTROS
+   */
+  limpiarFiltros(): void {
+    this.filtroBusqueda = '';
+    this.filtroEstado = 'todos';
+    this.aplicarFiltros();
   }
 
   cambiarFiltro(estado: string): void {
@@ -187,7 +200,6 @@ export class ProyectosAsignadosPage implements OnInit {
 
   /**
    * EVALUAR O RE-EVALUAR PROYECTO
-   * Redirige al formulario de evaluación
    */
   evaluar(evaluacionId: number): void {
     console.log('➡️ ENTRANDO A FORMULARIO ID:', evaluacionId);

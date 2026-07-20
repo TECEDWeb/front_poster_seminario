@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: 'https://apievaluacion.teced.org/api'
+//apiUrl: 'http://localhost:3000/api'
 };
 
 /*
