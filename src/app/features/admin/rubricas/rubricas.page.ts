@@ -47,7 +47,8 @@ import {
   pricetagOutline,
   starOutline,
   trophyOutline,
-  filterOutline
+  filterOutline,
+  optionsOutline
 } from 'ionicons/icons';
 
 interface Concurso {
@@ -147,7 +148,8 @@ export class RubricasPage implements OnInit {
       starOutline,
       searchOutline,
       funnelOutline,
-      checkmarkOutline
+      checkmarkOutline,
+      optionsOutline
     });
   }
 
