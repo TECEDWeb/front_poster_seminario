@@ -263,14 +263,19 @@
 
 <!-- ========== MODALES FUERA DEL ION-CONTENT ========== -->
 
-<!-- MODAL 1: Editar datos generales -->
+<!--
+  MODAL 1: Editar / crear datos generales
+  ⚠️ IMPORTANTE: este modal es un diálogo centrado (--width/--max-width
+  definidos en el SCSS), NO un "sheet". Por eso NO lleva
+  [initialBreakpoint] ni [breakpoints] ni [handle] — esos atributos
+  convierten al modal en una hoja deslizante que calcula su propia
+  altura, lo cual choca con "--height: auto" del SCSS y hacía que el
+  modal se viera colapsado (solo el header, sin el formulario).
+-->
 <ion-modal 
   [isOpen]="modalAbierto" 
   (didDismiss)="cerrarModal()" 
-  [backdropDismiss]="false"
-  [initialBreakpoint]="1"
-  [breakpoints]="[0, 1]"
-  [handle]="false">
+  [backdropDismiss]="false">
   <ng-template>
     <ion-header>
       <ion-toolbar>
