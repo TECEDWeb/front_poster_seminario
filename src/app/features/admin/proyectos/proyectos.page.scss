@@ -1,3 +1,8 @@
+// ============================================
+// PROYECTOS PAGE - SCSS MEJORADO (MOBILE-FIRST)
+// Paleta institucional UPSE
+// ============================================
+
 $upse-blue: #001b4c;
 $upse-blue-dark: #001433;
 $upse-blue-light: #e8f0fe;
@@ -15,25 +20,38 @@ $radius: 16px;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================
-// CONTENT PRINCIPAL
+// CONTENT PRINCIPAL - MOBILE FIRST
 // ============================================
 .proyectos-content {
   --background: #f0f4fb;
   position: relative;
+  --padding-bottom: 0;
 }
 
 .page-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 12px 80px;
+  padding: 12px 10px 100px;
 
-  @media (min-width: 576px) { padding: 20px 16px 80px; }
-  @media (min-width: 768px) { padding: 24px 24px 80px; }
-  @media (min-width: 1024px) { padding: 28px 32px 80px; }
+  @media (min-width: 480px) {
+    padding: 14px 14px 90px;
+  }
+
+  @media (min-width: 576px) {
+    padding: 16px 16px 80px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 20px 20px 80px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 24px 32px 80px;
+  }
 }
 
 // ============================================
-// TOAST NOTIFICATION
+// TOAST NOTIFICATION - MOBILE FIRST
 // ============================================
 .toast-notification {
   position: fixed;
@@ -43,17 +61,32 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 9999;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-  border-radius: 14px;
-  font-size: 13.5px;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 12px;
   font-weight: 600;
   color: white;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  max-width: 90vw;
+  max-width: 92vw;
   animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, toastOut 0.3s ease 3.2s forwards;
 
-  ion-icon { font-size: 18px; flex-shrink: 0; }
+  @media (min-width: 480px) {
+    padding: 12px 20px;
+    font-size: 13.5px;
+    border-radius: 14px;
+    max-width: 90vw;
+    gap: 10px;
+  }
+
+  ion-icon { 
+    font-size: 16px; 
+    flex-shrink: 0;
+
+    @media (min-width: 480px) {
+      font-size: 18px;
+    }
+  }
 
   &.toast-success { background: linear-gradient(135deg, $upse-green, #008f45); }
   &.toast-danger { background: linear-gradient(135deg, $upse-red, #b91c1c); }
@@ -70,53 +103,95 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TOOLBAR
+// TOOLBAR - MOBILE FIRST
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
   --color: #0f172a;
   --border-color: #e2e8f0;
   --box-shadow: 0 1px 0 rgba(0, 27, 76, 0.05);
-  padding: 0 8px;
+  padding: 0 4px;
+
+  @media (min-width: 480px) {
+    padding: 0 8px;
+  }
 
   ion-title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     font-weight: 600;
 
+    @media (min-width: 480px) {
+      gap: 8px;
+    }
+
+    @media (min-width: 768px) {
+      gap: 10px;
+    }
+
     .title-text {
-      font-size: 16px;
+      font-size: 14px;
       color: #0f172a;
       letter-spacing: -0.5px;
-      @media (min-width: 768px) { font-size: 20px; }
+
+      @media (min-width: 480px) {
+        font-size: 16px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
     }
 
     .title-badge {
-      font-size: 9px;
+      font-size: 8px;
       background: $upse-blue-light;
       color: $upse-blue;
-      padding: 2px 12px;
-      border-radius: 20px;
+      padding: 1px 8px;
+      border-radius: 16px;
       font-weight: 600;
       display: none;
       letter-spacing: 0.3px;
 
-      @media (min-width: 480px) { display: inline-block; font-size: 10px; padding: 2px 14px; }
-      @media (min-width: 768px) { font-size: 11px; padding: 3px 16px; }
+      @media (min-width: 380px) {
+        display: inline-block;
+      }
+
+      @media (min-width: 480px) {
+        font-size: 10px;
+        padding: 2px 14px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 11px;
+        padding: 3px 16px;
+      }
     }
   }
 
   .btn-refresh {
-    --padding-start: 8px;
-    --padding-end: 8px;
+    --padding-start: 6px;
+    --padding-end: 6px;
     --color: #64748b;
     --border-radius: 50%;
 
+    @media (min-width: 480px) {
+      --padding-start: 8px;
+      --padding-end: 8px;
+    }
+
     ion-icon {
-      font-size: 18px;
+      font-size: 16px;
       transition: $transition;
-      @media (min-width: 768px) { font-size: 20px; }
+
+      @media (min-width: 480px) {
+        font-size: 18px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
     }
 
     &:hover {
@@ -127,57 +202,188 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// PAGE HEADER
+// PAGE HEADER - MOBILE FIRST
 // ============================================
 .page-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  @media (min-width: 576px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  @media (min-width: 768px) {
+    margin-bottom: 24px;
+  }
 
   .header-left {
     flex: 1;
-    min-width: 200px;
+    min-width: 0;
 
     h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
       color: $upse-blue;
       letter-spacing: -0.5px;
-      @media (min-width: 768px) { font-size: 28px; }
+
+      @media (min-width: 480px) {
+        font-size: 22px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 28px;
+      }
     }
 
     p {
-      margin: 6px 0 0;
+      margin: 4px 0 0;
       color: #64748b;
-      font-size: 14px;
-      @media (min-width: 768px) { font-size: 15px; }
+      font-size: 12px;
+
+      @media (min-width: 480px) {
+        font-size: 13px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 15px;
+        margin: 6px 0 0;
+      }
     }
   }
 
   .header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
     flex-wrap: wrap;
+
+    @media (min-width: 480px) {
+      gap: 8px;
+    }
+
+    @media (min-width: 768px) {
+      gap: 12px;
+    }
+
+    .export-actions {
+      display: flex;
+      gap: 4px;
+
+      @media (min-width: 480px) {
+        gap: 6px;
+      }
+
+      @media (min-width: 768px) {
+        gap: 8px;
+      }
+
+      .btn-export {
+        --border-radius: 8px;
+        --border-color: #e2e8f0;
+        --color: #64748b;
+        font-weight: 600;
+        height: 34px;
+        font-size: 11px;
+        transition: $transition;
+        --padding-start: 8px;
+        --padding-end: 8px;
+
+        @media (min-width: 480px) {
+          --border-radius: 10px;
+          height: 38px;
+          font-size: 12px;
+          --padding-start: 12px;
+          --padding-end: 12px;
+        }
+
+        @media (min-width: 768px) {
+          --border-radius: 12px;
+          height: 44px;
+          font-size: 13px;
+          --padding-start: 16px;
+          --padding-end: 16px;
+        }
+
+        ion-icon {
+          font-size: 14px;
+
+          @media (min-width: 768px) {
+            font-size: 16px;
+          }
+        }
+
+        &:hover {
+          --border-color: #{$upse-blue};
+          --color: #{$upse-blue};
+          transform: translateY(-1px);
+        }
+
+        span {
+          display: none;
+
+          @media (min-width: 480px) {
+            display: inline;
+          }
+        }
+      }
+
+      .btn-csv:hover {
+        --border-color: #{$upse-green};
+        --color: #{$upse-green};
+      }
+
+      .btn-pdf:hover {
+        --border-color: #{$upse-red};
+        --color: #{$upse-red};
+      }
+    }
 
     .btn-add-desktop {
       --background: #{$upse-blue};
       --color: #ffffff;
-      --border-radius: 12px;
+      --border-radius: 8px;
       font-weight: 600;
       --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
-      --padding-start: 20px;
-      --padding-end: 20px;
-      height: 44px;
-      font-size: 14px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      height: 34px;
+      font-size: 11px;
 
-      ion-icon { font-size: 20px; margin-right: 8px; }
+      @media (min-width: 480px) {
+        --border-radius: 10px;
+        --padding-start: 16px;
+        --padding-end: 16px;
+        height: 38px;
+        font-size: 12px;
+      }
 
-      @media (max-width: 768px) { display: none !important; }
+      @media (min-width: 768px) {
+        --border-radius: 12px;
+        --padding-start: 20px;
+        --padding-end: 20px;
+        height: 44px;
+        font-size: 14px;
+      }
+
+      ion-icon { 
+        font-size: 16px; 
+        margin-right: 4px;
+
+        @media (min-width: 768px) {
+          font-size: 20px;
+          margin-right: 8px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        display: none !important;
+      }
 
       &:hover {
         --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
@@ -191,61 +397,119 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 16px;
+      padding: 4px 8px;
       background: white;
-      border-radius: 12px;
+      border-radius: 8px;
       border: 1px solid #eef2f7;
-      min-width: 60px;
+      min-width: 40px;
       box-shadow: $shadow-sm;
       transition: $transition;
 
-      &:hover { transform: translateY(-2px); box-shadow: $shadow-md; }
+      @media (min-width: 480px) {
+        padding: 5px 12px;
+        min-width: 50px;
+        border-radius: 10px;
+      }
+
+      @media (min-width: 768px) {
+        padding: 6px 16px;
+        min-width: 60px;
+        border-radius: 12px;
+      }
+
+      &:hover { 
+        transform: translateY(-2px); 
+        box-shadow: $shadow-md; 
+      }
 
       .stat-count {
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 700;
         color: $upse-blue;
         line-height: 1.2;
-        @media (min-width: 768px) { font-size: 22px; }
+
+        @media (min-width: 480px) {
+          font-size: 18px;
+        }
+
+        @media (min-width: 768px) {
+          font-size: 22px;
+        }
       }
 
       .stat-label {
-        font-size: 10px;
+        font-size: 8px;
         color: #94a3b8;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.3px;
-        @media (min-width: 768px) { font-size: 11px; }
+
+        @media (min-width: 480px) {
+          font-size: 9px;
+        }
+
+        @media (min-width: 768px) {
+          font-size: 11px;
+        }
       }
     }
   }
 }
 
 // ============================================
-// FILTER BAR
+// FILTER BAR - MOBILE FIRST
 // ============================================
 .filter-bar {
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  @media (min-width: 480px) {
+    gap: 10px;
+  }
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  @media (min-width: 768px) {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
 
   .search-group {
-    flex: 2;
-    min-width: 200px;
+    width: 100%;
+
+    @media (min-width: 600px) {
+      flex: 2;
+      min-width: 200px;
+    }
 
     .filter-search {
       --background: white;
-      --border-radius: 12px;
+      --border-radius: 10px;
       --box-shadow: none;
       --border-color: #e2e8f0;
       --placeholder-color: #94a3b8;
       padding: 0;
-      height: 44px;
+      height: 38px;
       --icon-color: #94a3b8;
       box-shadow: $shadow-sm;
-      border-radius: 12px;
+      border-radius: 10px;
       transition: $transition;
+
+      @media (min-width: 480px) {
+        height: 40px;
+        --border-radius: 12px;
+      }
+
+      @media (min-width: 768px) {
+        height: 44px;
+      }
 
       &:focus-within {
         --border-color: #{$upse-blue};
@@ -255,22 +519,46 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .filter-group {
-    flex: 1;
-    min-width: 140px;
+    width: 100%;
+
+    @media (min-width: 600px) {
+      flex: 1;
+      min-width: 120px;
+      width: auto;
+    }
+
+    @media (min-width: 768px) {
+      min-width: 140px;
+    }
 
     .filter-select {
       --background: white;
-      --border-radius: 12px;
-      --padding-start: 16px;
-      --padding-end: 16px;
-      height: 44px;
+      --border-radius: 10px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      height: 38px;
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      min-width: 140px;
-      font-size: 14px;
+      border-radius: 10px;
+      width: 100%;
+      font-size: 13px;
       color: #0f172a;
       box-shadow: $shadow-sm;
       transition: $transition;
+
+      @media (min-width: 480px) {
+        height: 40px;
+        --border-radius: 12px;
+        --padding-start: 14px;
+        --padding-end: 14px;
+        font-size: 14px;
+      }
+
+      @media (min-width: 768px) {
+        height: 44px;
+        --padding-start: 16px;
+        --padding-end: 16px;
+        min-width: 140px;
+      }
 
       &:focus-within {
         border-color: $upse-blue;
@@ -278,17 +566,152 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
   }
+
+  .btn-clear-filters {
+    --color: #{$upse-red};
+    font-weight: 600;
+    font-size: 0.7rem;
+    height: 32px;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    width: 100%;
+    justify-content: center;
+
+    @media (min-width: 600px) {
+      width: auto;
+      height: 38px;
+      font-size: 0.75rem;
+      --padding-start: 12px;
+      --padding-end: 12px;
+    }
+
+    @media (min-width: 768px) {
+      height: 44px;
+      font-size: 0.8rem;
+      --padding-start: 16px;
+      --padding-end: 16px;
+    }
+  }
 }
 
 // ============================================
-// TABLA ESTILO EXCEL
+// SKELETON LOADING - MOBILE FIRST
+// ============================================
+.loading-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @media (min-width: 480px) {
+    gap: 14px;
+  }
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+  }
+}
+
+.proyecto-skeleton {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  box-shadow: $shadow-sm;
+
+  @media (min-width: 768px) {
+    padding: 24px;
+    border-radius: $radius;
+  }
+
+  .skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    @media (min-width: 768px) {
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .skeleton-icon { 
+      width: 40px; 
+      height: 40px; 
+      border-radius: 10px; 
+
+      @media (min-width: 768px) {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+      }
+    }
+
+    .skeleton-text-group {
+      flex: 1;
+      .skeleton-title { 
+        height: 16px; 
+        width: 70%; 
+        margin-bottom: 6px; 
+
+        @media (min-width: 768px) {
+          height: 18px;
+          margin-bottom: 8px;
+        }
+      }
+      .skeleton-subtitle { 
+        height: 10px; 
+        width: 40%; 
+
+        @media (min-width: 768px) {
+          height: 12px;
+        }
+      }
+    }
+  }
+
+  .skeleton-meta {
+    display: flex;
+    gap: 8px;
+
+    @media (min-width: 768px) {
+      gap: 12px;
+    }
+
+    .skeleton-badge { 
+      height: 20px; 
+      width: 60px; 
+      border-radius: 10px; 
+
+      @media (min-width: 768px) {
+        height: 24px;
+        width: 80px;
+        border-radius: 12px;
+      }
+    }
+  }
+}
+
+// ============================================
+// TABLA ESTILO EXCEL - MOBILE FIRST
 // ============================================
 .table-container {
   background: white;
-  border-radius: $radius;
+  border-radius: 12px;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
   overflow: hidden;
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+    border-radius: $radius;
+  }
 
   .table-scroll {
     overflow-x: auto;
@@ -308,23 +731,28 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TABLA EXCEL
+// TABLA EXCEL - MOBILE FIRST
 // ============================================
 .excel-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
-  font-size: 13px;
+  min-width: 700px;
+  font-size: 12px;
+
+  @media (min-width: 1024px) {
+    min-width: 900px;
+    font-size: 13px;
+  }
 
   thead {
     background: #f8fafc;
     border-bottom: 2px solid #e2e8f0;
 
     th {
-      padding: 12px 14px;
+      padding: 10px 12px;
       text-align: left;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #64748b;
@@ -333,15 +761,20 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       top: 0;
       background: #f8fafc;
       z-index: 10;
+
+      @media (min-width: 1024px) {
+        padding: 12px 14px;
+        font-size: 11px;
+      }
     }
 
-    .col-proyecto { min-width: 280px; max-width: 350px; }
-    .col-area { min-width: 100px; max-width: 120px; text-align: center; }
-    .col-nivel { min-width: 100px; max-width: 120px; text-align: center; }
-    .col-tutor { min-width: 150px; max-width: 200px; }
-    .col-participantes { min-width: 100px; max-width: 120px; text-align: center; }
-    .col-estado { min-width: 100px; max-width: 120px; text-align: center; }
-    .col-acciones { min-width: 120px; max-width: 140px; text-align: center; }
+    .col-proyecto { min-width: 200px; max-width: 280px; }
+    .col-area { min-width: 80px; max-width: 100px; text-align: center; }
+    .col-nivel { min-width: 80px; max-width: 100px; text-align: center; }
+    .col-tutor { min-width: 120px; max-width: 160px; }
+    .col-participantes { min-width: 80px; max-width: 100px; text-align: center; }
+    .col-estado { min-width: 80px; max-width: 100px; text-align: center; }
+    .col-acciones { min-width: 100px; max-width: 120px; text-align: center; }
   }
 
   tbody {
@@ -373,10 +806,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     td {
-      padding: 8px 14px;
+      padding: 6px 10px;
       vertical-align: middle;
 
-      &.col-proyecto { max-width: 350px; }
+      @media (min-width: 1024px) {
+        padding: 8px 14px;
+      }
+
+      &.col-proyecto { max-width: 280px; }
       &.col-area { text-align: center; }
       &.col-nivel { text-align: center; }
       &.col-participantes { text-align: center; }
@@ -387,24 +824,40 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: PROYECTO
+// CELDA: PROYECTO - MOBILE FIRST
 // ============================================
 .cell-proyecto {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 
+  @media (min-width: 1024px) {
+    gap: 10px;
+  }
+
   .proyecto-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 
-    ion-icon { font-size: 16px; }
+    @media (min-width: 1024px) {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    ion-icon { 
+      font-size: 14px; 
+
+      @media (min-width: 1024px) {
+        font-size: 16px;
+      }
+    }
 
     &.icon-upse { background: $upse-blue-light; color: $upse-blue; }
     &.icon-slate { background: #f1f5f9; color: #64748b; }
@@ -417,54 +870,75 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex: 1;
 
     .proyecto-nombre {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: #0f172a;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      @media (min-width: 1024px) {
+        font-size: 13px;
+      }
     }
 
     .proyecto-concurso {
-      font-size: 10px;
+      font-size: 9px;
       color: $upse-blue;
       font-weight: 500;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       margin-top: 1px;
 
-      ion-icon { font-size: 11px; }
+      @media (min-width: 1024px) {
+        font-size: 10px;
+        gap: 4px;
+      }
+
+      ion-icon { font-size: 10px; }
     }
   }
 }
 
 // ============================================
-// CELDA: ÁREA
+// CELDA: ÁREA - MOBILE FIRST
 // ============================================
 .tag-area {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
   background: $upse-blue-light;
   color: $upse-blue;
   white-space: nowrap;
   display: inline-block;
+
+  @media (min-width: 1024px) {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
 }
 
 // ============================================
-// CELDA: NIVEL
+// CELDA: NIVEL - MOBILE FIRST
 // ============================================
 .tag-nivel {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   white-space: nowrap;
   display: inline-block;
+
+  @media (min-width: 1024px) {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
 
   &.nivel-basico {
     background: #e8f5e9;
@@ -483,55 +957,81 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: TUTOR
+// CELDA: TUTOR - MOBILE FIRST
 // ============================================
 .cell-tutor {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+
+  @media (min-width: 1024px) {
+    gap: 8px;
+  }
 
   .tutor-avatar {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: $upse-gold-light;
     color: $upse-gold;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     flex-shrink: 0;
+
+    @media (min-width: 1024px) {
+      width: 26px;
+      height: 26px;
+      font-size: 10px;
+    }
   }
 
   .tutor-nombre {
-    font-size: 12.5px;
+    font-size: 11px;
     color: #0f172a;
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    @media (min-width: 1024px) {
+      font-size: 12.5px;
+    }
   }
 }
 
 .empty-value {
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 11px;
+
+  @media (min-width: 1024px) {
+    font-size: 12px;
+  }
 }
 
 // ============================================
-// CELDA: PARTICIPANTES
+// CELDA: PARTICIPANTES - MOBILE FIRST
 // ============================================
 .cell-participantes {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
+
+  @media (min-width: 1024px) {
+    gap: 8px;
+  }
 
   .participantes-count {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: #0f172a;
+
+    @media (min-width: 1024px) {
+      font-size: 13px;
+    }
   }
 
   .participantes-avatars {
@@ -539,49 +1039,72 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     align-items: center;
 
     .mini-avatar {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: $upse-blue-light;
       color: $upse-blue;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 700;
       border: 2px solid white;
-      margin-right: -5px;
+      margin-right: -4px;
+
+      @media (min-width: 1024px) {
+        width: 24px;
+        height: 24px;
+        font-size: 9px;
+        margin-right: -5px;
+      }
 
       &:last-child { margin-right: 0; }
 
       &.more {
         background: #e2e8f0;
         color: #64748b;
-        font-size: 8px;
+        font-size: 7px;
+
+        @media (min-width: 1024px) {
+          font-size: 8px;
+        }
       }
     }
   }
 }
 
 // ============================================
-// CELDA: ESTADO
+// CELDA: ESTADO - MOBILE FIRST
 // ============================================
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
+  gap: 4px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 20px;
+  padding: 2px 8px;
+  border-radius: 16px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   white-space: nowrap;
 
+  @media (min-width: 1024px) {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    gap: 5px;
+  }
+
   .status-dot {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
+
+    @media (min-width: 1024px) {
+      width: 5px;
+      height: 5px;
+    }
   }
 
   &.status-active {
@@ -608,7 +1131,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: ACCIONES
+// CELDA: ACCIONES - MOBILE FIRST
 // ============================================
 .cell-acciones {
   display: flex;
@@ -617,9 +1140,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   gap: 2px;
 
   .btn-action {
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
     border: none;
     display: flex;
     align-items: center;
@@ -630,7 +1153,19 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: #64748b;
     -webkit-tap-highlight-color: transparent;
 
-    ion-icon { font-size: 15px; }
+    @media (min-width: 1024px) {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+    }
+
+    ion-icon { 
+      font-size: 13px; 
+
+      @media (min-width: 1024px) {
+        font-size: 15px;
+      }
+    }
 
     &:hover {
       background: white;
@@ -659,72 +1194,81 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// SKELETON LOADING
-// ============================================
-.loading-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
-
-  @media (min-width: 600px) { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-}
-
-.proyecto-skeleton {
-  background: white;
-  padding: 24px;
-  border-radius: $radius;
-  border: 1px solid #f1f5f9;
-  box-shadow: $shadow-sm;
-
-  .skeleton-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-
-    .skeleton-icon { width: 48px; height: 48px; border-radius: 12px; }
-
-    .skeleton-text-group {
-      flex: 1;
-      .skeleton-title { height: 18px; width: 70%; margin-bottom: 8px; }
-      .skeleton-subtitle { height: 12px; width: 40%; }
-    }
-  }
-
-  .skeleton-meta {
-    display: flex;
-    gap: 12px;
-    .skeleton-badge { height: 24px; width: 80px; border-radius: 12px; }
-  }
-}
-
-// ============================================
-// EMPTY STATE
+// EMPTY STATE - MOBILE FIRST
 // ============================================
 .empty-state-table {
   text-align: center;
-  padding: 40px 20px;
+  padding: 30px 16px;
+
+  @media (min-width: 768px) {
+    padding: 40px 20px;
+  }
 
   .empty-icon {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: $upse-blue-light;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 14px;
+    margin: 0 auto 10px;
 
-    ion-icon { font-size: 28px; color: $upse-blue; }
+    @media (min-width: 768px) {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 14px;
+    }
+
+    ion-icon { 
+      font-size: 22px; 
+      color: $upse-blue; 
+
+      @media (min-width: 768px) {
+        font-size: 28px;
+      }
+    }
   }
 
-  h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; color: #0f172a; }
-  p { margin: 0 0 18px; color: #64748b; font-size: 13px; }
+  h3 { 
+    margin: 0 0 4px; 
+    font-size: 15px; 
+    font-weight: 600; 
+    color: #0f172a; 
+
+    @media (min-width: 768px) {
+      font-size: 17px;
+      margin: 0 0 6px;
+    }
+  }
+
+  p { 
+    margin: 0 0 14px; 
+    color: #64748b; 
+    font-size: 12px; 
+
+    @media (min-width: 768px) {
+      font-size: 13px;
+      margin: 0 0 18px;
+    }
+  }
 
   .btn-primary {
     --background: #{$upse-blue};
-    --border-radius: 10px;
+    --border-radius: 8px;
     font-weight: 600;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    height: 36px;
+    font-size: 13px;
+
+    @media (min-width: 768px) {
+      --border-radius: 10px;
+      --padding-start: 24px;
+      --padding-end: 24px;
+      height: 44px;
+      font-size: 14px;
+    }
 
     &:hover {
       --background: #{$upse-blue-dark};
@@ -733,34 +1277,27 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// GRID DE CARDS (SOLO MÓVIL)
+// GRID DE CARDS (SOLO MÓVIL) - MOBILE FIRST
 // ============================================
 .proyectos-grid {
-  display: none !important;
-}
+  display: grid !important;
+  grid-template-columns: 1fr;
+  gap: 12px;
 
-// ============================================
-// RESPONSIVE
-// ============================================
-@media (max-width: 768px) {
-  .table-container {
+  @media (min-width: 480px) {
+    gap: 14px;
+  }
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  @media (min-width: 768px) {
     display: none !important;
   }
-
-  .proyectos-grid {
-    display: grid !important;
-    grid-template-columns: 1fr;
-    gap: 16px;
-
-    @media (min-width: 600px) {
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    }
-  }
 }
 
-// ============================================
-// CARDS (MÓVIL)
-// ============================================
 @keyframes cardEnter {
   from { opacity: 0; transform: translateY(16px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -768,7 +1305,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .proyecto-card {
   background: white;
-  border-radius: $radius;
+  border-radius: 12px;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
   transition: $transition;
@@ -776,6 +1313,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-direction: column;
   overflow: hidden;
   animation: cardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @media (min-width: 480px) {
+    border-radius: $radius;
+  }
 
   &:hover {
     transform: translateY(-3px);
@@ -788,18 +1329,30 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   .card-header {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 16px 16px 12px;
+    gap: 10px;
+    padding: 12px 12px 10px;
+
+    @media (min-width: 480px) {
+      padding: 14px 14px 12px;
+      gap: 12px;
+    }
 
     .card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 16px;
       flex-shrink: 0;
+
+      @media (min-width: 480px) {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        border-radius: 10px;
+      }
 
       &.icon-upse { background: $upse-blue-light; color: $upse-blue; }
       &.icon-slate { background: #f1f5f9; color: #64748b; }
@@ -811,36 +1364,59 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       .card-title {
         margin: 0;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 700;
         color: #0f172a;
         line-height: 1.3;
+
+        @media (min-width: 480px) {
+          font-size: 14px;
+        }
       }
 
       .card-meta-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 4px;
-        margin-top: 4px;
+        gap: 3px;
+        margin-top: 3px;
+
+        @media (min-width: 480px) {
+          gap: 4px;
+          margin-top: 4px;
+        }
 
         .tag {
           display: inline-flex;
           align-items: center;
-          gap: 3px;
-          font-size: 10px;
-          padding: 2px 8px;
-          border-radius: 10px;
+          gap: 2px;
+          font-size: 9px;
+          padding: 1px 6px;
+          border-radius: 8px;
           font-weight: 500;
           max-width: 100%;
 
-          ion-icon { font-size: 10px; flex-shrink: 0; }
+          @media (min-width: 480px) {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            gap: 3px;
+          }
+
+          ion-icon { 
+            font-size: 9px; 
+            flex-shrink: 0;
+
+            @media (min-width: 480px) {
+              font-size: 10px;
+            }
+          }
 
           &.tag-area { background: $upse-blue-light; color: $upse-blue; }
           &.tag-nivel { background: $upse-gold-light; color: $upse-gold; }
           &.tag-tutor {
             background: $upse-gold-light;
             color: #92660f;
-            max-width: 140px;
+            max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -855,15 +1431,27 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       .status-badge {
         display: flex;
         align-items: center;
-        gap: 4px;
-        font-size: 9px;
+        gap: 3px;
+        font-size: 8px;
         font-weight: 600;
-        padding: 2px 8px;
-        border-radius: 12px;
+        padding: 2px 6px;
+        border-radius: 10px;
         text-transform: uppercase;
         letter-spacing: 0.3px;
 
-        .status-dot { width: 4px; height: 4px; border-radius: 50%; display: inline-block; }
+        @media (min-width: 480px) {
+          font-size: 9px;
+          padding: 2px 8px;
+          border-radius: 12px;
+          gap: 4px;
+        }
+
+        .status-dot { 
+          width: 4px; 
+          height: 4px; 
+          border-radius: 50%; 
+          display: inline-block; 
+        }
 
         &.status-active {
           background: $upse-green-light;
@@ -881,70 +1469,137 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card-body {
-    padding: 0 16px 12px;
+    padding: 0 12px 10px;
     flex: 1;
 
+    @media (min-width: 480px) {
+      padding: 0 14px 12px;
+    }
+
     .card-description {
-      margin: 0 0 12px;
-      font-size: 12px;
+      margin: 0 0 10px;
+      font-size: 11px;
       color: #475569;
       line-height: 1.5;
+
+      @media (min-width: 480px) {
+        font-size: 12px;
+        margin: 0 0 12px;
+      }
     }
 
     .card-participants {
       background: #f8fafc;
-      border-radius: 8px;
-      padding: 8px 12px;
+      border-radius: 6px;
+      padding: 6px 10px;
       border: 1px solid #f1f5f9;
+
+      @media (min-width: 480px) {
+        border-radius: 8px;
+        padding: 8px 12px;
+      }
 
       .participants-header {
         display: flex;
         align-items: center;
         gap: 4px;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 600;
         color: #475569;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
 
-        ion-icon { font-size: 12px; color: #94a3b8; }
+        @media (min-width: 480px) {
+          font-size: 11px;
+          margin-bottom: 4px;
+        }
+
+        ion-icon { 
+          font-size: 11px; 
+          color: #94a3b8; 
+
+          @media (min-width: 480px) {
+            font-size: 12px;
+          }
+        }
       }
 
       .participants-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 4px;
+        gap: 3px;
+
+        @media (min-width: 480px) {
+          gap: 4px;
+        }
 
         .participant-chip {
-          font-size: 10px;
+          font-size: 9px;
           background: white;
-          padding: 1px 8px;
-          border-radius: 10px;
+          padding: 1px 6px;
+          border-radius: 8px;
           border: 1px solid #e2e8f0;
           color: #0f172a;
+
+          @media (min-width: 480px) {
+            font-size: 10px;
+            padding: 1px 8px;
+            border-radius: 10px;
+          }
         }
 
         .participant-more {
-          font-size: 10px;
+          font-size: 9px;
           color: #94a3b8;
-          padding: 1px 6px;
+          padding: 1px 4px;
+
+          @media (min-width: 480px) {
+            font-size: 10px;
+            padding: 1px 6px;
+          }
         }
       }
     }
   }
 
   .card-concurso {
-    padding: 0 16px 8px;
+    padding: 0 12px 8px;
+
+    @media (min-width: 480px) {
+      padding: 0 14px 8px;
+    }
 
     .chip-concurso {
-      height: 22px;
-      font-size: 10px;
+      height: 20px;
+      font-size: 9px;
       background: $upse-blue-light;
       color: $upse-blue;
       margin: 0;
       max-width: 100%;
 
-      ion-icon { font-size: 11px; color: $upse-blue; }
-      ion-label { font-size: 10px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      @media (min-width: 480px) {
+        height: 22px;
+        font-size: 10px;
+      }
+
+      ion-icon { 
+        font-size: 10px; 
+        color: $upse-blue; 
+
+        @media (min-width: 480px) {
+          font-size: 11px;
+        }
+      }
+      ion-label { 
+        font-size: 9px; 
+        font-weight: 500; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+
+        @media (min-width: 480px) {
+          font-size: 10px;
+        }
+      }
     }
   }
 
@@ -958,8 +1613,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
-      padding: 10px 4px;
+      gap: 1px;
+      padding: 8px 4px;
       background: none;
       border: none;
       border-right: 1px solid #f1f5f9;
@@ -967,10 +1622,28 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       transition: $transition;
       color: #64748b;
 
+      @media (min-width: 480px) {
+        padding: 10px 4px;
+        gap: 2px;
+      }
+
       &:last-child { border-right: none; }
 
-      ion-icon { font-size: 16px; }
-      span { font-size: 10px; font-weight: 600; }
+      ion-icon { 
+        font-size: 14px; 
+
+        @media (min-width: 480px) {
+          font-size: 16px;
+        }
+      }
+      span { 
+        font-size: 9px; 
+        font-weight: 600; 
+
+        @media (min-width: 480px) {
+          font-size: 10px;
+        }
+      }
 
       &:hover { background: $upse-blue-light; color: $upse-blue; }
       &.danger:hover { background: $upse-red-light; color: $upse-red; }
@@ -981,49 +1654,94 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// FAB MÓVIL
+// FAB MÓVIL - MOBILE FIRST
 // ============================================
 .fab-mobile {
-  display: none;
-  @media (max-width: 768px) { display: block; }
+  display: block;
+  bottom: 20px;
+  right: 16px;
+
+  @media (min-width: 576px) {
+    display: none;
+  }
 }
 
 ion-fab-button {
   --background: $upse-blue;
   --box-shadow: 0 8px 24px rgba(0, 27, 76, 0.45);
-  ion-icon { font-size: 24px; }
+  --border-radius: 50%;
+  
+  ion-icon { 
+    font-size: 20px; 
+
+    @media (min-width: 480px) {
+      font-size: 24px;
+    }
+  }
+  
   &:hover { --background: $upse-blue-dark; }
 }
 
 // ============================================
-// MODALES
+// MODALES - MOBILE FIRST
 // ============================================
 .modal-content { --background: #f8fafc; }
 
 .modal-toolbar {
   --background: #{$upse-blue};
   --color: white;
+  --min-height: 48px;
+
+  @media (min-width: 768px) {
+    --min-height: 56px;
+  }
 
   .modal-title-group {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     padding-left: 8px;
 
+    @media (min-width: 768px) {
+      gap: 10px;
+      padding-left: 8px;
+    }
+
     .modal-title-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
       background: rgba(255,255,255,0.15);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
 
-      ion-icon { font-size: 18px; color: white; }
+      @media (min-width: 768px) {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+      }
+
+      ion-icon { 
+        font-size: 16px; 
+        color: white; 
+
+        @media (min-width: 768px) {
+          font-size: 18px;
+        }
+      }
     }
 
-    ion-title { padding: 0; font-size: 16px; font-weight: 600; }
+    ion-title { 
+      padding: 0; 
+      font-size: 14px; 
+      font-weight: 600; 
+
+      @media (min-width: 768px) {
+        font-size: 16px;
+      }
+    }
   }
 
   ion-buttons[slot="end"] ion-button { --color: white; }
@@ -1032,53 +1750,109 @@ ion-fab-button {
 .modal-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
+
+  @media (min-width: 480px) {
+    padding: 18px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 20px;
+  }
 
   @media (min-width: 900px) { max-width: 680px; }
 
   .form-row-2 {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0 16px;
-    @media (min-width: 560px) { grid-template-columns: 1fr 1fr; }
+    gap: 0;
+
+    @media (min-width: 480px) {
+      gap: 0 12px;
+    }
+
+    @media (min-width: 560px) { 
+      grid-template-columns: 1fr 1fr; 
+      gap: 0 16px;
+    }
   }
 
   .form-field {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 16px;
+    }
 
     .field-label {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 6px;
-      font-size: 13px;
+      gap: 4px;
+      font-size: 12px;
       font-weight: 600;
       color: #374151;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
 
-      ion-icon { color: $upse-blue; font-size: 15px; }
+      @media (min-width: 480px) {
+        font-size: 13px;
+        gap: 6px;
+        margin-bottom: 6px;
+      }
+
+      ion-icon { 
+        color: $upse-blue; 
+        font-size: 13px; 
+
+        @media (min-width: 480px) {
+          font-size: 15px;
+        }
+      }
       .required { color: #ef4444; font-weight: 700; margin-left: 2px; }
-      .field-hint { font-size: 11px; color: #94a3b8; font-weight: 400; }
+      .field-hint { 
+        font-size: 10px; 
+        color: #94a3b8; 
+        font-weight: 400; 
+
+        @media (min-width: 480px) {
+          font-size: 11px;
+        }
+      }
     }
 
     .field-input {
       --background: white;
-      --border-radius: 10px;
-      --padding-start: 14px;
-      --padding-end: 14px;
-      --inner-padding-end: 14px;
+      --border-radius: 8px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      --inner-padding-end: 12px;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      min-height: 44px;
+      border-radius: 8px;
+      min-height: 38px;
       box-shadow: $shadow-sm;
       transition: $transition;
+
+      @media (min-width: 480px) {
+        --border-radius: 10px;
+        --padding-start: 14px;
+        --padding-end: 14px;
+        --inner-padding-end: 14px;
+        min-height: 44px;
+      }
 
       &:focus-within {
         border-color: $upse-blue;
         box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
       }
 
-      ion-input, ion-textarea, ion-select, ion-toggle { --padding-start: 0; font-size: 14px; }
+      ion-input, ion-textarea, ion-select, ion-toggle { 
+        --padding-start: 0; 
+        font-size: 13px; 
+
+        @media (min-width: 480px) {
+          font-size: 14px;
+        }
+      }
     }
 
     .field-help {
@@ -1088,11 +1862,15 @@ ion-fab-button {
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        font-size: 12px;
+        font-size: 11px;
         color: $upse-green;
         font-weight: 600;
 
-        ion-icon { font-size: 14px; }
+        @media (min-width: 480px) {
+          font-size: 12px;
+        }
+
+        ion-icon { font-size: 12px; }
       }
     }
   }
@@ -1100,56 +1878,110 @@ ion-fab-button {
   .tutores-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
 
-    @media (min-width: 560px) { grid-template-columns: 1fr 1fr; }
+    @media (min-width: 480px) {
+      gap: 10px;
+    }
+
+    @media (min-width: 560px) { 
+      grid-template-columns: 1fr 1fr; 
+    }
 
     .tutor-item {
       --background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      min-height: 44px;
+      border-radius: 8px;
+      min-height: 38px;
       transition: $transition;
 
-      &:focus-within { border-color: $upse-gold; box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15); }
+      @media (min-width: 480px) {
+        border-radius: 10px;
+        min-height: 44px;
+      }
+
+      &:focus-within { 
+        border-color: $upse-gold; 
+        box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15); 
+      }
     }
 
-    .tutor-star { color: $upse-gold; font-size: 16px; }
+    .tutor-star { 
+      color: $upse-gold; 
+      font-size: 14px; 
+
+      @media (min-width: 480px) {
+        font-size: 16px;
+      }
+    }
   }
 
   .toggle-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 
-    .toggle-label { font-size: 14px; font-weight: 500; color: #0f172a; }
+    @media (min-width: 480px) {
+      gap: 10px;
+    }
+
+    .toggle-label { 
+      font-size: 13px; 
+      font-weight: 500; 
+      color: #0f172a; 
+
+      @media (min-width: 480px) {
+        font-size: 14px;
+      }
+    }
   }
 
   .form-actions {
     display: flex;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
     margin-top: 8px;
+
+    @media (min-width: 480px) {
+      flex-direction: row;
+      gap: 12px;
+      margin-top: 8px;
+    }
 
     .cancel-btn {
       --border-color: #e2e8f0;
       --color: #64748b;
-      --border-radius: 10px;
+      --border-radius: 8px;
       font-weight: 600;
-      flex: 1;
-      height: 44px;
+      height: 38px;
       transition: $transition;
+      width: 100%;
+
+      @media (min-width: 480px) {
+        flex: 1;
+        --border-radius: 10px;
+        height: 44px;
+        width: auto;
+      }
 
       &:hover { --border-color: #{$upse-blue}; --color: #{$upse-blue}; }
     }
 
     .submit-btn {
       --background: #{$upse-blue};
-      --border-radius: 10px;
+      --border-radius: 8px;
       font-weight: 600;
-      flex: 2;
-      height: 44px;
+      height: 38px;
       --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
       transition: $transition;
+      width: 100%;
+
+      @media (min-width: 480px) {
+        flex: 2;
+        --border-radius: 10px;
+        height: 44px;
+        width: auto;
+      }
 
       &:disabled { opacity: 0.5; --box-shadow: none; }
 
@@ -1163,105 +1995,211 @@ ion-fab-button {
 }
 
 // ============================================
-// MODAL DETALLE
+// MODAL DETALLE - MOBILE FIRST
 // ============================================
 .detalle-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px 16px 40px;
+  padding: 14px 12px 30px;
+
+  @media (min-width: 480px) {
+    padding: 16px 14px 35px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 20px 16px 40px;
+  }
 }
 
 .detalle-section {
   background: white;
-  border-radius: $radius;
+  border-radius: 12px;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
-  padding: 18px;
-  margin-bottom: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+
+  @media (min-width: 480px) {
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  @media (min-width: 768px) {
+    border-radius: $radius;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
 }
 
 .detalle-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  @media (min-width: 768px) {
+    gap: 14px;
+    margin-bottom: 10px;
+  }
 
   .detalle-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     flex-shrink: 0;
+
+    @media (min-width: 768px) {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      font-size: 20px;
+    }
 
     &.icon-upse { background: $upse-blue-light; color: $upse-blue; }
     &.icon-slate { background: #f1f5f9; color: #64748b; }
   }
 
-  h2 { margin: 0 0 4px; font-size: 16px; font-weight: 700; color: #0f172a; }
+  h2 { 
+    margin: 0 0 2px; 
+    font-size: 15px; 
+    font-weight: 700; 
+    color: #0f172a; 
+
+    @media (min-width: 480px) {
+      font-size: 16px;
+      margin: 0 0 4px;
+    }
+  }
 }
 
 .detalle-descripcion {
-  font-size: 13px;
+  font-size: 12px;
   color: #475569;
   line-height: 1.6;
-  margin: 0 0 14px;
+  margin: 0 0 12px;
+
+  @media (min-width: 768px) {
+    font-size: 13px;
+    margin: 0 0 14px;
+  }
+
   &.empty { color: #94a3b8; font-style: italic; }
 }
 
 .detalle-meta-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 8px;
 
-  @media (max-width: 480px) { grid-template-columns: 1fr; }
+  @media (min-width: 480px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
 
   .meta-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: #f8fafc;
-    border-radius: 8px;
-    padding: 8px 12px;
+    border-radius: 6px;
+    padding: 6px 10px;
 
-    ion-icon { font-size: 16px; color: $upse-blue; flex-shrink: 0; }
+    @media (min-width: 768px) {
+      gap: 10px;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+
+    ion-icon { 
+      font-size: 14px; 
+      color: $upse-blue; 
+      flex-shrink: 0; 
+
+      @media (min-width: 768px) {
+        font-size: 16px;
+      }
+    }
     div { display: flex; flex-direction: column; min-width: 0; }
-    .meta-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600; }
-    .meta-value { font-size: 12px; color: #0f172a; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .meta-label { 
+      font-size: 9px; 
+      color: #94a3b8; 
+      text-transform: uppercase; 
+      font-weight: 600; 
+
+      @media (min-width: 768px) {
+        font-size: 10px;
+      }
+    }
+    .meta-value { 
+      font-size: 11px; 
+      color: #0f172a; 
+      font-weight: 500; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      white-space: nowrap; 
+
+      @media (min-width: 768px) {
+        font-size: 12px;
+      }
+    }
   }
 }
 
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12px;
   font-weight: 700;
   color: $upse-blue;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 
-  ion-icon { font-size: 16px; }
+  @media (min-width: 768px) {
+    font-size: 13px;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  ion-icon { 
+    font-size: 14px; 
+
+    @media (min-width: 768px) {
+      font-size: 16px;
+    }
+  }
 }
 
 .participantes-full-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+
+  @media (min-width: 768px) {
+    gap: 6px;
+  }
 }
 
 .participante-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 6px 8px;
   background: #f8fafc;
-  border-radius: 8px;
+  border-radius: 6px;
+
+  @media (min-width: 768px) {
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
 
   .participante-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: $upse-blue-light;
     color: $upse-blue;
@@ -1269,8 +2207,14 @@ ion-fab-button {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 10px;
     flex-shrink: 0;
+
+    @media (min-width: 768px) {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
 
     &.tutor-avatar { background: $upse-gold-light; color: $upse-gold; }
   }
@@ -1279,27 +2223,52 @@ ion-fab-button {
     display: flex;
     flex-direction: column;
 
-    strong { font-size: 12.5px; color: #0f172a; }
-    span { font-size: 11px; color: #64748b; }
+    strong { 
+      font-size: 11px; 
+      color: #0f172a; 
+
+      @media (min-width: 768px) {
+        font-size: 12.5px;
+      }
+    }
+    span { 
+      font-size: 10px; 
+      color: #64748b; 
+
+      @media (min-width: 768px) {
+        font-size: 11px;
+      }
+    }
 
     .tutor-badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      font-size: 10px;
+      gap: 3px;
+      font-size: 9px;
       font-weight: 700;
       color: $upse-gold;
       text-transform: uppercase;
-      ion-icon { font-size: 10px; }
+
+      @media (min-width: 768px) {
+        font-size: 10px;
+        gap: 4px;
+      }
+
+      ion-icon { font-size: 9px; }
     }
   }
 }
 
 .loading-mini, .error-mini, .empty-mini {
   text-align: center;
-  padding: 12px;
-  font-size: 12px;
+  padding: 10px;
+  font-size: 11px;
   color: #94a3b8;
+
+  @media (min-width: 768px) {
+    padding: 12px;
+    font-size: 12px;
+  }
 }
 
 .error-mini {
@@ -1312,18 +2281,46 @@ ion-fab-button {
 
 .evaluaciones-summary {
   display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 10px;
+
+  @media (min-width: 768px) {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
 
   .summary-stat {
     flex: 1;
     text-align: center;
     background: $upse-blue-light;
-    border-radius: 8px;
-    padding: 8px;
+    border-radius: 6px;
+    padding: 6px;
 
-    .summary-value { display: block; font-size: 16px; font-weight: 700; color: $upse-blue; }
-    .summary-label { font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600; }
+    @media (min-width: 768px) {
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .summary-value { 
+      display: block; 
+      font-size: 14px; 
+      font-weight: 700; 
+      color: $upse-blue; 
+
+      @media (min-width: 768px) {
+        font-size: 16px;
+      }
+    }
+    .summary-label { 
+      font-size: 9px; 
+      color: #64748b; 
+      text-transform: uppercase; 
+      font-weight: 600; 
+
+      @media (min-width: 768px) {
+        font-size: 10px;
+      }
+    }
   }
 }
 
@@ -1331,41 +2328,82 @@ ion-fab-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
+  padding: 6px 8px;
   background: #f8fafc;
-  border-radius: 8px;
+  border-radius: 6px;
   margin-bottom: 4px;
+
+  @media (min-width: 768px) {
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+  }
 
   .ev-info {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 
-    strong { font-size: 12px; color: #0f172a; }
+    @media (min-width: 768px) {
+      gap: 8px;
+    }
+
+    strong { 
+      font-size: 11px; 
+      color: #0f172a; 
+
+      @media (min-width: 768px) {
+        font-size: 12px;
+      }
+    }
 
     .ev-estado {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 10px;
+      padding: 1px 6px;
+      border-radius: 8px;
       text-transform: uppercase;
+
+      @media (min-width: 768px) {
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+      }
 
       &.status-excellent { background: $upse-green-light; color: $upse-green; }
       &.status-regular { background: #fef3c7; color: #d97706; }
     }
   }
 
-  .ev-puntaje { font-size: 12px; font-weight: 700; color: $upse-blue; }
+  .ev-puntaje { 
+    font-size: 11px; 
+    font-weight: 700; 
+    color: $upse-blue; 
+
+    @media (min-width: 768px) {
+      font-size: 12px;
+    }
+  }
 }
 
 .detalle-actions {
-  margin-top: 16px;
+  margin-top: 12px;
+
+  @media (min-width: 768px) {
+    margin-top: 16px;
+  }
 
   .edit-from-detail-btn {
     --background: #{$upse-blue};
-    --border-radius: 12px;
+    --border-radius: 8px;
     font-weight: 600;
-    height: 44px;
+    height: 38px;
+
+    @media (min-width: 768px) {
+      --border-radius: 12px;
+      height: 44px;
+    }
+
     transition: $transition;
 
     &:hover { --background: #{$upse-blue-dark}; transform: translateY(-1px); }
@@ -1381,9 +2419,9 @@ ion-fab-button {
 // ============================================
 // SCROLLBAR
 // ============================================
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
-::-webkit-scrollbar-thumb { background: $upse-blue; border-radius: 3px; transition: $transition; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: $upse-blue; border-radius: 2px; transition: $transition; }
 ::-webkit-scrollbar-thumb:hover { background: $upse-blue-dark; }
 
 // ============================================
@@ -1422,6 +2460,16 @@ ion-fab-button {
       border-color: #334155;
       .stat-count { color: #60a5fa; }
       .stat-label { color: #64748b; }
+    }
+
+    .header-right .export-actions .btn-export {
+      --border-color: #334155;
+      --color: #94a3b8;
+
+      &:hover {
+        --border-color: #60a5fa;
+        --color: #60a5fa;
+      }
     }
   }
 
@@ -1599,70 +2647,28 @@ ion-fab-button {
 }
 
 // ============================================
-// RESPONSIVE AJUSTES
+// RESPONSIVE AJUSTES FINALES
 // ============================================
 @media (max-width: 480px) {
   .modal-container {
-    padding: 16px;
-    .form-actions { flex-direction: column; .cancel-btn, .submit-btn { flex: none; width: 100%; } }
-  }
-
-  .filter-bar { flex-direction: column; .search-group, .filter-group { width: 100%; min-width: 100%; } }
-}
-
-// ============================================
-// AÑADIR AL FINAL DE proyectos.page.scss
-// Botones de exportación CSV / PDF (header)
-// ============================================
-.export-actions {
-  display: flex;
-  gap: 8px;
-
-  .btn-export {
-    --border-radius: 12px;
-    --border-color: #e2e8f0;
-    --color: #64748b;
-    font-weight: 600;
-    height: 44px;
-    font-size: 13px;
-    transition: $transition;
-
-    ion-icon { font-size: 16px; }
-
-    &:hover {
-      --border-color: #{$upse-blue};
-      --color: #{$upse-blue};
-      transform: translateY(-1px);
+    padding: 14px;
+    .form-actions { 
+      flex-direction: column; 
+      .cancel-btn, .submit-btn { flex: none; width: 100%; } 
     }
-
-    // En móvil, solo ícono (oculta el texto "CSV"/"PDF")
-    @media (max-width: 480px) {
-      span { display: none; }
-      --padding-start: 10px;
-      --padding-end: 10px;
-    }
-  }
-
-  .btn-csv:hover {
-    --border-color: #{$upse-green};
-    --color: #{$upse-green};
-  }
-
-  .btn-pdf:hover {
-    --border-color: #{$upse-red};
-    --color: #{$upse-red};
   }
 }
 
-// Modo oscuro para los botones de exportación
-@media (prefers-color-scheme: dark) {
-  .export-actions .btn-export {
-    --border-color: #334155;
-    --color: #94a3b8;
+@media (max-width: 380px) {
+  .page-header .header-right .stats-mini {
+    padding: 3px 6px;
+    min-width: 32px;
 
-    &:hover {
-      --border-color: #60a5fa;
-      --color: #60a5fa;
-    }
+    .stat-count { font-size: 13px; }
+    .stat-label { font-size: 7px; }
+  }
+
+  .proyecto-card .card-header .card-info .card-meta-tags .tag-tutor {
+    max-width: 80px;
   }
 }
