@@ -51,7 +51,9 @@ import {
   schoolOutline,
   star,
   checkmarkDoneOutline,
-  alertCircleOutline
+  alertCircleOutline,
+  downloadOutline,
+  documentOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -98,6 +100,7 @@ export class ProyectosPage implements OnInit {
   totalParticipantes: number = 0;
   cargando: boolean = false;
   cargandoConcursos: boolean = false;
+  exportando: boolean = false;
 
   // ============================================
   // FILTROS
@@ -105,6 +108,7 @@ export class ProyectosPage implements OnInit {
   busqueda: string = '';
   filtroNivel: string = 'todos';
   filtroEstado: string = 'todos';
+  filtroConcurso: string = 'todos';
 
   // ============================================
   // MODAL CREAR/EDITAR
@@ -154,7 +158,8 @@ export class ProyectosPage implements OnInit {
       businessOutline, barChartOutline, peopleOutline, trophyOutline,
       eyeOutline, createOutline, trashOutline, folderOpenOutline,
       closeOutline, pricetagOutline, toggleOutline, checkmarkOutline,
-      schoolOutline, star, checkmarkDoneOutline, alertCircleOutline
+      schoolOutline, star, checkmarkDoneOutline, alertCircleOutline,
+      downloadOutline, documentOutline
     });
   }
 
@@ -239,7 +244,23 @@ export class ProyectosPage implements OnInit {
       filtered = filtered.filter(p => !p.activo);
     }
 
+    // Filtro por concurso (comparación numérica: los ion-select-option
+    // usan el id del concurso como valor, y concursoId puede venir
+    // como string desde el backend)
+    if (this.filtroConcurso !== 'todos') {
+      const concursoIdNum = Number(this.filtroConcurso);
+      filtered = filtered.filter(p => Number(p.concursoId) === concursoIdNum);
+    }
+
     this.proyectosFiltrados = filtered;
+  }
+
+  limpiarFiltros(): void {
+    this.busqueda = '';
+    this.filtroNivel = 'todos';
+    this.filtroEstado = 'todos';
+    this.filtroConcurso = 'todos';
+    this.filtrarProyectos();
   }
 
   // ============================================
@@ -439,6 +460,123 @@ export class ProyectosPage implements OnInit {
     const proyecto = this.proyectoSeleccionado;
     this.cerrarModalDetalle();
     this.editar(proyecto);
+  }
+
+  // ============================================
+  // EXPORTACIÓN CSV
+  // ============================================
+  exportarCSV(): void {
+    const datos = this.proyectosFiltrados || [];
+
+    if (datos.length === 0) {
+      this.mostrarNotificacion('No hay proyectos para exportar con los filtros actuales', 'warning');
+      return;
+    }
+
+    const headers = ['Proyecto', 'Área', 'Nivel', 'Tutor encargado', 'N° Participantes', 'Participantes', 'Concurso', 'Estado'];
+
+    const filas = datos.map(p => [
+      p.nombre || '',
+      p.area || '',
+      p.nivel || '',
+      this.tutorEncargado(p) || '',
+      String((p.participantes || []).length),
+      (p.participantes || []).map(part => part.nombre).join(' | '),
+      this.nombreConcurso(p),
+      p.activo ? 'Activo' : 'Inactivo'
+    ]);
+
+    const escapar = (valor: string): string => {
+      const texto = String(valor ?? '');
+      if (texto.includes(',') || texto.includes('"') || texto.includes('\n')) {
+        return `"${texto.replace(/"/g, '""')}"`;
+      }
+      return texto;
+    };
+
+    const filasCSV = [headers, ...filas].map(fila => fila.map(escapar).join(','));
+    // \uFEFF (BOM) al inicio para que Excel reconozca los acentos/UTF-8 correctamente
+    const csvContent = '\uFEFF' + filasCSV.join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `proyectos_${this.obtenerFechaArchivo()}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    this.mostrarNotificacion(`CSV exportado: ${datos.length} proyecto(s)`, 'success');
+  }
+
+  // ============================================
+  // EXPORTACIÓN PDF (jsPDF + jspdf-autotable)
+  // ============================================
+  async exportarPDF(): Promise<void> {
+    const datos = this.proyectosFiltrados || [];
+
+    if (datos.length === 0) {
+      this.mostrarNotificacion('No hay proyectos para exportar con los filtros actuales', 'warning');
+      return;
+    }
+
+    this.exportando = true;
+
+    try {
+      // Import dinámico: evita cargar jsPDF en el bundle inicial de la página
+      const { default: jsPDF } = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      const autoTable = autoTableModule.default;
+
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+      doc.setFontSize(16);
+      doc.setTextColor(0, 27, 76);
+      doc.text('Informe de Proyectos - Sistema UPSE', 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const fechaLegible = new Date().toLocaleString('es-EC');
+      doc.text(`Generado: ${fechaLegible}  •  Total: ${datos.length} proyecto(s)`, 14, 21);
+
+      const columnas = ['Proyecto', 'Área', 'Nivel', 'Tutor encargado', 'Participantes', 'Concurso', 'Estado'];
+
+      const filas = datos.map(p => [
+        p.nombre || '—',
+        p.area || '—',
+        p.nivel || '—',
+        this.tutorEncargado(p) || '—',
+        String((p.participantes || []).length),
+        this.nombreConcurso(p),
+        p.activo ? 'Activo' : 'Inactivo'
+      ]);
+
+      autoTable(doc, {
+        head: [columnas],
+        body: filas,
+        startY: 26,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 27, 76], textColor: 255, fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 3 },
+        alternateRowStyles: { fillColor: [232, 240, 254] }
+      });
+
+      doc.save(`proyectos_${this.obtenerFechaArchivo()}.pdf`);
+      this.mostrarNotificacion(`PDF exportado: ${datos.length} proyecto(s)`, 'success');
+    } catch (err) {
+      console.error('Error generando el PDF:', err);
+      this.mostrarNotificacion('Error al generar el PDF', 'danger');
+    } finally {
+      this.exportando = false;
+    }
+  }
+
+  private obtenerFechaArchivo(): string {
+    const ahora = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${ahora.getFullYear()}${pad(ahora.getMonth() + 1)}${pad(ahora.getDate())}_${pad(ahora.getHours())}${pad(ahora.getMinutes())}`;
   }
 
   // ============================================

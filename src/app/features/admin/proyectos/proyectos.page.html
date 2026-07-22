@@ -34,6 +34,17 @@
         <p>{{ proyectos.length }} proyectos registrados en el sistema</p>
       </div>
       <div class="header-right">
+        <div class="export-actions">
+          <ion-button fill="outline" class="btn-export btn-csv" (click)="exportarCSV()" title="Descargar CSV">
+            <ion-icon name="document-outline" slot="start"></ion-icon>
+            <span>CSV</span>
+          </ion-button>
+          <ion-button fill="outline" class="btn-export btn-pdf" (click)="exportarPDF()" [disabled]="exportando" title="Descargar PDF">
+            <ion-icon [name]="exportando ? 'refresh-outline' : 'document-outline'" [class.spinning]="exportando" slot="start"></ion-icon>
+            <span>PDF</span>
+          </ion-button>
+        </div>
+
         <ion-button class="btn-add-desktop" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           <span>Nuevo proyecto</span>
@@ -93,6 +104,29 @@
           <ion-select-option value="inactivo">Inactivos</ion-select-option>
         </ion-select>
       </div>
+
+      <!-- Tercer filtro: por concurso -->
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroConcurso"
+          (ionChange)="filtrarProyectos()"
+          placeholder="Todos los concursos"
+          interface="popover"
+          class="filter-select"
+          [disabled]="cargandoConcursos">
+          <ion-select-option value="todos">Todos los concursos</ion-select-option>
+          <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
+            {{ c.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+
+      <ion-button fill="clear" size="small" class="btn-clear-filters"
+                  (click)="limpiarFiltros()"
+                  *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos' || filtroConcurso !== 'todos'">
+        <ion-icon name="close-outline"></ion-icon>
+        Limpiar
+      </ion-button>
     </div>
 
     <!-- SKELETON LOADING -->
@@ -221,10 +255,10 @@
                     <ion-icon name="folder-open-outline"></ion-icon>
                   </div>
                   <h3>No hay proyectos</h3>
-                  <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos'">
+                  <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos' && filtroConcurso === 'todos'">
                     Comienza creando el primer proyecto de investigación
                   </p>
-                  <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos'">
+                  <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos' || filtroConcurso !== 'todos'">
                     No se encontraron proyectos con los filtros aplicados
                   </p>
                   <ion-button class="btn-primary" (click)="abrirCrear()">
