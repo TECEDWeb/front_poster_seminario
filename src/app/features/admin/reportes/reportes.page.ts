@@ -100,6 +100,7 @@ interface Ganador {
   area?: string;
   nivel?: string;
   promedio: number;
+  puntajeMaximo: number;
   evaluaciones: number;
   evaluadores?: any[];
   posicion: number;
@@ -272,6 +273,7 @@ export class ReportesPage implements OnInit {
           estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado',
           participantes: item.participantes || [],
           tutores: item.tutores || [],
+          puntajeMaximo: item.puntajeMaximo || item.puntaje_maximo || 100,
           concursoId: item.concursoId ?? item.concurso_id ?? null,
           concursoNombre: item.concursoNombre ?? item.concurso_nombre ?? null
         }));
@@ -298,8 +300,8 @@ export class ReportesPage implements OnInit {
       return;
     }
 
-    const proyectosConEvaluaciones = this.proyectos.filter(p => 
-      p.evaluaciones && p.evaluaciones.length > 0 && p.promedio > 0
+    const proyectosConEvaluaciones = this.proyectos.filter(p =>
+      (p.evaluaciones || 0) > 0 && (p.promedio || 0) > 0
     );
 
     if (proyectosConEvaluaciones.length === 0) {
@@ -307,7 +309,7 @@ export class ReportesPage implements OnInit {
       return;
     }
 
-    const sorted = [...proyectosConEvaluaciones].sort((a, b) => 
+    const sorted = [...proyectosConEvaluaciones].sort((a, b) =>
       (b.promedio || 0) - (a.promedio || 0)
     );
 
@@ -317,7 +319,8 @@ export class ReportesPage implements OnInit {
       area: proyecto.area || 'Sin área',
       nivel: proyecto.nivel || 'Sin nivel',
       promedio: proyecto.promedio || 0,
-      evaluaciones: proyecto.evaluaciones?.length || 0,
+      puntajeMaximo: proyecto.puntajeMaximo || 100,
+      evaluaciones: proyecto.evaluaciones || 0,
       evaluadores: proyecto.evaluadores || [],
       posicion: index + 1,
       medalla: index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉',
@@ -333,13 +336,14 @@ export class ReportesPage implements OnInit {
 
     let mensaje = 'PODIO DEL CONCURSO\n\n';
     mensaje += '━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
-    
+
     this.ganadores.forEach((g, index) => {
       const posicion = index === 0 ? '1er Lugar' : index === 1 ? '2do Lugar' : '3er Lugar';
-      
+      const pct = this.getPorcentaje(g.promedio, g.puntajeMaximo);
+
       mensaje += `${posicion}\n`;
       mensaje += `Proyecto: ${g.nombre}\n`;
-      mensaje += `Promedio: ${g.promedio.toFixed(2)} pts\n`;
+      mensaje += `Puntaje: ${g.promedio.toFixed(2)} / ${g.puntajeMaximo} (${pct}%)\n`;
       mensaje += `Evaluaciones: ${g.evaluaciones || 0}\n`;
       mensaje += `Área: ${g.area || 'Sin área'}\n`;
       mensaje += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
@@ -430,14 +434,15 @@ export class ReportesPage implements OnInit {
       });
     }
 
-    if (this.filtroStatus === 'excelente') {
-      filtered = filtered.filter(p => (p.promedio || 0) >= 8);
-    } else if (this.filtroStatus === 'bueno') {
-      filtered = filtered.filter(p => (p.promedio || 0) >= 6 && (p.promedio || 0) < 8);
-    } else if (this.filtroStatus === 'regular') {
-      filtered = filtered.filter(p => (p.promedio || 0) >= 4 && (p.promedio || 0) < 6);
-    } else if (this.filtroStatus === 'bajo') {
-      filtered = filtered.filter(p => (p.promedio || 0) < 4);
+    if (this.filtroStatus !== 'todos') {
+      filtered = filtered.filter(p => {
+        const pct = this.getPorcentaje(p.promedio, p.puntajeMaximo);
+        if (this.filtroStatus === 'excelente') return pct >= 80;
+        if (this.filtroStatus === 'bueno') return pct >= 60 && pct < 80;
+        if (this.filtroStatus === 'regular') return pct >= 40 && pct < 60;
+        if (this.filtroStatus === 'bajo') return pct < 40;
+        return true;
+      });
     }
 
     if (this.filtroEvaluador !== 'todos') {
@@ -465,7 +470,6 @@ export class ReportesPage implements OnInit {
     this.filtroConcurso = 'todos';
     this.aplicarFiltros();
   }
-
 
   getNombreConcurso(id: string): string {
     if (id === 'todos') return 'Todos los concursos';
@@ -519,13 +523,15 @@ export class ReportesPage implements OnInit {
     }
 
     const headers = [
-      'Proyecto', 
-      'Área', 
-      'Nivel', 
-      'Tutor encargado', 
+      'Proyecto',
+      'Área',
+      'Nivel',
+      'Tutor encargado',
       'Participantes',
       'Evaluaciones',
-      'Promedio',
+      'Puntaje',
+      'Puntaje máximo',
+      'Porcentaje',
       'Estado',
       'Concurso'
     ];
@@ -538,14 +544,16 @@ export class ReportesPage implements OnInit {
       (p.participantes || []).map((part: any) => part.nombre).join(' | '),
       String(p.evaluaciones || 0),
       String(p.promedio ? p.promedio.toFixed(2) : '0.00'),
-      this.getStatusText(p.promedio),
+      String(p.puntajeMaximo || 100),
+      `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
+      this.getStatusText(p.promedio, p.puntajeMaximo),
       this.getNombreConcursoFiltro(p)
     ]);
 
     const csvContent = this.generarCSV(headers, filas);
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    const nombreConcurso = this.filtroConcurso !== 'todos' 
+
+    const nombreConcurso = this.filtroConcurso !== 'todos'
       ? this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_')
       : 'todos';
     const fecha = new Date().toISOString().split('T')[0];
@@ -573,7 +581,7 @@ export class ReportesPage implements OnInit {
 
       doc.setFontSize(16);
       doc.setTextColor(0, 27, 76);
-      const titulo = this.filtroConcurso !== 'todos' 
+      const titulo = this.filtroConcurso !== 'todos'
         ? `Reporte - ${this.getNombreConcurso(this.filtroConcurso)}`
         : 'Reporte General de Evaluaciones';
       doc.text(titulo, 14, 15);
@@ -584,13 +592,14 @@ export class ReportesPage implements OnInit {
       doc.text(`Generado: ${fechaLegible}  •  Total: ${datos.length} proyecto(s)`, 14, 21);
 
       const columnas = [
-        'Proyecto', 
-        'Área', 
-        'Nivel', 
-        'Tutor', 
-        'Evaluaciones', 
-        'Promedio', 
-        'Estado', 
+        'Proyecto',
+        'Área',
+        'Nivel',
+        'Tutor',
+        'Eval.',
+        'Puntaje',
+        '%',
+        'Estado',
         'Concurso'
       ];
 
@@ -600,8 +609,9 @@ export class ReportesPage implements OnInit {
         p.nivel || '—',
         this.tutorPrincipal(p) || '—',
         String(p.evaluaciones || 0),
-        p.promedio ? p.promedio.toFixed(2) : '0.00',
-        this.getStatusText(p.promedio),
+        `${p.promedio ? p.promedio.toFixed(2) : '0.00'} / ${p.puntajeMaximo || 100}`,
+        `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
+        this.getStatusText(p.promedio, p.puntajeMaximo),
         this.getNombreConcursoFiltro(p)
       ]);
 
@@ -615,7 +625,7 @@ export class ReportesPage implements OnInit {
         alternateRowStyles: { fillColor: [232, 240, 254] }
       });
 
-      const nombreConcurso = this.filtroConcurso !== 'todos' 
+      const nombreConcurso = this.filtroConcurso !== 'todos'
         ? this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_')
         : 'todos';
       const fecha = new Date().toISOString().split('T')[0];
@@ -665,7 +675,6 @@ export class ReportesPage implements OnInit {
       }
     });
   }
-
 
   editarEvaluacionAdmin(proyecto: any): void {
     const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
@@ -745,7 +754,7 @@ export class ReportesPage implements OnInit {
           evaluadores: data.evaluadores || proyecto.evaluadores || [],
           participantes: data.participantes || proyecto.participantes || [],
           tutores: data.tutores || proyecto.tutores || [],
-          puntajeMaximo: data.puntajeMaximo || 100
+          puntajeMaximo: data.puntajeMaximo || proyecto.puntajeMaximo || 100
         };
         this.cargandoDetalle = false;
       },
@@ -761,7 +770,7 @@ export class ReportesPage implements OnInit {
           evaluadores: proyecto.evaluadores || [],
           participantes: proyecto.participantes || [],
           tutores: proyecto.tutores || [],
-          puntajeMaximo: 100
+          puntajeMaximo: proyecto.puntajeMaximo || 100
         };
       }
     });
@@ -864,40 +873,44 @@ export class ReportesPage implements OnInit {
     return colors[index];
   }
 
-  getStatusClass(promedio: number): string {
-    if (!promedio) return 'status-low';
-    if (promedio >= 8) return 'status-excellent';
-    if (promedio >= 6) return 'status-good';
-    if (promedio >= 4) return 'status-regular';
-    return 'status-low';
-  }
-
-  getStatusText(promedio: number): string {
-    if (!promedio) return 'Sin datos';
-    if (promedio >= 8) return 'Excelente';
-    if (promedio >= 6) return 'Bueno';
-    if (promedio >= 4) return 'Regular';
-    return 'Bajo';
-  }
-
-  getPorcentaje(promedio: number, maximo: number = 10): number {
+  getPorcentaje(promedio: number, maximo: number = 100): number {
     if (!promedio || !maximo) return 0;
     return Math.min(Math.round((promedio / maximo) * 100), 100);
   }
 
-  getStatusIcon(promedio: number): string {
+  getStatusClass(promedio: number, maximo: number = 100): string {
+    if (!promedio) return 'status-low';
+    const pct = this.getPorcentaje(promedio, maximo);
+    if (pct >= 80) return 'status-excellent';
+    if (pct >= 60) return 'status-good';
+    if (pct >= 40) return 'status-regular';
+    return 'status-low';
+  }
+
+  getStatusText(promedio: number, maximo: number = 100): string {
+    if (!promedio) return 'Sin datos';
+    const pct = this.getPorcentaje(promedio, maximo);
+    if (pct >= 80) return 'Excelente';
+    if (pct >= 60) return 'Bueno';
+    if (pct >= 40) return 'Regular';
+    return 'Bajo';
+  }
+
+  getStatusIcon(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'alert-circle-outline';
-    if (promedio >= 8) return 'checkmark-circle-outline';
-    if (promedio >= 6) return 'time-outline';
-    if (promedio >= 4) return 'alert-circle-outline';
+    const pct = this.getPorcentaje(promedio, maximo);
+    if (pct >= 80) return 'checkmark-circle-outline';
+    if (pct >= 60) return 'time-outline';
+    if (pct >= 40) return 'alert-circle-outline';
     return 'close-circle-outline';
   }
 
-  getColorClass(promedio: number): string {
+  getColorClass(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'color-gray';
-    if (promedio >= 8) return 'color-green';
-    if (promedio >= 6) return 'color-blue';
-    if (promedio >= 4) return 'color-orange';
+    const pct = this.getPorcentaje(promedio, maximo);
+    if (pct >= 80) return 'color-green';
+    if (pct >= 60) return 'color-blue';
+    if (pct >= 40) return 'color-orange';
     return 'color-red';
   }
 
