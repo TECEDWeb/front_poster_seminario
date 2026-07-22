@@ -176,6 +176,45 @@
                   </div>
                 </div>
               </div>
+
+              <!-- ============================================ -->
+              <!-- EVALUADORES YA ASIGNADOS A ESTE PROYECTO -->
+              <!-- ============================================ -->
+              <!-- Aparece apenas se elige un proyecto. Aquí es donde se -->
+              <!-- resuelve el caso de "un evaluador no vino, hay que quitarlo". -->
+              <div class="asignados-proyecto" *ngIf="proyectoId">
+                <div class="asignados-header">
+                  <ion-icon name="people-outline"></ion-icon>
+                  <span>Evaluadores asignados a este proyecto ({{ asignacionesDelProyecto.length }})</span>
+                </div>
+
+                <div class="asignados-list" *ngIf="asignacionesDelProyecto.length > 0">
+                  <div class="asignado-item" *ngFor="let a of asignacionesDelProyecto">
+                    <div class="asignado-avatar" [class]="a.status || a.estado || 'pending'">
+                      <ion-icon [name]="getStatusIcon(a.status || a.estado)"></ion-icon>
+                    </div>
+                    <div class="asignado-info">
+                      <span class="asignado-nombre">{{ a.evaluador_nombre || a.evaluador?.nombre }}</span>
+                      <span class="asignado-estado" [class]="a.status || a.estado || 'pending'">
+                        {{ getStatusText(a.status || a.estado) }}
+                      </span>
+                    </div>
+                    <button
+                      class="quitar-btn"
+                      type="button"
+                      (click)="quitarAsignacion(a)"
+                      title="Quitar esta asignación">
+                      <ion-icon name="person-remove-outline"></ion-icon>
+                      Quitar
+                    </button>
+                  </div>
+                </div>
+
+                <div class="asignados-empty" *ngIf="asignacionesDelProyecto.length === 0">
+                  <ion-icon name="information-circle-outline"></ion-icon>
+                  <span>Aún no hay evaluadores asignados a este proyecto</span>
+                </div>
+              </div>
             </div>
 
             <!-- CAMPO: EVALUADOR -->
@@ -296,9 +335,8 @@
                 </span>
               </div>
               
-              <!-- ✅ ACCIONES ADMIN - SIEMPRE VISIBLES PARA ADMIN -->
+              <!-- ACCIONES ADMIN -->
               <div class="assignment-admin-actions" *ngIf="esAdmin">
-                <!-- ✏️ BOTÓN EDITAR - SIEMPRE VISIBLE PARA ADMIN -->
                 <button class="admin-btn admin-btn-editar" 
                         (click)="editarEvaluacionAdmin(a)"
                         title="Editar respuestas de esta evaluación">
@@ -306,7 +344,6 @@
                   Editar
                 </button>
                 
-                <!-- 🔄 BOTÓN REABRIR - solo si está completado/evaluado -->
                 <button class="admin-btn admin-btn-reabrir" 
                         (click)="reabrirEvaluacion(a)" 
                         *ngIf="a.status === 'completed' || a.status === 'completado' || a.estado === 'evaluado' || a.yaEvaluado === true"
@@ -315,7 +352,6 @@
                   Reabrir
                 </button>
                 
-                <!-- 🗑️ BOTÓN ELIMINAR - siempre visible para admin -->
                 <button class="admin-btn admin-btn-eliminar" 
                         (click)="eliminarEvaluacion(a)"
                         title="Eliminar evaluación">
@@ -323,7 +359,6 @@
                   Eliminar
                 </button>
                 
-                <!-- 👁️ BOTÓN VER DETALLE - siempre visible -->
                 <button class="admin-btn admin-btn-ver" 
                         (click)="verDetalleAsignacion(a)"
                         title="Ver detalle">
