@@ -207,6 +207,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid #eef2f7;
       min-width: 60px;
       box-shadow: $shadow-sm;
+      transition: $transition;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+        border-color: $upse-blue;
+      }
 
       .stat-count {
         font-size: 20px;
@@ -1110,158 +1117,7 @@ ion-fab-button {
 }
 
 // ============================================
-// MODAL (edición de datos generales)
-// ============================================
-.modal-content {
-  --background: #f8fafc;
-}
-
-.modal-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 14px 16px;
-
-  @media (min-width: 480px) {
-    padding: 16px 20px;
-  }
-
-  @media (min-width: 768px) {
-    max-width: 600px;
-    padding: 20px 24px;
-  }
-
-  .form-field {
-    margin-bottom: 14px;
-
-    @media (min-width: 768px) { margin-bottom: 18px; }
-
-    .field-label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 4px;
-
-      @media (min-width: 768px) {
-        font-size: 13px;
-        gap: 6px;
-        margin-bottom: 6px;
-      }
-
-      ion-icon {
-        color: $upse-blue;
-        font-size: 14px;
-
-        @media (min-width: 768px) { font-size: 16px; }
-      }
-
-      .required {
-        color: #ef4444;
-        font-weight: 700;
-        margin-left: 2px;
-      }
-    }
-
-    .field-input {
-      --background: white;
-      --border-radius: 8px;
-      --padding-start: 10px;
-      --padding-end: 10px;
-      --inner-padding-end: 10px;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      min-height: 36px;
-      box-shadow: $shadow-sm;
-
-      @media (min-width: 768px) {
-        --border-radius: 10px;
-        --padding-start: 14px;
-        --padding-end: 14px;
-        --inner-padding-end: 14px;
-        min-height: 44px;
-      }
-
-      &:focus-within {
-        border-color: $upse-blue;
-        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
-      }
-
-      ion-input, ion-textarea, ion-select, ion-toggle {
-        --padding-start: 0;
-        font-size: 13px;
-
-        @media (min-width: 768px) { font-size: 14px; }
-      }
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 12px;
-
-    @media (min-width: 480px) {
-      flex-direction: row;
-      gap: 12px;
-    }
-
-    @media (min-width: 768px) { margin-top: 16px; }
-
-    .cancel-btn {
-      --border-color: #e2e8f0;
-      --color: #64748b;
-      --border-radius: 8px;
-      font-weight: 600;
-      height: 38px;
-      transition: $transition;
-
-      @media (min-width: 768px) {
-        --border-radius: 10px;
-        height: 44px;
-        flex: 1;
-      }
-
-      &:hover {
-        --border-color: #{$upse-blue};
-        --color: #{$upse-blue};
-      }
-    }
-
-    .submit-btn {
-      --background: #{$upse-blue};
-      --border-radius: 8px;
-      font-weight: 600;
-      height: 38px;
-      --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
-
-      @media (min-width: 768px) {
-        --border-radius: 10px;
-        height: 44px;
-        flex: 2;
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        --box-shadow: none;
-      }
-
-      &:hover:not(:disabled) {
-        --background: #{$upse-blue-dark};
-        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
-      }
-
-      .spinning {
-        animation: spin 1s linear infinite;
-      }
-    }
-  }
-}
-
-// ============================================
-// ANIMATIONS
+// ANIMACIONES
 // ============================================
 .spinning {
   animation: spin 1s linear infinite;
@@ -1294,160 +1150,49 @@ ion-fab-button {
 ::-webkit-scrollbar-thumb:hover {
   background: $upse-blue-dark;
 }
-// Mejoras adicionales para el builder
 
-// Estados de carga y error mejorados
-.loading-state, .error-state {
-  ion-button {
-    margin-top: 8px;
-    --border-color: #{$upse-blue};
-    --color: #{$upse-blue};
-  }
-}
-
-// Mejoras para niveles personalizados
-.niveles-criterio {
-  .niveles-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 8px;
-
-    .niveles-criterio-hint {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: #94a3b8;
-
-      .hint-light {
-        opacity: 0.7;
-        font-style: italic;
-      }
-
-      ion-icon {
-        font-size: 14px;
-        color: $upse-blue;
-      }
-    }
-  }
-}
-
-// Mejoras para secciones
-.seccion-card {
-  .seccion-desc {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-left: 8px;
-    font-style: italic;
-  }
-
-  .seccion-titulo {
-    flex-wrap: wrap;
-
-    .seccion-count {
-      background: $upse-blue-light;
-      padding: 1px 10px;
-      border-radius: 12px;
-      font-size: 10px;
-      color: $upse-blue;
-    }
-  }
-}
-
-// Botones de acción en criterios
-.criterio-main {
-  .criterio-actions {
-    display: flex;
-    gap: 2px;
-    margin-left: auto;
-  }
-}
-
-// Mejoras para filas de adición
-.add-row {
-  &.seccion-add {
-    background: $upse-blue-light;
-    border-color: $upse-blue;
-    padding: 12px 14px;
-  }
-}
-
-// Mejoras para el panel de estadísticas en el header
-.stats-mini {
-  transition: $transition;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
-    border-color: $upse-blue;
-  }
-}
-
-// Responsive mejorado
-@media (max-width: 576px) {
-  .builder-container {
-    padding: 12px 8px 40px;
-  }
-
-  .panel {
-    padding: 14px 12px;
-  }
-
-  .nivel-row, .add-row {
-    padding: 6px 8px;
-    gap: 6px;
-  }
-
-  .inline-input {
-    min-width: 60px;
-    font-size: 12px;
-    padding: 4px 6px;
-
-    &.small {
-      flex: 0 0 50px;
-      min-width: 50px;
-    }
-  }
-
-  .icon-btn {
-    width: 24px;
-    height: 24px;
-
-    ion-icon {
-      font-size: 14px;
-    }
-  }
-}
-
-// Ajustes para el modal
-.modal-content {
-  .modal-container {
-    .form-field {
-      .field-input {
-        ion-select {
-          --placeholder-color: #94a3b8;
-        }
-      }
-    }
-  }
-}
 // ============================================
-// MODALES CORREGIDOS
+// MODALES (bloque único y consolidado)
 // ============================================
+// ⚠️ Antes había DOS bloques de reglas para ion-modal /
+// .modal-content / .modal-container repetidos y con valores
+// distintos (probablemente de una edición paralela con otra
+// herramienta). Eso, combinado con abrir un modal antes de que
+// el otro terminara su animación de salida, era lo que hacía
+// que "Nueva rúbrica" pareciera cargar por debajo de la interfaz.
+// Ahora solo hay un bloque, y el problema de fondo ya se resolvió
+// en el .ts (ver cerrarBuilderYLuego / cerrarModalYLuego).
 
-// Modal de edición general
 ion-modal {
   --border-radius: 16px;
   --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  
+
   &::part(backdrop) {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
   }
 }
 
-// Modal del builder - Ocupa toda la pantalla
+// Modal de edición/creación de datos generales - tamaño mediano
+ion-modal:not(.builder-modal) {
+  --width: 90%;
+  --max-width: 500px;
+  --height: auto;
+  --max-height: 90vh;
+  --border-radius: 16px;
+
+  @media (min-width: 768px) {
+    --width: 80%;
+    --max-width: 600px;
+  }
+
+  @media (max-width: 576px) {
+    --width: 95% !important;
+    --max-height: 95vh !important;
+  }
+}
+
+// Modal del builder - ocupa toda la pantalla
 .builder-modal {
   --width: 100% !important;
   --height: 100% !important;
@@ -1455,181 +1200,145 @@ ion-modal {
   --max-height: 100% !important;
   --border-radius: 0 !important;
   --box-shadow: none !important;
-  
+
   &::part(content) {
     height: 100vh !important;
     width: 100vw !important;
     max-height: 100vh !important;
     max-width: 100vw !important;
   }
-  
+
   &::part(backdrop) {
     background: rgba(0, 0, 0, 0.8) !important;
     backdrop-filter: blur(4px);
   }
-}
 
-// Modal de edición - Tamaño mediano
-ion-modal:not(.builder-modal) {
-  --width: 90%;
-  --max-width: 500px;
-  --height: auto;
-  --max-height: 90vh;
-  --border-radius: 16px;
-  
-  @media (min-width: 768px) {
-    --width: 80%;
-    --max-width: 600px;
-  }
-}
-
-// Contenido del modal de edición
-.modal-content {
-  --background: #f8fafc;
-  --padding-bottom: 16px;
-  
-  .modal-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 16px 20px;
-    
-    @media (min-width: 768px) {
-      padding: 24px 32px;
-    }
-    
-    .form-field {
-      margin-bottom: 16px;
-      
-      .field-label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 6px;
-        
-        ion-icon {
-          color: $upse-blue;
-          font-size: 16px;
-        }
-        
-        .required {
-          color: #ef4444;
-          font-weight: 700;
-          margin-left: 2px;
-        }
-      }
-      
-      .field-input {
-        --background: white;
-        --border-radius: 10px;
-        --padding-start: 14px;
-        --padding-end: 14px;
-        --inner-padding-end: 14px;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        min-height: 44px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        
-        &:focus-within {
-          border-color: $upse-blue;
-          box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
-        }
-        
-        ion-input, ion-textarea, ion-select {
-          --padding-start: 0;
-          font-size: 14px;
-        }
-      }
-    }
-    
-    .form-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
-      
-      @media (min-width: 480px) {
-        flex-direction: row;
-        gap: 12px;
-      }
-      
-      .cancel-btn {
-        --border-color: #e2e8f0;
-        --color: #64748b;
-        --border-radius: 10px;
-        font-weight: 600;
-        height: 44px;
-        
-        @media (min-width: 768px) {
-          flex: 1;
-        }
-        
-        &:hover {
-          --border-color: #{$upse-blue};
-          --color: #{$upse-blue};
-        }
-      }
-      
-      .submit-btn {
-        --background: #{$upse-blue};
-        --border-radius: 10px;
-        font-weight: 600;
-        height: 44px;
-        --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
-        
-        @media (min-width: 768px) {
-          flex: 2;
-        }
-        
-        &:disabled {
-          opacity: 0.5;
-          --box-shadow: none;
-        }
-        
-        &:hover:not(:disabled) {
-          --background: #{$upse-blue-dark};
-          --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
-        }
-        
-        .spinning {
-          animation: spin 1s linear infinite;
-        }
-      }
-    }
-  }
-}
-
-// ============================================
-// ANIMACIONES
-// ============================================
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-// ============================================
-// RESPONSIVE PARA MODALES
-// ============================================
-@media (max-width: 576px) {
-  .builder-modal {
-    --width: 100% !important;
-    --height: 100% !important;
-    --border-radius: 0 !important;
-    
+  @media (max-width: 576px) {
     &::part(content) {
       height: 100dvh !important;
       width: 100vw !important;
     }
   }
-  
-  ion-modal:not(.builder-modal) {
-    --width: 95% !important;
-    --max-height: 95vh !important;
+}
+
+.modal-content {
+  --background: #f8fafc;
+  --padding-bottom: 16px;
+}
+
+.modal-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px 20px;
+
+  @media (min-width: 768px) {
+    padding: 24px 32px;
+  }
+
+  .form-field {
+    margin-bottom: 16px;
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+
+      ion-icon {
+        color: $upse-blue;
+        font-size: 16px;
+      }
+
+      .required {
+        color: #ef4444;
+        font-weight: 700;
+        margin-left: 2px;
+      }
+    }
+
+    .field-input {
+      --background: white;
+      --border-radius: 10px;
+      --padding-start: 14px;
+      --padding-end: 14px;
+      --inner-padding-end: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      min-height: 44px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+      &:focus-within {
+        border-color: $upse-blue;
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.1);
+      }
+
+      ion-input, ion-textarea, ion-select, ion-toggle {
+        --padding-start: 0;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+
+    @media (min-width: 480px) {
+      flex-direction: row;
+      gap: 12px;
+    }
+
+    .cancel-btn {
+      --border-color: #e2e8f0;
+      --color: #64748b;
+      --border-radius: 10px;
+      font-weight: 600;
+      height: 44px;
+      transition: $transition;
+
+      @media (min-width: 768px) {
+        flex: 1;
+      }
+
+      &:hover {
+        --border-color: #{$upse-blue};
+        --color: #{$upse-blue};
+      }
+    }
+
+    .submit-btn {
+      --background: #{$upse-blue};
+      --border-radius: 10px;
+      font-weight: 600;
+      height: 44px;
+      --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
+
+      @media (min-width: 768px) {
+        flex: 2;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        --box-shadow: none;
+      }
+
+      &:hover:not(:disabled) {
+        --background: #{$upse-blue-dark};
+        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+      }
+
+      .spinning {
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+
+  ion-select {
+    --placeholder-color: #94a3b8;
   }
 }

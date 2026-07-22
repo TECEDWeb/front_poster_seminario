@@ -56,6 +56,10 @@ interface Concurso {
   descripcion?: string;
 }
 
+// Duración segura para esperar a que termine la animación de salida
+// de un ion-modal antes de presentar el siguiente (Ionic usa ~300-350ms).
+const MODAL_TRANSITION_MS = 350;
+
 @Component({
   selector: 'app-rubricas',
   standalone: true,
@@ -237,22 +241,47 @@ export class RubricasPage implements OnInit {
     this.aplicarFiltros();
   }
 
+  // ==========================================================
+  // COORDINACIÓN ENTRE MODALES (evita que se abran solapados)
+  // ==========================================================
+  // Si el builder está abierto, lo cerramos y ESPERAMOS a que
+  // termine su animación de salida antes de ejecutar la acción
+  // que abre el otro modal. Sin esta espera, el nuevo modal se
+  // presenta mientras el anterior aún se está desvaneciendo y
+  // puede quedar visualmente "debajo" de él.
+  private cerrarBuilderYLuego(accion: () => void): void {
+    if (this.builderAbierto) {
+      this.builderAbierto = false;
+      this.concursoSeleccionadoBuilder = null;
+      setTimeout(() => accion(), MODAL_TRANSITION_MS);
+    } else {
+      accion();
+    }
+  }
+
+  private cerrarModalYLuego(accion: () => void): void {
+    if (this.modalAbierto) {
+      this.modalAbierto = false;
+      this.guardando = false;
+      setTimeout(() => accion(), MODAL_TRANSITION_MS);
+    } else {
+      accion();
+    }
+  }
+
   // ========== MODAL DE EDICIÓN ==========
   abrirCrear(): void {
-    // Cerrar cualquier otro modal abierto
-    if (this.builderAbierto) {
-      this.cerrarBuilder();
-    }
-    
-    this.editando = false;
-    this.form = {
-      id: null,
-      concursoId: null,
-      nombre: '',
-      descripcion: '',
-      puntajeMaximo: 100
-    };
-    this.modalAbierto = true;
+    this.cerrarBuilderYLuego(() => {
+      this.editando = false;
+      this.form = {
+        id: null,
+        concursoId: null,
+        nombre: '',
+        descripcion: '',
+        puntajeMaximo: 100
+      };
+      this.modalAbierto = true;
+    });
   }
 
   cerrarModal(): void {
@@ -261,31 +290,28 @@ export class RubricasPage implements OnInit {
   }
 
   editar(rubrica: RubricaConcurso): void {
-    // Cerrar cualquier otro modal abierto
-    if (this.builderAbierto) {
-      this.cerrarBuilder();
-    }
+    this.cerrarBuilderYLuego(() => {
+      console.log('📝 Editando rúbrica:', rubrica);
 
-    console.log('📝 Editando rúbrica:', rubrica);
+      this.editando = true;
 
-    this.editando = true;
+      const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
 
-    const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
+      const nombreRubrica = concurso?.nombre
+        ? `Rúbrica: ${concurso.nombre}`
+        : `Rúbrica del concurso #${rubrica.concursoId}`;
 
-    const nombreRubrica = concurso?.nombre
-      ? `Rúbrica: ${concurso.nombre}`
-      : `Rúbrica del concurso #${rubrica.concursoId}`;
+      this.form = {
+        id: rubrica.concursoId,
+        concursoId: rubrica.concursoId,
+        nombre: nombreRubrica,
+        descripcion: concurso?.descripcion || '',
+        puntajeMaximo: 100
+      };
 
-    this.form = {
-      id: rubrica.concursoId,
-      concursoId: rubrica.concursoId,
-      nombre: nombreRubrica,
-      descripcion: concurso?.descripcion || '',
-      puntajeMaximo: 100
-    };
-
-    console.log('📝 Formulario después de editar:', this.form);
-    this.modalAbierto = true;
+      console.log('📝 Formulario después de editar:', this.form);
+      this.modalAbierto = true;
+    });
   }
 
   guardar(): void {
@@ -344,7 +370,7 @@ export class RubricasPage implements OnInit {
         } else if (err.message) {
           mensaje = err.message;
         }
-        
+
         alert(mensaje);
       }
     });
@@ -469,19 +495,12 @@ export class RubricasPage implements OnInit {
 
   // ========== MODAL DEL BUILDER ==========
   abrirBuilder(rubrica: RubricaConcurso): void {
-    // Cerrar el modal de edición si está abierto
-    if (this.modalAbierto) {
-      this.cerrarModal();
-    }
-
-    const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
-    this.concursoSeleccionadoBuilder = rubrica.concursoId;
-    this.concursoNombreBuilder = concurso?.nombre || `Concurso #${rubrica.concursoId}`;
-    
-    // Pequeño retraso para asegurar que el modal anterior se cerró
-    setTimeout(() => {
+    this.cerrarModalYLuego(() => {
+      const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
+      this.concursoSeleccionadoBuilder = rubrica.concursoId;
+      this.concursoNombreBuilder = concurso?.nombre || `Concurso #${rubrica.concursoId}`;
       this.builderAbierto = true;
-    }, 100);
+    });
   }
 
   cerrarBuilder(): void {

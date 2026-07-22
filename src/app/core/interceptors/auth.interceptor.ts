@@ -17,17 +17,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const esPublica = esLogin || esRegister || esOlvidePassword || esResetPassword;
 
   console.log('========================================');
-  console.log('🔐 INTERCEPTOR ACTIVADO');
-  console.log('📌 URL:', req.url);
-  console.log('📌 Método:', req.method);
-  console.log('📌 Es pública:', esPublica);
+  console.log('INTERCEPTOR ACTIVADO');
+  console.log('URL:', req.url);
+  console.log('Método:', req.method);
+  console.log('Es pública:', esPublica);
   console.log('========================================');
 
   return from(storage.getToken()).pipe(
     switchMap(token => {
-      console.log('📌 Token obtenido del storage:', token ? '✅ Existe' : '❌ NO EXISTE');
+      console.log('Token obtenido del storage:', token ? 'Existe' : 'NO EXISTE');
       if (token) {
-        console.log('📌 Token (primeros 30 chars):', token.substring(0, 30) + '...');
+        console.log('Token (primeros 30 chars):', token.substring(0, 30) + '...');
       }
       
       let request = req;
@@ -38,24 +38,24 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log('✅ Token agregado a la petición');
+        console.log('Token agregado a la petición');
       } else if (!esPublica && !token) {
-        console.warn('⚠️ No hay token para petición protegida:', req.url);
+        console.warn('No hay token para petición protegida:', req.url);
       } else {
-        console.log('ℹ️ Petición pública, no se agrega token');
+        console.log('ℹPetición pública, no se agrega token');
       }
 
-      console.log('📤 Enviando petición a:', request.url);
+      console.log('Enviando petición a:', request.url);
       return next(request);
     }),
     catchError(error => {
-      console.log('❌ ERROR HTTP DETECTADO:');
+      console.log('ERROR HTTP DETECTADO:');
       console.log('   Status:', error?.status);
       console.log('   Mensaje:', error?.message);
       console.log('   URL:', req.url);
 
       if (error?.status === 401) {
-        console.log('🔴 Token inválido o expirado - Redirigiendo a login');
+        console.log('Token inválido o expirado - Redirigiendo a login');
         storage.clear();
         router.navigate(['/login'], { replaceUrl: true });
       }
