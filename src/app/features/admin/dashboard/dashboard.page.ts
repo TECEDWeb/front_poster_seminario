@@ -15,7 +15,9 @@ import {
   IonChip,
   IonLabel,
   IonRefresher,
-  IonRefresherContent
+  IonRefresherContent,
+  IonPopover,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { StatsCardComponent } from '../../../shared/components/stats-card/stats-card.component';
@@ -39,7 +41,10 @@ import {
   timeOutline,
   checkmarkCircleOutline,
   createOutline,
-  chevronDownCircleOutline
+  chevronDownCircleOutline,
+  swapHorizontalOutline,
+  checkboxOutline,
+  informationCircleOutline
 } from 'ionicons/icons';
 
 interface Activity {
@@ -47,6 +52,13 @@ interface Activity {
   color: string;
   text: string;
   time: string;
+}
+
+interface NotificacionItem {
+  icon?: string;
+  titulo?: string;
+  text?: string;
+  time?: string;
 }
 
 @Component({
@@ -69,6 +81,8 @@ interface Activity {
     IonLabel,
     IonRefresher,
     IonRefresherContent,
+    IonPopover,
+    IonSpinner,
     StatsCardComponent
   ],
   templateUrl: './dashboard.page.html',
@@ -91,6 +105,13 @@ export class DashboardPage implements OnInit {
   recentActivities: Activity[] = [];
   notificacionesPendientes: number = 0;
 
+  // ============================================
+  // PANEL DE NOTIFICACIONES (nuevo)
+  // ============================================
+  popoverNotifAbierto = false;
+  notificacionesList: NotificacionItem[] = [];
+  cargandoNotificaciones = false;
+
   constructor() {
     addIcons({
       peopleOutline,
@@ -111,7 +132,10 @@ export class DashboardPage implements OnInit {
       timeOutline,
       checkmarkCircleOutline,
       createOutline,
-      chevronDownCircleOutline
+      chevronDownCircleOutline,
+      swapHorizontalOutline,
+      checkboxOutline,
+      informationCircleOutline
     });
   }
 
@@ -171,7 +195,6 @@ export class DashboardPage implements OnInit {
     this.cargarNotificaciones();
   }
 
-  // Pull-to-refresh handler (móvil/touch)
   onRefresh(event: any) {
     this.dashboardService.obtenerResumenAdmin().subscribe({
       next: (data) => {
@@ -190,15 +213,48 @@ export class DashboardPage implements OnInit {
     });
   }
 
-  verNotificaciones(): void {
-    if (this.notificacionesPendientes > 0) {
-      this.dashboardService.marcarNotificacionesComoLeidas().subscribe({
-        next: () => {
-          this.notificacionesPendientes = 0;
-        },
-        error: () => {}
-      });
-    }
+  // ============================================
+  // ANTES: verNotificaciones() marcaba todo como
+  // leído apenas hacías clic, sin mostrar nada —
+  // perdías el badge sin haber visto el contenido.
+  // AHORA: abre un panel con la lista real, y
+  // "marcar leídas" es una acción explícita del
+  // usuario dentro del panel.
+  // ============================================
+  toggleNotificaciones(): void {
+    this.popoverNotifAbierto = true;
+    this.cargarListaNotificaciones();
+  }
+
+  cerrarNotificaciones(): void {
+    this.popoverNotifAbierto = false;
+  }
+
+  private cargarListaNotificaciones(): void {
+    this.cargandoNotificaciones = true;
+
+    // ⚠️ Asume que DashboardService tiene un método `obtenerNotificaciones()`
+    // que devuelve la lista completa (no solo el conteo). Si en tu servicio
+    // se llama distinto, ajusta solo esta línea.
+    this.dashboardService.obtenerNotificaciones().subscribe({
+      next: (lista: NotificacionItem[]) => {
+        this.notificacionesList = lista || [];
+        this.cargandoNotificaciones = false;
+      },
+      error: () => {
+        this.notificacionesList = [];
+        this.cargandoNotificaciones = false;
+      }
+    });
+  }
+
+  marcarTodasLeidas(): void {
+    this.dashboardService.marcarNotificacionesComoLeidas().subscribe({
+      next: () => {
+        this.notificacionesPendientes = 0;
+      },
+      error: () => {}
+    });
   }
 
   verTodasActividades(): void {

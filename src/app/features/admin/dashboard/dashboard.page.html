@@ -8,7 +8,7 @@
       <span class="title-badge">Administración</span>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" class="notification-btn" (click)="verNotificaciones()">
+      <ion-button fill="clear" class="notification-btn" (click)="toggleNotificaciones()">
         <ion-badge class="notification-badge" *ngIf="notificacionesPendientes > 0">{{ notificacionesPendientes }}</ion-badge>
         <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
       </ion-button>
@@ -157,6 +157,30 @@
           </div>
           <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
         </button>
+
+        <!-- NUEVO: acceso directo a Asignaciones -->
+        <button class="action-card" routerLink="/admin/asignaciones">
+          <div class="action-icon teal-upse">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>
+          </div>
+          <div class="action-info">
+            <span class="action-title">Asignaciones</span>
+            <span class="action-desc">Asignar evaluadores</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
+        </button>
+
+        <!-- NUEVO: acceso directo a Rúbricas -->
+        <button class="action-card" routerLink="/admin/rubricas">
+          <div class="action-icon gold-upse">
+            <ion-icon name="checkbox-outline"></ion-icon>
+          </div>
+          <div class="action-info">
+            <span class="action-title">Rúbricas</span>
+            <span class="action-desc">Configurar evaluación</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
+        </button>
       </div>
     </section>
 
@@ -188,4 +212,51 @@
     </section>
 
   </div>
+
+  <!-- ============================================ -->
+  <!-- PANEL DE NOTIFICACIONES (nuevo) -->
+  <!-- ============================================ -->
+  <ion-popover
+    [isOpen]="popoverNotifAbierto"
+    (didDismiss)="cerrarNotificaciones()"
+    class="notif-popover"
+    [showBackdrop]="true">
+    <ng-template>
+      <div class="notif-panel">
+        <div class="notif-header">
+          <span class="notif-title">Notificaciones</span>
+          <ion-button
+            fill="clear"
+            size="small"
+            class="notif-marcar-btn"
+            *ngIf="notificacionesPendientes > 0"
+            (click)="marcarTodasLeidas()">
+            Marcar leídas
+          </ion-button>
+        </div>
+
+        <div class="notif-loading" *ngIf="cargandoNotificaciones">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+
+        <div class="notif-list" *ngIf="!cargandoNotificaciones && notificacionesList.length > 0">
+          <div class="notif-item" *ngFor="let n of notificacionesList">
+            <div class="notif-item-icon">
+              <ion-icon [name]="n.icon || 'information-circle-outline'"></ion-icon>
+            </div>
+            <div class="notif-item-text">
+              <span class="notif-item-title">{{ n.titulo || n.text }}</span>
+              <span class="notif-item-time" *ngIf="n.time">{{ n.time }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="notif-empty" *ngIf="!cargandoNotificaciones && notificacionesList.length === 0">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>No tienes notificaciones pendientes</span>
+        </div>
+      </div>
+    </ng-template>
+  </ion-popover>
+
 </ion-content>
