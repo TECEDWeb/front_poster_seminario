@@ -1174,11 +1174,17 @@ ion-modal {
 }
 
 // Modal de edición/creación de datos generales - tamaño mediano
+// ⚠️ Se usa una altura FIJA (calculada con min()) en vez de "auto".
+// "--height: auto" depende de que Ionic mida el contenido interno,
+// y esa medición podía fallar/ejecutarse antes de tiempo (coincidía
+// con el error de hidratación de "options-outline"), dejando el
+// wrapper del modal con altura 0 y mostrando solo el header.
+// Con una altura numérica fija, el modal siempre tiene un tamaño
+// garantizado sin depender de ningún cálculo de contenido.
 ion-modal:not(.builder-modal) {
   --width: 90%;
   --max-width: 500px;
-  --height: auto;
-  --max-height: 90vh;
+  --height: min(640px, 90vh);
   --border-radius: 16px;
 
   @media (min-width: 768px) {
@@ -1188,7 +1194,7 @@ ion-modal:not(.builder-modal) {
 
   @media (max-width: 576px) {
     --width: 95% !important;
-    --max-height: 95vh !important;
+    --height: min(600px, 95vh) !important;
   }
 }
 
