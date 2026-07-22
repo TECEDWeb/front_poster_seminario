@@ -147,6 +147,7 @@ export class ReportesPage implements OnInit {
   nombresEvaluadores: string[] = [];
 
   cargando: boolean = false;
+  exportando: boolean = false;
   error: string | null = null;
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
@@ -269,9 +270,6 @@ export class ReportesPage implements OnInit {
           _expandido: false,
           evaluacionId: item.evaluacion_id || item.evaluacionId || null,
           estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado',
-          // Tutores y participantes: se leen tal cual venga del backend.
-          // Si el backend aún no los envía en este endpoint, quedan como
-          // arreglo vacío y sus secciones simplemente no se muestran.
           participantes: item.participantes || [],
           tutores: item.tutores || [],
           concursoId: item.concursoId ?? item.concurso_id ?? null,
@@ -333,23 +331,22 @@ export class ReportesPage implements OnInit {
       return;
     }
 
-    let mensaje = '🏆 PODIO DEL CONCURSO 🏆\n\n';
+    let mensaje = 'PODIO DEL CONCURSO\n\n';
     mensaje += '━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
     
     this.ganadores.forEach((g, index) => {
-      const medalla = g.medalla || (index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉');
-      const posicion = index === 0 ? '🥇 1er Lugar' : index === 1 ? '🥈 2do Lugar' : '🥉 3er Lugar';
+      const posicion = index === 0 ? '1er Lugar' : index === 1 ? '2do Lugar' : '3er Lugar';
       
-      mensaje += `${medalla} ${posicion}\n`;
-      mensaje += `📌 ${g.nombre}\n`;
-      mensaje += `📊 Promedio: ${g.promedio.toFixed(2)} pts\n`;
-      mensaje += `📝 Evaluaciones: ${g.evaluaciones || 0}\n`;
-      mensaje += `🏷️ Área: ${g.area || 'Sin área'}\n`;
+      mensaje += `${posicion}\n`;
+      mensaje += `Proyecto: ${g.nombre}\n`;
+      mensaje += `Promedio: ${g.promedio.toFixed(2)} pts\n`;
+      mensaje += `Evaluaciones: ${g.evaluaciones || 0}\n`;
+      mensaje += `Área: ${g.area || 'Sin área'}\n`;
       mensaje += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
     });
 
-    mensaje += `📈 Total de proyectos evaluados: ${this.proyectos?.length || 0}\n`;
-    mensaje += `🏅 Promedio general: ${this.reportes?.promedio?.toFixed(2) || '0.00'}`;
+    mensaje += `Total de proyectos evaluados: ${this.proyectos?.length || 0}\n`;
+    mensaje += `Promedio general: ${this.reportes?.promedio?.toFixed(2) || '0.00'}`;
 
     alert(mensaje);
   }
@@ -449,9 +446,6 @@ export class ReportesPage implements OnInit {
       );
     }
 
-    // Filtro por concurso (requiere que el backend envíe concursoId
-    // en cada proyecto del reporte; si no viene, este filtro queda
-    // sin efecto de forma segura)
     if (this.filtroConcurso !== 'todos') {
       const concursoIdNum = Number(this.filtroConcurso);
       filtered = filtered.filter(p => Number(p.concursoId) === concursoIdNum);
@@ -472,29 +466,176 @@ export class ReportesPage implements OnInit {
     this.aplicarFiltros();
   }
 
-  exportar(): void {
-    this.reporteService.exportar().subscribe({
-      next: (archivo: Blob) => {
-        this.descargarArchivo(archivo, `reporte-evaluaciones-${new Date().toISOString().split('T')[0]}.xlsx`);
-      },
-      error: (err) => {
-        console.error('Error exportando:', err);
-        this.mostrarMensaje('Error al exportar el reporte general', 'error');
-      }
-    });
+  // ============================================
+  // EXPORTACIÓN CON FILTROS (IGUAL QUE EN PROYECTOS)
+  // ============================================
+
+  getNombreConcurso(id: string): string {
+    if (id === 'todos') return 'Todos los concursos';
+    const concurso = this.concursosDisponibles.find(c => String(c.id) === String(id));
+    return concurso?.nombre || 'Concurso';
   }
 
-  exportarPDF(): void {
-    this.reporteService.exportarPDF().subscribe({
-      next: (archivo: Blob) => {
-        this.descargarArchivo(archivo, `reporte-evaluaciones-${new Date().toISOString().split('T')[0]}.pdf`);
-      },
-      error: (err) => {
-        console.error('Error exportando PDF:', err);
-        this.mostrarMensaje('Error al exportar el PDF general', 'error');
-      }
-    });
+  private getNombreConcursoFiltro(proyecto: any): string {
+    if (proyecto.concursoNombre) return proyecto.concursoNombre;
+    if (proyecto.concursoId) {
+      const concurso = this.concursosDisponibles.find(c => Number(c.id) === Number(proyecto.concursoId));
+      return concurso?.nombre || `Concurso #${proyecto.concursoId}`;
+    }
+    return 'Sin concurso';
   }
+
+  private generarCSV(headers: string[], filas: any[][]): string {
+    const escapar = (valor: any): string => {
+      const texto = String(valor ?? '');
+      if (texto.includes(',') || texto.includes('"') || texto.includes('\n')) {
+        return `"${texto.replace(/"/g, '""')}"`;
+      }
+      return texto;
+    };
+
+    const filasCSV = [
+      headers.map(escapar).join(','),
+      ...filas.map(fila => fila.map(escapar).join(','))
+    ];
+
+    return filasCSV.join('\r\n');
+  }
+
+  private descargarArchivo(blob: Blob, nombreArchivo: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = nombreArchivo;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    window.URL.revokeObjectURL(url);
+  }
+
+  exportarExcelConFiltros(): void {
+    const datos = this.proyectosFiltrados || [];
+
+    if (datos.length === 0) {
+      this.mostrarMensaje('No hay proyectos para exportar con los filtros actuales', 'error');
+      return;
+    }
+
+    const headers = [
+      'Proyecto', 
+      'Área', 
+      'Nivel', 
+      'Tutor encargado', 
+      'Participantes',
+      'Evaluaciones',
+      'Promedio',
+      'Estado',
+      'Concurso'
+    ];
+
+    const filas = datos.map(p => [
+      p.proyecto || p.nombre || '—',
+      p.area || '—',
+      p.nivel || '—',
+      this.tutorPrincipal(p) || '—',
+      (p.participantes || []).map((part: any) => part.nombre).join(' | '),
+      String(p.evaluaciones || 0),
+      String(p.promedio ? p.promedio.toFixed(2) : '0.00'),
+      this.getStatusText(p.promedio),
+      this.getNombreConcursoFiltro(p)
+    ]);
+
+    const csvContent = this.generarCSV(headers, filas);
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const nombreConcurso = this.filtroConcurso !== 'todos' 
+      ? this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_')
+      : 'todos';
+    const fecha = new Date().toISOString().split('T')[0];
+    this.descargarArchivo(blob, `reporte-${nombreConcurso}-${fecha}.csv`);
+
+    this.mostrarMensaje(`Excel exportado: ${datos.length} proyecto(s)`, 'success');
+  }
+
+  async exportarPDFConFiltros(): Promise<void> {
+    const datos = this.proyectosFiltrados || [];
+
+    if (datos.length === 0) {
+      this.mostrarMensaje('No hay proyectos para exportar con los filtros actuales', 'error');
+      return;
+    }
+
+    this.exportando = true;
+
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      const autoTable = autoTableModule.default;
+
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+      doc.setFontSize(16);
+      doc.setTextColor(0, 27, 76);
+      const titulo = this.filtroConcurso !== 'todos' 
+        ? `Reporte - ${this.getNombreConcurso(this.filtroConcurso)}`
+        : 'Reporte General de Evaluaciones';
+      doc.text(titulo, 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const fechaLegible = new Date().toLocaleString('es-EC');
+      doc.text(`Generado: ${fechaLegible}  •  Total: ${datos.length} proyecto(s)`, 14, 21);
+
+      const columnas = [
+        'Proyecto', 
+        'Área', 
+        'Nivel', 
+        'Tutor', 
+        'Evaluaciones', 
+        'Promedio', 
+        'Estado', 
+        'Concurso'
+      ];
+
+      const filas = datos.map(p => [
+        p.proyecto || p.nombre || '—',
+        p.area || '—',
+        p.nivel || '—',
+        this.tutorPrincipal(p) || '—',
+        String(p.evaluaciones || 0),
+        p.promedio ? p.promedio.toFixed(2) : '0.00',
+        this.getStatusText(p.promedio),
+        this.getNombreConcursoFiltro(p)
+      ]);
+
+      autoTable(doc, {
+        head: [columnas],
+        body: filas,
+        startY: 26,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 27, 76], textColor: 255, fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 3 },
+        alternateRowStyles: { fillColor: [232, 240, 254] }
+      });
+
+      const nombreConcurso = this.filtroConcurso !== 'todos' 
+        ? this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_')
+        : 'todos';
+      const fecha = new Date().toISOString().split('T')[0];
+      doc.save(`reporte-${nombreConcurso}-${fecha}.pdf`);
+
+      this.mostrarMensaje(`PDF exportado: ${datos.length} proyecto(s)`, 'success');
+    } catch (err) {
+      console.error('Error generando PDF:', err);
+      this.mostrarMensaje('Error al generar el PDF', 'error');
+    } finally {
+      this.exportando = false;
+    }
+  }
+
+  // ============================================
+  // EXPORTACIÓN INDIVIDUAL DE PROYECTOS
+  // ============================================
 
   exportarProyectoExcel(proyecto: any): void {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
@@ -532,17 +673,6 @@ export class ReportesPage implements OnInit {
     });
   }
 
-  private descargarArchivo(archivo: Blob, nombreArchivo: string): void {
-    const url = window.URL.createObjectURL(archivo);
-    const enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = nombreArchivo;
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
-    window.URL.revokeObjectURL(url);
-  }
-
   // ============================================
   // ADMIN ACTIONS
   // ============================================
@@ -572,7 +702,7 @@ export class ReportesPage implements OnInit {
       this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" reabierta correctamente`, 'success');
       this.recargar();
     } catch (err: any) {
-      console.error('❌ Error reabriendo:', err);
+      console.error('Error reabriendo:', err);
       this.mostrarMensaje(err.error?.mensaje || 'Error al reabrir la evaluación', 'error');
     }
   }
@@ -593,7 +723,7 @@ export class ReportesPage implements OnInit {
       this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" eliminada correctamente`, 'success');
       this.recargar();
     } catch (err: any) {
-      console.error('❌ Error eliminando:', err);
+      console.error('Error eliminando:', err);
       this.mostrarMensaje(err.error?.mensaje || 'Error al eliminar la evaluación', 'error');
     }
   }
@@ -627,8 +757,6 @@ export class ReportesPage implements OnInit {
           evaluaciones: data.evaluaciones || [],
           promedio: data.promedio || proyecto.promedio || 0,
           evaluadores: data.evaluadores || proyecto.evaluadores || [],
-          // Si el detalle del backend no trae tutores/participantes,
-          // se usa lo que ya venía en la fila de la lista como respaldo
           participantes: data.participantes || proyecto.participantes || [],
           tutores: data.tutores || proyecto.tutores || [],
           puntajeMaximo: data.puntajeMaximo || 100
@@ -737,8 +865,6 @@ export class ReportesPage implements OnInit {
     alert(`${icono} ${mensaje}`);
   }
 
-  // Tutor principal de un proyecto: el marcado como "encargado",
-  // o si no hay ninguno marcado, el primero de la lista.
   tutorPrincipal(proyecto: any): string | null {
     const tutores = proyecto?.tutores || [];
     if (tutores.length === 0) return null;

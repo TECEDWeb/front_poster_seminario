@@ -31,16 +31,6 @@
           <ion-icon name="time-outline"></ion-icon>
           <span>Última actualización: {{ fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
-        <div class="export-actions">
-          <ion-button class="btn-export-desktop btn-export-excel" (click)="exportar()" [disabled]="cargando">
-            <ion-icon name="download-outline" slot="start"></ion-icon>
-            Excel
-          </ion-button>
-          <ion-button class="btn-export-desktop btn-export-pdf" (click)="exportarPDF()" [disabled]="cargando">
-            <ion-icon name="document-outline" slot="start"></ion-icon>
-            PDF
-          </ion-button>
-        </div>
       </div>
     </div>
 
@@ -57,9 +47,7 @@
       </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- 🏆 PODIO: 1er, 2do y 3er LUGAR -->
-    <!-- ============================================ -->
+    <!-- PODIO -->
     <div class="podio-section" *ngIf="!cargando && ganadores && ganadores.length > 0">
       <div class="podio-header">
         <h2>
@@ -70,9 +58,10 @@
       </div>
 
       <div class="podio-grid">
-        <!-- 2do Lugar (izquierda) -->
         <div class="podio-card podio-2" *ngIf="ganadores.length >= 2">
-          <div class="podio-medalla">🥈</div>
+          <div class="podio-medalla">
+            <ion-icon name="medal-outline"></ion-icon>
+          </div>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[1].nombre)">
             <span>{{ ganadores[1].nombre?.charAt(0) || 'P' }}</span>
           </div>
@@ -87,10 +76,13 @@
           <div class="podio-posicion">2do Lugar</div>
         </div>
 
-        <!-- 1er Lugar (centro - más grande) -->
         <div class="podio-card podio-1" *ngIf="ganadores.length >= 1">
-          <div class="podio-corona">👑</div>
-          <div class="podio-medalla">🥇</div>
+          <div class="podio-corona">
+            <ion-icon name="ribbon-outline"></ion-icon>
+          </div>
+          <div class="podio-medalla">
+            <ion-icon name="trophy-outline"></ion-icon>
+          </div>
           <div class="podio-avatar podio-avatar-grande" [class]="getRandomColor(ganadores[0].nombre)">
             <span>{{ ganadores[0].nombre?.charAt(0) || 'P' }}</span>
           </div>
@@ -102,12 +94,13 @@
               <span class="podio-label">Promedio</span>
             </div>
           </div>
-          <div class="podio-posicion podio-posicion-1">🏆 1er Lugar</div>
+          <div class="podio-posicion podio-posicion-1">1er Lugar</div>
         </div>
 
-        <!-- 3er Lugar (derecha) -->
         <div class="podio-card podio-3" *ngIf="ganadores.length >= 3">
-          <div class="podio-medalla">🥉</div>
+          <div class="podio-medalla">
+            <ion-icon name="medal-outline"></ion-icon>
+          </div>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[2].nombre)">
             <span>{{ ganadores[2].nombre?.charAt(0) || 'P' }}</span>
           </div>
@@ -123,7 +116,6 @@
         </div>
       </div>
 
-      <!-- Botón de acción -->
       <div class="podio-actions">
         <button class="podio-btn" (click)="verGanadores()">
           <ion-icon name="trophy-outline"></ion-icon>
@@ -132,7 +124,6 @@
       </div>
     </div>
 
-    <!-- Mensaje cuando no hay ganadores -->
     <div class="podio-empty" *ngIf="!cargando && ganadores && ganadores.length === 0">
       <div class="empty-icon">
         <ion-icon name="trophy-outline"></ion-icon>
@@ -143,17 +134,11 @@
 
     <!-- TOGGLE DE VISTA -->
     <div class="vista-toggle" *ngIf="!cargando">
-      <button
-        class="toggle-btn"
-        [class.active]="vistaActual === 'proyectos'"
-        (click)="cambiarVista('proyectos')">
+      <button class="toggle-btn" [class.active]="vistaActual === 'proyectos'" (click)="cambiarVista('proyectos')">
         <ion-icon name="grid-outline"></ion-icon>
         Por proyecto
       </button>
-      <button
-        class="toggle-btn"
-        [class.active]="vistaActual === 'evaluadores'"
-        (click)="cambiarVista('evaluadores')">
+      <button class="toggle-btn" [class.active]="vistaActual === 'evaluadores'" (click)="cambiarVista('evaluadores')">
         <ion-icon name="people-outline"></ion-icon>
         Por evaluador
       </button>
@@ -200,7 +185,6 @@
         </ion-select>
       </div>
 
-      <!-- Filtro por concurso -->
       <div class="filter-group">
         <ion-select
           [(ngModel)]="filtroConcurso"
@@ -227,6 +211,38 @@
       </ion-button>
     </div>
 
+    <!-- EXPORT TOOLBAR -->
+    <div class="export-toolbar" *ngIf="!cargando && !error && vistaActual === 'proyectos' && proyectosFiltrados.length > 0">
+      <div class="export-toolbar-left">
+        <span class="export-counter">
+          <ion-icon name="document-text-outline"></ion-icon>
+          {{ proyectosFiltrados.length }} proyecto(s) mostrado(s)
+          <span class="filter-badge" *ngIf="filtroConcurso !== 'todos'">
+            · Filtrado por: {{ getNombreConcurso(filtroConcurso) }}
+          </span>
+          <span class="filter-badge" *ngIf="filtroStatus !== 'todos'">
+            · {{ filtroStatus | titlecase }}
+          </span>
+        </span>
+      </div>
+      <div class="export-toolbar-right">
+        <ion-button 
+          class="btn-export-excel" 
+          (click)="exportarExcelConFiltros()" 
+          [disabled]="cargando || exportando">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          <span class="btn-label">Excel</span>
+        </ion-button>
+        <ion-button 
+          class="btn-export-pdf" 
+          (click)="exportarPDFConFiltros()" 
+          [disabled]="cargando || exportando">
+          <ion-icon [name]="exportando ? 'refresh-outline' : 'document-outline'" slot="start" [class.spinning]="exportando"></ion-icon>
+          <span class="btn-label">PDF</span>
+        </ion-button>
+      </div>
+    </div>
+
     <!-- LOADING -->
     <div class="loading-grid" *ngIf="cargando">
       <div class="report-skeleton" *ngFor="let i of [1,2,3,4,5]">
@@ -247,32 +263,18 @@
       </ion-button>
     </div>
 
-    <!-- ============================================ -->
-    <!-- VISTA: POR PROYECTO - LISTA CON ACORDEÓN -->
-    <!-- ============================================ -->
+    <!-- VISTA: POR PROYECTO -->
     <div class="proyectos-section" *ngIf="!cargando && !error && vistaActual === 'proyectos'">
       <div class="section-header">
         <div class="section-header-left">
           <h2>Reportes por proyecto</h2>
           <span class="section-count">{{ proyectosFiltrados.length }} de {{ proyectos.length }} proyectos</span>
         </div>
-        <div class="section-header-right">
-          <ion-button fill="outline" size="small" class="export-mobile-btn" (click)="exportar()" [disabled]="cargando">
-            <ion-icon name="download-outline"></ion-icon>
-            Excel
-          </ion-button>
-          <ion-button fill="outline" size="small" class="export-mobile-btn export-mobile-pdf" (click)="exportarPDF()" [disabled]="cargando">
-            <ion-icon name="document-outline"></ion-icon>
-            PDF
-          </ion-button>
-        </div>
       </div>
 
-      <!-- LISTA DE PROYECTOS CON ACORDEÓN -->
       <div class="proyectos-lista">
         <div class="proyecto-item" *ngFor="let p of proyectosFiltrados || []; trackBy: trackById">
           
-          <!-- HEADER DEL PROYECTO (SIEMPRE VISIBLE) -->
           <div class="proyecto-header" (click)="toggleProyecto(p)" [class.expanded]="p._expandido">
             <div class="ph-left">
               <div class="ph-icon" [class]="getRandomColor(p.proyecto || p.nombre)">
@@ -315,11 +317,9 @@
             </div>
           </div>
 
-          <!-- CONTENIDO EXPANDIDO DEL PROYECTO -->
           <div class="proyecto-body" [class.expanded]="p._expandido">
             <div class="pb-content">
               
-              <!-- Progress bar -->
               <div class="pb-progress">
                 <div class="progress-bar">
                   <div class="progress-fill" [style.width]="getPorcentaje(p.promedio, p.puntajeMaximo) + '%'"></div>
@@ -327,7 +327,6 @@
                 <span class="progress-label">{{ getPorcentaje(p.promedio, p.puntajeMaximo) }}%</span>
               </div>
 
-              <!-- Tutores del proyecto -->
               <div class="pb-personas" *ngIf="(p.tutores || []).length > 0">
                 <div class="pb-section-title">
                   <ion-icon name="school-outline"></ion-icon>
@@ -347,7 +346,6 @@
                 </div>
               </div>
 
-              <!-- Participantes del proyecto -->
               <div class="pb-personas" *ngIf="(p.participantes || []).length > 0">
                 <div class="pb-section-title">
                   <ion-icon name="person-outline"></ion-icon>
@@ -363,13 +361,11 @@
                 </div>
               </div>
 
-              <!-- Aviso si no hay tutores/participantes cargados -->
               <div class="pb-personas-empty" *ngIf="(p.tutores || []).length === 0 && (p.participantes || []).length === 0">
                 <ion-icon name="alert-circle-outline"></ion-icon>
                 <span>Este reporte aún no incluye tutores/participantes para este proyecto</span>
               </div>
 
-              <!-- Evaluadores -->
               <div class="pb-evaluadores">
                 <div class="pb-section-title">
                   <ion-icon name="people-outline"></ion-icon>
@@ -390,52 +386,38 @@
                 </div>
               </div>
 
-              <!-- ACCIONES PARA ADMIN -->
               <div class="pb-acciones-admin" *ngIf="esAdmin && p.evaluacionId">
                 <div class="pb-section-title admin-title">
                   <ion-icon name="settings-outline"></ion-icon>
                   <span>Administrar evaluación</span>
                 </div>
                 <div class="pb-admin-actions">
-                  <button class="pb-btn pb-btn-editar" 
-                          (click)="editarEvaluacionAdmin(p)"
-                          title="Editar respuestas de esta evaluación">
+                  <button class="pb-btn pb-btn-editar" (click)="editarEvaluacionAdmin(p)" title="Editar respuestas de esta evaluación">
                     <ion-icon name="create-outline"></ion-icon>
                     Editar
                   </button>
-                  
-                  <button class="pb-btn pb-btn-reabrir" 
-                          (click)="reabrirEvaluacion(p)" 
-                          *ngIf="p.estadoEvaluacion === 'evaluado' || p.estado === 'evaluado'"
-                          title="Reabrir evaluación para que el evaluador pueda modificarla">
+                  <button class="pb-btn pb-btn-reabrir" (click)="reabrirEvaluacion(p)" *ngIf="p.estadoEvaluacion === 'evaluado' || p.estado === 'evaluado'" title="Reabrir evaluación">
                     <ion-icon name="refresh-outline"></ion-icon>
                     Reabrir
                   </button>
-                  
-                  <button class="pb-btn pb-btn-eliminar" 
-                          (click)="eliminarEvaluacion(p)"
-                          title="Eliminar esta evaluación permanentemente">
+                  <button class="pb-btn pb-btn-eliminar" (click)="eliminarEvaluacion(p)" title="Eliminar esta evaluación">
                     <ion-icon name="trash-outline"></ion-icon>
                     Eliminar
                   </button>
-                  
-                  <button class="pb-btn pb-btn-ver" 
-                          (click)="verDetalleEvaluacion(p)"
-                          title="Ver detalle completo de la evaluación">
+                  <button class="pb-btn pb-btn-ver" (click)="verDetalleEvaluacion(p)" title="Ver detalle completo">
                     <ion-icon name="eye-outline"></ion-icon>
                     Ver
                   </button>
                 </div>
                 <div class="pb-admin-status" *ngIf="p.estadoEvaluacion">
                   <span class="status-label">Estado:</span>
-                  <span class="status-value" [class.estado-evaluado]="p.estadoEvaluacion === 'evaluado'"
-                                           [class.estado-asignado]="p.estadoEvaluacion === 'asignado'">
-                    {{ p.estadoEvaluacion === 'evaluado' ? '✅ Evaluado' : '⏳ En progreso' }}
+                  <span class="status-value" [class.estado-evaluado]="p.estadoEvaluacion === 'evaluado'" [class.estado-asignado]="p.estadoEvaluacion === 'asignado'">
+                    <ion-icon [name]="p.estadoEvaluacion === 'evaluado' ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
+                    {{ p.estadoEvaluacion === 'evaluado' ? 'Evaluado' : 'En progreso' }}
                   </span>
                 </div>
               </div>
 
-              <!-- Acciones normales -->
               <div class="pb-actions">
                 <button class="pb-btn pb-btn-excel" (click)="exportarProyectoExcel(p)">
                   <ion-icon name="download-outline"></ion-icon>
@@ -457,7 +439,6 @@
         </div>
       </div>
 
-      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="proyectosFiltrados.length === 0 && proyectos.length > 0">
         <div class="empty-icon">
           <ion-icon name="filter-outline"></ion-icon>
@@ -479,9 +460,7 @@
       </div>
     </div>
 
-    <!-- ============================================ -->
     <!-- VISTA: POR EVALUADOR -->
-    <!-- ============================================ -->
     <div class="evaluadores-resumen-section" *ngIf="!cargando && !error && vistaActual === 'evaluadores'">
       <div class="section-header">
         <div class="section-header-left">
@@ -499,7 +478,6 @@
               <span class="er-rol">{{ e.rol }}</span>
             </div>
           </div>
-
           <div class="er-stats">
             <div class="er-stat">
               <span class="er-stat-value">{{ e.proyectosEvaluados }}</span>
@@ -512,7 +490,6 @@
               <span class="er-stat-label">Promedio otorgado</span>
             </div>
           </div>
-
           <button class="er-ver-btn" (click)="verProyectosDeEvaluador(e.nombre)">
             <ion-icon name="folder-outline"></ion-icon>
             Ver sus proyectos
@@ -532,9 +509,7 @@
 
   </div>
 
-  <!-- ============================================ -->
-  <!-- MODAL: DETALLE DE PROYECTO -->
-  <!-- ============================================ -->
+  <!-- MODAL DETALLE PROYECTO -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
@@ -569,7 +544,6 @@
             </div>
           </div>
 
-          <!-- Tutores -->
           <div class="detalle-tutores" *ngIf="(proyectoSeleccionado.tutores || []).length > 0">
             <h3>
               <ion-icon name="school-outline"></ion-icon>
@@ -591,7 +565,6 @@
             </div>
           </div>
 
-          <!-- Participantes -->
           <div class="detalle-participantes" *ngIf="(proyectoSeleccionado.participantes || []).length > 0">
             <h3>
               <ion-icon name="person-outline"></ion-icon>
@@ -611,14 +584,11 @@
             </div>
           </div>
 
-          <!-- Aviso si el backend aún no envía tutores/participantes -->
-          <div class="detalle-personas-empty"
-               *ngIf="(proyectoSeleccionado.tutores || []).length === 0 && (proyectoSeleccionado.participantes || []).length === 0">
+          <div class="detalle-personas-empty" *ngIf="(proyectoSeleccionado.tutores || []).length === 0 && (proyectoSeleccionado.participantes || []).length === 0">
             <ion-icon name="alert-circle-outline"></ion-icon>
             <span>Este proyecto aún no tiene tutores/participantes registrados en el reporte</span>
           </div>
 
-          <!-- Evaluadores -->
           <div class="detalle-evaluadores">
             <h3>Evaluadores</h3>
             <div class="evaluadores-grid">
@@ -635,7 +605,6 @@
             </div>
           </div>
 
-          <!-- Evaluaciones individuales -->
           <div class="detalle-evaluaciones" *ngIf="proyectoSeleccionado.evaluaciones?.length">
             <h3>Evaluaciones registradas</h3>
             <div class="evaluaciones-list">
@@ -644,6 +613,7 @@
                   <span class="ei-evaluador">{{ ev.evaluador }}</span>
                   <span class="ei-meta">
                     <span class="ei-estado" [class]="getEstadoEvaluacionClass(ev.estado)">
+                      <ion-icon [name]="ev.estado === 'evaluado' ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
                       {{ ev.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
                     </span>
                     <span class="ei-fecha" *ngIf="ev.fecha_evaluacion">
@@ -651,10 +621,7 @@
                     </span>
                   </span>
                 </div>
-                <button
-                  class="ei-btn"
-                  *ngIf="ev.estado === 'evaluado'"
-                  (click)="verRespuestas(ev.id)">
+                <button class="ei-btn" *ngIf="ev.estado === 'evaluado'" (click)="verRespuestas(ev.id)">
                   <ion-icon name="eye-outline"></ion-icon>
                   Ver respuestas
                 </button>
@@ -686,9 +653,7 @@
     </ng-template>
   </ion-modal>
 
-  <!-- ============================================ -->
-  <!-- MODAL: RESPUESTAS DE EVALUACIÓN -->
-  <!-- ============================================ -->
+  <!-- MODAL RESPUESTAS -->
   <ion-modal [isOpen]="modalRespuestasAbierto" (didDismiss)="cerrarModalRespuestas()">
     <ng-template>
       <ion-header>
