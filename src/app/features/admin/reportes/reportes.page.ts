@@ -50,17 +50,28 @@ import {
   trashOutline,
   createOutline,
   ribbonOutline,
-  medalOutline
+  medalOutline,
+  schoolOutline,
+  starOutline,
+  star
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ConcursoService } from '../../../core/services/concurso.service';
 
 interface StatCard {
   icon: string;
   label: string;
   value: number | string;
   color: string;
+}
+
+interface PersonaProyecto {
+  nombre: string;
+  encargado?: boolean;
+  cedula?: string;
+  email?: string;
 }
 
 interface DetalleProyecto {
@@ -70,6 +81,8 @@ interface DetalleProyecto {
   evaluaciones: any[];
   promedio: number;
   evaluadores: any[];
+  participantes: PersonaProyecto[];
+  tutores: PersonaProyecto[];
   puntajeMaximo: number;
 }
 
@@ -143,6 +156,10 @@ export class ReportesPage implements OnInit {
   filtroBusqueda: string = '';
   filtroStatus: string = 'todos';
   filtroEvaluador: string = 'todos';
+  filtroConcurso: string = 'todos';
+
+  concursosDisponibles: any[] = [];
+  cargandoConcursos: boolean = false;
 
   ganadores: Ganador[] = [];
 
@@ -161,6 +178,7 @@ export class ReportesPage implements OnInit {
     private reporteService: ReporteService,
     private evaluacionService: EvaluacionService,
     private authService: AuthService,
+    private concursoService: ConcursoService,
     private router: Router
   ) {
     addIcons({
@@ -194,7 +212,10 @@ export class ReportesPage implements OnInit {
       trashOutline,
       createOutline,
       ribbonOutline,
-      medalOutline
+      medalOutline,
+      schoolOutline,
+      starOutline,
+      star
     });
 
     this.esAdmin = this.authService.esAdmin();
@@ -202,6 +223,22 @@ export class ReportesPage implements OnInit {
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.cargarConcursos();
+  }
+
+  cargarConcursos(): void {
+    this.cargandoConcursos = true;
+    this.concursoService.listar().subscribe({
+      next: (res: any) => {
+        this.concursosDisponibles = res?.data ?? res ?? [];
+        this.cargandoConcursos = false;
+      },
+      error: (err) => {
+        console.error('Error cargando concursos:', err);
+        this.concursosDisponibles = [];
+        this.cargandoConcursos = false;
+      }
+    });
   }
 
   cargarDatos(): void {
@@ -231,7 +268,14 @@ export class ReportesPage implements OnInit {
           nombre: item.proyecto || item.nombre || 'Proyecto sin nombre',
           _expandido: false,
           evaluacionId: item.evaluacion_id || item.evaluacionId || null,
-          estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado'
+          estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado',
+          // Tutores y participantes: se leen tal cual venga del backend.
+          // Si el backend aún no los envía en este endpoint, quedan como
+          // arreglo vacío y sus secciones simplemente no se muestran.
+          participantes: item.participantes || [],
+          tutores: item.tutores || [],
+          concursoId: item.concursoId ?? item.concurso_id ?? null,
+          concursoNombre: item.concursoNombre ?? item.concurso_nombre ?? null
         }));
 
         this.calcularGanadores();
@@ -281,8 +325,6 @@ export class ReportesPage implements OnInit {
       medalla: index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉',
       clase: index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'
     }));
-
-    console.log('🏆 Ganadores del concurso:', this.ganadores);
   }
 
   verGanadores(): void {
@@ -319,13 +361,13 @@ export class ReportesPage implements OnInit {
   actualizarStatsCards(): void {
     this.statsCards = [
       { icon: 'folder-outline', label: 'Proyectos', value: this.reportes.proyectos || 0, color: 'blue' },
-      { icon: 'checkmark-done-outline', label: 'Evaluaciones', value: this.reportes.evaluaciones || 0, color: 'green' },
-      { icon: 'stats-chart-outline', label: 'Completadas', value: this.reportes.completadas || 0, color: 'orange' },
+      { icon: 'checkmark-done-outline', label: 'Evaluaciones', value: this.reportes.evaluaciones || 0, color: 'gold' },
+      { icon: 'stats-chart-outline', label: 'Completadas', value: this.reportes.completadas || 0, color: 'green' },
       {
         icon: 'trophy-outline',
         label: 'Promedio general',
         value: this.reportes.promedio ? this.reportes.promedio.toFixed(1) : '0.0',
-        color: 'purple'
+        color: 'navy'
       }
     ];
   }
@@ -372,9 +414,23 @@ export class ReportesPage implements OnInit {
 
     if (this.filtroBusqueda && this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
-      filtered = filtered.filter(p =>
-        (p.proyecto || p.nombre || '').toLowerCase().includes(texto)
-      );
+      filtered = filtered.filter(p => {
+        const nombre = (p.proyecto || p.nombre || '').toLowerCase();
+        const area = (p.area || '').toLowerCase();
+        const nivel = (p.nivel || '').toLowerCase();
+        const tutores = (p.tutores || []).some((t: PersonaProyecto) =>
+          t.nombre?.toLowerCase().includes(texto)
+        );
+        const participantes = (p.participantes || []).some((part: PersonaProyecto) =>
+          part.nombre?.toLowerCase().includes(texto)
+        );
+        const evaluadores = (p.evaluadores || []).some((e: any) =>
+          e.nombre?.toLowerCase().includes(texto)
+        );
+
+        return nombre.includes(texto) || area.includes(texto) || nivel.includes(texto)
+          || tutores || participantes || evaluadores;
+      });
     }
 
     if (this.filtroStatus === 'excelente') {
@@ -393,11 +449,27 @@ export class ReportesPage implements OnInit {
       );
     }
 
+    // Filtro por concurso (requiere que el backend envíe concursoId
+    // en cada proyecto del reporte; si no viene, este filtro queda
+    // sin efecto de forma segura)
+    if (this.filtroConcurso !== 'todos') {
+      const concursoIdNum = Number(this.filtroConcurso);
+      filtered = filtered.filter(p => Number(p.concursoId) === concursoIdNum);
+    }
+
     this.proyectosFiltrados = filtered;
   }
 
   recargar(): void {
     this.cargarDatos();
+  }
+
+  limpiarFiltros(): void {
+    this.filtroBusqueda = '';
+    this.filtroStatus = 'todos';
+    this.filtroEvaluador = 'todos';
+    this.filtroConcurso = 'todos';
+    this.aplicarFiltros();
   }
 
   exportar(): void {
@@ -496,7 +568,7 @@ export class ReportesPage implements OnInit {
     }
 
     try {
-      const result = await this.evaluacionService.reabrirEvaluacion(evaluacionId).toPromise();
+      await this.evaluacionService.reabrirEvaluacion(evaluacionId).toPromise();
       this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" reabierta correctamente`, 'success');
       this.recargar();
     } catch (err: any) {
@@ -517,7 +589,7 @@ export class ReportesPage implements OnInit {
     }
 
     try {
-      const result = await this.evaluacionService.eliminarEvaluacion(evaluacionId).toPromise();
+      await this.evaluacionService.eliminarEvaluacion(evaluacionId).toPromise();
       this.mostrarMensaje(`Evaluación de "${proyecto.nombre || proyecto.proyecto}" eliminada correctamente`, 'success');
       this.recargar();
     } catch (err: any) {
@@ -555,6 +627,10 @@ export class ReportesPage implements OnInit {
           evaluaciones: data.evaluaciones || [],
           promedio: data.promedio || proyecto.promedio || 0,
           evaluadores: data.evaluadores || proyecto.evaluadores || [],
+          // Si el detalle del backend no trae tutores/participantes,
+          // se usa lo que ya venía en la fila de la lista como respaldo
+          participantes: data.participantes || proyecto.participantes || [],
+          tutores: data.tutores || proyecto.tutores || [],
           puntajeMaximo: data.puntajeMaximo || 100
         };
         this.cargandoDetalle = false;
@@ -569,6 +645,8 @@ export class ReportesPage implements OnInit {
           evaluaciones: [],
           promedio: proyecto.promedio || 0,
           evaluadores: proyecto.evaluadores || [],
+          participantes: proyecto.participantes || [],
+          tutores: proyecto.tutores || [],
           puntajeMaximo: 100
         };
       }
@@ -650,13 +728,6 @@ export class ReportesPage implements OnInit {
     this.aplicarFiltros();
   }
 
-  limpiarFiltros(): void {
-    this.filtroBusqueda = '';
-    this.filtroStatus = 'todos';
-    this.filtroEvaluador = 'todos';
-    this.aplicarFiltros();
-  }
-
   // ============================================
   // UTILIDADES
   // ============================================
@@ -666,8 +737,21 @@ export class ReportesPage implements OnInit {
     alert(`${icono} ${mensaje}`);
   }
 
+  // Tutor principal de un proyecto: el marcado como "encargado",
+  // o si no hay ninguno marcado, el primero de la lista.
+  tutorPrincipal(proyecto: any): string | null {
+    const tutores = proyecto?.tutores || [];
+    if (tutores.length === 0) return null;
+    return tutores.find((t: PersonaProyecto) => t.encargado)?.nombre || tutores[0]?.nombre || null;
+  }
+
+  nombresParticipantes(proyecto: any): string {
+    const participantes = proyecto?.participantes || [];
+    return participantes.map((p: PersonaProyecto) => p.nombre).join(', ');
+  }
+
   getRandomColor(proyecto: string): string {
-    const colors = ['color-blue', 'color-green', 'color-gold', 'color-purple', 'color-pink', 'color-cyan', 'color-indigo'];
+    const colors = ['color-blue', 'color-gold', 'color-navy', 'color-teal', 'color-green', 'color-slate'];
     const index = proyecto?.length ? proyecto.length % colors.length : 0;
     return colors[index];
   }

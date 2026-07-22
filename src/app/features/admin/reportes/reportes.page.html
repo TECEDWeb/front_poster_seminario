@@ -31,10 +31,16 @@
           <ion-icon name="time-outline"></ion-icon>
           <span>Última actualización: {{ fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
-        <ion-button class="btn-export-desktop" (click)="exportar()" [disabled]="cargando">
-          <ion-icon name="download-outline" slot="start"></ion-icon>
-          Exportar reportes
-        </ion-button>
+        <div class="export-actions">
+          <ion-button class="btn-export-desktop btn-export-excel" (click)="exportar()" [disabled]="cargando">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Excel
+          </ion-button>
+          <ion-button class="btn-export-desktop btn-export-pdf" (click)="exportarPDF()" [disabled]="cargando">
+            <ion-icon name="document-outline" slot="start"></ion-icon>
+            PDF
+          </ion-button>
+        </div>
       </div>
     </div>
 
@@ -159,7 +165,7 @@
         <ion-searchbar
           [(ngModel)]="filtroBusqueda"
           (ionChange)="aplicarFiltros()"
-          placeholder="Buscar proyecto..."
+          placeholder="Buscar por proyecto, área, tutor, participante o evaluador..."
           class="filter-search"
           animated>
         </ion-searchbar>
@@ -194,12 +200,28 @@
         </ion-select>
       </div>
 
+      <!-- Filtro por concurso -->
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroConcurso"
+          (ionChange)="aplicarFiltros()"
+          placeholder="Todos los concursos"
+          interface="popover"
+          class="filter-select"
+          [disabled]="cargandoConcursos">
+          <ion-select-option value="todos">Todos los concursos</ion-select-option>
+          <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
+            {{ c.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+
       <ion-button 
         fill="clear" 
         size="small" 
         class="btn-clear-filters" 
         (click)="limpiarFiltros()" 
-        *ngIf="filtroBusqueda || filtroStatus !== 'todos' || filtroEvaluador !== 'todos'">
+        *ngIf="filtroBusqueda || filtroStatus !== 'todos' || filtroEvaluador !== 'todos' || filtroConcurso !== 'todos'">
         <ion-icon name="close-outline"></ion-icon>
         Limpiar
       </ion-button>
@@ -237,7 +259,11 @@
         <div class="section-header-right">
           <ion-button fill="outline" size="small" class="export-mobile-btn" (click)="exportar()" [disabled]="cargando">
             <ion-icon name="download-outline"></ion-icon>
-            Exportar
+            Excel
+          </ion-button>
+          <ion-button fill="outline" size="small" class="export-mobile-btn export-mobile-pdf" (click)="exportarPDF()" [disabled]="cargando">
+            <ion-icon name="document-outline"></ion-icon>
+            PDF
           </ion-button>
         </div>
       </div>
@@ -257,6 +283,10 @@
                 <div class="ph-meta">
                   <span class="ph-area">{{ p.area || 'Sin área' }}</span>
                   <span class="ph-nivel">{{ p.nivel || 'Sin nivel' }}</span>
+                  <span class="ph-tutor" *ngIf="tutorPrincipal(p)">
+                    <ion-icon name="school-outline"></ion-icon>
+                    {{ tutorPrincipal(p) }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -295,6 +325,48 @@
                   <div class="progress-fill" [style.width]="getPorcentaje(p.promedio, p.puntajeMaximo) + '%'"></div>
                 </div>
                 <span class="progress-label">{{ getPorcentaje(p.promedio, p.puntajeMaximo) }}%</span>
+              </div>
+
+              <!-- Tutores del proyecto -->
+              <div class="pb-personas" *ngIf="(p.tutores || []).length > 0">
+                <div class="pb-section-title">
+                  <ion-icon name="school-outline"></ion-icon>
+                  <span>Tutores ({{ p.tutores.length }})</span>
+                </div>
+                <div class="pb-personas-grid">
+                  <div class="pb-persona pb-tutor" *ngFor="let t of p.tutores">
+                    <div class="pbp-avatar">{{ t.nombre?.charAt(0) || 'T' }}</div>
+                    <div class="pbp-info">
+                      <span class="pbp-nombre">{{ t.nombre }}</span>
+                      <span class="pbp-badge" *ngIf="t.encargado">
+                        <ion-icon name="star"></ion-icon>
+                        Encargado
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Participantes del proyecto -->
+              <div class="pb-personas" *ngIf="(p.participantes || []).length > 0">
+                <div class="pb-section-title">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <span>Participantes ({{ p.participantes.length }})</span>
+                </div>
+                <div class="pb-personas-grid">
+                  <div class="pb-persona" *ngFor="let part of p.participantes">
+                    <div class="pbp-avatar">{{ part.nombre?.charAt(0) || 'P' }}</div>
+                    <div class="pbp-info">
+                      <span class="pbp-nombre">{{ part.nombre }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Aviso si no hay tutores/participantes cargados -->
+              <div class="pb-personas-empty" *ngIf="(p.tutores || []).length === 0 && (p.participantes || []).length === 0">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <span>Este reporte aún no incluye tutores/participantes para este proyecto</span>
               </div>
 
               <!-- Evaluadores -->
@@ -495,6 +567,55 @@
                 <span class="stat-value">{{ proyectoSeleccionado.evaluaciones.length || 0 }}</span>
               </div>
             </div>
+          </div>
+
+          <!-- Tutores -->
+          <div class="detalle-tutores" *ngIf="(proyectoSeleccionado.tutores || []).length > 0">
+            <h3>
+              <ion-icon name="school-outline"></ion-icon>
+              Tutores
+            </h3>
+            <div class="personas-grid">
+              <div class="persona-card persona-tutor" *ngFor="let t of proyectoSeleccionado.tutores">
+                <div class="persona-avatar">
+                  <span>{{ t.nombre?.charAt(0) || 'T' }}</span>
+                </div>
+                <div class="persona-info">
+                  <span class="persona-nombre">{{ t.nombre }}</span>
+                  <span class="persona-badge" *ngIf="t.encargado">
+                    <ion-icon name="star"></ion-icon>
+                    Tutor encargado
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Participantes -->
+          <div class="detalle-participantes" *ngIf="(proyectoSeleccionado.participantes || []).length > 0">
+            <h3>
+              <ion-icon name="person-outline"></ion-icon>
+              Participantes
+            </h3>
+            <div class="personas-grid">
+              <div class="persona-card" *ngFor="let part of proyectoSeleccionado.participantes">
+                <div class="persona-avatar">
+                  <span>{{ part.nombre?.charAt(0) || 'P' }}</span>
+                </div>
+                <div class="persona-info">
+                  <span class="persona-nombre">{{ part.nombre }}</span>
+                  <span class="persona-extra" *ngIf="part.cedula">CI: {{ part.cedula }}</span>
+                  <span class="persona-extra" *ngIf="part.email">{{ part.email }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aviso si el backend aún no envía tutores/participantes -->
+          <div class="detalle-personas-empty"
+               *ngIf="(proyectoSeleccionado.tutores || []).length === 0 && (proyectoSeleccionado.participantes || []).length === 0">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>Este proyecto aún no tiene tutores/participantes registrados en el reporte</span>
           </div>
 
           <!-- Evaluadores -->
