@@ -466,9 +466,6 @@ export class ReportesPage implements OnInit {
     this.aplicarFiltros();
   }
 
-  // ============================================
-  // EXPORTACIÓN CON FILTROS (IGUAL QUE EN PROYECTOS)
-  // ============================================
 
   getNombreConcurso(id: string): string {
     if (id === 'todos') return 'Todos los concursos';
@@ -633,10 +630,6 @@ export class ReportesPage implements OnInit {
     }
   }
 
-  // ============================================
-  // EXPORTACIÓN INDIVIDUAL DE PROYECTOS
-  // ============================================
-
   exportarProyectoExcel(proyecto: any): void {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
     if (!id) {
@@ -673,9 +666,6 @@ export class ReportesPage implements OnInit {
     });
   }
 
-  // ============================================
-  // ADMIN ACTIONS
-  // ============================================
 
   editarEvaluacionAdmin(proyecto: any): void {
     const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
@@ -731,10 +721,6 @@ export class ReportesPage implements OnInit {
   verDetalleEvaluacion(proyecto: any): void {
     this.verDetalle(proyecto);
   }
-
-  // ============================================
-  // DETALLE DE PROYECTO
-  // ============================================
 
   async verDetalle(proyecto: any): Promise<void> {
     const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
@@ -855,10 +841,6 @@ export class ReportesPage implements OnInit {
   toggleFilter(): void {
     this.aplicarFiltros();
   }
-
-  // ============================================
-  // UTILIDADES
-  // ============================================
 
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
     const icono = tipo === 'success' ? '✅' : '❌';
