@@ -56,7 +56,10 @@
           <ion-icon name="trophy-outline"></ion-icon>
           Podio del Concurso
         </h2>
-        <p>Los mejores proyectos evaluados</p>
+        <p *ngIf="filtroConcurso !== 'todos'">{{ getNombreConcurso(filtroConcurso) }}</p>
+        <p *ngIf="filtroConcurso === 'todos'" class="podio-warning">
+          Mostrando el mejor puntaje combinado de todos los concursos. Si tus concursos usan rúbricas distintas, filtra por uno específico arriba para un ranking justo.
+        </p>
       </div>
 
       <div class="podio-grid">

@@ -230,6 +230,15 @@ $shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.15);
       font-size: 0.9rem;
       margin: 4px 0 0;
     }
+
+    .podio-warning {
+      max-width: 480px;
+      margin: 8px auto 0;
+      color: $upse-gold;
+      font-size: 0.75rem;
+      font-style: italic;
+      line-height: 1.4;
+    }
   }
 
   .podio-grid {
@@ -2037,18 +2046,32 @@ $shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.15);
     .proyecto-body {
       .pb-content {
         .pb-admin-actions {
-          flex-direction: column;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 6px;
 
           .pb-btn {
             justify-content: center;
           }
+
+          .pb-btn:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
+          }
         }
 
         .pb-actions {
-          flex-direction: column;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 6px;
 
           .pb-btn {
             justify-content: center;
+          }
+
+          // Si son 3 botones, que el tercero ocupe todo el ancho
+          // en vez de quedar solo colgando a la izquierda
+          .pb-btn:last-child:nth-child(odd) {
+            grid-column: 1 / -1;
           }
         }
       }

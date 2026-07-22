@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -133,7 +133,7 @@ interface Ganador {
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss']
 })
-export class ReportesPage implements OnInit {
+export class ReportesPage implements OnInit, OnDestroy {
 
   reportes = {
     proyectos: 0,
@@ -223,9 +223,28 @@ export class ReportesPage implements OnInit {
     this.esAdmin = this.authService.esAdmin();
   }
 
+  // Auto-refresh: recarga los datos cada cierto tiempo sin bloquear
+  // la pantalla (sin skeleton, sin cerrar acordeones abiertos). No es
+  // un WebSocket en vivo, pero acerca bastante el reporte a "tiempo real".
+  private autoRefreshHandle: any;
+  private readonly AUTO_REFRESH_MS = 60000; // 60 segundos
+
   ngOnInit(): void {
     this.cargarDatos();
     this.cargarConcursos();
+    this.iniciarAutoRefresh();
+  }
+
+  ngOnDestroy(): void {
+    if (this.autoRefreshHandle) {
+      clearInterval(this.autoRefreshHandle);
+    }
+  }
+
+  private iniciarAutoRefresh(): void {
+    this.autoRefreshHandle = setInterval(() => {
+      this.cargarDatos(true);
+    }, this.AUTO_REFRESH_MS);
   }
 
   cargarConcursos(): void {
@@ -243,8 +262,12 @@ export class ReportesPage implements OnInit {
     });
   }
 
-  cargarDatos(): void {
-    this.cargando = true;
+  // `silencioso = true` se usa desde el auto-refresh: no muestra el
+  // skeleton de carga y conserva qué proyectos tenías expandidos.
+  cargarDatos(silencioso: boolean = false): void {
+    if (!silencioso) {
+      this.cargando = true;
+    }
     this.error = null;
 
     this.reporteService.getStats().subscribe({
@@ -255,7 +278,9 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error stats:', err);
-        this.error = err.error?.mensaje || 'Error al cargar estadísticas';
+        if (!silencioso) {
+          this.error = err.error?.mensaje || 'Error al cargar estadísticas';
+        }
         this.actualizarStatsCards();
       }
     });
@@ -264,19 +289,28 @@ export class ReportesPage implements OnInit {
       next: (res: any) => {
         let data = res?.data ?? res ?? [];
 
-        this.proyectos = data.map((item: any, index: number) => ({
-          ...item,
-          id: item.id || item.proyecto_id || index + 1,
-          nombre: item.proyecto || item.nombre || 'Proyecto sin nombre',
-          _expandido: false,
-          evaluacionId: item.evaluacion_id || item.evaluacionId || null,
-          estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado',
-          participantes: item.participantes || [],
-          tutores: item.tutores || [],
-          puntajeMaximo: item.puntajeMaximo || item.puntaje_maximo || 100,
-          concursoId: item.concursoId ?? item.concurso_id ?? null,
-          concursoNombre: item.concursoNombre ?? item.concurso_nombre ?? null
-        }));
+        // Conserva el estado "expandido" de los proyectos que ya
+        // estaban abiertos antes de este refresh
+        const expandidosPrevios = new Set(
+          this.proyectos.filter(p => p._expandido).map(p => p.id)
+        );
+
+        this.proyectos = data.map((item: any, index: number) => {
+          const id = item.id || item.proyecto_id || index + 1;
+          return {
+            ...item,
+            id,
+            nombre: item.proyecto || item.nombre || 'Proyecto sin nombre',
+            _expandido: expandidosPrevios.has(id),
+            evaluacionId: item.evaluacion_id || item.evaluacionId || null,
+            estadoEvaluacion: item.estado_evaluacion || item.estado || 'asignado',
+            participantes: item.participantes || [],
+            tutores: item.tutores || [],
+            puntajeMaximo: item.puntajeMaximo || item.puntaje_maximo || 100,
+            concursoId: item.concursoId ?? item.concurso_id ?? null,
+            concursoNombre: item.concursoNombre ?? item.concurso_nombre ?? null
+          };
+        });
 
         this.calcularGanadores();
         this.construirResumenEvaluadores();
@@ -285,22 +319,41 @@ export class ReportesPage implements OnInit {
       },
       error: (err) => {
         console.error('Error proyectos:', err);
-        this.error = err.error?.mensaje || 'Error al cargar proyectos';
-        this.proyectos = [];
-        this.proyectosFiltrados = [];
-        this.ganadores = [];
+        if (!silencioso) {
+          this.error = err.error?.mensaje || 'Error al cargar proyectos';
+          this.proyectos = [];
+          this.proyectosFiltrados = [];
+          this.ganadores = [];
+        }
         this.cargando = false;
       }
     });
   }
 
+  // ============================================
+  // GANADORES — AHORA RESPETAN EL FILTRO DE CONCURSO
+  // ============================================
+  // ANTES: siempre calculaba sobre `this.proyectos` completo, sin
+  // importar qué concurso tuvieras seleccionado en el filtro. Por eso
+  // el podio nunca cambiaba al cambiar de concurso — mezclaba todos
+  // los proyectos de todos los concursos en un solo ranking.
+  //
+  // AHORA: si hay un concurso filtrado, el podio se calcula SOLO con
+  // los proyectos de ESE concurso. Si el filtro está en "todos", se
+  // muestra el podio combinado (con la advertencia de que mezclar
+  // concursos con rúbricas distintas puede no ser justo — ver nota
+  // más abajo).
   calcularGanadores(): void {
     if (!this.proyectos || this.proyectos.length === 0) {
       this.ganadores = [];
       return;
     }
 
-    const proyectosConEvaluaciones = this.proyectos.filter(p =>
+    const baseParaPodio = this.filtroConcurso !== 'todos'
+      ? this.proyectos.filter(p => Number(p.concursoId) === Number(this.filtroConcurso))
+      : this.proyectos;
+
+    const proyectosConEvaluaciones = baseParaPodio.filter(p =>
       (p.evaluaciones || 0) > 0 && (p.promedio || 0) > 0
     );
 
@@ -411,6 +464,11 @@ export class ReportesPage implements OnInit {
   }
 
   aplicarFiltros(): void {
+    // El podio depende del concurso filtrado, así que se recalcula
+    // aquí también — así cambiar el ion-select de concurso actualiza
+    // el podio al instante, sin esperar a un recargar().
+    this.calcularGanadores();
+
     let filtered = [...this.proyectos];
 
     if (this.filtroBusqueda && this.filtroBusqueda.trim()) {
