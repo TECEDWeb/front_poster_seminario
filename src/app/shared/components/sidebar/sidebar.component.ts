@@ -1,7 +1,8 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MenuController } from '@ionic/angular';
+import { Subscription, filter } from 'rxjs';
 
 import {
   IonMenu,
@@ -39,6 +40,11 @@ interface MenuItem {
   iconActive: string;
 }
 
+// Debe coincidir con el breakpoint del SCSS (992px) donde el menú
+// horizontal de escritorio toma el control y el ion-menu móvil deja
+// de aplicar.
+const DESKTOP_BREAKPOINT = 992;
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -57,14 +63,23 @@ interface MenuItem {
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy {
 
   private authService = inject(AuthService);
   private router = inject(Router);
   private menuCtrl = inject(MenuController);
 
+  // Referencia directa al ion-menu del template (ver #mainMenu en el HTML).
+  // Usamos esto ADEMÁS de MenuController porque en algunos casos
+  // menuCtrl.close('main-menu') falla silenciosamente por timing o
+  // por desajuste de registro del menú, sin lanzar ningún error.
+  // Llamando directamente sobre la instancia evitamos ese problema.
+  @ViewChild('mainMenu') menuRef?: IonMenu;
+
   usuario = this.authService.usuario;
   userMenuOpen = false;
+
+  private routerSubscription?: Subscription;
 
   adminMenuItems: MenuItem[] = [
     { label: 'Dashboard', route: '/admin/dashboard', icon: 'grid-outline', iconActive: 'grid' },
@@ -109,6 +124,29 @@ export class SidebarComponent {
     });
   }
 
+  ngOnInit(): void {
+    // Cierra el menú lateral automáticamente cada vez que una navegación
+    // termina (NavigationEnd) — sin importar si el clic vino de un
+    // ion-item, un routerLink, o cualquier otro disparador — pero SOLO
+    // en viewport móvil, ya que en escritorio el menú horizontal es
+    // estático y no debe verse afectado.
+    this.routerSubscription = this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(() => {
+        if (this.esViewportMovil()) {
+          this.cerrarMenu();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.routerSubscription?.unsubscribe();
+  }
+
+  private esViewportMovil(): boolean {
+    return window.innerWidth < DESKTOP_BREAKPOINT;
+  }
+
   iniciales = computed(() => {
     const u = this.usuario();
     if (!u?.nombre) return '';
@@ -125,8 +163,20 @@ export class SidebarComponent {
     this.userMenuOpen = !this.userMenuOpen;
   }
 
-  cerrarMenu() {
-    this.menuCtrl.close('main-menu');
+  /**
+   * Cierra el menú lateral usando DOS mecanismos en paralelo:
+   * 1. La referencia directa al componente (this.menuRef.close()),
+   *    que es más confiable porque actúa sobre la instancia real
+   *    sin depender de que MenuController encuentre el menú por su id.
+   * 2. MenuController.close('main-menu') como respaldo, por si el
+   *    ViewChild aún no está disponible en algún punto del ciclo de vida.
+   */
+  cerrarMenu(): void {
+    if (this.menuRef) {
+      this.menuRef.close();
+    } else {
+      this.menuCtrl.close('main-menu');
+    }
   }
 
   async cerrarSesion() {
