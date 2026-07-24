@@ -1,7 +1,11 @@
+// ============================================
+// VARIABLES
+// ============================================
 $upse-blue: #001b4c;
 $upse-blue-dark: #001433;
 $upse-blue-light: #e8f0fe;
 $upse-gold: #c9a84c;
+$upse-gold-dark: #a8873a;  // ✅ AGREGADA
 $upse-gold-light: #f8f0e0;
 $upse-green: #00a651;
 $upse-green-light: #e8f5e9;
@@ -1160,6 +1164,13 @@ ion-skeleton-text {
   }
 
   .assignment-admin-actions .admin-btn {
+    &.admin-btn-editar {
+      background: #1a2a4a;
+      color: #60a5fa;
+
+      &:hover { background: #60a5fa; color: #0f172a; }
+    }
+
     &.admin-btn-reabrir {
       background: #3a2a1a;
       color: #fbbf24;
