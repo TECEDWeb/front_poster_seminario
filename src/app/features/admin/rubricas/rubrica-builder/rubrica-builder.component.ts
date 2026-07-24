@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon,
-  IonContent, IonItem, IonInput, IonTextarea, IonSpinner
+  IonContent, IonSpinner
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -73,7 +73,7 @@ interface SeccionUI extends Seccion {
   imports: [
     CommonModule, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon,
-    IonContent, IonItem, IonInput, IonTextarea, IonSpinner
+    IonContent, IonSpinner
   ],
   templateUrl: './rubrica-builder.component.html',
   styleUrls: ['./rubrica-builder.component.scss']

@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  IonHeader, IonToolbar, IonButtons, IonMenuButton, IonBackButton, IonTitle,
+  IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
   IonContent, IonButton, IonIcon, IonItem, IonSelect, IonSelectOption,
-  IonInput, IonSpinner
+  IonInput
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -23,9 +23,9 @@ import { Certificado } from '../../../../core/models/certificado.model';
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonBackButton, IonTitle,
+    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle,
     IonContent, IonButton, IonIcon, IonItem, IonSelect, IonSelectOption,
-    IonInput, IonSpinner
+    IonInput
   ],
   templateUrl: './generacion-certificado.page.html',
   styleUrls: ['./generacion-certificado.page.scss']

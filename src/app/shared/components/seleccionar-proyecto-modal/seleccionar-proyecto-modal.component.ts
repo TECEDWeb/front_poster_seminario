@@ -13,11 +13,8 @@ import {
   IonSearchbar,
   IonSelect,
   IonSelectOption,
-  IonItem,
   IonBadge,
-  IonSkeletonText,
-  IonAvatar,
-  IonChip
+  IonSkeletonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -50,11 +47,8 @@ import { ConcursoService } from '../../../core/services/concurso.service';
     IonSearchbar,
     IonSelect,
     IonSelectOption,
-    IonItem,
     IonBadge,
-    IonSkeletonText,
-    IonAvatar,
-    IonChip
+    IonSkeletonText
   ],
   templateUrl: './seleccionar-proyecto-modal.component.html',
   styleUrls: ['./seleccionar-proyecto-modal.component.scss']
@@ -123,12 +117,11 @@ export class SeleccionarProyectoModalComponent implements OnInit {
   cargarProyectos(): void {
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
-        // ✅ NORMALIZAR DATOS - convertir snake_case a camelCase
         if (res && res.ok && res.data) {
           this.proyectos = res.data.map((p: any) => ({
             ...p,
-            concursoId: p.concursoId ?? p.concurso_id ?? null,  // ✅ Asegurar campo concursoId
-            concurso_id: p.concursoId ?? p.concurso_id ?? null  // ✅ Mantener ambos por compatibilidad
+            concursoId: p.concursoId ?? p.concurso_id ?? null,
+            concurso_id: p.concursoId ?? p.concurso_id ?? null
           }));
         } else if (Array.isArray(res)) {
           this.proyectos = res.map((p: any) => ({
@@ -141,8 +134,6 @@ export class SeleccionarProyectoModalComponent implements OnInit {
         }
         
         console.log('📊 PROYECTOS CARGADOS (normalizados):', this.proyectos);
-        console.log('📊 Primer proyecto con concursoId:', this.proyectos[0]?.concursoId);
-        
         this.aplicarFiltros();
         this.cargando = false;
       },
@@ -167,23 +158,16 @@ export class SeleccionarProyectoModalComponent implements OnInit {
     console.log('🔍 Aplicando filtros...');
     console.log('🔍 filtroConcursoId:', this.filtroConcursoId);
 
-    // ✅ FILTRO POR CONCURSO - Usar concursoId (camelCase)
     if (this.filtroConcursoId !== null && this.filtroConcursoId !== undefined) {
       const idNum = Number(this.filtroConcursoId);
       filtrados = filtrados.filter(p => {
-        // ✅ Usar concursoId que es el campo correcto
         const concursoId = p.concursoId ?? p.concurso_id;
         const coincide = Number(concursoId) === idNum;
-        
-        if (coincide) {
-          console.log(`✅ Coincidencia: proyecto ${p.id} (${p.nombre}) -> concursoId: ${concursoId}`);
-        }
         return coincide;
       });
       console.log(`🔍 Proyectos con concurso ${idNum}:`, filtrados.length);
     }
 
-    // ✅ FILTRO POR BÚSQUEDA
     if (this.filtroBusqueda.trim()) {
       const busqueda = this.filtroBusqueda.toLowerCase().trim();
       filtrados = filtrados.filter(p => {
@@ -215,7 +199,6 @@ export class SeleccionarProyectoModalComponent implements OnInit {
     this.isOpenChange.emit(false);
   }
 
-  // ✅ DEPURACIÓN
   debugInfo(): void {
     console.log('========================================');
     console.log('🔍 DEPURACIÓN DEL MODAL DE PROYECTOS');

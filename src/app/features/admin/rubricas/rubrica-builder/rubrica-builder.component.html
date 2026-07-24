@@ -127,7 +127,7 @@
               <ng-container *ngIf="!s.editando; else editSeccion">
                 <div class="seccion-titulo" (click)="$event.stopPropagation()">
                   <strong>{{ s.nombre }}</strong>
-                  <span class="seccion-count">{{ s.criterios?.length || 0 }} criterio(s)</span>
+                  <span class="seccion-count">{{ s.criterios.length || 0 }} criterio(s)</span>
                   <span class="seccion-desc" *ngIf="s.descripcion">{{ s.descripcion }}</span>
                 </div>
                 <div class="row-actions" (click)="$event.stopPropagation()">

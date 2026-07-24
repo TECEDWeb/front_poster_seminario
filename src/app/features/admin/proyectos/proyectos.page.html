@@ -220,7 +220,7 @@
                   <span class="participantes-count">{{ (p.participantes || []).length }}</span>
                   <div class="participantes-avatars">
                     <div class="mini-avatar" *ngFor="let part of (p.participantes || []).slice(0, 2)">
-                      {{ part.nombre?.charAt(0) || '?' }}
+                      {{ part.nombre.charAt(0) || '?' }}
                     </div>
                     <div class="mini-avatar more" *ngIf="(p.participantes || []).length > 2">
                       +{{ (p.participantes || []).length - 2 }}
@@ -335,7 +335,7 @@
                 {{ part.nombre }}
               </div>
               <div class="participant-more" *ngIf="(p.participantes?.length || 0) > 4">
-                +{{ (p.participantes?.length || 0) - 4 }} más
+                +{{ (p.participantes.length || 0) - 4 }} más
               </div>
             </div>
           </div>
@@ -722,7 +722,7 @@
             </div>
             <div class="participantes-full-list" *ngIf="(p.participantes || []).length > 0">
               <div class="participante-row" *ngFor="let part of p.participantes">
-                <div class="participante-avatar">{{ part.nombre?.charAt(0) || '?' }}</div>
+                <div class="participante-avatar">{{ part.nombre.charAt(0) || '?' }}</div>
                 <div class="participante-info">
                   <strong>{{ part.nombre }}</strong>
                   <span *ngIf="part.cedula">CI: {{ part.cedula }}</span>

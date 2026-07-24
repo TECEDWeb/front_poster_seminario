@@ -11,10 +11,7 @@ import {
   IonIcon,
   IonContent,
   IonSearchbar,
-  IonItem,
-  IonBadge,
   IonSkeletonText,
-  IonAvatar
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -42,10 +39,7 @@ import { UsuarioService } from '../../../core/services/usuario.service';
     IonIcon,
     IonContent,
     IonSearchbar,
-    IonItem,
-    IonBadge,
     IonSkeletonText,
-    IonAvatar
   ],
   templateUrl: './seleccionar-evaluador-modal.component.html',
   styleUrls: ['./seleccionar-evaluador-modal.component.scss']

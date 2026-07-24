@@ -126,8 +126,8 @@
             <span class="card-subtitle">Concurso ID: {{ r.concursoId }}</span>
           </div>
           <div class="card-status">
-            <span class="status-badge" [class]="getStatusClass(r.secciones?.length || 0)">
-              {{ getStatusText(r.secciones?.length || 0) }}
+            <span class="status-badge" [class]="getStatusClass(r.secciones.length || 0)">
+              {{ getStatusText(r.secciones.length || 0) }}
             </span>
           </div>
         </div>
@@ -157,14 +157,14 @@
             <ion-icon name="layers-outline"></ion-icon>
             <div class="stat-content">
               <span class="stat-label">Secciones</span>
-              <span class="stat-value">{{ r.secciones?.length || 0 }}</span>
+              <span class="stat-value">{{ r.secciones.length || 0 }}</span>
             </div>
           </div>
           <div class="stat-item">
             <ion-icon name="list-outline"></ion-icon>
             <div class="stat-content">
               <span class="stat-label">Niveles</span>
-              <span class="stat-value">{{ r.niveles?.length || 0 }}</span>
+              <span class="stat-value">{{ r.niveles.length || 0 }}</span>
             </div>
           </div>
           <div class="stat-item">
@@ -185,7 +185,7 @@
           <div class="secciones-list">
             <div class="seccion-item" *ngFor="let s of r.secciones.slice(0, 3)">
               <span class="seccion-nombre">{{ s.nombre }}</span>
-              <span class="seccion-criterios">{{ s.criterios?.length || 0 }} criterios</span>
+              <span class="seccion-criterios">{{ s.criterios.length || 0 }} criterios</span>
             </div>
             <div class="seccion-more" *ngIf="r.secciones.length > 3">
               +{{ r.secciones.length - 3 }} secciones más

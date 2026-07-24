@@ -67,7 +67,7 @@
         <div class="podio-card podio-2" *ngIf="ganadores.length >= 2">
           <div class="podio-medalla">🥈</div>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[1].nombre)">
-            <span>{{ ganadores[1].nombre?.charAt(0) || 'P' }}</span>
+            <span>{{ ganadores[1].nombre.charAt(0) || 'P' }}</span>
           </div>
           <div class="podio-info">
             <h3>{{ ganadores[1].nombre }}</h3>
@@ -85,7 +85,7 @@
           <div class="podio-corona">👑</div>
           <div class="podio-medalla">🥇</div>
           <div class="podio-avatar podio-avatar-grande" [class]="getRandomColor(ganadores[0].nombre)">
-            <span>{{ ganadores[0].nombre?.charAt(0) || 'P' }}</span>
+            <span>{{ ganadores[0].nombre.charAt(0) || 'P' }}</span>
           </div>
           <div class="podio-info">
             <h2>{{ ganadores[0].nombre }}</h2>
@@ -102,7 +102,7 @@
         <div class="podio-card podio-3" *ngIf="ganadores.length >= 3">
           <div class="podio-medalla">🥉</div>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[2].nombre)">
-            <span>{{ ganadores[2].nombre?.charAt(0) || 'P' }}</span>
+            <span>{{ ganadores[2].nombre.charAt(0) || 'P' }}</span>
           </div>
           <div class="podio-info">
             <h3>{{ ganadores[2].nombre }}</h3>
@@ -574,7 +574,7 @@
             <div class="personas-grid">
               <div class="persona-card persona-tutor" *ngFor="let t of proyectoSeleccionado.tutores">
                 <div class="persona-avatar">
-                  <span>{{ t.nombre?.charAt(0) || 'T' }}</span>
+                  <span>{{ t.nombre.charAt(0) || 'T' }}</span>
                 </div>
                 <div class="persona-info">
                   <span class="persona-nombre">{{ t.nombre }}</span>
@@ -596,7 +596,7 @@
             <div class="personas-grid">
               <div class="persona-card" *ngFor="let part of proyectoSeleccionado.participantes">
                 <div class="persona-avatar">
-                  <span>{{ part.nombre?.charAt(0) || 'P' }}</span>
+                  <span>{{ part.nombre.charAt(0) || 'P' }}</span>
                 </div>
                 <div class="persona-info">
                   <span class="persona-nombre">{{ part.nombre }}</span>

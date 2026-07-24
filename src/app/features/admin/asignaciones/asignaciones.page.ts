@@ -6,7 +6,6 @@ import {
   IonHeader,
   IonToolbar,
   IonButtons,
-  IonMenuButton,
   IonTitle,
   IonContent,
   IonCard,
@@ -15,15 +14,12 @@ import {
   IonCardSubtitle,
   IonCardContent,
   IonItem,
-  IonSelect,
-  IonSelectOption,
   IonButton,
   IonIcon,
   IonChip,
   IonDatetime,
   IonLabel,
   IonSkeletonText,
-  IonAlert
 } from '@ionic/angular/standalone';
 import { AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -58,8 +54,6 @@ import { AsignacionService } from '../../../core/services/asignacion.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
-
-// ✅ IMPORTAR MODALES DE SELECCIÓN
 import { SeleccionarProyectoModalComponent } from '../../../shared/components/seleccionar-proyecto-modal/seleccionar-proyecto-modal.component';
 import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/seleccionar-evaluador-modal/seleccionar-evaluador-modal.component';
 
@@ -72,7 +66,6 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonHeader,
     IonToolbar,
     IonButtons,
-    IonMenuButton,
     IonTitle,
     IonContent,
     IonCard,
@@ -81,16 +74,12 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonCardSubtitle,
     IonCardContent,
     IonItem,
-    IonSelect,
-    IonSelectOption,
     IonButton,
     IonIcon,
     IonChip,
     IonDatetime,
     IonLabel,
     IonSkeletonText,
-    IonAlert,
-    // ✅ MODALES DE SELECCIÓN
     SeleccionarProyectoModalComponent,
     SeleccionarEvaluadorModalComponent
   ],
