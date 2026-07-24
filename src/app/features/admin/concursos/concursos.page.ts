@@ -402,16 +402,40 @@ export class ConcursosPage implements OnInit {
     this.rubricaDelConcurso = null;
   }
 
+  /**
+   * Cierra el modal de detalle y, tras esperar a que termine su animación
+   * de salida (~350ms), abre el modal de edición. Abrir un modal nuevo
+   * mientras el anterior aún se está cerrando causa fallos de renderizado
+   * en Ionic — por eso el delay es necesario, no opcional.
+   */
   editarDesdeDetalle(): void {
     if (!this.concursoSeleccionado) return;
     const concurso = this.concursoSeleccionado;
+
     this.cerrarModalDetalle();
-    this.editar(concurso);
+
+    setTimeout(() => {
+      this.editar(concurso);
+    }, 350);
   }
 
+  /**
+   * Cierra el modal de detalle y navega a la página de Rúbricas,
+   * pasando el concursoId por queryParam para que esa página pueda
+   * preseleccionar/filtrar directamente la rúbrica de este concurso
+   * en lugar de mostrar la lista completa.
+   */
   irARubricaDesdeDetalle(): void {
+    if (!this.concursoSeleccionado) return;
+    const concursoId = this.concursoSeleccionado.id;
+
     this.cerrarModalDetalle();
-    this.router.navigate(['/admin/rubricas']);
+
+    setTimeout(() => {
+      this.router.navigate(['/admin/rubricas'], {
+        queryParams: { concursoId }
+      });
+    }, 350);
   }
 
   getEstadoConcursoTexto(concurso: Concurso): string {
