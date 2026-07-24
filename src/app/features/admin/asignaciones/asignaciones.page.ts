@@ -21,6 +21,9 @@ import {
   IonModal,
   IonLabel,
   IonSkeletonText,
+  IonSearchbar,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/angular/standalone';
 import { AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -82,6 +85,9 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonModal,
     IonLabel,
     IonSkeletonText,
+    IonSearchbar,
+    IonSelect,
+    IonSelectOption,
     SeleccionarProyectoModalComponent,
     SeleccionarEvaluadorModalComponent
   ],
@@ -133,6 +139,15 @@ export class AsignacionesPage implements OnInit {
   today: string = new Date().toISOString();
 
   // ============================================
+  // MODAL "VER TODAS"
+  // ============================================
+  modalTodasAbierto = false;
+  busquedaTodas = '';
+  filtroEstadoTodas: string = 'todos';
+  paginaActualTodas = 1;
+  itemsPorPaginaTodas = 15;
+
+  // ============================================
   // GETTERS
   // ============================================
   get proyectoSeleccionado(): any {
@@ -148,6 +163,42 @@ export class AsignacionesPage implements OnInit {
   get asignacionesDelProyecto(): any[] {
     if (!this.proyectoId) return [];
     return this.asignacionesTodas.filter(a => this.obtenerProyectoIdDeAsignacion(a) === this.proyectoId);
+  }
+
+  get asignacionesFiltradas(): any[] {
+    let resultado = [...this.asignacionesTodas];
+
+    // Ordenar por fecha descendente
+    resultado.sort((a, b) => {
+      const fechaA = new Date(this.obtenerFechaDeAsignacion(a) || 0).getTime();
+      const fechaB = new Date(this.obtenerFechaDeAsignacion(b) || 0).getTime();
+      return fechaB - fechaA;
+    });
+
+    // Filtro por estado
+    if (this.filtroEstadoTodas !== 'todos') {
+      resultado = resultado.filter(a => this.getStatusClass(a.status || a.estado || 'pending') === this.filtroEstadoTodas);
+    }
+
+    // Búsqueda por texto (proyecto o evaluador)
+    if (this.busquedaTodas.trim()) {
+      const term = this.busquedaTodas.trim().toLowerCase();
+      resultado = resultado.filter(a =>
+        this.getNombreProyecto(a).toLowerCase().includes(term) ||
+        this.getNombreEvaluador(a).toLowerCase().includes(term)
+      );
+    }
+
+    return resultado;
+  }
+
+  get totalPaginasTodas(): number {
+    return Math.max(1, Math.ceil(this.asignacionesFiltradas.length / this.itemsPorPaginaTodas));
+  }
+
+  get asignacionesPaginadas(): any[] {
+    const inicio = (this.paginaActualTodas - 1) * this.itemsPorPaginaTodas;
+    return this.asignacionesFiltradas.slice(inicio, inicio + this.itemsPorPaginaTodas);
   }
 
   // ============================================
@@ -262,6 +313,12 @@ export class AsignacionesPage implements OnInit {
         const data = res?.data ?? res ?? [];
         this.asignacionesTodas = Array.isArray(data) ? data : [];
 
+        // 🔍 DIAGNÓSTICO TEMPORAL — revisa la consola del navegador (F12)
+        // y comparte el objeto impreso para ajustar los nombres de campo reales.
+        if (this.asignacionesTodas.length > 0) {
+          console.log('📋 ESTRUCTURA REAL DE UNA ASIGNACIÓN:', this.asignacionesTodas[0]);
+        }
+
         // Ordenar por fecha descendente (lo más reciente primero)
         const ordenadas = [...this.asignacionesTodas].sort((a, b) => {
           const fechaA = new Date(this.obtenerFechaDeAsignacion(a) || 0).getTime();
@@ -304,6 +361,29 @@ export class AsignacionesPage implements OnInit {
 
   private obtenerFechaDeAsignacion(a: any): string | null {
     return a.fecha_asignacion || a.created_at || a.fecha || null;
+  }
+
+  // ============================================
+  // HELPERS DE NOMBRE (con fallback ampliado)
+  // ============================================
+  getNombreProyecto(a: any): string {
+    return a.proyecto_nombre
+      || a.proyectoNombre
+      || a.proyecto?.nombre
+      || a.proyecto?.titulo
+      || a.nombre_proyecto
+      || a.proyecto_titulo
+      || 'Proyecto sin nombre';
+  }
+
+  getNombreEvaluador(a: any): string {
+    return a.evaluador_nombre
+      || a.evaluadorNombre
+      || a.evaluador?.nombre
+      || a.nombre_evaluador
+      || a.evaluador?.nombre_completo
+      || a.evaluador_nombre_completo
+      || 'Evaluador sin nombre';
   }
 
   // ============================================
@@ -354,6 +434,31 @@ export class AsignacionesPage implements OnInit {
 
   cancelarFecha(): void {
     this.calendarModalOpen = false;
+  }
+
+  // ============================================
+  // MODAL "VER TODAS"
+  // ============================================
+  abrirModalTodas(): void {
+    this.busquedaTodas = '';
+    this.filtroEstadoTodas = 'todos';
+    this.paginaActualTodas = 1;
+    this.modalTodasAbierto = true;
+  }
+
+  cerrarModalTodas(): void {
+    this.modalTodasAbierto = false;
+  }
+
+  cambiarPaginaTodas(delta: number): void {
+    const nueva = this.paginaActualTodas + delta;
+    if (nueva >= 1 && nueva <= this.totalPaginasTodas) {
+      this.paginaActualTodas = nueva;
+    }
+  }
+
+  onFiltroChangeTodas(): void {
+    this.paginaActualTodas = 1;
   }
 
   // ============================================
@@ -438,8 +543,8 @@ export class AsignacionesPage implements OnInit {
       return;
     }
 
-    const nombreEvaluador = a.evaluador_nombre || a.evaluador?.nombre || 'este evaluador';
-    const nombreProyecto = a.proyecto_nombre || a.proyecto?.nombre || 'este proyecto';
+    const nombreEvaluador = this.getNombreEvaluador(a);
+    const nombreProyecto = this.getNombreProyecto(a);
 
     const yaEvaluado = a.status === 'completed' || a.status === 'completado'
       || a.estado === 'evaluado' || a.yaEvaluado === true;
@@ -503,7 +608,7 @@ export class AsignacionesPage implements OnInit {
       return;
     }
 
-    const nombreProyecto = asignacion.proyecto_nombre || asignacion.proyecto?.nombre || 'proyecto';
+    const nombreProyecto = this.getNombreProyecto(asignacion);
 
     const alert = await this.alertController.create({
       header: 'Reabrir evaluación',
@@ -542,7 +647,7 @@ export class AsignacionesPage implements OnInit {
       return;
     }
 
-    const nombreProyecto = asignacion.proyecto_nombre || asignacion.proyecto?.nombre || 'proyecto';
+    const nombreProyecto = this.getNombreProyecto(asignacion);
 
     const alert = await this.alertController.create({
       header: 'Eliminar evaluación',
@@ -592,10 +697,6 @@ export class AsignacionesPage implements OnInit {
     this.proyectoId = null;
     this.evaluadorId = null;
     this.fechaLimite = null;
-  }
-
-  verTodasAsignaciones(): void {
-    this.router.navigate(['/admin/asignaciones/todas']);
   }
 
   // Tiempo relativo tipo "Hace 2h" para actividades recientes

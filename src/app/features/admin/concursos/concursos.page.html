@@ -22,12 +22,11 @@
         <p>Administra los concursos científicos y sus convocatorias</p>
       </div>
       <div class="header-right">
-        <!-- ✅ BOTÓN ÚNICO - SOLO EN ESCRITORIO (ESTILO UPSE) -->
         <ion-button class="btn-add-desktop" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           <span>Nuevo concurso</span>
         </ion-button>
-        
+
         <div class="stats-mini">
           <span class="stat-count">{{ concursos.length }}</span>
           <span class="stat-label">Total concursos</span>
@@ -85,7 +84,7 @@
 
     <!-- LISTA -->
     <div class="concursos-grid" *ngIf="!cargando">
-      <div class="concurso-card" 
+      <div class="concurso-card"
            *ngFor="let c of concursosFiltrados || []; trackBy: trackById"
            [class.card-active]="c.activo"
            [class.card-inactive]="!c.activo">
@@ -208,11 +207,17 @@
     </ion-fab-button>
   </ion-fab>
 
+  <!-- MODAL: CREAR / EDITAR -->
   <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
     <ng-template>
       <ion-header>
-        <ion-toolbar>
-          <ion-title>{{ editando ? 'Editar concurso' : 'Nuevo concurso' }}</ion-title>
+        <ion-toolbar class="modal-toolbar">
+          <div class="modal-title-group" slot="start">
+            <div class="modal-title-icon">
+              <ion-icon [name]="editando ? 'create-outline' : 'add-outline'"></ion-icon>
+            </div>
+            <ion-title>{{ editando ? 'Editar concurso' : 'Nuevo concurso' }}</ion-title>
+          </div>
           <ion-buttons slot="end">
             <ion-button (click)="cerrarModal()">
               <ion-icon name="close-outline"></ion-icon>
@@ -361,6 +366,7 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
   <!-- MODAL: VER DETALLE (solo lectura) -->
   <ion-modal [isOpen]="modalDetalleAbierto" (didDismiss)="cerrarModalDetalle()">
     <ng-template>
@@ -481,7 +487,7 @@
                   <strong *ngIf="tieneRubricaConfigurada">Rúbrica configurada</strong>
                   <strong *ngIf="!tieneRubricaConfigurada">Rúbrica sin configurar</strong>
                   <span *ngIf="tieneRubricaConfigurada">
-                    {{ rubricaDelConcurso.secciones.length }} secciones · {{ totalCriteriosRubrica() }} criterios
+                    {{ totalSeccionesRubrica() }} secciones · {{ totalCriteriosRubrica() }} criterios
                   </span>
                   <span *ngIf="!tieneRubricaConfigurada">
                     Este concurso aún no tiene secciones ni criterios de evaluación

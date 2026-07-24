@@ -181,7 +181,7 @@
                       <ion-icon [name]="getStatusIcon(a.status || a.estado)"></ion-icon>
                     </div>
                     <div class="asignado-info">
-                      <span class="asignado-nombre">{{ a.evaluador_nombre || a.evaluador?.nombre }}</span>
+                      <span class="asignado-nombre">{{ getNombreEvaluador(a) }}</span>
                       <span class="asignado-estado" [class]="getStatusClass(a.status || a.estado || 'pending')">
                         {{ getStatusText(a.status || a.estado) }}
                       </span>
@@ -308,7 +308,7 @@
           </h3>
           <div class="section-actions">
             <span class="total-badge">{{ asignacionesCount }} total</span>
-            <ion-button fill="clear" size="small" class="view-all" (click)="verTodasAsignaciones()">
+            <ion-button fill="clear" size="small" class="view-all" (click)="abrirModalTodas()">
               Ver todas <ion-icon name="arrow-forward-outline"></ion-icon>
             </ion-button>
           </div>
@@ -321,10 +321,10 @@
             </div>
             <div class="assignment-info">
               <div class="assignment-main">
-                <span class="assignment-project">{{ a.proyecto_nombre || a.proyecto?.nombre }}</span>
+                <span class="assignment-project">{{ getNombreProyecto(a) }}</span>
                 <span class="assignment-evaluator">
                   <ion-icon name="person-outline"></ion-icon>
-                  {{ a.evaluador_nombre || a.evaluador?.nombre }}
+                  {{ getNombreEvaluador(a) }}
                 </span>
               </div>
               <div class="assignment-meta">
@@ -435,5 +435,109 @@
         </ion-button>
       </div>
     </div>
+  </ng-template>
+</ion-modal>
+
+<!-- MODAL: VER TODAS LAS ASIGNACIONES -->
+<ion-modal
+  [isOpen]="modalTodasAbierto"
+  (didDismiss)="cerrarModalTodas()"
+  class="todas-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar class="todas-toolbar">
+        <ion-title>Todas las asignaciones ({{ asignacionesTodas.length }})</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrarModalTodas()">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="todas-content">
+      <div class="todas-filters">
+        <ion-searchbar
+          [(ngModel)]="busquedaTodas"
+          (ionInput)="onFiltroChangeTodas()"
+          placeholder="Buscar por proyecto o evaluador..."
+          class="todas-search">
+        </ion-searchbar>
+
+        <ion-select
+          [(ngModel)]="filtroEstadoTodas"
+          (ionChange)="onFiltroChangeTodas()"
+          interface="popover"
+          class="todas-filter-select">
+          <ion-select-option value="todos">Todos los estados</ion-select-option>
+          <ion-select-option value="status-pending">Pendientes</ion-select-option>
+          <ion-select-option value="status-progress">En progreso</ion-select-option>
+          <ion-select-option value="status-completed">Completados</ion-select-option>
+          <ion-select-option value="status-rejected">Rechazados</ion-select-option>
+        </ion-select>
+      </div>
+
+      <div class="todas-list" *ngIf="asignacionesPaginadas.length > 0">
+        <div class="assignment-item" *ngFor="let a of asignacionesPaginadas">
+          <div class="assignment-avatar" [class]="getStatusClass(a.status || a.estado || 'pending')">
+            <ion-icon [name]="getStatusIcon(a.status || a.estado)"></ion-icon>
+          </div>
+          <div class="assignment-info">
+            <div class="assignment-main">
+              <span class="assignment-project">{{ getNombreProyecto(a) }}</span>
+              <span class="assignment-evaluator">
+                <ion-icon name="person-outline"></ion-icon>
+                {{ getNombreEvaluador(a) }}
+              </span>
+            </div>
+            <div class="assignment-meta">
+              <span class="assignment-date">
+                <ion-icon name="time-outline"></ion-icon>
+                {{ tiempoRelativo(a.fecha_asignacion || a.created_at || a.fecha) }}
+              </span>
+              <span class="assignment-status" [class]="getStatusClass(a.status || a.estado || 'pending')">
+                {{ getStatusText(a.status || a.estado) }}
+              </span>
+            </div>
+
+            <div class="assignment-admin-actions" *ngIf="esAdmin">
+              <button class="admin-btn admin-btn-editar" (click)="editarEvaluacionAdmin(a)" title="Editar respuestas">
+                <ion-icon name="create-outline"></ion-icon>
+              </button>
+              <button class="admin-btn admin-btn-reabrir"
+                      (click)="reabrirEvaluacion(a)"
+                      *ngIf="a.status === 'completed' || a.status === 'completado' || a.estado === 'evaluado'"
+                      title="Reabrir evaluación">
+                <ion-icon name="refresh-outline"></ion-icon>
+              </button>
+              <button class="admin-btn admin-btn-quitar" (click)="quitarAsignacion(a)" title="Quitar esta asignación">
+                <ion-icon name="person-remove-outline"></ion-icon>
+              </button>
+              <button class="admin-btn admin-btn-eliminar" (click)="eliminarEvaluacion(a)" title="Eliminar evaluación">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+              <button class="admin-btn admin-btn-ver" (click)="verDetalleAsignacion(a)" title="Ver detalle">
+                <ion-icon name="eye-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="todas-empty" *ngIf="asignacionesPaginadas.length === 0">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <p>No se encontraron asignaciones con estos filtros</p>
+      </div>
+
+      <div class="todas-paginacion" *ngIf="asignacionesFiltradas.length > 0">
+        <button class="pag-btn" [disabled]="paginaActualTodas === 1" (click)="cambiarPaginaTodas(-1)">
+          <ion-icon name="chevron-forward-outline" style="transform: rotate(180deg);"></ion-icon>
+        </button>
+        <span class="pag-info">Página {{ paginaActualTodas }} de {{ totalPaginasTodas }}</span>
+        <button class="pag-btn" [disabled]="paginaActualTodas === totalPaginasTodas" (click)="cambiarPaginaTodas(1)">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </div>
+    </ion-content>
   </ng-template>
 </ion-modal>

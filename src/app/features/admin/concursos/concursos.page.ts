@@ -51,7 +51,11 @@ import {
   refreshOutline,
   documentTextOutline,
   folderOutline,
-  toggleOutline
+  toggleOutline,
+  checkmarkCircleOutline,
+  alertCircleOutline,
+  folderOpenOutline,
+  checkboxOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -112,6 +116,7 @@ export class ConcursosPage implements OnInit {
     puntajeMaximo: null,
     activo: true
   };
+
   // Modal "Ver detalle" (solo lectura)
   modalDetalleAbierto = false;
   cargandoDetalle = false;
@@ -126,7 +131,6 @@ export class ConcursosPage implements OnInit {
     private rubricaService: RubricaService,
     private route: ActivatedRoute,
     private router: Router
-
   ) {
     addIcons({
       addOutline,
@@ -146,7 +150,11 @@ export class ConcursosPage implements OnInit {
       refreshOutline,
       documentTextOutline,
       folderOutline,
-      toggleOutline
+      toggleOutline,
+      checkmarkCircleOutline,
+      alertCircleOutline,
+      folderOpenOutline,
+      checkboxOutline
     });
   }
 
@@ -323,8 +331,11 @@ export class ConcursosPage implements OnInit {
     // Proyectos inscritos en este concurso
     this.proyectoService.listar().subscribe({
       next: (proyectos: any) => {
-        const lista = Array.isArray(proyectos) ? proyectos : [];
-        this.proyectosDelConcurso = lista.filter(p => Number(p.concursoId) === Number(concurso.id));
+        const data = proyectos?.data ?? proyectos?.proyectos ?? proyectos ?? [];
+        const lista = Array.isArray(data) ? data : [];
+        this.proyectosDelConcurso = lista.filter(
+          p => Number(p.concursoId ?? p.concurso_id) === Number(concurso.id)
+        );
       },
       error: () => {
         this.proyectosDelConcurso = [];
@@ -333,17 +344,55 @@ export class ConcursosPage implements OnInit {
 
     // Estado de la rúbrica de este concurso
     this.rubricaService.obtenerPorConcurso(concurso.id).subscribe({
-      next: (rubrica) => {
+      next: (res: any) => {
+        const rubrica = res?.data ?? res?.rubrica ?? res ?? null;
         this.rubricaDelConcurso = rubrica;
-        this.tieneRubricaConfigurada = (rubrica?.secciones?.length || 0) > 0;
+
+        const secciones = this.extraerSecciones(rubrica);
+        this.tieneRubricaConfigurada = secciones.length > 0;
+
         this.cargandoDetalle = false;
       },
-      error: () => {
+      error: (err) => {
+        if (err.status === 404) {
+          // Caso normal: este concurso aún no tiene rúbrica creada
+          console.log('Este concurso no tiene rúbrica configurada aún');
+        } else {
+          console.error('Error inesperado cargando rúbrica del concurso:', err);
+        }
         this.rubricaDelConcurso = null;
         this.tieneRubricaConfigurada = false;
         this.cargandoDetalle = false;
       }
     });
+  }
+
+  /**
+   * Extrae las secciones de la rúbrica sin importar la forma exacta del objeto:
+   * - rubrica.secciones (plano)
+   * - rubrica.niveles[].secciones (anidado por nivel)
+   */
+  private extraerSecciones(rubrica: any): any[] {
+    if (!rubrica) return [];
+
+    if (Array.isArray(rubrica.secciones) && rubrica.secciones.length > 0) {
+      return rubrica.secciones;
+    }
+
+    if (Array.isArray(rubrica.niveles)) {
+      return rubrica.niveles.flatMap((n: any) => n.secciones ?? []);
+    }
+
+    return [];
+  }
+
+  totalSeccionesRubrica(): number {
+    return this.extraerSecciones(this.rubricaDelConcurso).length;
+  }
+
+  totalCriteriosRubrica(): number {
+    const secciones = this.extraerSecciones(this.rubricaDelConcurso);
+    return secciones.reduce((total: number, s: any) => total + (s.criterios?.length || 0), 0);
   }
 
   cerrarModalDetalle(): void {
@@ -371,13 +420,6 @@ export class ConcursosPage implements OnInit {
 
   getEstadoConcursoColor(concurso: Concurso): string {
     return getEstadoColor(concurso);
-  }
-
-  totalCriteriosRubrica(): number {
-    if (!this.rubricaDelConcurso?.secciones) return 0;
-    return this.rubricaDelConcurso.secciones.reduce(
-      (total: number, s: any) => total + (s.criterios?.length || 0), 0
-    );
   }
 
   confirmarEliminar(concurso: Concurso): void {

@@ -43,7 +43,7 @@ export class RubricaService {
    * Obtener rúbrica por concurso ID
    */
   obtenerPorConcurso(concursoId: number): Observable<RubricaConcurso> {
-    return this.http.get<any>(`${this.apiUrl}/concurso/${concursoId}`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/${concursoId}`).pipe(
       map((res: any) => {
         const data = res?.data ?? res ?? {};
         return this.mapearRubrica(data);

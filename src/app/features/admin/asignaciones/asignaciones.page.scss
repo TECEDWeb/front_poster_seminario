@@ -425,7 +425,6 @@ ion-skeleton-text {
     height: 100%;
   }
 
-  // Variante para el selector de fecha, con acento dorado cuando ya hay fecha
   &.date-selector-btn.has-date {
     --border-color: #{$upse-blue};
     --background: #ffffff;
@@ -543,7 +542,7 @@ ion-skeleton-text {
 }
 
 // ============================================
-// FECHA PREVIEW (bajo el selector de fecha)
+// FECHA PREVIEW
 // ============================================
 .fecha-preview {
   display: flex;
@@ -1239,6 +1238,121 @@ ion-modal.calendar-modal {
 }
 
 // ============================================
+// MODAL: TODAS LAS ASIGNACIONES
+// ============================================
+ion-modal.todas-modal {
+  --width: 100%;
+  --height: 100%;
+
+  @media (min-width: 768px) {
+    --width: 600px;
+    --height: 85%;
+    --border-radius: 20px;
+  }
+}
+
+.todas-toolbar {
+  --background: #ffffff;
+  --color: #001b4c;
+
+  ion-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $upse-blue;
+  }
+}
+
+.todas-content {
+  --background: #f0f4fb;
+
+  .todas-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    background: white;
+    border-bottom: 1px solid #eef2f7;
+
+    @media (min-width: 480px) { flex-direction: row; }
+
+    .todas-search {
+      --background: #f8fafc;
+      --border-radius: 10px;
+      --box-shadow: none;
+      padding: 0;
+      flex: 2;
+    }
+
+    .todas-filter-select {
+      --background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0 12px;
+      font-size: 13px;
+      flex: 1;
+      min-height: 40px;
+    }
+  }
+
+  .todas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+
+    .assignment-item {
+      background: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border: 1px solid #eef2f7;
+    }
+  }
+
+  .todas-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+
+    ion-icon { font-size: 32px; color: #cbd5e1; margin-bottom: 8px; }
+    p { margin: 0; font-size: 13px; }
+  }
+
+  .todas-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+
+    .pag-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      background: white;
+      color: $upse-blue;
+      cursor: pointer;
+      transition: $transition;
+
+      &:disabled { opacity: 0.4; cursor: not-allowed; }
+      &:hover:not(:disabled) { background: $upse-blue; color: white; }
+    }
+
+    .pag-info {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+    }
+  }
+}
+
+// ============================================
 // ANIMACIONES GLOBALES
 // ============================================
 .spinning { animation: spin 1s linear infinite; }
@@ -1424,6 +1538,40 @@ ion-modal.calendar-modal {
         color: #0f172a;
         &:hover { --background: #3b82f6; }
       }
+    }
+  }
+
+  .todas-toolbar {
+    --background: #1e293b;
+    ion-title { color: #60a5fa; }
+  }
+
+  .todas-content {
+    --background: #0f172a;
+
+    .todas-filters {
+      background: #1e293b;
+      border-color: #334155;
+
+      .todas-search { --background: #0f172a; }
+      .todas-filter-select { --background: #0f172a; border-color: #334155; color: #f1f5f9; }
+    }
+
+    .todas-list .assignment-item {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    .todas-empty { color: #64748b; ion-icon { color: #334155; } }
+
+    .todas-paginacion {
+      .pag-btn {
+        background: #1e293b;
+        border-color: #334155;
+        color: #60a5fa;
+        &:hover:not(:disabled) { background: #60a5fa; color: #0f172a; }
+      }
+      .pag-info { color: #94a3b8; }
     }
   }
 
