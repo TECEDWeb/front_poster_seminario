@@ -14,7 +14,6 @@ import {
   IonSelect,
   IonSelectOption,
   IonItem,
-  IonLabel,
   IonBadge,
   IonSkeletonText,
   IonAvatar,
@@ -51,7 +50,6 @@ import { ConcursoService } from '../../../core/services/concurso.service';
     IonSelect,
     IonSelectOption,
     IonItem,
-    IonLabel,
     IonBadge,
     IonSkeletonText,
     IonAvatar,
@@ -75,6 +73,9 @@ export class SeleccionarProyectoModalComponent implements OnInit {
   filtroBusqueda = '';
   filtroConcursoId: number | null = null;
 
+  // ✅ Para depuración
+  debugInfo: string = '';
+
   constructor(
     private proyectoService: ProyectoService,
     private concursoService: ConcursoService
@@ -95,6 +96,7 @@ export class SeleccionarProyectoModalComponent implements OnInit {
 
   cargarDatos(): void {
     this.cargando = true;
+    this.debugInfo = 'Cargando...';
     this.cargarConcursos();
     this.cargarProyectos();
   }
@@ -102,11 +104,29 @@ export class SeleccionarProyectoModalComponent implements OnInit {
   cargarConcursos(): void {
     this.concursoService.listar().subscribe({
       next: (res: any) => {
-        this.concursos = res?.data ?? res ?? [];
+        // ✅ Asegurar que obtenemos los datos correctamente
+        if (res && res.ok && res.data) {
+          this.concursos = res.data;
+        } else if (Array.isArray(res)) {
+          this.concursos = res;
+        } else if (res && res.concursos) {
+          this.concursos = res.concursos;
+        } else {
+          this.concursos = res ?? [];
+        }
+        
+        console.log('📊 CONCURSOS CARGADOS:', this.concursos);
+        this.debugInfo = `Concursos: ${this.concursos.length}`;
+        
+        // ✅ Si hay proyectos, aplicar filtros nuevamente
+        if (this.proyectos.length > 0) {
+          this.aplicarFiltros();
+        }
       },
       error: (err) => {
-        console.error('Error cargando concursos:', err);
+        console.error('❌ Error cargando concursos:', err);
         this.concursos = [];
+        this.debugInfo = 'Error cargando concursos';
       }
     });
   }
@@ -114,26 +134,60 @@ export class SeleccionarProyectoModalComponent implements OnInit {
   cargarProyectos(): void {
     this.proyectoService.listar().subscribe({
       next: (res: any) => {
-        this.proyectos = res?.data ?? res?.proyectos ?? res ?? [];
+        // ✅ Asegurar que obtenemos los datos correctamente
+        if (res && res.ok && res.data) {
+          this.proyectos = res.data;
+        } else if (Array.isArray(res)) {
+          this.proyectos = res;
+        } else if (res && res.proyectos) {
+          this.proyectos = res.proyectos;
+        } else {
+          this.proyectos = res ?? [];
+        }
+        
+        console.log('📊 PROYECTOS CARGADOS:', this.proyectos);
+        console.log('📊 Primer proyecto:', this.proyectos[0]);
+        console.log('📊 concurso_id del primer proyecto:', this.proyectos[0]?.concurso_id);
+        
+        this.debugInfo = `Proyectos: ${this.proyectos.length}`;
         this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
-        console.error('Error cargando proyectos:', err);
+        console.error('❌ Error cargando proyectos:', err);
         this.proyectos = [];
         this.proyectosFiltrados = [];
         this.cargando = false;
+        this.debugInfo = 'Error cargando proyectos';
       }
     });
+  }
+
+  // ✅ MÉTODO PARA OBTENER NOMBRE DE CONCURSO (más robusto)
+  getNombreConcurso(concursoId: number): string {
+    if (!concursoId) return 'Sin concurso';
+    const concurso = this.concursos.find(c => Number(c.id) === Number(concursoId));
+    return concurso?.nombre || `Concurso #${concursoId}`;
   }
 
   aplicarFiltros(): void {
     let filtrados = [...this.proyectos];
 
+    console.log('🔍 Aplicando filtros...');
+    console.log('🔍 filtroConcursoId:', this.filtroConcursoId);
+    console.log('🔍 filtroBusqueda:', this.filtroBusqueda);
+
+    // ✅ FILTRO POR CONCURSO - Comparación segura
     if (this.filtroConcursoId) {
-      filtrados = filtrados.filter(p => Number(p.concurso_id) === Number(this.filtroConcursoId));
+      const idNum = Number(this.filtroConcursoId);
+      filtrados = filtrados.filter(p => {
+        const concursoId = Number(p.concurso_id);
+        return concursoId === idNum;
+      });
+      console.log(`🔍 Proyectos con concurso ${idNum}:`, filtrados.length);
     }
 
+    // ✅ FILTRO POR BÚSQUEDA
     if (this.filtroBusqueda.trim()) {
       const busqueda = this.filtroBusqueda.toLowerCase().trim();
       filtrados = filtrados.filter(p => {
@@ -142,9 +196,11 @@ export class SeleccionarProyectoModalComponent implements OnInit {
         const nivel = (p.nivel || '').toLowerCase();
         return nombre.includes(busqueda) || area.includes(busqueda) || nivel.includes(busqueda);
       });
+      console.log('🔍 Después de búsqueda:', filtrados.length);
     }
 
     this.proyectosFiltrados = filtrados;
+    console.log('🔍 Proyectos filtrados finales:', this.proyectosFiltrados.length);
   }
 
   limpiarFiltros(): void {
@@ -163,8 +219,16 @@ export class SeleccionarProyectoModalComponent implements OnInit {
     this.isOpenChange.emit(false);
   }
 
-  getNombreConcurso(concursoId: number): string {
-    const concurso = this.concursos.find(c => Number(c.id) === Number(concursoId));
-    return concurso?.nombre || `Concurso #${concursoId}`;
+  // ✅ DEPURACIÓN - Muestra info en la consola
+  debugInfoConsola(): void {
+    console.log('========================================');
+    console.log('🔍 DEPURACIÓN DEL MODAL DE PROYECTOS');
+    console.log('========================================');
+    console.log('📊 CONCURSOS:', this.concursos);
+    console.log('📊 PROYECTOS:', this.proyectos);
+    console.log('📊 FILTRO CONCURSO:', this.filtroConcursoId);
+    console.log('📊 FILTRO BUSQUEDA:', this.filtroBusqueda);
+    console.log('📊 PROYECTOS FILTRADOS:', this.proyectosFiltrados);
+    console.log('========================================');
   }
 }
