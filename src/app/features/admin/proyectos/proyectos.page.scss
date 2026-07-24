@@ -7,6 +7,7 @@ $upse-blue: #001b4c;
 $upse-blue-dark: #001433;
 $upse-blue-light: #e8f0fe;
 $upse-gold: #c9a84c;
+$upse-gold-dark: #a8873a;
 $upse-gold-light: #f8f0e0;
 $upse-green: #00a651;
 $upse-green-light: #e8f5e9;
@@ -31,14 +32,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 .page-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 12px 10px 100px;
+  padding: 10px 8px 100px;
 
   @media (min-width: 480px) {
-    padding: 14px 14px 90px;
+    padding: 12px 12px 90px;
   }
 
   @media (min-width: 576px) {
-    padding: 16px 16px 80px;
+    padding: 14px 14px 80px;
   }
 
   @media (min-width: 768px) {
@@ -51,7 +52,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TOAST NOTIFICATION - MOBILE FIRST
+// TOAST NOTIFICATION
 // ============================================
 .toast-notification {
   position: fixed;
@@ -103,7 +104,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TOOLBAR - MOBILE FIRST
+// TOOLBAR
 // ============================================
 .toolbar-custom {
   --background: #ffffff;
@@ -202,23 +203,24 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// PAGE HEADER - MOBILE FIRST
+// PAGE HEADER
 // ============================================
 .page-header {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
 
   @media (min-width: 576px) {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 14px;
   }
 
   @media (min-width: 768px) {
     margin-bottom: 24px;
+    gap: 16px;
   }
 
   .header-left {
@@ -227,13 +229,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     h1 {
       margin: 0;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       color: $upse-blue;
       letter-spacing: -0.5px;
 
       @media (min-width: 480px) {
-        font-size: 22px;
+        font-size: 20px;
       }
 
       @media (min-width: 768px) {
@@ -242,12 +244,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     p {
-      margin: 4px 0 0;
+      margin: 2px 0 0;
       color: #64748b;
-      font-size: 12px;
+      font-size: 11px;
 
       @media (min-width: 480px) {
-        font-size: 13px;
+        font-size: 12px;
       }
 
       @media (min-width: 768px) {
@@ -260,11 +262,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   .header-right {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     flex-wrap: wrap;
 
     @media (min-width: 480px) {
-      gap: 8px;
+      gap: 6px;
     }
 
     @media (min-width: 768px) {
@@ -273,10 +275,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .export-actions {
       display: flex;
-      gap: 4px;
+      gap: 3px;
 
       @media (min-width: 480px) {
-        gap: 6px;
+        gap: 5px;
       }
 
       @media (min-width: 768px) {
@@ -284,22 +286,22 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .btn-export {
-        --border-radius: 8px;
+        --border-radius: 6px;
         --border-color: #e2e8f0;
         --color: #64748b;
         font-weight: 600;
-        height: 34px;
-        font-size: 11px;
+        height: 28px;
+        font-size: 10px;
         transition: $transition;
-        --padding-start: 8px;
-        --padding-end: 8px;
+        --padding-start: 6px;
+        --padding-end: 6px;
 
         @media (min-width: 480px) {
-          --border-radius: 10px;
-          height: 38px;
-          font-size: 12px;
-          --padding-start: 12px;
-          --padding-end: 12px;
+          --border-radius: 8px;
+          height: 34px;
+          font-size: 11px;
+          --padding-start: 10px;
+          --padding-end: 10px;
         }
 
         @media (min-width: 768px) {
@@ -311,7 +313,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         ion-icon {
-          font-size: 14px;
+          font-size: 12px;
+
+          @media (min-width: 480px) {
+            font-size: 14px;
+          }
 
           @media (min-width: 768px) {
             font-size: 16px;
@@ -347,20 +353,20 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     .btn-add-desktop {
       --background: #{$upse-blue};
       --color: #ffffff;
-      --border-radius: 8px;
+      --border-radius: 6px;
       font-weight: 600;
       --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
-      --padding-start: 12px;
-      --padding-end: 12px;
-      height: 34px;
-      font-size: 11px;
+      --padding-start: 10px;
+      --padding-end: 10px;
+      height: 28px;
+      font-size: 10px;
 
       @media (min-width: 480px) {
-        --border-radius: 10px;
-        --padding-start: 16px;
-        --padding-end: 16px;
-        height: 38px;
-        font-size: 12px;
+        --border-radius: 8px;
+        --padding-start: 14px;
+        --padding-end: 14px;
+        height: 34px;
+        font-size: 11px;
       }
 
       @media (min-width: 768px) {
@@ -372,8 +378,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       ion-icon { 
-        font-size: 16px; 
-        margin-right: 4px;
+        font-size: 14px; 
+        margin-right: 2px;
+
+        @media (min-width: 480px) {
+          font-size: 16px;
+          margin-right: 4px;
+        }
 
         @media (min-width: 768px) {
           font-size: 20px;
@@ -397,18 +408,18 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 4px 8px;
+      padding: 3px 6px;
       background: white;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid #eef2f7;
-      min-width: 40px;
+      min-width: 32px;
       box-shadow: $shadow-sm;
       transition: $transition;
 
       @media (min-width: 480px) {
-        padding: 5px 12px;
-        min-width: 50px;
-        border-radius: 10px;
+        padding: 4px 10px;
+        min-width: 44px;
+        border-radius: 8px;
       }
 
       @media (min-width: 768px) {
@@ -423,13 +434,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .stat-count {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 700;
         color: $upse-blue;
         line-height: 1.2;
 
         @media (min-width: 480px) {
-          font-size: 18px;
+          font-size: 16px;
         }
 
         @media (min-width: 768px) {
@@ -438,14 +449,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .stat-label {
-        font-size: 8px;
+        font-size: 7px;
         color: #94a3b8;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.3px;
 
         @media (min-width: 480px) {
-          font-size: 9px;
+          font-size: 8px;
         }
 
         @media (min-width: 768px) {
@@ -457,23 +468,23 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// FILTER BAR - MOBILE FIRST
+// FILTER BAR
 // ============================================
 .filter-bar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 14px;
 
   @media (min-width: 480px) {
-    gap: 10px;
+    gap: 8px;
   }
 
   @media (min-width: 600px) {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 18px;
   }
 
   @media (min-width: 768px) {
@@ -486,29 +497,34 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     @media (min-width: 600px) {
       flex: 2;
-      min-width: 200px;
+      min-width: 180px;
+    }
+
+    @media (min-width: 1024px) {
+      min-width: 250px;
     }
 
     .filter-search {
       --background: white;
-      --border-radius: 10px;
+      --border-radius: 8px;
       --box-shadow: none;
       --border-color: #e2e8f0;
       --placeholder-color: #94a3b8;
       padding: 0;
-      height: 38px;
+      height: 34px;
       --icon-color: #94a3b8;
       box-shadow: $shadow-sm;
-      border-radius: 10px;
+      border-radius: 8px;
       transition: $transition;
 
       @media (min-width: 480px) {
-        height: 40px;
-        --border-radius: 12px;
+        height: 38px;
+        --border-radius: 10px;
       }
 
       @media (min-width: 768px) {
         height: 44px;
+        --border-radius: 12px;
       }
 
       &:focus-within {
@@ -523,7 +539,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     @media (min-width: 600px) {
       flex: 1;
-      min-width: 120px;
+      min-width: 100px;
       width: auto;
     }
 
@@ -533,24 +549,24 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .filter-select {
       --background: white;
-      --border-radius: 10px;
-      --padding-start: 12px;
-      --padding-end: 12px;
-      height: 38px;
+      --border-radius: 8px;
+      --padding-start: 10px;
+      --padding-end: 10px;
+      height: 34px;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
+      border-radius: 8px;
       width: 100%;
-      font-size: 13px;
+      font-size: 12px;
       color: #0f172a;
       box-shadow: $shadow-sm;
       transition: $transition;
 
       @media (min-width: 480px) {
-        height: 40px;
-        --border-radius: 12px;
-        --padding-start: 14px;
-        --padding-end: 14px;
-        font-size: 14px;
+        height: 38px;
+        --border-radius: 10px;
+        --padding-start: 12px;
+        --padding-end: 12px;
+        font-size: 13px;
       }
 
       @media (min-width: 768px) {
@@ -558,6 +574,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         --padding-start: 16px;
         --padding-end: 16px;
         min-width: 140px;
+        font-size: 14px;
+        --border-radius: 12px;
       }
 
       &:focus-within {
@@ -570,19 +588,19 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   .btn-clear-filters {
     --color: #{$upse-red};
     font-weight: 600;
-    font-size: 0.7rem;
-    height: 32px;
-    --padding-start: 10px;
-    --padding-end: 10px;
+    font-size: 0.65rem;
+    height: 28px;
+    --padding-start: 8px;
+    --padding-end: 8px;
     width: 100%;
     justify-content: center;
 
     @media (min-width: 600px) {
       width: auto;
-      height: 38px;
-      font-size: 0.75rem;
-      --padding-start: 12px;
-      --padding-end: 12px;
+      height: 34px;
+      font-size: 0.7rem;
+      --padding-start: 10px;
+      --padding-end: 10px;
     }
 
     @media (min-width: 768px) {
@@ -595,32 +613,32 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// SKELETON LOADING - MOBILE FIRST
+// SKELETON LOADING
 // ============================================
 .loading-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 
   @media (min-width: 480px) {
-    gap: 14px;
+    gap: 12px;
   }
 
   @media (min-width: 600px) {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
   }
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 18px;
   }
 }
 
 .proyecto-skeleton {
   background: white;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 10px;
   border: 1px solid #f1f5f9;
   box-shadow: $shadow-sm;
 
@@ -632,8 +650,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   .skeleton-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 10px;
 
     @media (min-width: 768px) {
       gap: 16px;
@@ -641,9 +659,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .skeleton-icon { 
-      width: 40px; 
-      height: 40px; 
-      border-radius: 10px; 
+      width: 36px; 
+      height: 36px; 
+      border-radius: 8px; 
 
       @media (min-width: 768px) {
         width: 48px;
@@ -655,9 +673,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     .skeleton-text-group {
       flex: 1;
       .skeleton-title { 
-        height: 16px; 
+        height: 14px; 
         width: 70%; 
-        margin-bottom: 6px; 
+        margin-bottom: 4px; 
 
         @media (min-width: 768px) {
           height: 18px;
@@ -665,7 +683,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
       }
       .skeleton-subtitle { 
-        height: 10px; 
+        height: 9px; 
         width: 40%; 
 
         @media (min-width: 768px) {
@@ -677,16 +695,16 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .skeleton-meta {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 
     @media (min-width: 768px) {
       gap: 12px;
     }
 
     .skeleton-badge { 
-      height: 20px; 
-      width: 60px; 
-      border-radius: 10px; 
+      height: 18px; 
+      width: 50px; 
+      border-radius: 8px; 
 
       @media (min-width: 768px) {
         height: 24px;
@@ -698,11 +716,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TABLA ESTILO EXCEL - MOBILE FIRST
+// TABLA ESTILO EXCEL
 // ============================================
 .table-container {
   background: white;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
   overflow: hidden;
@@ -731,13 +749,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// TABLA EXCEL - MOBILE FIRST
+// TABLA EXCEL
 // ============================================
 .excel-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 850px;
-  font-size: 12px;
+  min-width: 750px;
+  font-size: 11px;
 
   @media (min-width: 1024px) {
     min-width: 1050px;
@@ -749,10 +767,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-bottom: 2px solid #e2e8f0;
 
     th {
-      padding: 10px 12px;
+      padding: 8px 10px;
       text-align: left;
       font-weight: 700;
-      font-size: 10px;
+      font-size: 9px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #64748b;
@@ -768,15 +786,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    // ✅ NUEVA COLUMNA CÓDIGO
-    .col-codigo { min-width: 90px; max-width: 120px; text-align: center; }
-    .col-proyecto { min-width: 200px; max-width: 280px; }
-    .col-area { min-width: 80px; max-width: 100px; text-align: center; }
-    .col-nivel { min-width: 80px; max-width: 100px; text-align: center; }
-    .col-tutor { min-width: 120px; max-width: 160px; }
-    .col-participantes { min-width: 80px; max-width: 100px; text-align: center; }
-    .col-estado { min-width: 80px; max-width: 100px; text-align: center; }
-    .col-acciones { min-width: 100px; max-width: 120px; text-align: center; }
+    .col-codigo { min-width: 80px; max-width: 100px; text-align: center; }
+    .col-proyecto { min-width: 180px; max-width: 260px; }
+    .col-area { min-width: 70px; max-width: 90px; text-align: center; }
+    .col-nivel { min-width: 70px; max-width: 90px; text-align: center; }
+    .col-tutor { min-width: 100px; max-width: 140px; }
+    .col-participantes { min-width: 70px; max-width: 90px; text-align: center; }
+    .col-estado { min-width: 70px; max-width: 90px; text-align: center; }
+    .col-acciones { min-width: 90px; max-width: 110px; text-align: center; }
   }
 
   tbody {
@@ -808,7 +825,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     td {
-      padding: 6px 10px;
+      padding: 5px 8px;
       vertical-align: middle;
 
       @media (min-width: 1024px) {
@@ -816,7 +833,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       &.col-codigo { text-align: center; }
-      &.col-proyecto { max-width: 280px; }
+      &.col-proyecto { max-width: 260px; }
       &.col-area { text-align: center; }
       &.col-nivel { text-align: center; }
       &.col-participantes { text-align: center; }
@@ -826,15 +843,15 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ✅ ESTILO PARA CÓDIGO EN TABLA
+// ESTILO PARA CÓDIGO EN TABLA
 .codigo-proyecto {
   font-family: 'Courier New', monospace;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: $upse-blue;
   background: $upse-blue-light;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 1px 6px;
+  border-radius: 3px;
   display: inline-block;
   white-space: nowrap;
 
@@ -846,12 +863,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: PROYECTO - MOBILE FIRST
+// CELDA: PROYECTO
 // ============================================
 .cell-proyecto {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 
   @media (min-width: 1024px) {
@@ -859,9 +876,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .proyecto-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -874,7 +891,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     ion-icon { 
-      font-size: 14px; 
+      font-size: 12px; 
 
       @media (min-width: 1024px) {
         font-size: 16px;
@@ -892,7 +909,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex: 1;
 
     .proyecto-nombre {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: #0f172a;
       white-space: nowrap;
@@ -905,12 +922,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .proyecto-concurso {
-      font-size: 9px;
+      font-size: 8px;
       color: $upse-blue;
       font-weight: 500;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       margin-top: 1px;
 
       @media (min-width: 1024px) {
@@ -918,19 +935,19 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         gap: 4px;
       }
 
-      ion-icon { font-size: 10px; }
+      ion-icon { font-size: 8px; }
     }
   }
 }
 
 // ============================================
-// CELDA: ÁREA - MOBILE FIRST
+// CELDA: ÁREA
 // ============================================
 .tag-area {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
   background: $upse-blue-light;
   color: $upse-blue;
   white-space: nowrap;
@@ -944,13 +961,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: NIVEL - MOBILE FIRST
+// CELDA: NIVEL
 // ============================================
 .tag-nivel {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   white-space: nowrap;
@@ -979,27 +996,27 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: TUTOR - MOBILE FIRST
+// CELDA: TUTOR
 // ============================================
 .cell-tutor {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 
   @media (min-width: 1024px) {
     gap: 8px;
   }
 
   .tutor-avatar {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: $upse-gold-light;
     color: $upse-gold;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
     flex-shrink: 0;
 
@@ -1011,7 +1028,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .tutor-nombre {
-    font-size: 11px;
+    font-size: 10px;
     color: #0f172a;
     font-weight: 500;
     white-space: nowrap;
@@ -1026,7 +1043,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .empty-value {
   color: #94a3b8;
-  font-size: 11px;
+  font-size: 10px;
 
   @media (min-width: 1024px) {
     font-size: 12px;
@@ -1034,20 +1051,20 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: PARTICIPANTES - MOBILE FIRST
+// CELDA: PARTICIPANTES
 // ============================================
 .cell-participantes {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
 
   @media (min-width: 1024px) {
     gap: 8px;
   }
 
   .participantes-count {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: #0f172a;
 
@@ -1061,18 +1078,18 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     align-items: center;
 
     .mini-avatar {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: $upse-blue-light;
       color: $upse-blue;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 8px;
+      font-size: 7px;
       font-weight: 700;
       border: 2px solid white;
-      margin-right: -4px;
+      margin-right: -3px;
 
       @media (min-width: 1024px) {
         width: 24px;
@@ -1086,7 +1103,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       &.more {
         background: #e2e8f0;
         color: #64748b;
-        font-size: 7px;
+        font-size: 6px;
 
         @media (min-width: 1024px) {
           font-size: 8px;
@@ -1097,16 +1114,16 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: ESTADO - MOBILE FIRST
+// CELDA: ESTADO
 // ============================================
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 10px;
+  gap: 3px;
+  font-size: 9px;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 16px;
+  padding: 1px 6px;
+  border-radius: 12px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   white-space: nowrap;
@@ -1119,8 +1136,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .status-dot {
-    width: 4px;
-    height: 4px;
+    width: 3px;
+    height: 3px;
     border-radius: 50%;
 
     @media (min-width: 1024px) {
@@ -1153,7 +1170,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CELDA: ACCIONES - MOBILE FIRST
+// CELDA: ACCIONES
 // ============================================
 .cell-acciones {
   display: flex;
@@ -1162,8 +1179,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   gap: 2px;
 
   .btn-action {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     border-radius: 4px;
     border: none;
     display: flex;
@@ -1182,7 +1199,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     ion-icon { 
-      font-size: 13px; 
+      font-size: 12px; 
 
       @media (min-width: 1024px) {
         font-size: 15px;
@@ -1216,25 +1233,25 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// EMPTY STATE - MOBILE FIRST
+// EMPTY STATE
 // ============================================
 .empty-state-table {
   text-align: center;
-  padding: 30px 16px;
+  padding: 24px 14px;
 
   @media (min-width: 768px) {
     padding: 40px 20px;
   }
 
   .empty-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: $upse-blue-light;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 10px;
+    margin: 0 auto 8px;
 
     @media (min-width: 768px) {
       width: 60px;
@@ -1243,7 +1260,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     ion-icon { 
-      font-size: 22px; 
+      font-size: 18px; 
       color: $upse-blue; 
 
       @media (min-width: 768px) {
@@ -1253,8 +1270,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   h3 { 
-    margin: 0 0 4px; 
-    font-size: 15px; 
+    margin: 0 0 2px; 
+    font-size: 13px; 
     font-weight: 600; 
     color: #0f172a; 
 
@@ -1265,9 +1282,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   p { 
-    margin: 0 0 14px; 
+    margin: 0 0 10px; 
     color: #64748b; 
-    font-size: 12px; 
+    font-size: 11px; 
 
     @media (min-width: 768px) {
       font-size: 13px;
@@ -1277,12 +1294,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .btn-primary {
     --background: #{$upse-blue};
-    --border-radius: 8px;
+    --border-radius: 6px;
     font-weight: 600;
-    --padding-start: 16px;
-    --padding-end: 16px;
-    height: 36px;
-    font-size: 13px;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    height: 32px;
+    font-size: 12px;
 
     @media (min-width: 768px) {
       --border-radius: 10px;
@@ -1299,20 +1316,20 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// GRID DE CARDS (SOLO MÓVIL) - MOBILE FIRST
+// GRID DE CARDS (SOLO MÓVIL)
 // ============================================
 .proyectos-grid {
   display: grid !important;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 
   @media (min-width: 480px) {
-    gap: 14px;
+    gap: 12px;
   }
 
   @media (min-width: 600px) {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
   }
 
   @media (min-width: 768px) {
@@ -1327,7 +1344,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .proyecto-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
   transition: $transition;
@@ -1337,43 +1354,43 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: cardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 
   @media (min-width: 480px) {
-    border-radius: $radius;
+    border-radius: 12px;
   }
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: $shadow-md;
   }
 
-  &.card-active { border-left: 4px solid $upse-blue; }
-  &.card-inactive { border-left: 4px solid #94a3b8; opacity: 0.75; }
+  &.card-active { border-left: 3px solid $upse-blue; }
+  &.card-inactive { border-left: 3px solid #94a3b8; opacity: 0.75; }
 
   .card-header {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 12px 12px 10px;
+    gap: 8px;
+    padding: 10px 10px 8px;
 
     @media (min-width: 480px) {
-      padding: 14px 14px 12px;
-      gap: 12px;
+      padding: 12px 12px 10px;
+      gap: 10px;
     }
 
     .card-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 14px;
       flex-shrink: 0;
 
       @media (min-width: 480px) {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-        border-radius: 10px;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        border-radius: 8px;
       }
 
       &.icon-upse { background: $upse-blue-light; color: $upse-blue; }
@@ -1386,73 +1403,72 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       .card-title {
         margin: 0;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         color: #0f172a;
         line-height: 1.3;
 
         @media (min-width: 480px) {
-          font-size: 14px;
+          font-size: 13px;
         }
       }
 
-      // ✅ CÓDIGO EN TARJETA
       .card-codigo {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        font-size: 10px;
+        gap: 3px;
+        font-size: 9px;
         color: $upse-blue;
         background: $upse-blue-light;
-        padding: 1px 8px;
-        border-radius: 4px;
+        padding: 1px 6px;
+        border-radius: 3px;
         margin-top: 2px;
         font-family: 'Courier New', monospace;
         font-weight: 600;
 
         @media (min-width: 480px) {
-          font-size: 11px;
-          padding: 2px 10px;
-          border-radius: 6px;
+          font-size: 10px;
+          padding: 2px 8px;
+          border-radius: 4px;
         }
 
-        ion-icon { font-size: 10px; }
+        ion-icon { font-size: 9px; }
       }
 
       .card-meta-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 3px;
-        margin-top: 3px;
+        gap: 2px;
+        margin-top: 2px;
 
         @media (min-width: 480px) {
-          gap: 4px;
-          margin-top: 4px;
+          gap: 3px;
+          margin-top: 3px;
         }
 
         .tag {
           display: inline-flex;
           align-items: center;
           gap: 2px;
-          font-size: 9px;
-          padding: 1px 6px;
-          border-radius: 8px;
+          font-size: 8px;
+          padding: 1px 5px;
+          border-radius: 6px;
           font-weight: 500;
           max-width: 100%;
 
           @media (min-width: 480px) {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
+            font-size: 9px;
+            padding: 1px 6px;
+            border-radius: 8px;
             gap: 3px;
           }
 
           ion-icon { 
-            font-size: 9px; 
+            font-size: 8px; 
             flex-shrink: 0;
 
             @media (min-width: 480px) {
-              font-size: 10px;
+              font-size: 9px;
             }
           }
 
@@ -1461,7 +1477,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           &.tag-tutor {
             background: $upse-gold-light;
             color: #92660f;
-            max-width: 120px;
+            max-width: 100px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1476,24 +1492,24 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       .status-badge {
         display: flex;
         align-items: center;
-        gap: 3px;
-        font-size: 8px;
+        gap: 2px;
+        font-size: 7px;
         font-weight: 600;
-        padding: 2px 6px;
-        border-radius: 10px;
+        padding: 1px 5px;
+        border-radius: 8px;
         text-transform: uppercase;
         letter-spacing: 0.3px;
 
         @media (min-width: 480px) {
-          font-size: 9px;
-          padding: 2px 8px;
-          border-radius: 12px;
-          gap: 4px;
+          font-size: 8px;
+          padding: 2px 6px;
+          border-radius: 10px;
+          gap: 3px;
         }
 
         .status-dot { 
-          width: 4px; 
-          height: 4px; 
+          width: 3px; 
+          height: 3px; 
           border-radius: 50%; 
           display: inline-block; 
         }
@@ -1514,56 +1530,56 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card-body {
-    padding: 0 12px 10px;
+    padding: 0 10px 8px;
     flex: 1;
 
     @media (min-width: 480px) {
-      padding: 0 14px 12px;
+      padding: 0 12px 10px;
     }
 
     .card-description {
-      margin: 0 0 10px;
-      font-size: 11px;
+      margin: 0 0 8px;
+      font-size: 10px;
       color: #475569;
       line-height: 1.5;
 
       @media (min-width: 480px) {
-        font-size: 12px;
-        margin: 0 0 12px;
+        font-size: 11px;
+        margin: 0 0 10px;
       }
     }
 
     .card-participants {
       background: #f8fafc;
-      border-radius: 6px;
-      padding: 6px 10px;
+      border-radius: 5px;
+      padding: 5px 8px;
       border: 1px solid #f1f5f9;
 
       @media (min-width: 480px) {
-        border-radius: 8px;
-        padding: 8px 12px;
+        border-radius: 6px;
+        padding: 6px 10px;
       }
 
       .participants-header {
         display: flex;
         align-items: center;
-        gap: 4px;
-        font-size: 10px;
+        gap: 3px;
+        font-size: 9px;
         font-weight: 600;
         color: #475569;
-        margin-bottom: 3px;
+        margin-bottom: 2px;
 
         @media (min-width: 480px) {
-          font-size: 11px;
-          margin-bottom: 4px;
+          font-size: 10px;
+          margin-bottom: 3px;
         }
 
         ion-icon { 
-          font-size: 11px; 
+          font-size: 10px; 
           color: #94a3b8; 
 
           @media (min-width: 480px) {
-            font-size: 12px;
+            font-size: 11px;
           }
         }
       }
@@ -1571,35 +1587,35 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       .participants-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 3px;
+        gap: 2px;
 
         @media (min-width: 480px) {
-          gap: 4px;
+          gap: 3px;
         }
 
         .participant-chip {
-          font-size: 9px;
+          font-size: 8px;
           background: white;
-          padding: 1px 6px;
-          border-radius: 8px;
+          padding: 1px 5px;
+          border-radius: 6px;
           border: 1px solid #e2e8f0;
           color: #0f172a;
 
           @media (min-width: 480px) {
-            font-size: 10px;
-            padding: 1px 8px;
-            border-radius: 10px;
+            font-size: 9px;
+            padding: 1px 6px;
+            border-radius: 8px;
           }
         }
 
         .participant-more {
-          font-size: 9px;
+          font-size: 8px;
           color: #94a3b8;
-          padding: 1px 4px;
+          padding: 1px 3px;
 
           @media (min-width: 480px) {
-            font-size: 10px;
-            padding: 1px 6px;
+            font-size: 9px;
+            padding: 1px 4px;
           }
         }
       }
@@ -1607,42 +1623,42 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card-concurso {
-    padding: 0 12px 8px;
+    padding: 0 10px 6px;
 
     @media (min-width: 480px) {
-      padding: 0 14px 8px;
+      padding: 0 12px 6px;
     }
 
     .chip-concurso {
-      height: 20px;
-      font-size: 9px;
+      height: 18px;
+      font-size: 8px;
       background: $upse-blue-light;
       color: $upse-blue;
       margin: 0;
       max-width: 100%;
 
       @media (min-width: 480px) {
-        height: 22px;
-        font-size: 10px;
+        height: 20px;
+        font-size: 9px;
       }
 
       ion-icon { 
-        font-size: 10px; 
+        font-size: 9px; 
         color: $upse-blue; 
 
         @media (min-width: 480px) {
-          font-size: 11px;
+          font-size: 10px;
         }
       }
       ion-label { 
-        font-size: 9px; 
+        font-size: 8px; 
         font-weight: 500; 
         white-space: nowrap; 
         overflow: hidden; 
         text-overflow: ellipsis; 
 
         @media (min-width: 480px) {
-          font-size: 10px;
+          font-size: 9px;
         }
       }
     }
@@ -1659,7 +1675,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-direction: column;
       align-items: center;
       gap: 1px;
-      padding: 8px 4px;
+      padding: 6px 2px;
       background: none;
       border: none;
       border-right: 1px solid #f1f5f9;
@@ -1668,25 +1684,25 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       color: #64748b;
 
       @media (min-width: 480px) {
-        padding: 10px 4px;
+        padding: 8px 4px;
         gap: 2px;
       }
 
       &:last-child { border-right: none; }
 
       ion-icon { 
-        font-size: 14px; 
+        font-size: 12px; 
 
         @media (min-width: 480px) {
-          font-size: 16px;
+          font-size: 14px;
         }
       }
       span { 
-        font-size: 9px; 
+        font-size: 8px; 
         font-weight: 600; 
 
         @media (min-width: 480px) {
-          font-size: 10px;
+          font-size: 9px;
         }
       }
 
@@ -1699,7 +1715,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// FAB MÓVIL - MOBILE FIRST
+// FAB MÓVIL
 // ============================================
 .fab-mobile {
   display: block;
@@ -1728,7 +1744,7 @@ ion-fab-button {
 }
 
 // ============================================
-// MODALES - MOBILE FIRST
+// MODALES
 // ============================================
 .modal-content { --background: #f8fafc; }
 
@@ -1744,8 +1760,8 @@ ion-fab-button {
   .modal-title-group {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding-left: 8px;
+    gap: 6px;
+    padding-left: 6px;
 
     @media (min-width: 768px) {
       gap: 10px;
@@ -1753,9 +1769,9 @@ ion-fab-button {
     }
 
     .modal-title-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
       background: rgba(255,255,255,0.15);
       display: flex;
       align-items: center;
@@ -1769,7 +1785,7 @@ ion-fab-button {
       }
 
       ion-icon { 
-        font-size: 16px; 
+        font-size: 14px; 
         color: white; 
 
         @media (min-width: 768px) {
@@ -1780,7 +1796,7 @@ ion-fab-button {
 
     ion-title { 
       padding: 0; 
-      font-size: 14px; 
+      font-size: 13px; 
       font-weight: 600; 
 
       @media (min-width: 768px) {
@@ -1795,10 +1811,10 @@ ion-fab-button {
 .modal-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 12px;
 
   @media (min-width: 480px) {
-    padding: 18px;
+    padding: 16px;
   }
 
   @media (min-width: 768px) {
@@ -1813,7 +1829,7 @@ ion-fab-button {
     gap: 0;
 
     @media (min-width: 480px) {
-      gap: 0 12px;
+      gap: 0 10px;
     }
 
     @media (min-width: 560px) { 
@@ -1823,7 +1839,7 @@ ion-fab-button {
   }
 
   .form-field {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 
     @media (min-width: 768px) {
       margin-bottom: 16px;
@@ -1833,13 +1849,19 @@ ion-fab-button {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 4px;
-      font-size: 12px;
+      gap: 3px;
+      font-size: 11px;
       font-weight: 600;
       color: #374151;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
 
       @media (min-width: 480px) {
+        font-size: 12px;
+        gap: 5px;
+        margin-bottom: 5px;
+      }
+
+      @media (min-width: 768px) {
         font-size: 13px;
         gap: 6px;
         margin-bottom: 6px;
@@ -1847,19 +1869,27 @@ ion-fab-button {
 
       ion-icon { 
         color: $upse-blue; 
-        font-size: 13px; 
+        font-size: 12px; 
 
         @media (min-width: 480px) {
+          font-size: 14px;
+        }
+
+        @media (min-width: 768px) {
           font-size: 15px;
         }
       }
       .required { color: #ef4444; font-weight: 700; margin-left: 2px; }
       .field-hint { 
-        font-size: 10px; 
+        font-size: 9px; 
         color: #94a3b8; 
         font-weight: 400; 
 
         @media (min-width: 480px) {
+          font-size: 10px;
+        }
+
+        @media (min-width: 768px) {
           font-size: 11px;
         }
       }
@@ -1867,17 +1897,25 @@ ion-fab-button {
 
     .field-input {
       --background: white;
-      --border-radius: 8px;
-      --padding-start: 12px;
-      --padding-end: 12px;
-      --inner-padding-end: 12px;
+      --border-radius: 6px;
+      --padding-start: 10px;
+      --padding-end: 10px;
+      --inner-padding-end: 10px;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      min-height: 38px;
+      border-radius: 6px;
+      min-height: 34px;
       box-shadow: $shadow-sm;
       transition: $transition;
 
       @media (min-width: 480px) {
+        --border-radius: 8px;
+        --padding-start: 12px;
+        --padding-end: 12px;
+        --inner-padding-end: 12px;
+        min-height: 40px;
+      }
+
+      @media (min-width: 768px) {
         --border-radius: 10px;
         --padding-start: 14px;
         --padding-end: 14px;
@@ -1892,27 +1930,37 @@ ion-fab-button {
 
       ion-input, ion-textarea, ion-select, ion-toggle { 
         --padding-start: 0; 
-        font-size: 13px; 
+        font-size: 12px; 
 
         @media (min-width: 480px) {
+          font-size: 13px;
+        }
+
+        @media (min-width: 768px) {
           font-size: 14px;
         }
       }
     }
 
-    // ✅ PREVIEW DEL CÓDIGO
     .codigo-preview {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 4px;
-      padding: 4px 12px;
+      gap: 4px;
+      margin-top: 3px;
+      padding: 3px 10px;
       background: #f8fafc;
-      border-radius: 6px;
+      border-radius: 5px;
       border: 1px dashed #e2e8f0;
-      font-size: 11px;
+      font-size: 10px;
 
       @media (min-width: 480px) {
+        font-size: 11px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        gap: 6px;
+      }
+
+      @media (min-width: 768px) {
         font-size: 12px;
         padding: 6px 14px;
         border-radius: 8px;
@@ -1920,10 +1968,14 @@ ion-fab-button {
 
       ion-icon {
         color: $upse-green;
-        font-size: 14px;
+        font-size: 12px;
         flex-shrink: 0;
 
         @media (min-width: 480px) {
+          font-size: 14px;
+        }
+
+        @media (min-width: 768px) {
           font-size: 16px;
         }
       }
@@ -1935,31 +1987,40 @@ ion-fab-button {
 
       .auto {
         color: #94a3b8;
-        font-size: 10px;
+        font-size: 9px;
         font-style: italic;
 
         @media (min-width: 480px) {
+          font-size: 10px;
+        }
+
+        @media (min-width: 768px) {
           font-size: 11px;
         }
       }
     }
 
     .field-help {
-      margin-top: 4px;
+      margin-top: 3px;
 
       .participant-count {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        font-size: 11px;
+        gap: 3px;
+        font-size: 10px;
         color: $upse-green;
         font-weight: 600;
 
         @media (min-width: 480px) {
+          font-size: 11px;
+          gap: 4px;
+        }
+
+        @media (min-width: 768px) {
           font-size: 12px;
         }
 
-        ion-icon { font-size: 12px; }
+        ion-icon { font-size: 11px; }
       }
     }
   }
@@ -1967,10 +2028,10 @@ ion-fab-button {
   .tutores-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 6px;
 
     @media (min-width: 480px) {
-      gap: 10px;
+      gap: 8px;
     }
 
     @media (min-width: 560px) { 
@@ -1980,11 +2041,16 @@ ion-fab-button {
     .tutor-item {
       --background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      min-height: 38px;
+      border-radius: 6px;
+      min-height: 34px;
       transition: $transition;
 
       @media (min-width: 480px) {
+        border-radius: 8px;
+        min-height: 40px;
+      }
+
+      @media (min-width: 768px) {
         border-radius: 10px;
         min-height: 44px;
       }
@@ -1997,9 +2063,13 @@ ion-fab-button {
 
     .tutor-star { 
       color: $upse-gold; 
-      font-size: 14px; 
+      font-size: 12px; 
 
       @media (min-width: 480px) {
+        font-size: 14px;
+      }
+
+      @media (min-width: 768px) {
         font-size: 16px;
       }
     }
@@ -2008,18 +2078,26 @@ ion-fab-button {
   .toggle-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 
     @media (min-width: 480px) {
+      gap: 8px;
+    }
+
+    @media (min-width: 768px) {
       gap: 10px;
     }
 
     .toggle-label { 
-      font-size: 13px; 
+      font-size: 12px; 
       font-weight: 500; 
       color: #0f172a; 
 
       @media (min-width: 480px) {
+        font-size: 13px;
+      }
+
+      @media (min-width: 768px) {
         font-size: 14px;
       }
     }
@@ -2028,11 +2106,16 @@ ion-fab-button {
   .form-actions {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 6px;
+    margin-top: 6px;
 
     @media (min-width: 480px) {
       flex-direction: row;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    @media (min-width: 768px) {
       gap: 12px;
       margin-top: 8px;
     }
@@ -2040,17 +2123,22 @@ ion-fab-button {
     .cancel-btn {
       --border-color: #e2e8f0;
       --color: #64748b;
-      --border-radius: 8px;
+      --border-radius: 6px;
       font-weight: 600;
-      height: 38px;
+      height: 34px;
       transition: $transition;
       width: 100%;
 
       @media (min-width: 480px) {
         flex: 1;
+        --border-radius: 8px;
+        height: 40px;
+        width: auto;
+      }
+
+      @media (min-width: 768px) {
         --border-radius: 10px;
         height: 44px;
-        width: auto;
       }
 
       &:hover { --border-color: #{$upse-blue}; --color: #{$upse-blue}; }
@@ -2058,18 +2146,23 @@ ion-fab-button {
 
     .submit-btn {
       --background: #{$upse-blue};
-      --border-radius: 8px;
+      --border-radius: 6px;
       font-weight: 600;
-      height: 38px;
+      height: 34px;
       --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
       transition: $transition;
       width: 100%;
 
       @media (min-width: 480px) {
         flex: 2;
+        --border-radius: 8px;
+        height: 40px;
+        width: auto;
+      }
+
+      @media (min-width: 768px) {
         --border-radius: 10px;
         height: 44px;
-        width: auto;
       }
 
       &:disabled { opacity: 0.5; --box-shadow: none; }
@@ -2084,15 +2177,15 @@ ion-fab-button {
 }
 
 // ============================================
-// MODAL DETALLE - MOBILE FIRST
+// MODAL DETALLE - CORREGIDO
 // ============================================
 .detalle-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 14px 12px 30px;
+  padding: 12px 10px 24px;
 
   @media (min-width: 480px) {
-    padding: 16px 14px 35px;
+    padding: 14px 12px 30px;
   }
 
   @media (min-width: 768px) {
@@ -2102,15 +2195,16 @@ ion-fab-button {
 
 .detalle-section {
   background: white;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
-  padding: 14px;
-  margin-bottom: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
 
   @media (min-width: 480px) {
-    padding: 16px;
-    margin-bottom: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 12px;
   }
 
   @media (min-width: 768px) {
@@ -2123,8 +2217,8 @@ ion-fab-button {
 .detalle-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 6px;
 
   @media (min-width: 768px) {
     gap: 14px;
@@ -2132,13 +2226,13 @@ ion-fab-button {
   }
 
   .detalle-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     flex-shrink: 0;
 
     @media (min-width: 768px) {
@@ -2154,45 +2248,55 @@ ion-fab-button {
 
   h2 { 
     margin: 0 0 2px; 
-    font-size: 15px; 
+    font-size: 14px; 
     font-weight: 700; 
     color: #0f172a; 
 
     @media (min-width: 480px) {
+      font-size: 15px;
+      margin: 0 0 3px;
+    }
+
+    @media (min-width: 768px) {
       font-size: 16px;
       margin: 0 0 4px;
     }
   }
 
-  // ✅ CÓDIGO EN DETALLE
   .detalle-codigo {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    font-size: 11px;
+    gap: 3px;
+    font-size: 10px;
     color: $upse-blue;
     background: $upse-blue-light;
-    padding: 2px 10px;
-    border-radius: 4px;
+    padding: 1px 8px;
+    border-radius: 3px;
     font-family: 'Courier New', monospace;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 
     @media (min-width: 480px) {
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: 4px;
+    }
+
+    @media (min-width: 768px) {
       font-size: 12px;
       padding: 2px 12px;
       border-radius: 6px;
     }
 
-    ion-icon { font-size: 12px; }
+    ion-icon { font-size: 11px; }
   }
 }
 
 .detalle-descripcion {
-  font-size: 12px;
+  font-size: 11px;
   color: #475569;
   line-height: 1.6;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 
   @media (min-width: 768px) {
     font-size: 13px;
@@ -2205,20 +2309,24 @@ ion-fab-button {
 .detalle-meta-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 6px;
 
   @media (min-width: 480px) {
     grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  @media (min-width: 768px) {
     gap: 10px;
   }
 
   .meta-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: #f8fafc;
-    border-radius: 6px;
-    padding: 6px 10px;
+    border-radius: 5px;
+    padding: 5px 8px;
 
     @media (min-width: 768px) {
       gap: 10px;
@@ -2227,7 +2335,7 @@ ion-fab-button {
     }
 
     ion-icon { 
-      font-size: 14px; 
+      font-size: 12px; 
       color: $upse-blue; 
       flex-shrink: 0; 
 
@@ -2237,7 +2345,7 @@ ion-fab-button {
     }
     div { display: flex; flex-direction: column; min-width: 0; }
     .meta-label { 
-      font-size: 9px; 
+      font-size: 8px; 
       color: #94a3b8; 
       text-transform: uppercase; 
       font-weight: 600; 
@@ -2247,7 +2355,7 @@ ion-fab-button {
       }
     }
     .meta-value { 
-      font-size: 11px; 
+      font-size: 10px; 
       color: #0f172a; 
       font-weight: 500; 
       overflow: hidden; 
@@ -2264,11 +2372,11 @@ ion-fab-button {
 .section-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 11px;
   font-weight: 700;
   color: $upse-blue;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 
   @media (min-width: 768px) {
     font-size: 13px;
@@ -2277,7 +2385,7 @@ ion-fab-button {
   }
 
   ion-icon { 
-    font-size: 14px; 
+    font-size: 13px; 
 
     @media (min-width: 768px) {
       font-size: 16px;
@@ -2288,7 +2396,7 @@ ion-fab-button {
 .participantes-full-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 
   @media (min-width: 768px) {
     gap: 6px;
@@ -2298,10 +2406,10 @@ ion-fab-button {
 .participante-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: 6px;
+  padding: 5px 6px;
   background: #f8fafc;
-  border-radius: 6px;
+  border-radius: 5px;
 
   @media (min-width: 768px) {
     gap: 10px;
@@ -2310,8 +2418,8 @@ ion-fab-button {
   }
 
   .participante-avatar {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: $upse-blue-light;
     color: $upse-blue;
@@ -2319,7 +2427,7 @@ ion-fab-button {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 10px;
+    font-size: 9px;
     flex-shrink: 0;
 
     @media (min-width: 768px) {
@@ -2336,7 +2444,7 @@ ion-fab-button {
     flex-direction: column;
 
     strong { 
-      font-size: 11px; 
+      font-size: 10px; 
       color: #0f172a; 
 
       @media (min-width: 768px) {
@@ -2344,7 +2452,7 @@ ion-fab-button {
       }
     }
     span { 
-      font-size: 10px; 
+      font-size: 9px; 
       color: #64748b; 
 
       @media (min-width: 768px) {
@@ -2355,8 +2463,8 @@ ion-fab-button {
     .tutor-badge {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      font-size: 9px;
+      gap: 2px;
+      font-size: 8px;
       font-weight: 700;
       color: $upse-gold;
       text-transform: uppercase;
@@ -2366,15 +2474,15 @@ ion-fab-button {
         gap: 4px;
       }
 
-      ion-icon { font-size: 9px; }
+      ion-icon { font-size: 8px; }
     }
   }
 }
 
 .loading-mini, .error-mini, .empty-mini {
   text-align: center;
-  padding: 10px;
-  font-size: 11px;
+  padding: 8px;
+  font-size: 10px;
   color: #94a3b8;
 
   @media (min-width: 768px) {
@@ -2388,13 +2496,13 @@ ion-fab-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .evaluaciones-summary {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
 
   @media (min-width: 768px) {
     gap: 10px;
@@ -2405,8 +2513,8 @@ ion-fab-button {
     flex: 1;
     text-align: center;
     background: $upse-blue-light;
-    border-radius: 6px;
-    padding: 6px;
+    border-radius: 5px;
+    padding: 5px;
 
     @media (min-width: 768px) {
       border-radius: 8px;
@@ -2415,7 +2523,7 @@ ion-fab-button {
 
     .summary-value { 
       display: block; 
-      font-size: 14px; 
+      font-size: 12px; 
       font-weight: 700; 
       color: $upse-blue; 
 
@@ -2424,7 +2532,7 @@ ion-fab-button {
       }
     }
     .summary-label { 
-      font-size: 9px; 
+      font-size: 8px; 
       color: #64748b; 
       text-transform: uppercase; 
       font-weight: 600; 
@@ -2440,10 +2548,10 @@ ion-fab-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 8px;
+  padding: 5px 6px;
   background: #f8fafc;
-  border-radius: 6px;
-  margin-bottom: 4px;
+  border-radius: 5px;
+  margin-bottom: 3px;
 
   @media (min-width: 768px) {
     padding: 8px 10px;
@@ -2454,14 +2562,14 @@ ion-fab-button {
   .ev-info {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 
     @media (min-width: 768px) {
       gap: 8px;
     }
 
     strong { 
-      font-size: 11px; 
+      font-size: 10px; 
       color: #0f172a; 
 
       @media (min-width: 768px) {
@@ -2470,10 +2578,10 @@ ion-fab-button {
     }
 
     .ev-estado {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 600;
-      padding: 1px 6px;
-      border-radius: 8px;
+      padding: 1px 5px;
+      border-radius: 6px;
       text-transform: uppercase;
 
       @media (min-width: 768px) {
@@ -2488,7 +2596,7 @@ ion-fab-button {
   }
 
   .ev-puntaje { 
-    font-size: 11px; 
+    font-size: 10px; 
     font-weight: 700; 
     color: $upse-blue; 
 
@@ -2498,8 +2606,11 @@ ion-fab-button {
   }
 }
 
+// ============================================
+// DETALLE ACTIONS - CORREGIDO
+// ============================================
 .detalle-actions {
-  margin-top: 12px;
+  margin-top: 10px;
 
   @media (min-width: 768px) {
     margin-top: 16px;
@@ -2507,18 +2618,20 @@ ion-fab-button {
 
   .edit-from-detail-btn {
     --background: #{$upse-blue};
-    --border-radius: 8px;
+    --border-radius: 6px;
     font-weight: 600;
-    height: 38px;
+    height: 34px;
+    transition: $transition;
 
     @media (min-width: 768px) {
       --border-radius: 12px;
       height: 44px;
     }
 
-    transition: $transition;
-
-    &:hover { --background: #{$upse-blue-dark}; transform: translateY(-1px); }
+    &:hover {
+      --background: #{$upse-blue-dark};
+      transform: translateY(-1px);
+    }
   }
 }
 
@@ -2784,24 +2897,37 @@ ion-fab-button {
 // ============================================
 @media (max-width: 480px) {
   .modal-container {
-    padding: 14px;
+    padding: 12px;
     .form-actions { 
       flex-direction: column; 
       .cancel-btn, .submit-btn { flex: none; width: 100%; } 
     }
   }
-}
 
-@media (max-width: 380px) {
   .page-header .header-right .stats-mini {
-    padding: 3px 6px;
-    min-width: 32px;
+    padding: 2px 4px;
+    min-width: 28px;
 
-    .stat-count { font-size: 13px; }
-    .stat-label { font-size: 7px; }
+    .stat-count { font-size: 12px; }
+    .stat-label { font-size: 6px; }
   }
 
   .proyecto-card .card-header .card-info .card-meta-tags .tag-tutor {
-    max-width: 80px;
+    max-width: 70px;
   }
+
+  .excel-table {
+    min-width: 650px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .page-header .header-left h1 { font-size: 16px; }
+  .page-header .header-left p { font-size: 10px; }
+  
+  .filter-bar .filter-select { font-size: 11px; height: 30px; }
+  .filter-bar .filter-search { height: 30px; }
+  
+  .proyecto-card .card-header .card-info .card-title { font-size: 11px; }
 }
