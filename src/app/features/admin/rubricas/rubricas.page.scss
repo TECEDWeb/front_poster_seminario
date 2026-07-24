@@ -1,3 +1,5 @@
+@use "sass:color";
+
 $upse-blue: #001b4c;
 $upse-blue-dark: #001433;
 $upse-blue-light: #e8f0fe;
@@ -1357,7 +1359,7 @@ ion-modal:not(.builder-modal) {
     }
   }
 
-  // ✅ NUEVA FILA PARA BOTONES SECUNDARIOS
+  // Fila para botones secundarios
   .actions-secondary-row {
     display: flex;
     gap: 6px;
@@ -1394,15 +1396,15 @@ ion-modal:not(.builder-modal) {
         }
       }
 
-      // ✅ ESTILO ESPECIAL PARA BOTÓN DE PDF
+      // Estilo especial para botón de PDF
       &.btn-download-pdf {
         --color: #{$upse-gold};
         --border-color: #{$upse-gold};
 
         @media (hover: hover) and (pointer: fine) {
           &:hover {
-            --color: #{darken($upse-gold, 15%)};
-            --border-color: #{darken($upse-gold, 15%)};
+            --color: #{color.adjust($upse-gold, $lightness: -15%)};
+            --border-color: #{color.adjust($upse-gold, $lightness: -15%)};
             background: $upse-gold-light;
           }
         }
@@ -1411,7 +1413,7 @@ ion-modal:not(.builder-modal) {
   }
 }
 
-// ✅ ESTILO PARA BOTÓN DE DESCARGA EN ACCIONES RÁPIDAS
+// Estilo para botón de descarga en acciones rápidas
 .icon-action {
   width: 30px;
   height: 30px;
@@ -1450,7 +1452,7 @@ ion-modal:not(.builder-modal) {
       color: $upse-blue;
     }
 
-    // ✅ ESTILO ESPECIAL PARA BOTÓN DE DESCARGA
+    // Estilo especial para botón de descarga
     &.download:hover {
       background: $upse-gold-light;
       color: $upse-gold;
