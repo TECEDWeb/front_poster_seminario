@@ -5,12 +5,16 @@ $upse-blue: #001b4c;
 $upse-blue-dark: #001433;
 $upse-blue-light: #e8f0fe;
 $upse-gold: #c9a84c;
+$upse-gold-dark: #a8873a;
 $upse-gold-light: #f8f0e0;
 $upse-green: #00a651;
 $upse-green-light: #e8f5e9;
 $upse-orange: #f57c00;
+$upse-orange-light: #fff3e0;
 $upse-red: #dc2626;
 $upse-red-light: #fef2f2;
+$upse-teal: #00838f;
+$upse-teal-light: #e0f7fa;
 $shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
 $shadow-md: 0 4px 20px rgba(0, 27, 76, 0.08);
 $shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.12);
@@ -424,7 +428,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// CRITERIOS
+// CRITERIOS - MEJORADOS
 // ============================================
 .criterio-card {
   padding: 14px 0;
@@ -483,58 +487,135 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
+  // ✅ NIVELES - ESTILOS MEJORADOS
   .niveles-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
     padding-left: 24px;
 
-    .nivel-item {
-      --padding-start: 0;
-      --inner-padding-end: 0;
-      --background: transparent;
-      min-height: 40px;
+    // ✅ WRAPPER PARA CLICK EN TODO EL ÁREA
+    .nivel-item-wrapper {
+      border-radius: 10px;
+      border: 2px solid transparent;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
 
-      ion-radio {
-        --border-width: 2px;
-        --border-color: #d1d5db;
-        --color-checked: #{$upse-blue};
-        --size: 18px;
-        margin-right: 12px;
+      &:hover {
+        border-color: #d1d5db;
+        background: #f8fafc;
+      }
 
-        @media (min-width: 768px) {
-          --size: 20px;
-          margin-right: 14px;
+      // ✅ ESTILOS POR NIVEL DE PUNTAJE
+      &.nivel-bajo {
+        &:hover { border-color: #fca5a5; background: #fef2f2; }
+        &.selected {
+          border-color: $upse-red;
+          background: $upse-red-light;
+          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
         }
       }
 
-      .nivel-label {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 4px 12px;
-        font-size: 13px;
-        color: #0f172a;
-        padding: 4px 0;
+      &.nivel-medio {
+        &:hover { border-color: #fcd34d; background: #fffbeb; }
+        &.selected {
+          border-color: $upse-gold;
+          background: $upse-gold-light;
+          box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+        }
+      }
 
-        @media (min-width: 768px) { font-size: 14px; }
+      &.nivel-alto {
+        &:hover { border-color: #6ee7b7; background: #ecfdf5; }
+        &.selected {
+          border-color: $upse-green;
+          background: $upse-green-light;
+          box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.15);
+        }
+      }
 
-        .nivel-nombre {
-          font-weight: 600;
+      .nivel-item {
+        --padding-start: 12px;
+        --inner-padding-end: 12px;
+        --background: transparent;
+        min-height: 44px;
+        pointer-events: none;
+
+        ion-radio {
+          --border-width: 2px;
+          --border-color: #d1d5db;
+          --color-checked: #{$upse-blue};
+          --size: 18px;
+          margin-right: 12px;
+          pointer-events: none;
+
+          @media (min-width: 768px) {
+            --size: 20px;
+            margin-right: 14px;
+          }
         }
 
-        .nivel-descripcion {
-          color: #64748b;
-          font-weight: 400;
+        // ✅ RADIO SELECCIONADO CON COLOR SEGÚN NIVEL
+        .nivel-item-wrapper.nivel-bajo.selected & ion-radio {
+          --color-checked: #{$upse-red};
+          --border-color: #{$upse-red};
         }
 
-        .nivel-puntaje {
-          font-weight: 700;
-          color: $upse-blue;
-          background: $upse-blue-light;
-          padding: 0 10px;
-          border-radius: 12px;
-          font-size: 12px;
+        .nivel-item-wrapper.nivel-medio.selected & ion-radio {
+          --color-checked: #{$upse-gold};
+          --border-color: #{$upse-gold};
+        }
+
+        .nivel-item-wrapper.nivel-alto.selected & ion-radio {
+          --color-checked: #{$upse-green};
+          --border-color: #{$upse-green};
+        }
+
+        .nivel-label {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 4px 12px;
+          font-size: 13px;
+          color: #0f172a;
+          padding: 4px 0;
+
+          @media (min-width: 768px) { font-size: 14px; }
+
+          .nivel-nombre {
+            font-weight: 600;
+          }
+
+          .nivel-descripcion {
+            color: #64748b;
+            font-weight: 400;
+          }
+
+          .nivel-puntaje {
+            font-weight: 700;
+            background: $upse-blue-light;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: $upse-blue;
+            transition: all 0.3s ease;
+
+            // ✅ COLOR DEL PUNTAJE SEGÚN NIVEL SELECCIONADO
+            .nivel-item-wrapper.nivel-bajo.selected & {
+              background: $upse-red-light;
+              color: $upse-red;
+            }
+
+            .nivel-item-wrapper.nivel-medio.selected & {
+              background: $upse-gold-light;
+              color: $upse-gold-dark;
+            }
+
+            .nivel-item-wrapper.nivel-alto.selected & {
+              background: $upse-green-light;
+              color: $upse-green;
+            }
+          }
         }
       }
     }
@@ -672,6 +753,24 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     &:disabled {
       opacity: 0.5;
       --box-shadow: none;
+    }
+  }
+
+  .btn-ver-resultados {
+    --background: #{$upse-blue};
+    --color: #ffffff;
+    --border-radius: 12px;
+    font-weight: 600;
+    flex: 1;
+    height: 48px;
+    --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.35);
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.45);
+        transform: translateY(-2px);
+        --background: #{$upse-blue-dark};
+      }
     }
   }
 }
@@ -832,8 +931,41 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    .niveles-group .nivel-item {
-      .nivel-label {
+    // ✅ MODO OSCURO PARA NIVELES
+    .niveles-group .nivel-item-wrapper {
+      &:hover {
+        border-color: #475569;
+        background: #0f172a;
+      }
+
+      &.nivel-bajo {
+        &:hover { border-color: #7f1d1d; background: #1a1a2e; }
+        &.selected {
+          border-color: #dc2626;
+          background: #1a1a2e;
+          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+      }
+
+      &.nivel-medio {
+        &:hover { border-color: #78350f; background: #1a1a2e; }
+        &.selected {
+          border-color: #c9a84c;
+          background: #1a1a2e;
+          box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+        }
+      }
+
+      &.nivel-alto {
+        &:hover { border-color: #064e3b; background: #1a1a2e; }
+        &.selected {
+          border-color: #00a651;
+          background: #1a1a2e;
+          box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.15);
+        }
+      }
+
+      .nivel-item .nivel-label {
         color: #f1f5f9;
         .nivel-descripcion { color: #94a3b8; }
         .nivel-puntaje {

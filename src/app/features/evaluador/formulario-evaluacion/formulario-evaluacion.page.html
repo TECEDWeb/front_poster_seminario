@@ -83,7 +83,8 @@
             <div class="detalle-item">
               <span class="detalle-label">Estado</span>
               <span class="detalle-valor" [class.estado-completo]="getPorcentajeProgreso() === 100">
-                {{ getPorcentajeProgreso() === 100 ? '✅ Completo' : '⏳ En progreso' }}
+                <span class="estado-icon">{{ getPorcentajeProgreso() === 100 ? '✅' : '⏳' }}</span>
+                {{ getPorcentajeProgreso() === 100 ? 'Completo' : 'En progreso' }}
               </span>
             </div>
           </div>
@@ -135,19 +136,30 @@
                 </div>
               </div>
 
+              <!-- ✅ NIVELES CON CLICK EN TODO EL ÁREA -->
               <ion-radio-group 
                 [(ngModel)]="respuestas[criterio.id]" 
                 (ionChange)="seleccionar(criterio.id, $event.detail.value)" 
                 class="niveles-group">
                 
-                <ion-item class="nivel-item" *ngFor="let nivel of criterio.niveles" lines="none">
-                  <ion-radio slot="start" [value]="nivel.id" color="primary" mode="md"></ion-radio>
-                  <ion-label class="nivel-label">
-                    <span class="nivel-nombre">{{ nivel.nombre }}</span>
-                    <span class="nivel-descripcion">{{ nivel.descripcion }}</span>
-                    <span class="nivel-puntaje">{{ nivel.puntaje }} pts</span>
-                  </ion-label>
-                </ion-item>
+                <div 
+                  class="nivel-item-wrapper" 
+                  *ngFor="let nivel of criterio.niveles"
+                  [class.selected]="respuestas[criterio.id] === nivel.id"
+                  [class.nivel-bajo]="nivel.puntaje <= 1"
+                  [class.nivel-medio]="nivel.puntaje === 2"
+                  [class.nivel-alto]="nivel.puntaje >= 3"
+                  (click)="seleccionarNivel(criterio.id, nivel.id)">
+                  
+                  <ion-item class="nivel-item" lines="none">
+                    <ion-radio slot="start" [value]="nivel.id" color="primary" mode="md"></ion-radio>
+                    <ion-label class="nivel-label">
+                      <span class="nivel-nombre">{{ nivel.nombre }}</span>
+                      <span class="nivel-descripcion">{{ nivel.descripcion }}</span>
+                      <span class="nivel-puntaje">{{ nivel.puntaje }} pts</span>
+                    </ion-label>
+                  </ion-item>
+                </div>
               </ion-radio-group>
             </div>
           </div>
@@ -171,7 +183,7 @@
         </ion-item>
       </div>
 
-      <!-- ✅ ESTADO DE LA EVALUACIÓN -->
+      <!-- ESTADO DE LA EVALUACIÓN -->
       <div class="evaluacion-status" *ngIf="!cargando && !error && formulario">
         <div class="status-info" [class.estado-asignado]="estadoEvaluacion === 'asignado'" 
                                 [class.estado-evaluado]="estadoEvaluacion === 'evaluado'">
@@ -185,7 +197,7 @@
         </div>
       </div>
 
-      <!-- ✅ BOTONES DE ACCIÓN (UN SOLO BLOQUE) -->
+      <!-- BOTONES DE ACCIÓN -->
       <div class="form-actions" *ngIf="estadoEvaluacion !== 'evaluado'">
         <ion-button
           fill="outline"
@@ -212,7 +224,7 @@
         </ion-button>
       </div>
 
-      <!-- ✅ BOTÓN PARA EVALUACIÓN YA FINALIZADA -->
+      <!-- BOTÓN PARA EVALUACIÓN YA FINALIZADA -->
       <div class="form-actions" *ngIf="estadoEvaluacion === 'evaluado'">
         <ion-button
           fill="outline"

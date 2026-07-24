@@ -274,14 +274,35 @@ export class FormularioEvaluacionPage implements OnInit {
   // ============================================
   // MANEJO DE RESPUESTAS
   // ============================================
-  seleccionar(criterioId: number, nivelId: number): void {
-    console.log('Respuesta seleccionada', { criterioId, nivelId });
+  /**
+   * ✅ NUEVO MÉTODO: Seleccionar nivel con click en todo el área
+   * Permite toggle (seleccionar/deseleccionar) al hacer click en el mismo nivel
+   */
+  seleccionarNivel(criterioId: number, nivelId: number): void {
+    console.log('👆 Click en nivel:', { criterioId, nivelId });
 
-    this.respuestas[criterioId] = nivelId;
+    // Si ya está seleccionado, lo deseleccionamos (toggle)
+    if (this.respuestas[criterioId] === nivelId) {
+      delete this.respuestas[criterioId];
+      console.log(`🔓 Deseleccionado nivel ${nivelId} del criterio ${criterioId}`);
+    } else {
+      this.respuestas[criterioId] = nivelId;
+      console.log(`🔒 Seleccionado nivel ${nivelId} del criterio ${criterioId}`);
+    }
+
     this.actualizarProgreso();
     console.log('📊 Criterios respondidos:', this.criteriosRespondidos);
     console.log('📊 Total criterios:', this.totalCriterios);
     console.log('📊 Porcentaje:', this.getPorcentajeProgreso());
+  }
+
+  /**
+   * Método original para compatibilidad con ionChange
+   */
+  seleccionar(criterioId: number, nivelId: number): void {
+    console.log('Respuesta seleccionada (ionChange)', { criterioId, nivelId });
+    this.respuestas[criterioId] = nivelId;
+    this.actualizarProgreso();
   }
 
   actualizarProgreso(): void {
