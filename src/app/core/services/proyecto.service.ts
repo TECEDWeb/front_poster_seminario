@@ -13,10 +13,6 @@ export class ProyectoService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Lista todos los proyectos, ya normalizados a camelCase
-   * con sus participantes y tutores incluidos.
-   */
   listar(): Observable<Proyecto[]> {
     return this.http
       .get<{ ok: boolean; data: any[] }>(this.apiUrl)
@@ -31,11 +27,6 @@ export class ProyectoService {
     );
   }
 
-  /**
-   * data.participantes y data.tutores deben venir como string[] de nombres
-   * (así los arma el componente antes de enviar). El backend se encarga
-   * de crear las filas correspondientes en las tablas participantes/tutores.
-   */
   crear(data: {
     nombre: string;
     descripcion?: string | null;
@@ -43,6 +34,7 @@ export class ProyectoService {
     nivel?: string | null;
     area?: string | null;
     activo?: boolean;
+    codigoProyecto?: string | null;  // NUEVO
     participantes: string[];
     tutores: string[];
   }): Observable<Proyecto> {
@@ -58,6 +50,7 @@ export class ProyectoService {
     nivel?: string | null;
     area?: string | null;
     activo?: boolean;
+    codigoProyecto?: string | null;  // NUEVO
     participantes: string[];
     tutores: string[];
   }): Observable<Proyecto> {
@@ -70,11 +63,6 @@ export class ProyectoService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  /**
-   * Traduce la respuesta cruda del backend (mezcla de snake_case y
-   * camelCase, según venga de proyectos/concursos/participantes/tutores)
-   * al modelo Proyecto consistente que usa todo el frontend.
-   */
   private normalizarProyecto(data: any): Proyecto {
     if (!data) return data;
 
@@ -87,6 +75,7 @@ export class ProyectoService {
       nivel: data.nivel ?? null,
       area: data.area ?? null,
       activo: data.activo === 1 || data.activo === true,
+      codigoProyecto: data.codigoProyecto ?? data.codigo_proyecto ?? null,  // ✅ NUEVO
       participantes: this.normalizarParticipantes(data.participantes),
       tutores: this.normalizarTutores(data.tutores),
       createdAt: data.createdAt ?? data.created_at

@@ -1,17 +1,14 @@
 export interface Participante {
-  id?: number;
-  proyectoId?: number;
+  id: number;
   nombre: string;
   cedula?: string | null;
   email?: string | null;
-  rol?: string | null;
 }
 
 export interface Tutor {
-  id?: number;
-  proyectoId?: number;
+  id: number;
   nombre: string;
-  encargado?: boolean;
+  encargado: boolean;
   cedula?: string | null;
   email?: string | null;
 }
@@ -19,15 +16,16 @@ export interface Tutor {
 export interface Proyecto {
   id: number;
   nombre: string;
-  descripcion?: string | null;
+  descripcion: string | null;
   concursoId: number | null;
-  concursoNombre?: string | null;
-  nivel?: string | null;
-  area?: string | null;
+  concursoNombre: string | null;
+  nivel: string | null;
+  area: string | null;
   activo: boolean;
+  codigoProyecto: string | null;  // ✅ NUEVO
   participantes: Participante[];
   tutores: Tutor[];
-  createdAt?: string;
+  createdAt: string;
 }
 
 // ============================================

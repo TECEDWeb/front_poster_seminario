@@ -53,7 +53,8 @@ import {
   checkmarkDoneOutline,
   alertCircleOutline,
   downloadOutline,
-  documentOutline
+  documentOutline,
+  barcodeOutline  
 } from 'ionicons/icons';
 
 @Component({
@@ -91,9 +92,7 @@ import {
 })
 export class ProyectosPage implements OnInit {
 
-  // ============================================
   // ESTADO PRINCIPAL
-  // ============================================
   proyectos: Proyecto[] = [];
   proyectosFiltrados: Proyecto[] = [];
   proyectosActivos: number = 0;
@@ -102,27 +101,25 @@ export class ProyectosPage implements OnInit {
   cargandoConcursos: boolean = false;
   exportando: boolean = false;
 
-  // ============================================
   // FILTROS
-  // ============================================
   busqueda: string = '';
   filtroNivel: string = 'todos';
   filtroEstado: string = 'todos';
   filtroConcurso: string = 'todos';
 
-  // ============================================
   // MODAL CREAR/EDITAR
-  // ============================================
   modalAbierto = false;
   editando = false;
   guardando = false;
   concursosDisponibles: any[] = [];
 
+  // FORMULARIO ACTUALIZADO con codigoProyecto
   form: any = {
     id: null,
     nombre: '',
     descripcion: '',
     concursoId: null,
+    codigoProyecto: '',  
     participantesTexto: '',
     tutorEncargado: '',
     tutor2: '',
@@ -133,18 +130,14 @@ export class ProyectosPage implements OnInit {
     activo: true
   };
 
-  // ============================================
   // MODAL DETALLE
-  // ============================================
   modalDetalleAbierto = false;
   cargandoDetalle = false;
   errorDetalle: string | null = null;
   proyectoSeleccionado: Proyecto | null = null;
   detalleEvaluaciones: any = null;
 
-  // ============================================
   // NOTIFICACIÓN (toast propio)
-  // ============================================
   notificacion: { mensaje: string; tipo: 'success' | 'danger' | 'warning' } | null = null;
   private notiTimeout: any;
 
@@ -159,7 +152,7 @@ export class ProyectosPage implements OnInit {
       eyeOutline, createOutline, trashOutline, folderOpenOutline,
       closeOutline, pricetagOutline, toggleOutline, checkmarkOutline,
       schoolOutline, star, checkmarkDoneOutline, alertCircleOutline,
-      downloadOutline, documentOutline
+      downloadOutline, documentOutline, barcodeOutline  
     });
   }
 
@@ -168,9 +161,7 @@ export class ProyectosPage implements OnInit {
     this.cargarConcursos();
   }
 
-  // ============================================
   // CARGA DE DATOS
-  // ============================================
   cargar(): void {
     this.cargando = true;
 
@@ -209,9 +200,7 @@ export class ProyectosPage implements OnInit {
     this.cargar();
   }
 
-  // ============================================
   // ESTADÍSTICAS Y FILTROS
-  // ============================================
   calcularEstadisticas(): void {
     this.proyectosActivos = this.proyectos.filter(p => p.activo).length;
     this.totalParticipantes = this.proyectos.reduce(
@@ -229,6 +218,7 @@ export class ProyectosPage implements OnInit {
         p.area?.toLowerCase().includes(texto) ||
         p.nivel?.toLowerCase().includes(texto) ||
         p.descripcion?.toLowerCase().includes(texto) ||
+        (p.codigoProyecto?.toLowerCase().includes(texto)) ||  // ✅ BUSCAR POR CÓDIGO
         (p.participantes || []).some(part => part.nombre?.toLowerCase().includes(texto)) ||
         (p.tutores || []).some(t => t.nombre?.toLowerCase().includes(texto))
       );
@@ -244,9 +234,7 @@ export class ProyectosPage implements OnInit {
       filtered = filtered.filter(p => !p.activo);
     }
 
-    // Filtro por concurso (comparación numérica: los ion-select-option
-    // usan el id del concurso como valor, y concursoId puede venir
-    // como string desde el backend)
+    // Filtro por concurso
     if (this.filtroConcurso !== 'todos') {
       const concursoIdNum = Number(this.filtroConcurso);
       filtered = filtered.filter(p => Number(p.concursoId) === concursoIdNum);
@@ -263,9 +251,7 @@ export class ProyectosPage implements OnInit {
     this.filtrarProyectos();
   }
 
-  // ============================================
   // PARTICIPANTES (texto <-> arreglo)
-  // ============================================
   contarParticipantes(texto: string): number {
     if (!texto || texto.trim() === '') return 0;
     return texto.split(',').filter(p => p.trim() !== '').length;
@@ -281,9 +267,17 @@ export class ProyectosPage implements OnInit {
     return participantes.map(p => p.nombre).join(', ');
   }
 
-  // ============================================
+  // FORMATEAR CÓDIGO (mayúsculas, sin espacios)
+  formatearCodigo(): void {
+    if (this.form.codigoProyecto) {
+      this.form.codigoProyecto = this.form.codigoProyecto
+        .toUpperCase()
+        .replace(/\s/g, '')
+        .replace(/[^A-Z0-9\-]/g, '');  // Solo letras, números y guiones
+    }
+  }
+
   // MODAL CREAR / EDITAR
-  // ============================================
   abrirCrear(): void {
     this.editando = false;
     this.form = {
@@ -291,6 +285,7 @@ export class ProyectosPage implements OnInit {
       nombre: '',
       descripcion: '',
       concursoId: null,
+      codigoProyecto: '',  
       participantesTexto: '',
       tutorEncargado: '',
       tutor2: '',
@@ -314,6 +309,7 @@ export class ProyectosPage implements OnInit {
       nombre: proyecto.nombre || '',
       descripcion: proyecto.descripcion || '',
       concursoId: proyecto.concursoId != null ? Number(proyecto.concursoId) : null,
+      codigoProyecto: proyecto.codigoProyecto || '',  // NUEVO
       participantesTexto,
       tutorEncargado: tutores[0]?.nombre || '',
       tutor2: tutores[1]?.nombre || '',
@@ -331,6 +327,7 @@ export class ProyectosPage implements OnInit {
     this.modalAbierto = false;
   }
 
+  // GUARDAR - ACTUALIZADO (participantes opcionales)
   guardar(): void {
     if (!this.form.nombre || this.form.nombre.trim() === '') {
       this.mostrarNotificacion('Ingresa el nombre del proyecto', 'warning');
@@ -352,11 +349,8 @@ export class ProyectosPage implements OnInit {
       return;
     }
 
+    // Si no hay participantes, se envía un arreglo vacío
     const participantes = this.procesarParticipantes(this.form.participantesTexto);
-    if (participantes.length === 0) {
-      this.mostrarNotificacion('Ingresa al menos un participante', 'warning');
-      return;
-    }
 
     const tutores = [this.form.tutorEncargado, this.form.tutor2, this.form.tutor3, this.form.tutor4]
       .filter(t => t && t.trim() !== '');
@@ -367,6 +361,7 @@ export class ProyectosPage implements OnInit {
       nombre: this.form.nombre.trim(),
       descripcion: this.form.descripcion || null,
       concursoId: this.form.concursoId || null,
+      codigoProyecto: this.form.codigoProyecto || null,  // ✅ NUEVO
       participantes,
       tutores,
       nivel: this.form.nivel,
@@ -396,9 +391,7 @@ export class ProyectosPage implements OnInit {
     });
   }
 
-  // ============================================
   // ELIMINAR
-  // ============================================
   confirmarEliminar(proyecto: Proyecto): void {
     if (confirm(`¿Estás seguro de eliminar el proyecto "${proyecto.nombre}"? Esta acción no se puede deshacer.`)) {
       this.eliminarProyecto(proyecto.id);
@@ -418,9 +411,7 @@ export class ProyectosPage implements OnInit {
     });
   }
 
-  // ============================================
   // DETALLE (solo lectura)
-  // ============================================
   verDetalle(proyecto: Proyecto): void {
     this.proyectoSeleccionado = proyecto;
     this.modalDetalleAbierto = true;
@@ -462,9 +453,7 @@ export class ProyectosPage implements OnInit {
     this.editar(proyecto);
   }
 
-  // ============================================
-  // EXPORTACIÓN CSV
-  // ============================================
+  // EXPORTACIÓN CSV (con código de proyecto)
   exportarCSV(): void {
     const datos = this.proyectosFiltrados || [];
 
@@ -473,9 +462,11 @@ export class ProyectosPage implements OnInit {
       return;
     }
 
-    const headers = ['Proyecto', 'Área', 'Nivel', 'Tutor encargado', 'N° Participantes', 'Participantes', 'Concurso', 'Estado'];
+    //  CABECERA CON CÓDIGO
+    const headers = ['Código', 'Proyecto', 'Área', 'Nivel', 'Tutor encargado', 'N° Participantes', 'Participantes', 'Concurso', 'Estado'];
 
     const filas = datos.map(p => [
+      p.codigoProyecto || '',
       p.nombre || '',
       p.area || '',
       p.nivel || '',
@@ -495,7 +486,6 @@ export class ProyectosPage implements OnInit {
     };
 
     const filasCSV = [headers, ...filas].map(fila => fila.map(escapar).join(','));
-    // \uFEFF (BOM) al inicio para que Excel reconozca los acentos/UTF-8 correctamente
     const csvContent = '\uFEFF' + filasCSV.join('\r\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -511,9 +501,7 @@ export class ProyectosPage implements OnInit {
     this.mostrarNotificacion(`CSV exportado: ${datos.length} proyecto(s)`, 'success');
   }
 
-  // ============================================
-  // EXPORTACIÓN PDF (jsPDF + jspdf-autotable)
-  // ============================================
+  // EXPORTACIÓN PDF (con código de proyecto)
   async exportarPDF(): Promise<void> {
     const datos = this.proyectosFiltrados || [];
 
@@ -525,7 +513,6 @@ export class ProyectosPage implements OnInit {
     this.exportando = true;
 
     try {
-      // Import dinámico: evita cargar jsPDF en el bundle inicial de la página
       const { default: jsPDF } = await import('jspdf');
       const autoTableModule = await import('jspdf-autotable');
       const autoTable = autoTableModule.default;
@@ -541,9 +528,10 @@ export class ProyectosPage implements OnInit {
       const fechaLegible = new Date().toLocaleString('es-EC');
       doc.text(`Generado: ${fechaLegible}  •  Total: ${datos.length} proyecto(s)`, 14, 21);
 
-      const columnas = ['Proyecto', 'Área', 'Nivel', 'Tutor encargado', 'Participantes', 'Concurso', 'Estado'];
+      const columnas = ['Código', 'Proyecto', 'Área', 'Nivel', 'Tutor encargado', 'Participantes', 'Concurso', 'Estado'];
 
       const filas = datos.map(p => [
+        p.codigoProyecto || '—',
         p.nombre || '—',
         p.area || '—',
         p.nivel || '—',
@@ -602,9 +590,7 @@ export class ProyectosPage implements OnInit {
     return item?.id ?? index;
   }
 
-  // ============================================
-  // NOTIFICACIÓN INLINE (reemplaza alert())
-  // ============================================
+  // NOTIFICACIÓN INLINE
   mostrarNotificacion(mensaje: string, tipo: 'success' | 'danger' | 'warning' = 'success'): void {
     clearTimeout(this.notiTimeout);
     this.notificacion = { mensaje, tipo };

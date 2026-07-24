@@ -736,11 +736,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 .excel-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  min-width: 850px;
   font-size: 12px;
 
   @media (min-width: 1024px) {
-    min-width: 900px;
+    min-width: 1050px;
     font-size: 13px;
   }
 
@@ -768,6 +768,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
+    // ✅ NUEVA COLUMNA CÓDIGO
+    .col-codigo { min-width: 90px; max-width: 120px; text-align: center; }
     .col-proyecto { min-width: 200px; max-width: 280px; }
     .col-area { min-width: 80px; max-width: 100px; text-align: center; }
     .col-nivel { min-width: 80px; max-width: 100px; text-align: center; }
@@ -813,6 +815,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         padding: 8px 14px;
       }
 
+      &.col-codigo { text-align: center; }
       &.col-proyecto { max-width: 280px; }
       &.col-area { text-align: center; }
       &.col-nivel { text-align: center; }
@@ -820,6 +823,25 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       &.col-estado { text-align: center; }
       &.col-acciones { text-align: center; }
     }
+  }
+}
+
+// ✅ ESTILO PARA CÓDIGO EN TABLA
+.codigo-proyecto {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: $upse-blue;
+  background: $upse-blue-light;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  white-space: nowrap;
+
+  @media (min-width: 1024px) {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
   }
 }
 
@@ -1374,6 +1396,29 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
       }
 
+      // ✅ CÓDIGO EN TARJETA
+      .card-codigo {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 10px;
+        color: $upse-blue;
+        background: $upse-blue-light;
+        padding: 1px 8px;
+        border-radius: 4px;
+        margin-top: 2px;
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+
+        @media (min-width: 480px) {
+          font-size: 11px;
+          padding: 2px 10px;
+          border-radius: 6px;
+        }
+
+        ion-icon { font-size: 10px; }
+      }
+
       .card-meta-tags {
         display: flex;
         flex-wrap: wrap;
@@ -1855,6 +1900,50 @@ ion-fab-button {
       }
     }
 
+    // ✅ PREVIEW DEL CÓDIGO
+    .codigo-preview {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      padding: 4px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px dashed #e2e8f0;
+      font-size: 11px;
+
+      @media (min-width: 480px) {
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 8px;
+      }
+
+      ion-icon {
+        color: $upse-green;
+        font-size: 14px;
+        flex-shrink: 0;
+
+        @media (min-width: 480px) {
+          font-size: 16px;
+        }
+      }
+
+      strong {
+        color: $upse-blue;
+        font-family: 'Courier New', monospace;
+      }
+
+      .auto {
+        color: #94a3b8;
+        font-size: 10px;
+        font-style: italic;
+
+        @media (min-width: 480px) {
+          font-size: 11px;
+        }
+      }
+    }
+
     .field-help {
       margin-top: 4px;
 
@@ -2073,6 +2162,29 @@ ion-fab-button {
       font-size: 16px;
       margin: 0 0 4px;
     }
+  }
+
+  // ✅ CÓDIGO EN DETALLE
+  .detalle-codigo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: $upse-blue;
+    background: $upse-blue-light;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    margin-bottom: 4px;
+
+    @media (min-width: 480px) {
+      font-size: 12px;
+      padding: 2px 12px;
+      border-radius: 6px;
+    }
+
+    ion-icon { font-size: 12px; }
   }
 }
 
@@ -2511,6 +2623,11 @@ ion-fab-button {
     }
   }
 
+  .codigo-proyecto {
+    background: #1a2a4a;
+    color: #60a5fa;
+  }
+
   .tag-area { background: #1e293b; color: #94a3b8; }
 
   .tag-nivel {
@@ -2556,6 +2673,10 @@ ion-fab-button {
 
     .card-header {
       .card-info .card-title { color: #f1f5f9; }
+      .card-info .card-codigo {
+        background: #1a2a4a;
+        color: #60a5fa;
+      }
       .card-info .card-meta-tags .tag {
         &.tag-area { background: #1a2a4a; color: #60a5fa; }
         &.tag-nivel { background: #2a2a1a; color: #fbbf24; }
@@ -2610,6 +2731,12 @@ ion-fab-button {
         border-color: #334155;
         ion-input, ion-textarea, ion-select, ion-toggle { color: #f1f5f9; }
       }
+      .codigo-preview {
+        background: #0f172a;
+        border-color: #334155;
+        strong { color: #60a5fa; }
+        .auto { color: #64748b; }
+      }
     }
     .tutores-grid .tutor-item { --background: #0f172a; border-color: #334155; }
     .toggle-item .toggle-label { color: #f1f5f9; }
@@ -2620,7 +2747,13 @@ ion-fab-button {
     border-color: #334155;
   }
 
-  .detalle-header h2 { color: #f1f5f9; }
+  .detalle-header {
+    h2 { color: #f1f5f9; }
+    .detalle-codigo {
+      background: #1a2a4a;
+      color: #60a5fa;
+    }
+  }
   .detalle-descripcion { color: #94a3b8; }
   .detalle-meta-grid .meta-item {
     background: #0f172a;

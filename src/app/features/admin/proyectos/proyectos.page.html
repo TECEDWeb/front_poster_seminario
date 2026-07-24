@@ -71,7 +71,7 @@
         <ion-searchbar
           [(ngModel)]="busqueda"
           (ionInput)="filtrarProyectos()"
-          placeholder="Buscar por nombre, área, nivel, participante o tutor..."
+          placeholder="Buscar por código, nombre, área, nivel, participante o tutor..."
           class="filter-search"
           animated>
           <ion-icon name="search-outline" slot="start"></ion-icon>
@@ -153,6 +153,7 @@
           <!-- CABECERA -->
           <thead>
             <tr>
+              <th class="col-codigo">Código</th>  <!-- ✅ NUEVA COLUMNA -->
               <th class="col-proyecto">Proyecto</th>
               <th class="col-area">Área</th>
               <th class="col-nivel">Nivel</th>
@@ -169,6 +170,11 @@
                 [class.row-active]="p.activo"
                 [class.row-inactive]="!p.activo">
               
+              <!-- ✅ CÓDIGO -->
+              <td class="col-codigo">
+                <span class="codigo-proyecto">{{ p.codigoProyecto || '—' }}</span>
+              </td>
+
               <!-- Proyecto -->
               <td class="col-proyecto">
                 <div class="cell-proyecto">
@@ -249,7 +255,7 @@
 
             <!-- EMPTY STATE -->
             <tr *ngIf="proyectosFiltrados?.length === 0">
-              <td colspan="7">
+              <td colspan="8">
                 <div class="empty-state-table">
                   <div class="empty-icon">
                     <ion-icon name="folder-open-outline"></ion-icon>
@@ -287,6 +293,11 @@
           </div>
           <div class="card-info">
             <h3 class="card-title">{{ p.nombre }}</h3>
+            <!-- ✅ CÓDIGO EN TARJETA -->
+            <div class="card-codigo" *ngIf="p.codigoProyecto">
+              <ion-icon name="barcode-outline"></ion-icon>
+              <span>{{ p.codigoProyecto }}</span>
+            </div>
             <div class="card-meta-tags">
               <span class="tag tag-area" *ngIf="p.area">
                 <ion-icon name="business-outline"></ion-icon>
@@ -402,6 +413,32 @@
               </ion-item>
             </div>
 
+            <!-- ✅ NUEVO CAMPO: CÓDIGO DEL PROYECTO -->
+            <div class="form-field">
+              <label class="field-label">
+                <ion-icon name="barcode-outline"></ion-icon>
+                Código del proyecto
+                <span class="field-hint">(opcional, se genera automáticamente)</span>
+              </label>
+              <ion-item class="field-input" lines="none">
+                <ion-input
+                  [(ngModel)]="form.codigoProyecto"
+                  name="codigoProyecto"
+                  placeholder="Ej: PROJ-2026-001"
+                  (ionInput)="formatearCodigo()">
+                </ion-input>
+              </ion-item>
+              <div class="codigo-preview" *ngIf="form.codigoProyecto">
+                <ion-icon name="checkmark-done-outline"></ion-icon>
+                <span>Código: <strong>{{ form.codigoProyecto }}</strong></span>
+                <span class="auto" *ngIf="!editando">(se usará este código)</span>
+              </div>
+              <div class="codigo-preview" *ngIf="!form.codigoProyecto && !editando">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <span class="auto">Se generará automáticamente al guardar</span>
+              </div>
+            </div>
+
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="document-text-outline"></ion-icon>
@@ -484,20 +521,19 @@
               </div>
             </div>
 
+            <!-- ✅ PARTICIPANTES - YA NO ES OBLIGATORIO -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="people-outline"></ion-icon>
                 Participantes
-                <span class="required">*</span>
-                <span class="field-hint">(separados por coma, sin límite)</span>
+                <span class="field-hint">(opcional, separados por coma)</span>
               </label>
               <ion-item class="field-input" lines="none">
                 <ion-textarea
                   [(ngModel)]="form.participantesTexto"
                   name="participantesTexto"
-                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz, Ana Torres..."
-                  rows="2"
-                  required>
+                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz..."
+                  rows="2">
                 </ion-textarea>
               </ion-item>
               <div class="field-help" *ngIf="form.participantesTexto">
@@ -620,6 +656,11 @@
               </div>
               <div>
                 <h2>{{ p.nombre }}</h2>
+                <!-- ✅ CÓDIGO EN DETALLE -->
+                <div class="detalle-codigo" *ngIf="p.codigoProyecto">
+                  <ion-icon name="barcode-outline"></ion-icon>
+                  <span>{{ p.codigoProyecto }}</span>
+                </div>
                 <span class="status-badge" [class]="p.activo ? 'status-active' : 'status-inactive'">
                   <span class="status-dot"></span>
                   {{ p.activo ? 'Activo' : 'Inactivo' }}
