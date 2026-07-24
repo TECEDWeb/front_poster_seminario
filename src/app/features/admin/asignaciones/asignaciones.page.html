@@ -10,6 +10,11 @@
     </ion-title>
 
     <ion-buttons slot="end">
+      <!-- ✅ BOTÓN PARA ABRIR MODAL -->
+      <ion-button class="btn-modal" (click)="abrirModalAsignacion()" title="Abrir asignación rápida">
+        <ion-icon name="person-add-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      
       <ion-button class="btn-refresh" (click)="cargarDatos()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
@@ -22,7 +27,53 @@
 
     <!-- SKELETON LOADING -->
     <ng-container *ngIf="cargando">
-      <!-- ... skeleton existente ... -->
+      <div class="stats-row">
+        <div class="stat-item" *ngFor="let i of [1,2,3]">
+          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+          <div class="stat-info">
+            <ion-skeleton-text animated class="skeleton-value"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
+          </div>
+        </div>
+      </div>
+
+      <ion-card class="form-card">
+        <ion-card-header>
+          <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="field-group">
+            <div class="field">
+              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
+              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
+            </div>
+            <div class="field">
+              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
+              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
+            </div>
+          </div>
+          <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-field" style="max-width: 300px;"></ion-skeleton-text>
+          <div class="form-actions">
+            <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-btn wide"></ion-skeleton-text>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="recent-assignments">
+        <ion-skeleton-text animated class="skeleton-section-title"></ion-skeleton-text>
+        <div class="assignments-list">
+          <div class="assignment-item" *ngFor="let i of [1,2,3]">
+            <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
+            <div class="assignment-info">
+              <ion-skeleton-text animated class="skeleton-line" style="width: 60%;"></ion-skeleton-text>
+              <ion-skeleton-text animated class="skeleton-line" style="width: 40%;"></ion-skeleton-text>
+            </div>
+          </div>
+        </div>
+      </div>
     </ng-container>
 
     <!-- CONTENIDO REAL -->
@@ -132,7 +183,7 @@
               </div>
 
               <!-- ============================================ -->
-              <!-- ✅ EVALUADORES YA ASIGNADOS A ESTE PROYECTO  -->
+              <!-- EVALUADORES YA ASIGNADOS A ESTE PROYECTO -->
               <!-- ============================================ -->
               <div class="asignados-proyecto" *ngIf="proyectoId">
                 <div class="asignados-header">
@@ -142,12 +193,12 @@
 
                 <div class="asignados-list" *ngIf="asignacionesDelProyecto.length > 0">
                   <div class="asignado-item" *ngFor="let a of asignacionesDelProyecto">
-                    <div class="asignado-avatar" [class]="a.status || a.estado || 'pending'">
+                    <div class="asignado-avatar" [class]="getStatusClass(a.status || a.estado || 'pending')">
                       <ion-icon [name]="getStatusIcon(a.status || a.estado)"></ion-icon>
                     </div>
                     <div class="asignado-info">
                       <span class="asignado-nombre">{{ a.evaluador_nombre || a.evaluador?.nombre }}</span>
-                      <span class="asignado-estado" [class]="a.status || a.estado || 'pending'">
+                      <span class="asignado-estado" [class]="getStatusClass(a.status || a.estado || 'pending')">
                         {{ getStatusText(a.status || a.estado) }}
                       </span>
                     </div>
@@ -266,8 +317,8 @@
 
         <div class="assignments-list">
           <div class="assignment-item" *ngFor="let a of asignacionesRecientes">
-            <div class="assignment-avatar" [class]="a.status || 'pending'">
-              <ion-icon [name]="getStatusIcon(a.status)"></ion-icon>
+            <div class="assignment-avatar" [class]="getStatusClass(a.status || a.estado || 'pending')">
+              <ion-icon [name]="getStatusIcon(a.status || a.estado)"></ion-icon>
             </div>
             <div class="assignment-info">
               <div class="assignment-main">
@@ -282,12 +333,12 @@
                   <ion-icon name="time-outline"></ion-icon>
                   {{ (a.fecha_asignacion || a.created_at || a.fecha) | date:'dd/MM/yyyy HH:mm' }}
                 </span>
-                <span class="assignment-status" [class]="a.status || 'pending'">
-                  {{ getStatusText(a.status) }}
+                <span class="assignment-status" [class]="getStatusClass(a.status || a.estado || 'pending')">
+                  {{ getStatusText(a.status || a.estado) }}
                 </span>
               </div>
               
-              <!-- ✅ ACCIONES ADMIN (incluye Quitar) -->
+              <!-- ACCIONES ADMIN (incluye Quitar) -->
               <div class="assignment-admin-actions" *ngIf="esAdmin">
                 <button class="admin-btn admin-btn-editar" 
                         (click)="editarEvaluacionAdmin(a)"
@@ -304,7 +355,7 @@
                   Reabrir
                 </button>
                 
-                <!-- ✅ BOTÓN QUITAR ASIGNACIÓN -->
+                <!-- BOTÓN QUITAR ASIGNACIÓN -->
                 <button class="admin-btn admin-btn-quitar" 
                         (click)="quitarAsignacion(a)"
                         title="Quitar esta asignación">
@@ -341,3 +392,11 @@
 
   </div>
 </ion-content>
+
+<!-- ============================================ -->
+<!-- ✅ MODAL DE ASIGNACIÓN -->
+<!-- ============================================ -->
+<app-asignacion-modal
+  [(isOpen)]="modalAbierto"
+  (asignacionCreada)="onAsignacionCreada($event)">
+</app-asignacion-modal>

@@ -23,9 +23,9 @@ import {
   IonDatetime,
   IonLabel,
   IonSkeletonText,
-  IonAlert  // ✅ Importar IonAlert
+  IonAlert
 } from '@ionic/angular/standalone';
-import { AlertController } from '@ionic/angular';  // ✅ Para alertas personalizadas
+import { AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -49,7 +49,7 @@ import {
   trashOutline,
   createOutline,
   personRemoveOutline,
-  warningOutline  // ✅ Nuevo icono
+  warningOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -57,6 +57,9 @@ import { AsignacionService } from '../../../core/services/asignacion.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
+
+// ✅ IMPORTAR EL MODAL
+import { AsignacionModalComponent } from '../../../shared/components/asignacion-modal/asignacion-modal.component';
 
 @Component({
   selector: 'app-asignaciones',
@@ -84,7 +87,8 @@ import { UsuarioService } from '../../../core/services/usuario.service';
     IonDatetime,
     IonLabel,
     IonSkeletonText,
-    IonAlert  // ✅ Importar IonAlert
+    IonAlert,
+    AsignacionModalComponent  // ✅ IMPORTAR EL MODAL
   ],
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss']
@@ -109,9 +113,8 @@ export class AsignacionesPage implements OnInit {
 
   esAdmin: boolean = false;
 
-  // ✅ Estado para la alerta de confirmación
-  asignacionAEliminar: any = null;
-  mostrandoAlertaEliminar: boolean = false;
+  // ✅ CONTROL DEL MODAL
+  modalAbierto = false;
 
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
@@ -130,7 +133,7 @@ export class AsignacionesPage implements OnInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private router: Router,
-    private alertController: AlertController  // ✅ Inyectar AlertController
+    private alertController: AlertController
   ) {
     addIcons({
       addOutline,
@@ -154,7 +157,7 @@ export class AsignacionesPage implements OnInit {
       trashOutline,
       createOutline,
       personRemoveOutline,
-      warningOutline  // ✅ Nuevo
+      warningOutline
     });
 
     this.esAdmin = this.authService.esAdmin();
@@ -164,6 +167,25 @@ export class AsignacionesPage implements OnInit {
     this.cargarDatos();
   }
 
+  // ============================================
+  // ABRIR / CERRAR MODAL
+  // ============================================
+  abrirModalAsignacion(): void {
+    this.modalAbierto = true;
+  }
+
+  cerrarModalAsignacion(): void {
+    this.modalAbierto = false;
+  }
+
+  onAsignacionCreada(event: any): void {
+    console.log('✅ Asignación creada desde modal:', event);
+    this.cargarDatos();
+  }
+
+  // ============================================
+  // CARGA DE DATOS
+  // ============================================
   cargarDatos(): void {
     this.cargando = true;
     this._proyectosListos = false;
@@ -261,10 +283,9 @@ export class AsignacionesPage implements OnInit {
     this.evaluadorId = null;
   }
 
-  onEvaluadorSeleccionado(event: any): void {
-    // Sin lógica adicional
-  }
-
+  // ============================================
+  // GUARDAR ASIGNACIÓN
+  // ============================================
   guardar(): void {
     if (!this.proyectoId) {
       this.showError('Por favor, selecciona un proyecto');
@@ -335,7 +356,7 @@ export class AsignacionesPage implements OnInit {
   }
 
   // ============================================
-  // ✅ QUITAR ASIGNACIÓN - CON ALERTA MEJORADA
+  // QUITAR ASIGNACIÓN
   // ============================================
   async quitarAsignacion(a: any): Promise<void> {
     const evaluacionId = a.id || a.evaluacion_id;
@@ -347,11 +368,9 @@ export class AsignacionesPage implements OnInit {
     const nombreEvaluador = a.evaluador_nombre || a.evaluador?.nombre || 'este evaluador';
     const nombreProyecto = a.proyecto_nombre || a.proyecto?.nombre || 'este proyecto';
     
-    // Determinar si ya tiene evaluación
     const yaEvaluado = a.status === 'completed' || a.status === 'completado'
       || a.estado === 'evaluado' || a.yaEvaluado === true;
 
-    // Crear alerta personalizada
     const alert = await this.alertController.create({
       header: yaEvaluado ? '⚠️ Eliminar evaluación' : 'Quitar asignación',
       subHeader: `Proyecto: ${nombreProyecto}`,
@@ -369,7 +388,7 @@ export class AsignacionesPage implements OnInit {
           role: 'destructive',
           cssClass: 'danger',
           handler: () => {
-            this.ejecutarQuitarAsignacion(evaluacionId, nombreEvaluador, nombreProyecto);
+            this.ejecutarQuitarAsignacion(evaluacionId, nombreEvaluador);
           }
         }
       ],
@@ -379,7 +398,7 @@ export class AsignacionesPage implements OnInit {
     await alert.present();
   }
 
-  private ejecutarQuitarAsignacion(evaluacionId: number, nombreEvaluador: string, nombreProyecto: string): void {
+  private ejecutarQuitarAsignacion(evaluacionId: number, nombreEvaluador: string): void {
     this.evaluacionService.eliminarEvaluacion(evaluacionId).subscribe({
       next: () => {
         this.showSuccess(`Asignación de "${nombreEvaluador}" eliminada correctamente`);
@@ -393,9 +412,8 @@ export class AsignacionesPage implements OnInit {
   }
 
   // ============================================
-  // MÉTODOS EXISTENTES
+  // ACCIONES ADMIN
   // ============================================
-
   editarEvaluacionAdmin(asignacion: any): void {
     const evaluacionId = asignacion.id || asignacion.evaluacion_id;
     if (!evaluacionId) {
@@ -494,14 +512,13 @@ export class AsignacionesPage implements OnInit {
     this.router.navigate(['/admin/evaluaciones', evaluacionId]);
   }
 
+  // ============================================
+  // UTILIDADES
+  // ============================================
   resetForm(): void {
     this.proyectoId = null;
     this.evaluadorId = null;
     this.fechaLimite = null;
-  }
-
-  openNewProject(): void {
-    this.router.navigate(['/admin/proyectos/nuevo']);
   }
 
   verTodasAsignaciones(): void {
@@ -540,8 +557,26 @@ export class AsignacionesPage implements OnInit {
     return texts[status] || 'Pendiente';
   }
 
+  getStatusClass(status: string): string {
+    const classes: Record<string, string> = {
+      'pending': 'status-pending',
+      'pendiente': 'status-pending',
+      'asignado': 'status-pending',
+      'in-progress': 'status-progress',
+      'en_progreso': 'status-progress',
+      'completed': 'status-completed',
+      'completado': 'status-completed',
+      'evaluado': 'status-completed',
+      'rejected': 'status-rejected',
+      'rechazado': 'status-rejected'
+    };
+    return classes[status] || 'status-pending';
+  }
+
+  // ============================================
+  // ALERTAS
+  // ============================================
   private showSuccess(message: string): void {
-    // Usar toast o alert simple
     const alert = this.alertController.create({
       header: '✅ Éxito',
       message: message,
