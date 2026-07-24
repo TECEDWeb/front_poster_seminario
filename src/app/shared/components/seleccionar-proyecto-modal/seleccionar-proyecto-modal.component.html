@@ -26,10 +26,10 @@
     <ion-content class="modal-content">
       <div class="modal-container">
 
-        <!-- 🔍 INFO DE DEPURACIÓN (visible solo en desarrollo) -->
-        <div class="debug-info" *ngIf="debugInfo">
-          <small>{{ debugInfo }}</small>
-          <ion-button fill="clear" size="small" (click)="debugInfoConsola()">
+        <!-- ✅ BARRA DE ESTADÍSTICAS -->
+        <div class="debug-bar">
+          <small>Proyectos: {{ proyectos.length }} | Filtrados: {{ proyectosFiltrados.length }}</small>
+          <ion-button fill="clear" size="small" (click)="debugInfo()" class="debug-btn">
             <ion-icon name="bug-outline"></ion-icon>
           </ion-button>
         </div>
@@ -89,12 +89,6 @@
 
           <!-- Lista real -->
           <ng-container *ngIf="!cargando">
-            <!-- ✅ MOSTRAR MENSAJE SI NO HAY PROYECTOS -->
-            <div class="info-message" *ngIf="proyectos.length === 0">
-              <ion-icon name="alert-circle-outline"></ion-icon>
-              <p>No hay proyectos disponibles</p>
-            </div>
-
             <div
               class="proyecto-item"
               *ngFor="let p of proyectosFiltrados"
@@ -108,12 +102,12 @@
                 <div class="proyecto-meta">
                   <span class="meta-tag area">{{ p.area || 'Sin área' }}</span>
                   <span class="meta-tag nivel">{{ p.nivel || 'Sin nivel' }}</span>
-                  <!-- ✅ MOSTRAR CONCURSO -->
-                  <span class="meta-tag concurso" *ngIf="p.concurso_id">
+                  <!-- ✅ Usar concursoId (camelCase) -->
+                  <span class="meta-tag concurso" *ngIf="p.concursoId">
                     <ion-icon name="trophy-outline"></ion-icon>
-                    {{ getNombreConcurso(p.concurso_id) }}
+                    {{ getNombreConcurso(p.concursoId) }}
                   </span>
-                  <span class="meta-tag concurso" *ngIf="!p.concurso_id">
+                  <span class="meta-tag concurso" *ngIf="!p.concursoId">
                     <ion-icon name="alert-circle-outline"></ion-icon>
                     Sin concurso
                   </span>
@@ -132,7 +126,10 @@
               <ion-icon name="alert-circle-outline"></ion-icon>
               <p *ngIf="filtroBusqueda || filtroConcursoId">No hay proyectos con estos filtros</p>
               <p *ngIf="!filtroBusqueda && !filtroConcursoId">No hay proyectos disponibles</p>
-              <small class="debug-hint">Concurso filtrado: {{ filtroConcursoId }} | Proyectos totales: {{ proyectos.length }}</small>
+              <small class="debug-hint">
+                Concurso filtrado: {{ filtroConcursoId }} | 
+                Proyectos totales: {{ proyectos.length }}
+              </small>
             </div>
           </ng-container>
         </div>
