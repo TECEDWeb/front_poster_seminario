@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
-    <!-- <ion-menu-button></ion-menu-button> -->
+      <ion-menu-button></ion-menu-button>
     </ion-buttons>
 
     <ion-title>
@@ -130,9 +130,7 @@
         <ion-card-content>
           <form (ngSubmit)="guardar()" #assignForm="ngForm">
 
-            <!-- ========================================== -->
-            <!-- CAMPO: PROYECTO (con modal) -->
-            <!-- ========================================== -->
+            <!-- CAMPO: PROYECTO -->
             <div class="field">
               <label class="field-label">
                 <ion-icon name="folder-outline"></ion-icon>
@@ -140,7 +138,6 @@
                 <span class="required">*</span>
               </label>
 
-              <!-- ✅ BOTÓN PARA ABRIR MODAL DE PROYECTOS -->
               <ion-button
                 expand="block"
                 fill="outline"
@@ -152,7 +149,7 @@
                 </span>
                 <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
               </ion-button>
-              
+
               <!-- Información del proyecto seleccionado -->
               <div class="proyecto-info-seleccionado" *ngIf="proyectoId && proyectoSeleccionado">
                 <div class="info-badge">
@@ -171,7 +168,7 @@
                 </div>
               </div>
 
-              <!-- EVALUADORES ASIGNADOS A ESTE PROYECTO -->
+              <!-- EVALUADORES ASIGNADOS -->
               <div class="asignados-proyecto" *ngIf="proyectoId">
                 <div class="asignados-header">
                   <ion-icon name="people-outline"></ion-icon>
@@ -207,9 +204,7 @@
               </div>
             </div>
 
-            <!-- ========================================== -->
-            <!-- CAMPO: EVALUADOR (con modal) -->
-            <!-- ========================================== -->
+            <!-- CAMPO: EVALUADOR -->
             <div class="field">
               <label class="field-label">
                 <ion-icon name="person-outline"></ion-icon>
@@ -217,7 +212,6 @@
                 <span class="required">*</span>
               </label>
 
-              <!-- ✅ BOTÓN PARA ABRIR MODAL DE EVALUADORES -->
               <ion-button
                 expand="block"
                 fill="outline"
@@ -230,36 +224,50 @@
                 </span>
                 <ion-icon name="chevron-forward-outline" slot="end" *ngIf="proyectoId"></ion-icon>
               </ion-button>
-              
-              <!-- Mensaje cuando no hay proyecto seleccionado -->
+
+              <!-- Mensajes -->
               <div class="field-hint" *ngIf="!proyectoId">
                 <ion-icon name="alert-circle-outline"></ion-icon>
                 <span>Primero selecciona un proyecto</span>
               </div>
 
-              <!-- Mensaje cuando no hay evaluadores disponibles -->
               <div class="field-hint warning" *ngIf="proyectoId && evaluadores.length === 0">
                 <ion-icon name="alert-circle-outline"></ion-icon>
                 <span>No hay evaluadores disponibles en el sistema</span>
               </div>
             </div>
 
-            <!-- FECHA LÍMITE -->
+            <!-- FECHA LÍMITE - MODAL DE CALENDARIO -->
             <div class="field optional-field">
               <label class="field-label">
                 <ion-icon name="calendar-outline"></ion-icon>
-                Fecha límite (opcional)
+                Fecha límite
+                <span class="field-hint">(opcional)</span>
               </label>
 
-              <ion-item class="custom-item" lines="none">
-                <ion-datetime
-                  [(ngModel)]="fechaLimite"
-                  name="fechaLimite"
-                  presentation="date"
-                  placeholder="Selecciona una fecha"
-                  class="custom-datetime responsive-datetime">
-                </ion-datetime>
-              </ion-item>
+              <ion-button
+                expand="block"
+                fill="outline"
+                class="selector-btn date-selector-btn"
+                [class.has-date]="fechaLimite"
+                (click)="abrirCalendarioModal()">
+                <ion-icon name="calendar-outline" slot="start"></ion-icon>
+                <span class="selector-text">
+                  {{ fechaLimite ? (fechaLimite | date:'dd MMMM yyyy') : 'Selecciona una fecha límite...' }}
+                </span>
+                <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+              </ion-button>
+
+              <!-- Vista previa de la fecha seleccionada -->
+              <div class="fecha-preview" *ngIf="fechaLimite">
+                <ion-icon name="checkmark-circle-outline" class="fecha-check"></ion-icon>
+                <span class="fecha-texto">
+                  Fecha límite: <strong>{{ fechaLimite | date:'dd/MM/yyyy' }}</strong>
+                </span>
+                <button class="fecha-remover" type="button" (click)="fechaLimite = null" title="Quitar fecha">
+                  <ion-icon name="close-outline"></ion-icon>
+                </button>
+              </div>
             </div>
 
             <!-- BOTONES -->
@@ -292,12 +300,18 @@
       </ion-card>
 
       <!-- ASIGNACIONES RECIENTES -->
-      <div class="recent-assignments" *ngIf="asignacionesRecientes.length">
+      <div class="recent-assignments" *ngIf="asignacionesRecientes.length > 0">
         <div class="section-header">
-          <h3>Asignaciones recientes</h3>
-          <ion-button fill="clear" size="small" class="view-all" (click)="verTodasAsignaciones()">
-            Ver todas <ion-icon name="arrow-forward-outline"></ion-icon>
-          </ion-button>
+          <h3>
+            <ion-icon name="time-outline"></ion-icon>
+            Asignaciones recientes
+          </h3>
+          <div class="section-actions">
+            <span class="total-badge">{{ asignacionesCount }} total</span>
+            <ion-button fill="clear" size="small" class="view-all" (click)="verTodasAsignaciones()">
+              Ver todas <ion-icon name="arrow-forward-outline"></ion-icon>
+            </ion-button>
+          </div>
         </div>
 
         <div class="assignments-list">
@@ -316,49 +330,44 @@
               <div class="assignment-meta">
                 <span class="assignment-date">
                   <ion-icon name="time-outline"></ion-icon>
-                  {{ (a.fecha_asignacion || a.created_at || a.fecha) | date:'dd/MM/yyyy HH:mm' }}
+                  {{ tiempoRelativo(a.fecha_asignacion || a.created_at || a.fecha) }}
                 </span>
                 <span class="assignment-status" [class]="getStatusClass(a.status || a.estado || 'pending')">
                   {{ getStatusText(a.status || a.estado) }}
                 </span>
               </div>
-              
+
               <!-- ACCIONES ADMIN -->
               <div class="assignment-admin-actions" *ngIf="esAdmin">
-                <button class="admin-btn admin-btn-editar" 
+                <button class="admin-btn admin-btn-editar"
                         (click)="editarEvaluacionAdmin(a)"
-                        title="Editar respuestas de esta evaluación">
+                        title="Editar respuestas">
                   <ion-icon name="create-outline"></ion-icon>
-                  Editar
                 </button>
-                
-                <button class="admin-btn admin-btn-reabrir" 
-                        (click)="reabrirEvaluacion(a)" 
-                        *ngIf="a.status === 'completed' || a.status === 'completado' || a.estado === 'evaluado' || a.yaEvaluado === true"
+
+                <button class="admin-btn admin-btn-reabrir"
+                        (click)="reabrirEvaluacion(a)"
+                        *ngIf="a.status === 'completed' || a.status === 'completado' || a.estado === 'evaluado'"
                         title="Reabrir evaluación">
                   <ion-icon name="refresh-outline"></ion-icon>
-                  Reabrir
                 </button>
-                
-                <button class="admin-btn admin-btn-quitar" 
+
+                <button class="admin-btn admin-btn-quitar"
                         (click)="quitarAsignacion(a)"
                         title="Quitar esta asignación">
                   <ion-icon name="person-remove-outline"></ion-icon>
-                  Quitar
                 </button>
-                
-                <button class="admin-btn admin-btn-eliminar" 
+
+                <button class="admin-btn admin-btn-eliminar"
                         (click)="eliminarEvaluacion(a)"
                         title="Eliminar evaluación">
                   <ion-icon name="trash-outline"></ion-icon>
-                  Eliminar
                 </button>
-                
-                <button class="admin-btn admin-btn-ver" 
+
+                <button class="admin-btn admin-btn-ver"
                         (click)="verDetalleAsignacion(a)"
                         title="Ver detalle">
                   <ion-icon name="eye-outline"></ion-icon>
-                  Ver
                 </button>
               </div>
             </div>
@@ -367,7 +376,7 @@
       </div>
 
       <!-- EMPTY STATE -->
-      <div class="empty-recent" *ngIf="!asignacionesRecientes.length">
+      <div class="empty-recent" *ngIf="asignacionesRecientes.length === 0">
         <ion-icon name="checkmark-done-outline"></ion-icon>
         <p>Aún no se han realizado asignaciones</p>
       </div>
@@ -377,20 +386,54 @@
   </div>
 </ion-content>
 
-<!-- ============================================ -->
 <!-- MODALES DE SELECCIÓN -->
-<!-- ============================================ -->
-
-<!-- MODAL: Seleccionar Proyecto -->
 <app-seleccionar-proyecto-modal
   [(isOpen)]="modalProyectoAbierto"
   [proyectoSeleccionadoId]="proyectoId"
   (proyectoSeleccionado)="onProyectoSeleccionado($event)">
 </app-seleccionar-proyecto-modal>
 
-<!-- MODAL: Seleccionar Evaluador -->
 <app-seleccionar-evaluador-modal
   [(isOpen)]="modalEvaluadorAbierto"
   [evaluadorSeleccionadoId]="evaluadorId"
   (evaluadorSeleccionado)="onEvaluadorSeleccionado($event)">
 </app-seleccionar-evaluador-modal>
+
+<!-- MODAL DE CALENDARIO -->
+<ion-modal
+  [isOpen]="calendarModalOpen"
+  (didDismiss)="cancelarFecha()"
+  class="calendar-modal"
+  [initialBreakpoint]="1"
+  [breakpoints]="[0, 1]">
+  <ng-template>
+    <div class="calendar-modal-content">
+      <div class="calendar-modal-header">
+        <h4>
+          <ion-icon name="calendar-outline"></ion-icon>
+          Selecciona la fecha límite
+        </h4>
+        <button class="calendar-close" type="button" (click)="cancelarFecha()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <ion-datetime
+        presentation="date"
+        [(ngModel)]="fechaLimiteTemp"
+        [min]="today"
+        [showDefaultButtons]="false">
+      </ion-datetime>
+
+      <div class="calendar-modal-actions">
+        <ion-button fill="clear" class="calendar-cancel" (click)="cancelarFecha()">
+          Cancelar
+        </ion-button>
+        <ion-button class="calendar-confirm" (click)="confirmarFecha()">
+          <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+          Confirmar fecha
+        </ion-button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>

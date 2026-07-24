@@ -6,6 +6,7 @@ import {
   IonHeader,
   IonToolbar,
   IonButtons,
+  IonMenuButton,
   IonTitle,
   IonContent,
   IonCard,
@@ -13,11 +14,11 @@ import {
   IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
-  IonItem,
   IonButton,
   IonIcon,
   IonChip,
   IonDatetime,
+  IonModal,
   IonLabel,
   IonSkeletonText,
 } from '@ionic/angular/standalone';
@@ -66,6 +67,7 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonHeader,
     IonToolbar,
     IonButtons,
+    IonMenuButton,
     IonTitle,
     IonContent,
     IonCard,
@@ -73,11 +75,11 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonCardTitle,
     IonCardSubtitle,
     IonCardContent,
-    IonItem,
     IonButton,
     IonIcon,
     IonChip,
     IonDatetime,
+    IonModal,
     IonLabel,
     IonSkeletonText,
     SeleccionarProyectoModalComponent,
@@ -118,13 +120,20 @@ export class AsignacionesPage implements OnInit {
   esAdmin: boolean = false;
 
   // ============================================
-  // ✅ CONTROL DE MODALES DE SELECCIÓN
+  // CONTROL DE MODALES DE SELECCIÓN
   // ============================================
   modalProyectoAbierto = false;
   modalEvaluadorAbierto = false;
 
   // ============================================
-  // ✅ GETTERS
+  // CALENDARIO (MODAL PROPIO)
+  // ============================================
+  calendarModalOpen = false;
+  fechaLimiteTemp: string | null = null;
+  today: string = new Date().toISOString();
+
+  // ============================================
+  // GETTERS
   // ============================================
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
@@ -252,7 +261,15 @@ export class AsignacionesPage implements OnInit {
       next: (res: any) => {
         const data = res?.data ?? res ?? [];
         this.asignacionesTodas = Array.isArray(data) ? data : [];
-        this.asignacionesRecientes = this.asignacionesTodas.slice(0, 5);
+
+        // Ordenar por fecha descendente (lo más reciente primero)
+        const ordenadas = [...this.asignacionesTodas].sort((a, b) => {
+          const fechaA = new Date(this.obtenerFechaDeAsignacion(a) || 0).getTime();
+          const fechaB = new Date(this.obtenerFechaDeAsignacion(b) || 0).getTime();
+          return fechaB - fechaA;
+        });
+
+        this.asignacionesRecientes = ordenadas.slice(0, 5);
         this.asignacionesCount = this.asignacionesTodas.length;
         this._asignacionesListas = true;
         this.verificarCargaCompleta();
@@ -285,8 +302,12 @@ export class AsignacionesPage implements OnInit {
     return valor != null ? Number(valor) : null;
   }
 
+  private obtenerFechaDeAsignacion(a: any): string | null {
+    return a.fecha_asignacion || a.created_at || a.fecha || null;
+  }
+
   // ============================================
-  // ✅ ABRIR MODALES DE SELECCIÓN
+  // ABRIR MODALES DE SELECCIÓN
   // ============================================
   abrirModalProyectos(): void {
     if (this.proyectos.length === 0) {
@@ -307,7 +328,7 @@ export class AsignacionesPage implements OnInit {
   }
 
   // ============================================
-  // ✅ SELECCIÓN DESDE MODALES
+  // SELECCIÓN DESDE MODALES
   // ============================================
   onProyectoSeleccionado(proyectoId: number): void {
     this.proyectoId = proyectoId;
@@ -316,6 +337,23 @@ export class AsignacionesPage implements OnInit {
 
   onEvaluadorSeleccionado(evaluadorId: number): void {
     this.evaluadorId = evaluadorId;
+  }
+
+  // ============================================
+  // CALENDARIO (MODAL PROPIO)
+  // ============================================
+  abrirCalendarioModal(): void {
+    this.fechaLimiteTemp = this.fechaLimite;
+    this.calendarModalOpen = true;
+  }
+
+  confirmarFecha(): void {
+    this.fechaLimite = this.fechaLimiteTemp;
+    this.calendarModalOpen = false;
+  }
+
+  cancelarFecha(): void {
+    this.calendarModalOpen = false;
   }
 
   // ============================================
@@ -402,7 +440,7 @@ export class AsignacionesPage implements OnInit {
 
     const nombreEvaluador = a.evaluador_nombre || a.evaluador?.nombre || 'este evaluador';
     const nombreProyecto = a.proyecto_nombre || a.proyecto?.nombre || 'este proyecto';
-    
+
     const yaEvaluado = a.status === 'completed' || a.status === 'completado'
       || a.estado === 'evaluado' || a.yaEvaluado === true;
 
@@ -558,6 +596,25 @@ export class AsignacionesPage implements OnInit {
 
   verTodasAsignaciones(): void {
     this.router.navigate(['/admin/asignaciones/todas']);
+  }
+
+  // Tiempo relativo tipo "Hace 2h" para actividades recientes
+  tiempoRelativo(fecha: string | Date | null | undefined): string {
+    if (!fecha) return '';
+    const ahora = new Date().getTime();
+    const entonces = new Date(fecha).getTime();
+    if (isNaN(entonces)) return '';
+
+    const diffMs = ahora - entonces;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHrs = Math.floor(diffMin / 60);
+    const diffDias = Math.floor(diffHrs / 24);
+
+    if (diffMin < 1) return 'Justo ahora';
+    if (diffMin < 60) return `Hace ${diffMin} min`;
+    if (diffHrs < 24) return `Hace ${diffHrs}h`;
+    if (diffDias < 7) return `Hace ${diffDias}d`;
+    return new Date(fecha).toLocaleDateString('es-EC', { day: '2-digit', month: 'short' });
   }
 
   getStatusIcon(status: string): string {
