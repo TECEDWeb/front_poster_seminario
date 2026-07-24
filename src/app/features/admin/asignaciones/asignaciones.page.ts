@@ -313,12 +313,6 @@ export class AsignacionesPage implements OnInit {
         const data = res?.data ?? res ?? [];
         this.asignacionesTodas = Array.isArray(data) ? data : [];
 
-        // 🔍 DIAGNÓSTICO TEMPORAL — revisa la consola del navegador (F12)
-        // y comparte el objeto impreso para ajustar los nombres de campo reales.
-        if (this.asignacionesTodas.length > 0) {
-          console.log('📋 ESTRUCTURA REAL DE UNA ASIGNACIÓN:', this.asignacionesTodas[0]);
-        }
-
         // Ordenar por fecha descendente (lo más reciente primero)
         const ordenadas = [...this.asignacionesTodas].sort((a, b) => {
           const fechaA = new Date(this.obtenerFechaDeAsignacion(a) || 0).getTime();
@@ -363,8 +357,20 @@ export class AsignacionesPage implements OnInit {
     return a.fecha_asignacion || a.created_at || a.fecha || null;
   }
 
+  /**
+   * El backend ahora expone evaluacion_id explícitamente (viene de un
+   * LEFT JOIN con la tabla evaluaciones). Es DISTINTO de asignacion_id
+   * — son tablas con secuencias autoincrementales independientes, así
+   * que nunca deben confundirse. Todas las acciones que operan sobre
+   * la evaluación (editar, reabrir, eliminar, ver detalle) DEBEN usar
+   * evaluacion_id, nunca el id de la fila de "asignaciones".
+   */
+  private obtenerEvaluacionId(a: any): number | null {
+    return a.evaluacion_id ?? a.evaluacionId ?? null;
+  }
+
   // ============================================
-  // HELPERS DE NOMBRE (con fallback ampliado)
+  // HELPERS DE NOMBRE
   // ============================================
   getNombreProyecto(a: any): string {
     return a.proyecto_nombre
@@ -537,9 +543,9 @@ export class AsignacionesPage implements OnInit {
   // QUITAR ASIGNACIÓN
   // ============================================
   async quitarAsignacion(a: any): Promise<void> {
-    const evaluacionId = a.id || a.evaluacion_id;
+    const evaluacionId = this.obtenerEvaluacionId(a);
     if (!evaluacionId) {
-      this.showError('No se encontró el ID de esta asignación');
+      this.showError('Esta asignación no tiene una evaluación asociada (dato inconsistente). Contacta soporte técnico.');
       return;
     }
 
@@ -593,18 +599,18 @@ export class AsignacionesPage implements OnInit {
   // ACCIONES ADMIN
   // ============================================
   editarEvaluacionAdmin(asignacion: any): void {
-    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
-      this.showError('No se encontró el ID de la evaluación');
+      this.showError('No se encontró una evaluación asociada a esta asignación');
       return;
     }
     this.router.navigate(['/admin/evaluaciones/formulario', evaluacionId]);
   }
 
   async reabrirEvaluacion(asignacion: any): Promise<void> {
-    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
-      this.showError('No se encontró el ID de la evaluación');
+      this.showError('No se encontró una evaluación asociada a esta asignación');
       return;
     }
 
@@ -641,9 +647,9 @@ export class AsignacionesPage implements OnInit {
   }
 
   async eliminarEvaluacion(asignacion: any): Promise<void> {
-    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
-      this.showError('No se encontró el ID de la evaluación');
+      this.showError('No se encontró una evaluación asociada a esta asignación');
       return;
     }
 
@@ -682,9 +688,9 @@ export class AsignacionesPage implements OnInit {
   }
 
   verDetalleAsignacion(asignacion: any): void {
-    const evaluacionId = asignacion.id || asignacion.evaluacion_id;
+    const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
-      this.showError('No se encontró el ID de la evaluación');
+      this.showError('No se encontró una evaluación asociada a esta asignación');
       return;
     }
     this.router.navigate(['/admin/evaluaciones', evaluacionId]);
