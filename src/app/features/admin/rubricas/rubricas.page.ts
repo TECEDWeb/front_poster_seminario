@@ -48,7 +48,8 @@ import {
   starOutline,
   trophyOutline,
   filterOutline,
-  optionsOutline
+  optionsOutline,
+  printOutline  // ✅ NUEVO ICONO
 } from 'ionicons/icons';
 
 interface Concurso {
@@ -57,8 +58,6 @@ interface Concurso {
   descripcion?: string;
 }
 
-// Duración segura para esperar a que termine la animación de salida
-// de un ion-modal antes de presentar el siguiente (Ionic usa ~300-350ms).
 const MODAL_TRANSITION_MS = 350;
 
 @Component({
@@ -127,6 +126,9 @@ export class RubricasPage implements OnInit {
   concursoSeleccionadoBuilder: number | null = null;
   concursoNombreBuilder = '';
 
+  // ✅ ESTADO PARA DESCARGA
+  descargando: boolean = false;
+
   constructor(private rubricaService: RubricaService) {
     addIcons({
       refreshOutline,
@@ -149,7 +151,8 @@ export class RubricasPage implements OnInit {
       searchOutline,
       funnelOutline,
       checkmarkOutline,
-      optionsOutline
+      optionsOutline,
+      printOutline  // ✅ NUEVO
     });
   }
 
@@ -244,13 +247,8 @@ export class RubricasPage implements OnInit {
   }
 
   // ==========================================================
-  // COORDINACIÓN ENTRE MODALES (evita que se abran solapados)
+  // COORDINACIÓN ENTRE MODALES
   // ==========================================================
-  // Si el builder está abierto, lo cerramos y ESPERAMOS a que
-  // termine su animación de salida antes de ejecutar la acción
-  // que abre el otro modal. Sin esta espera, el nuevo modal se
-  // presenta mientras el anterior aún se está desvaneciendo y
-  // puede quedar visualmente "debajo" de él.
   private cerrarBuilderYLuego(accion: () => void): void {
     if (this.builderAbierto) {
       this.builderAbierto = false;
@@ -397,8 +395,268 @@ export class RubricasPage implements OnInit {
     });
   }
 
+  //  NUEVO MÉTODO: DESCARGAR RÚBRICA EN FORMATO ESTRUCTURADO
+  async descargarRubrica(rubrica: RubricaConcurso): Promise<void> {
+    this.descargando = true;
+
+    try {
+      // Importar jsPDF y autoTable dinámicamente
+      const { default: jsPDF } = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      const autoTable = autoTableModule.default;
+
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      // ==========================================
+      // 1. ENCABEZADO
+      // ==========================================
+      const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
+      const nombreConcurso = concurso?.nombre || `Concurso #${rubrica.concursoId}`;
+
+      doc.setFontSize(20);
+      doc.setTextColor(0, 27, 76);
+      doc.text('RÚBRICA DE EVALUACIÓN', 105, 20, { align: 'center' });
+
+      doc.setFontSize(12);
+      doc.setTextColor(60, 60, 60);
+      doc.text(`Concurso: ${nombreConcurso}`, 105, 30, { align: 'center' });
+
+      // ✅ OBTENER DESCRIPCIÓN DESDE LA PRIMERA SECCIÓN O USAR TEXTO POR DEFECTO
+      const descripcionRubrica = rubrica.secciones?.[0]?.descripcion || 
+                                `Rúbrica de evaluación para el concurso "${nombreConcurso}"`;
+
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      const descLines = doc.splitTextToSize(descripcionRubrica, 170);
+      doc.text(descLines, 105, 38, { align: 'center' });
+
+      let yPos = 48;
+
+      // ==========================================
+      // 2. INFORMACIÓN GENERAL
+      // ==========================================
+      doc.setFontSize(11);
+      doc.setTextColor(0, 27, 76);
+      doc.text('INFORMACIÓN GENERAL', 14, yPos);
+      yPos += 6;
+
+      // ✅ CALCULAR PUNTAJE MÁXIMO DESDE LOS NIVELES
+      const puntajeMaximo = rubrica.niveles?.reduce((max, n) => Math.max(max, n.puntaje), 0) || 100;
+
+      const infoData = [
+        ['Rúbrica ID', `#${rubrica.concursoId}`],
+        ['Concurso', nombreConcurso],
+        ['Total Secciones', `${rubrica.secciones?.length || 0}`],
+        ['Total Criterios', `${this.totalCriterios(rubrica)}`],
+        ['Total Niveles', `${rubrica.niveles?.length || 0}`],
+        ['Puntaje Máximo', `${puntajeMaximo} pts`]
+      ];
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Campo', 'Valor']],
+        body: infoData,
+        theme: 'plain',
+        headStyles: {
+          fillColor: [0, 27, 76],
+          textColor: [255, 255, 255],
+          fontSize: 10,
+          fontStyle: 'bold'
+        },
+        bodyStyles: { fontSize: 9 },
+        columnStyles: {
+          0: { cellWidth: 60, fontStyle: 'bold' },
+          1: { cellWidth: 100 }
+        },
+        margin: { left: 14, right: 14 },
+        tableWidth: 170
+      });
+
+      yPos = (doc as any).lastAutoTable.finalY + 8;
+
+      // ==========================================
+      // 3. NIVELES DE DESEMPEÑO
+      // ==========================================
+      doc.setFontSize(12);
+      doc.setTextColor(0, 27, 76);
+      doc.text('NIVELES DE DESEMPEÑO', 14, yPos);
+      yPos += 6;
+
+      if (rubrica.niveles && rubrica.niveles.length > 0) {
+        // Ordenar niveles por puntaje (ascendente)
+        const nivelesOrdenados = [...rubrica.niveles].sort((a, b) => a.puntaje - b.puntaje);
+
+        const nivelesData = nivelesOrdenados.map(n => [
+          n.nombre,
+          `${n.puntaje} pts`,
+          n.descripcion || '—'
+        ]);
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Nivel', 'Puntaje', 'Descripción']],
+          body: nivelesData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: [201, 168, 76],
+            textColor: [255, 255, 255],
+            fontSize: 10,
+            fontStyle: 'bold'
+          },
+          bodyStyles: { fontSize: 9 },
+          columnStyles: {
+            0: { cellWidth: 35 },
+            1: { cellWidth: 25, halign: 'center' },
+            2: { cellWidth: 110 }
+          },
+          margin: { left: 14, right: 14 },
+          tableWidth: 170
+        });
+
+        yPos = (doc as any).lastAutoTable.finalY + 8;
+      } else {
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.text('No hay niveles configurados', 14, yPos + 4);
+        yPos += 10;
+      }
+
+      // ==========================================
+      // 4. SECCIONES Y CRITERIOS (PARTE PRINCIPAL)
+      // ==========================================
+      if (rubrica.secciones && rubrica.secciones.length > 0) {
+        doc.addPage();
+
+        doc.setFontSize(16);
+        doc.setTextColor(0, 27, 76);
+        doc.text('SECCIONES Y CRITERIOS', 105, 20, { align: 'center' });
+
+        let ySection = 30;
+
+        rubrica.secciones.forEach((seccion, idx) => {
+          // Verificar si necesitamos nueva página
+          if (ySection > 250) {
+            doc.addPage();
+            ySection = 20;
+          }
+
+          // Título de sección con fondo
+          const sectionTitle = `${idx + 1}. ${seccion.nombre}`;
+          doc.setFontSize(13);
+          doc.setTextColor(255, 255, 255);
+          doc.setFillColor(0, 27, 76);
+          doc.rect(14, ySection - 2, 182, 8, 'F');
+          doc.text(sectionTitle, 18, ySection + 4);
+
+          ySection += 10;
+
+          if (seccion.descripcion) {
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            const descLines2 = doc.splitTextToSize(`📝 ${seccion.descripcion}`, 170);
+            doc.text(descLines2, 18, ySection);
+            ySection += (descLines2.length * 4.5) + 3;
+          }
+
+          // Criterios de la sección
+          if (seccion.criterios && seccion.criterios.length > 0) {
+            const criteriosData = seccion.criterios.map((c, cIdx) => [
+              `${cIdx + 1}`,
+              c.texto,
+              '☐',  // Checkbox vacío
+              '☐',  // Checkbox vacío
+              '☐'   // Checkbox vacío
+            ]);
+
+            autoTable(doc, {
+              startY: ySection,
+              head: [['#', 'Criterio', 'Regular', 'Mediano', 'Completo']],
+              body: criteriosData,
+              theme: 'grid',
+              headStyles: {
+                fillColor: [201, 168, 76],
+                textColor: [255, 255, 255],
+                fontSize: 9,
+                fontStyle: 'bold'
+              },
+              bodyStyles: { fontSize: 8.5 },
+              columnStyles: {
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 110 },
+                2: { cellWidth: 18, halign: 'center' },
+                3: { cellWidth: 18, halign: 'center' },
+                4: { cellWidth: 18, halign: 'center' }
+              },
+              margin: { left: 14, right: 14 },
+              tableWidth: 182
+            });
+
+            ySection = (doc as any).lastAutoTable.finalY + 4;
+
+            // Espacio para observaciones
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Observaciones:', 18, ySection);
+            doc.setDrawColor(200, 200, 200);
+            doc.line(18, ySection + 2, 190, ySection + 2);
+            ySection += 10;
+
+          } else {
+            doc.setFontSize(9);
+            doc.setTextColor(150, 150, 150);
+            doc.text('(Sin criterios definidos)', 18, ySection);
+            ySection += 6;
+          }
+
+          // Espacio entre secciones
+          ySection += 6;
+        });
+
+      } else {
+        doc.setFontSize(11);
+        doc.setTextColor(150, 150, 150);
+        doc.text('No hay secciones configuradas en esta rúbrica', 105, 80, { align: 'center' });
+      }
+
+      // ==========================================
+      // 5. PIE DE PÁGINA
+      // ==========================================
+      const totalPages = doc.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(180, 180, 180);
+        doc.text(
+          `Rúbrica #${rubrica.concursoId} - Generado: ${new Date().toLocaleDateString('es-EC')}`,
+          105,
+          287,
+          { align: 'center' }
+        );
+        doc.text(`Página ${i} de ${totalPages}`, 195, 287, { align: 'right' });
+      }
+
+      // ==========================================
+      // 6. DESCARGAR PDF
+      // ==========================================
+      const nombreArchivo = `rubrica-concurso-${rubrica.concursoId}-${new Date().toISOString().slice(0, 10)}.pdf`;
+      doc.save(nombreArchivo);
+
+      this.descargando = false;
+      console.log(`✅ Rúbrica exportada correctamente: ${nombreArchivo}`);
+
+    } catch (error) {
+      console.error('❌ Error generando la rúbrica:', error);
+      this.descargando = false;
+      alert('Error al generar el PDF de la rúbrica. Por favor, intenta de nuevo.');
+    }
+  }
+
+  // ==========================================================
+  // MÉTODOS EXISTENTES
+  // ==========================================================
+
   exportarRubrica(rubrica: RubricaConcurso): void {
-    console.log('📤 Exportando rúbrica:', rubrica);
+    console.log('📤 Exportando rúbrica (Excel):', rubrica);
 
     this.rubricaService.exportar(rubrica.concursoId).subscribe({
       next: (blob: Blob) => {
@@ -423,8 +681,8 @@ export class RubricasPage implements OnInit {
 
         let mensaje = 'Error al exportar la rúbrica';
         if (err.status === 404) {
-          mensaje = 'La funcionalidad de exportación está en desarrollo.\n\n' +
-                    'Por ahora, puedes ver el detalle de la rúbrica con el botón "Ver detalle".';
+          mensaje = 'La funcionalidad de exportación Excel está en desarrollo.\n\n' +
+                    'Usa el botón "Descargar rúbrica" para obtener el PDF estructurado.';
         } else if (err.error?.mensaje) {
           mensaje = err.error.mensaje;
         } else if (err.message) {
@@ -508,7 +766,6 @@ export class RubricasPage implements OnInit {
   cerrarBuilder(): void {
     this.builderAbierto = false;
     this.concursoSeleccionadoBuilder = null;
-    // Recargar para actualizar contadores después de cambios
     setTimeout(() => {
       this.cargarRubricas();
     }, 300);

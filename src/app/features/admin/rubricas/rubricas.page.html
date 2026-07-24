@@ -140,6 +140,12 @@
           <button class="icon-action" (click)="editar(r)" title="Editar datos generales">
             <ion-icon name="create-outline"></ion-icon>
           </button>
+          <!-- ✅ NUEVO BOTÓN DESCARGAR RÚBRICA -->
+          <button class="icon-action download" (click)="descargarRubrica(r)" 
+                  [disabled]="descargando" title="Descargar rúbrica en PDF">
+            <ion-icon [name]="descargando ? 'refresh-outline' : 'print-outline'" 
+                      [class.spinning]="descargando"></ion-icon>
+          </button>
           <button class="icon-action danger" (click)="confirmarEliminar(r)" title="Eliminar rúbrica">
             <ion-icon name="trash-outline"></ion-icon>
           </button>
@@ -216,10 +222,19 @@
             <ion-icon name="options-outline" slot="start"></ion-icon>
             Configurar contenido
           </ion-button>
-          <ion-button fill="outline" size="small" class="action-btn-secondary" (click)="exportarRubrica(r)">
-            <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar
-          </ion-button>
+          <div class="actions-secondary-row">
+            <ion-button fill="outline" size="small" class="action-btn-secondary" (click)="exportarRubrica(r)">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Exportar Excel
+            </ion-button>
+            <!-- ✅ NUEVO BOTÓN DESCARGAR RÚBRICA (secundario) -->
+            <ion-button fill="outline" size="small" class="action-btn-secondary btn-download-pdf" 
+                        (click)="descargarRubrica(r)" [disabled]="descargando">
+              <ion-icon [name]="descargando ? 'refresh-outline' : 'print-outline'" 
+                        [class.spinning]="descargando" slot="start"></ion-icon>
+              {{ descargando ? 'Generando...' : 'Descargar PDF' }}
+            </ion-button>
+          </div>
         </div>
       </div>
 
@@ -261,17 +276,9 @@
 
 </ion-content>
 
-<!-- ========== MODALES FUERA DEL ION-CONTENT ========== -->
+<!-- ========== MODALES ========== -->
 
-<!--
-  MODAL 1: Editar / crear datos generales
-  ⚠️ IMPORTANTE: este modal es un diálogo centrado (--width/--max-width
-  definidos en el SCSS), NO un "sheet". Por eso NO lleva
-  [initialBreakpoint] ni [breakpoints] ni [handle] — esos atributos
-  convierten al modal en una hoja deslizante que calcula su propia
-  altura, lo cual choca con "--height: auto" del SCSS y hacía que el
-  modal se viera colapsado (solo el header, sin el formulario).
--->
+<!-- MODAL 1: Editar / crear datos generales -->
 <ion-modal 
   [isOpen]="modalAbierto" 
   (didDismiss)="cerrarModal()" 
@@ -389,7 +396,7 @@
   </ng-template>
 </ion-modal>
 
-<!-- MODAL 2: Constructor de rúbrica (con dimensiones completas) -->
+<!-- MODAL 2: Constructor de rúbrica -->
 <ion-modal 
   [isOpen]="builderAbierto" 
   (didDismiss)="cerrarBuilder()" 

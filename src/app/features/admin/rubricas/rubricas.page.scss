@@ -21,9 +21,7 @@ $shadow-xl: 0 12px 48px rgba(0, 27, 76, 0.16);
 $radius: 16px;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-// ============================================
 // CONTENT
-// ============================================
 .rubricas-content {
   --background: #f0f4fb;
 }
@@ -46,9 +44,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // TOOLBAR
-// ============================================
 .toolbar-custom {
   --background: #ffffff;
   --color: #0f172a;
@@ -120,9 +116,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // PAGE HEADER
-// ============================================
 .page-header {
   display: flex;
   flex-direction: column;
@@ -241,9 +235,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // FILTER BAR
-// ============================================
 .filter-bar {
   display: flex;
   flex-direction: column;
@@ -370,9 +362,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // LOADING
-// ============================================
 .loading-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -430,9 +420,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // RÚBRICAS GRID
-// ============================================
 .rubricas-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -449,9 +437,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // RÚBRICA CARD
-// ============================================
 .rubrica-card {
   background: white;
   border-radius: $radius;
@@ -924,9 +910,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // EMPTY STATE
-// ============================================
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
@@ -1029,9 +1013,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // ERROR CONTAINER
-// ============================================
 .error-container {
   display: flex;
   flex-direction: column;
@@ -1094,9 +1076,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ============================================
 // FAB - SOLO MÓVIL
-// ============================================
 .fab-mobile {
   display: block;
 
@@ -1116,9 +1096,7 @@ ion-fab-button {
   }
 }
 
-// ============================================
 // ANIMACIONES
-// ============================================
 .spinning {
   animation: spin 1s linear infinite;
 }
@@ -1128,9 +1106,7 @@ ion-fab-button {
   to { transform: rotate(360deg); }
 }
 
-// ============================================
 // SCROLLBAR
-// ============================================
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -1151,17 +1127,6 @@ ion-fab-button {
   background: $upse-blue-dark;
 }
 
-// ============================================
-// MODALES (bloque único y consolidado)
-// ============================================
-// ⚠️ Antes había DOS bloques de reglas para ion-modal /
-// .modal-content / .modal-container repetidos y con valores
-// distintos (probablemente de una edición paralela con otra
-// herramienta). Eso, combinado con abrir un modal antes de que
-// el otro terminara su animación de salida, era lo que hacía
-// que "Nueva rúbrica" pareciera cargar por debajo de la interfaz.
-// Ahora solo hay un bloque, y el problema de fondo ya se resolvió
-// en el .ts (ver cerrarBuilderYLuego / cerrarModalYLuego).
 
 ion-modal {
   --border-radius: 16px;
@@ -1346,5 +1311,170 @@ ion-modal:not(.builder-modal) {
 
   ion-select {
     --placeholder-color: #94a3b8;
+  }
+}
+// ============================================
+// ESTILOS PARA BOTÓN DE DESCARGA PDF
+// ============================================
+
+.card-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid #f1f5f9;
+
+  @media (min-width: 768px) {
+    padding: 14px 20px 20px;
+  }
+
+  .action-btn-primary {
+    --background: #{$upse-blue};
+    --border-radius: 10px;
+    --box-shadow: 0 3px 10px rgba(0, 27, 76, 0.25);
+    font-weight: 600;
+    height: 40px;
+    font-size: 13px;
+    transition: $transition;
+
+    @media (min-width: 768px) {
+      height: 42px;
+      font-size: 14px;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.2);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        --background: #{$upse-blue-dark};
+        --box-shadow: 0 5px 16px rgba(0, 27, 76, 0.35);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // ✅ NUEVA FILA PARA BOTONES SECUNDARIOS
+  .actions-secondary-row {
+    display: flex;
+    gap: 6px;
+
+    @media (min-width: 768px) {
+      gap: 8px;
+    }
+
+    .action-btn-secondary {
+      --border-radius: 8px;
+      --color: #64748b;
+      --border-color: #e2e8f0;
+      font-weight: 500;
+      font-size: 11px;
+      height: 32px;
+      transition: $transition;
+      flex: 1;
+
+      @media (min-width: 768px) {
+        --border-radius: 10px;
+        font-size: 12px;
+        height: 36px;
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.15);
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          --color: #{$upse-blue};
+          --border-color: #{$upse-blue};
+        }
+      }
+
+      // ✅ ESTILO ESPECIAL PARA BOTÓN DE PDF
+      &.btn-download-pdf {
+        --color: #{$upse-gold};
+        --border-color: #{$upse-gold};
+
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            --color: #{darken($upse-gold, 15%)};
+            --border-color: #{darken($upse-gold, 15%)};
+            background: $upse-gold-light;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ✅ ESTILO PARA BOTÓN DE DESCARGA EN ACCIONES RÁPIDAS
+.icon-action {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: #f8fafc;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: $transition;
+  -webkit-tap-highlight-color: transparent;
+
+  ion-icon {
+    font-size: 16px;
+
+    @media (min-width: 768px) {
+      font-size: 17px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    width: 32px;
+    height: 32px;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.18);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: $upse-blue-light;
+      color: $upse-blue;
+    }
+
+    // ✅ ESTILO ESPECIAL PARA BOTÓN DE DESCARGA
+    &.download:hover {
+      background: $upse-gold-light;
+      color: $upse-gold;
+    }
+
+    &.danger:hover {
+      background: #fef2f2;
+      color: #ef4444;
+    }
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: #f8fafc;
+        color: #64748b;
+      }
+    }
   }
 }
