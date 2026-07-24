@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
-import { Certificado } from '../models/certificado.model';
+import { Certificado, Firmante } from '../models/certificado.model';
 
 @Injectable({ providedIn: 'root' })
 export class CertificadoService {
@@ -30,6 +30,12 @@ export class CertificadoService {
     participanteNombre: string;
     participanteCedula: string;
     tipoCertificado: string;
+    rol: 'participante' | 'tutor';
+    nombreEvento: string;
+    categoriaActividad: string;
+    fechaEvento: string;
+    lugar?: string;
+    firmantes?: Firmante[];
   }): Observable<Certificado> {
     return this.http.post<any>(`${this.apiUrl}/generar`, data).pipe(
       map(res => this.mapear(res?.data ?? res))
@@ -50,19 +56,6 @@ export class CertificadoService {
     return this.http.get(`${this.apiUrl}/${id}/pdf`, { responseType: 'blob' });
   }
 
-  private mapear(c: any): Certificado {
-    return {
-      id: c.id,
-      codigo: c.codigo,
-      entidadCertifica: c.entidadCertifica ?? c.entidad_certifica,
-      tipoCertificado: c.tipoCertificado ?? c.tipo_certificado,
-      nombre: c.nombre,
-      cedula: c.cedula,
-      contenido: c.contenido,
-      fechaEmision: c.fechaEmision ?? c.fecha_emision,
-      createdAt: c.createdAt ?? c.created_at
-    };
-  }
   misCertificados(): Observable<Certificado[]> {
     return this.http.get<any>(`${this.apiUrl}/mios`).pipe(
       map(res => (res?.data ?? []).map((c: any) => this.mapear(c)))
@@ -72,5 +65,29 @@ export class CertificadoService {
   eliminar(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
-  
+
+  private mapear(c: any): Certificado {
+    return {
+      id: c.id,
+      proyectoId: c.proyectoId ?? c.proyecto_id,
+      concursoId: c.concursoId ?? c.concurso_id,
+      rol: c.rol,
+      codigo: c.codigo,
+      entidadCertifica: c.entidadCertifica ?? c.entidad_certifica,
+      tipoCertificado: c.tipoCertificado ?? c.tipo_certificado,
+      nombre: c.nombre,
+      cedula: c.cedula,
+      nombreEvento: c.nombreEvento ?? c.nombre_evento,
+      categoriaActividad: c.categoriaActividad ?? c.categoria_actividad,
+      temaProyecto: c.temaProyecto ?? c.tema_proyecto,
+      contenido: c.contenido,
+      fechaEmision: c.fechaEmision ?? c.fecha_emision,
+      lugar: c.lugar,
+      fechaEvento: c.fechaEvento ?? c.fecha_evento,
+      firmantes: typeof c.firmantes === 'string'
+        ? JSON.parse(c.firmantes)
+        : (c.firmantes ?? undefined),
+      createdAt: c.createdAt ?? c.created_at
+    };
+  }
 }

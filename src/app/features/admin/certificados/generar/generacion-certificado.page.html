@@ -14,10 +14,12 @@
 
     <div class="page-header">
       <h1>Generar certificado</h1>
-      <p>Emite un certificado para un participante de un proyecto evaluado</p>
+      <p>Emite un certificado para un participante o tutor de un proyecto evaluado</p>
     </div>
 
     <div class="generator-card">
+
+      <!-- PROYECTO -->
       <div class="form-field">
         <label><ion-icon name="trophy-outline"></ion-icon> Proyecto</label>
         <ion-item lines="none" class="field-input">
@@ -34,9 +36,44 @@
         </ion-item>
       </div>
 
+      <!-- ROL: PARTICIPANTE O TUTOR -->
+      <div class="form-field" *ngIf="proyectoSeleccionadoId">
+        <label><ion-icon name="person-outline"></ion-icon> ¿A quién certifica?</label>
+        <ion-segment [(ngModel)]="rol" (ionChange)="onRolChange()" class="rol-segment">
+          <ion-segment-button value="participante">
+            <ion-label>Participante</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="tutor">
+            <ion-label>Tutor</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <!-- SELECCIÓN DE PERSONA DEL PROYECTO -->
+      <div class="form-field" *ngIf="proyectoSeleccionadoId && personasDisponibles.length > 0">
+        <label><ion-icon name="list-outline"></ion-icon> Selecciona {{ rol === 'tutor' ? 'el tutor' : 'el participante' }}</label>
+        <ion-item lines="none" class="field-input">
+          <ion-select
+            [(ngModel)]="personaSeleccionadaIdx"
+            (ionChange)="onPersonaSeleccionada()"
+            placeholder="Selecciona de la lista"
+            interface="popover">
+            <ion-select-option *ngFor="let persona of personasDisponibles; let i = index" [value]="i">
+              {{ persona.nombre }} — CI {{ persona.cedula }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="field-hint" *ngIf="proyectoSeleccionadoId && personasDisponibles.length === 0">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        Este proyecto no tiene {{ rol === 'tutor' ? 'tutores' : 'participantes' }} registrados. Completa los datos manualmente abajo.
+      </div>
+
+      <!-- NOMBRE Y CÉDULA (editable siempre, por si no hay lista o se quiere ajustar) -->
       <div class="form-row">
         <div class="form-field">
-          <label><ion-icon name="person-outline"></ion-icon> Nombre del participante</label>
+          <label><ion-icon name="person-outline"></ion-icon> Nombre completo</label>
           <ion-item lines="none" class="field-input">
             <ion-input [(ngModel)]="participanteNombre" placeholder="Nombre completo"></ion-input>
           </ion-item>
@@ -50,6 +87,7 @@
         </div>
       </div>
 
+      <!-- TIPO DE CERTIFICADO -->
       <div class="form-field">
         <label><ion-icon name="ribbon-outline"></ion-icon> Tipo de certificado</label>
         <ion-item lines="none" class="field-input">
@@ -61,6 +99,49 @@
             <ion-select-option value="Tercer lugar">Tercer lugar</ion-select-option>
           </ion-select>
         </ion-item>
+      </div>
+
+      <!-- NOMBRE DEL EVENTO -->
+      <div class="form-field">
+        <label><ion-icon name="book-outline"></ion-icon> Nombre del evento</label>
+        <ion-item lines="none" class="field-input">
+          <ion-input
+            [(ngModel)]="nombreEvento"
+            placeholder='Ej: V Seminario Técnico Científico FACSISTEL 2026'>
+          </ion-input>
+        </ion-item>
+      </div>
+
+      <!-- CATEGORÍA DE ACTIVIDAD -->
+      <div class="form-field">
+        <label><ion-icon name="list-outline"></ion-icon> Categoría de la actividad</label>
+        <ion-item lines="none" class="field-input">
+          <ion-input
+            [(ngModel)]="categoriaActividad"
+            placeholder='Ej: concurso de pósteres científicos'>
+          </ion-input>
+        </ion-item>
+      </div>
+
+      <!-- FECHA DEL EVENTO Y LUGAR -->
+      <div class="form-row">
+        <div class="form-field">
+          <label><ion-icon name="calendar-outline"></ion-icon> Fecha del evento</label>
+          <ion-item lines="none" class="field-input">
+            <ion-datetime
+              [(ngModel)]="fechaEvento"
+              presentation="date"
+              placeholder="Fecha del evento">
+            </ion-datetime>
+          </ion-item>
+        </div>
+
+        <div class="form-field">
+          <label><ion-icon name="location-outline"></ion-icon> Lugar</label>
+          <ion-item lines="none" class="field-input">
+            <ion-input [(ngModel)]="lugar" placeholder="Ej: La Libertad"></ion-input>
+          </ion-item>
+        </div>
       </div>
 
       <div class="error-msg" *ngIf="error">
