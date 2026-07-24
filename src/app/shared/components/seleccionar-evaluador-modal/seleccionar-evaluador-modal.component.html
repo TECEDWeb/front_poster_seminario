@@ -1,0 +1,99 @@
+<ion-modal
+  [isOpen]="isOpen"
+  (didDismiss)="cerrarModal()"
+  class="seleccionar-modal"
+  [initialBreakpoint]="1"
+  [breakpoints]="[0, 1]"
+  [handle]="true">
+
+  <ng-template>
+    <ion-header>
+      <ion-toolbar class="modal-toolbar">
+        <ion-title>
+          <div class="modal-title-content">
+            <ion-icon name="people-outline" class="title-icon"></ion-icon>
+            <span>Seleccionar evaluador</span>
+          </div>
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrarModal()" class="close-btn">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content">
+      <div class="modal-container">
+
+        <!-- FILTROS -->
+        <div class="filtros-section">
+          <div class="filtros-row">
+            <div class="filtro-grupo search-group">
+              <ion-searchbar
+                [(ngModel)]="filtroBusqueda"
+                (ionInput)="aplicarFiltros()"
+                placeholder="Buscar evaluador..."
+                class="search-input"
+                animated>
+                <ion-icon name="search-outline" slot="start"></ion-icon>
+              </ion-searchbar>
+            </div>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              class="btn-limpiar"
+              (click)="limpiarFiltros()"
+              *ngIf="filtroBusqueda">
+              <ion-icon name="close-outline"></ion-icon>
+              Limpiar
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- LISTA DE EVALUADORES -->
+        <div class="lista-evaluadores">
+          <!-- Skeleton -->
+          <div class="skeleton-list" *ngIf="cargando">
+            <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]">
+              <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
+              <div class="skeleton-info">
+                <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+                <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista real -->
+          <ng-container *ngIf="!cargando">
+            <div
+              class="evaluador-item"
+              *ngFor="let e of evaluadoresFiltrados"
+              [class.selected]="e.id === evaluadorSeleccionadoId"
+              (click)="seleccionarEvaluador(e.id)">
+              <div class="evaluador-avatar">
+                <span>{{ (e.nombre || 'E').charAt(0).toUpperCase() }}</span>
+              </div>
+              <div class="evaluador-info">
+                <span class="evaluador-nombre">{{ e.nombre }}</span>
+                <span class="evaluador-rol">{{ e.especialidad || e.rol || 'Evaluador' }}</span>
+              </div>
+              <div class="evaluador-check" *ngIf="e.id === evaluadorSeleccionadoId">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              </div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="empty-evaluadores" *ngIf="evaluadoresFiltrados.length === 0">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <p *ngIf="filtroBusqueda">No hay evaluadores con ese nombre</p>
+              <p *ngIf="!filtroBusqueda">No hay evaluadores disponibles</p>
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

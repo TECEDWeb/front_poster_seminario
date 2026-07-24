@@ -5,7 +5,7 @@ $upse-blue: #001b4c;
 $upse-blue-dark: #001433;
 $upse-blue-light: #e8f0fe;
 $upse-gold: #c9a84c;
-$upse-gold-dark: #a8873a;  // ✅ AGREGADA
+$upse-gold-dark: #a8873a;
 $upse-gold-light: #f8f0e0;
 $upse-green: #00a651;
 $upse-green-light: #e8f5e9;
@@ -73,25 +73,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       @media (min-width: 480px) { display: inline-block; font-size: 10px; padding: 2px 14px; }
       @media (min-width: 768px) { font-size: 11px; padding: 3px 16px; }
-    }
-  }
-
-  .btn-modal {
-    --color: #{$upse-gold};
-    --padding-start: 8px;
-    --padding-end: 8px;
-    --border-radius: 50%;
-    margin-right: 4px;
-
-    ion-icon {
-      font-size: 22px;
-      transition: $transition;
-      @media (min-width: 768px) { font-size: 24px; }
-    }
-
-    &:hover {
-      --color: #{$upse-gold-dark};
-      ion-icon { transform: scale(1.1); }
     }
   }
 
@@ -1021,15 +1002,88 @@ ion-skeleton-text {
 }
 
 // ============================================
-// ANIMACIONES GLOBALES
+// ✅ BOTONES SELECTORES (reemplazan ion-select)
 // ============================================
-.spinning { animation: spin 1s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.selector-btn {
+  --border-radius: 12px;
+  --border-color: #e2e8f0;
+  --color: #0f172a;
+  --background: #f8fafc;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  height: 48px;
+  font-weight: 500;
+  font-size: 14px;
+  justify-content: space-between;
+  text-align: left;
+  transition: $transition;
+  margin: 0;
+
+  @media (min-width: 480px) {
+    height: 50px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    font-size: 15px;
+  }
+
+  .selector-text {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+    color: #0f172a;
+  }
+
+  ion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+
+    &:first-child {
+      margin-right: 4px;
+      color: $upse-blue;
+    }
+
+    &:last-child {
+      margin-left: 4px;
+      color: #94a3b8;
+    }
+  }
+
+  &:hover:not(:disabled) {
+    --border-color: #{$upse-blue};
+    --background: #ffffff;
+    --box-shadow: 0 0 0 4px rgba(0, 27, 76, 0.1);
+  }
+
+  &:disabled {
+    --color: #94a3b8;
+    --background: #f1f5f9;
+    cursor: not-allowed;
+
+    .selector-text {
+      color: #94a3b8;
+    }
+
+    ion-icon:last-child {
+      display: none;
+    }
+  }
+
+  .button-native {
+    justify-content: space-between;
+    text-align: left;
+    padding: 0 16px;
+    height: 100%;
+  }
+}
 
 // ============================================
 // MODO OSCURO
 // ============================================
 @media (prefers-color-scheme: dark) {
+  // === CONTENIDO OSCURO ===
   .assign-content { --background: #0f172a; }
 
   .toolbar-custom {
@@ -1039,7 +1093,6 @@ ion-skeleton-text {
 
     ion-title .title-text { color: #f1f5f9; }
     .btn-refresh { --color: #94a3b8; }
-    .btn-modal { --color: #{$upse-gold}; }
   }
 
   .stats-row .stat-item {
@@ -1217,5 +1270,69 @@ ion-skeleton-text {
       color: #64748b;
       ion-icon { color: #60a5fa; }
     }
+  }
+
+  // ============================================
+  // ✅ MODO OSCURO PARA BOTONES SELECTORES
+  // ============================================
+  .selector-btn {
+    --border-color: #334155;
+    --color: #f1f5f9;
+    --background: #0f172a;
+
+    .selector-text {
+      color: #f1f5f9;
+    }
+
+    ion-icon {
+      &:first-child {
+        color: #60a5fa;
+      }
+
+      &:last-child {
+        color: #64748b;
+      }
+    }
+
+    &:hover:not(:disabled) {
+      --border-color: #60a5fa;
+      --background: #1e293b;
+      --box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+    }
+
+    &:disabled {
+      --color: #64748b;
+      --background: #1a1a2e;
+
+      .selector-text {
+        color: #64748b;
+      }
+    }
+  }
+}
+
+// ============================================
+// ANIMACIONES GLOBALES
+// ============================================
+.spinning { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+// ============================================
+// SCROLLBAR
+// ============================================
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: $upse-blue; border-radius: 3px; transition: $transition; }
+  ::-webkit-scrollbar-thumb:hover { background: $upse-blue-dark; }
+}
+
+// ============================================
+// ACCESIBILIDAD
+// ============================================
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

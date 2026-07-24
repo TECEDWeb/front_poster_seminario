@@ -10,11 +10,6 @@
     </ion-title>
 
     <ion-buttons slot="end">
-      <!-- ✅ BOTÓN PARA ABRIR MODAL -->
-      <ion-button class="btn-modal" (click)="abrirModalAsignacion()" title="Abrir asignación rápida">
-        <ion-icon name="person-add-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-      
       <ion-button class="btn-refresh" (click)="cargarDatos()" [disabled]="cargando">
         <ion-icon name="refresh-outline" slot="icon-only" [class.spinning]="cargando"></ion-icon>
       </ion-button>
@@ -43,15 +38,13 @@
           <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
         </ion-card-header>
         <ion-card-content>
-          <div class="field-group">
-            <div class="field">
-              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
-            </div>
-            <div class="field">
-              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
-            </div>
+          <div class="field">
+            <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
+          </div>
+          <div class="field">
+            <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
+            <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
           </div>
           <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
           <ion-skeleton-text animated class="skeleton-field" style="max-width: 300px;"></ion-skeleton-text>
@@ -137,7 +130,9 @@
         <ion-card-content>
           <form (ngSubmit)="guardar()" #assignForm="ngForm">
 
-            <!-- CAMPO: PROYECTO -->
+            <!-- ========================================== -->
+            <!-- CAMPO: PROYECTO (con modal) -->
+            <!-- ========================================== -->
             <div class="field">
               <label class="field-label">
                 <ion-icon name="folder-outline"></ion-icon>
@@ -145,24 +140,18 @@
                 <span class="required">*</span>
               </label>
 
-              <ion-item class="custom-item" lines="none" [class.has-value]="proyectoId">
-                <ion-select
-                  [(ngModel)]="proyectoId"
-                  name="proyectoId"
-                  interface="action-sheet"
-                  placeholder="Selecciona un proyecto"
-                  (ionChange)="onProyectoSeleccionado($event)"
-                  [disabled]="submitting"
-                  class="responsive-select">
-                  
-                  <ion-select-option *ngFor="let p of proyectos" [value]="p.id">
-                    <div class="option-content">
-                      <span class="option-title">{{ p.nombre }}</span>
-                      <span class="option-sub">{{ p.area || p.categoria || 'Sin categoría' }}</span>
-                    </div>
-                  </ion-select-option>
-                </ion-select>
-              </ion-item>
+              <!-- ✅ BOTÓN PARA ABRIR MODAL DE PROYECTOS -->
+              <ion-button
+                expand="block"
+                fill="outline"
+                class="selector-btn"
+                (click)="abrirModalProyectos()">
+                <ion-icon name="folder-open-outline" slot="start"></ion-icon>
+                <span class="selector-text">
+                  {{ proyectoSeleccionado ? proyectoSeleccionado.nombre : 'Seleccionar proyecto...' }}
+                </span>
+                <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+              </ion-button>
               
               <!-- Información del proyecto seleccionado -->
               <div class="proyecto-info-seleccionado" *ngIf="proyectoId && proyectoSeleccionado">
@@ -182,13 +171,11 @@
                 </div>
               </div>
 
-              <!-- ============================================ -->
-              <!-- EVALUADORES YA ASIGNADOS A ESTE PROYECTO -->
-              <!-- ============================================ -->
+              <!-- EVALUADORES ASIGNADOS A ESTE PROYECTO -->
               <div class="asignados-proyecto" *ngIf="proyectoId">
                 <div class="asignados-header">
                   <ion-icon name="people-outline"></ion-icon>
-                  <span>Evaluadores asignados a este proyecto ({{ asignacionesDelProyecto.length }})</span>
+                  <span>Evaluadores asignados ({{ asignacionesDelProyecto.length }})</span>
                 </div>
 
                 <div class="asignados-list" *ngIf="asignacionesDelProyecto.length > 0">
@@ -215,12 +202,14 @@
 
                 <div class="asignados-empty" *ngIf="asignacionesDelProyecto.length === 0">
                   <ion-icon name="information-circle-outline"></ion-icon>
-                  <span>Aún no hay evaluadores asignados a este proyecto</span>
+                  <span>Aún no hay evaluadores asignados</span>
                 </div>
               </div>
             </div>
 
-            <!-- CAMPO: EVALUADOR -->
+            <!-- ========================================== -->
+            <!-- CAMPO: EVALUADOR (con modal) -->
+            <!-- ========================================== -->
             <div class="field">
               <label class="field-label">
                 <ion-icon name="person-outline"></ion-icon>
@@ -228,23 +217,19 @@
                 <span class="required">*</span>
               </label>
 
-              <ion-item class="custom-item" lines="none" [class.has-value]="evaluadorId">
-                <ion-select
-                  [(ngModel)]="evaluadorId"
-                  name="evaluadorId"
-                  interface="action-sheet"
-                  placeholder="Selecciona un evaluador"
-                  [disabled]="!proyectoId || submitting"
-                  class="responsive-select">
-                  
-                  <ion-select-option *ngFor="let e of evaluadores" [value]="e.id">
-                    <div class="option-content">
-                      <span class="option-title">{{ e.nombre }}</span>
-                      <span class="option-sub">{{ e.especialidad || e.rol || 'Evaluador' }}</span>
-                    </div>
-                  </ion-select-option>
-                </ion-select>
-              </ion-item>
+              <!-- ✅ BOTÓN PARA ABRIR MODAL DE EVALUADORES -->
+              <ion-button
+                expand="block"
+                fill="outline"
+                class="selector-btn"
+                [disabled]="!proyectoId"
+                (click)="abrirModalEvaluadores()">
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+                <span class="selector-text">
+                  {{ evaluadorSeleccionado ? evaluadorSeleccionado.nombre : (proyectoId ? 'Seleccionar evaluador...' : 'Primero selecciona un proyecto') }}
+                </span>
+                <ion-icon name="chevron-forward-outline" slot="end" *ngIf="proyectoId"></ion-icon>
+              </ion-button>
               
               <!-- Mensaje cuando no hay proyecto seleccionado -->
               <div class="field-hint" *ngIf="!proyectoId">
@@ -338,7 +323,7 @@
                 </span>
               </div>
               
-              <!-- ACCIONES ADMIN (incluye Quitar) -->
+              <!-- ACCIONES ADMIN -->
               <div class="assignment-admin-actions" *ngIf="esAdmin">
                 <button class="admin-btn admin-btn-editar" 
                         (click)="editarEvaluacionAdmin(a)"
@@ -355,7 +340,6 @@
                   Reabrir
                 </button>
                 
-                <!-- BOTÓN QUITAR ASIGNACIÓN -->
                 <button class="admin-btn admin-btn-quitar" 
                         (click)="quitarAsignacion(a)"
                         title="Quitar esta asignación">
@@ -394,9 +378,19 @@
 </ion-content>
 
 <!-- ============================================ -->
-<!-- ✅ MODAL DE ASIGNACIÓN -->
+<!-- MODALES DE SELECCIÓN -->
 <!-- ============================================ -->
-<app-asignacion-modal
-  [(isOpen)]="modalAbierto"
-  (asignacionCreada)="onAsignacionCreada($event)">
-</app-asignacion-modal>
+
+<!-- MODAL: Seleccionar Proyecto -->
+<app-seleccionar-proyecto-modal
+  [(isOpen)]="modalProyectoAbierto"
+  [proyectoSeleccionadoId]="proyectoId"
+  (proyectoSeleccionado)="onProyectoSeleccionado($event)">
+</app-seleccionar-proyecto-modal>
+
+<!-- MODAL: Seleccionar Evaluador -->
+<app-seleccionar-evaluador-modal
+  [(isOpen)]="modalEvaluadorAbierto"
+  [evaluadorSeleccionadoId]="evaluadorId"
+  (evaluadorSeleccionado)="onEvaluadorSeleccionado($event)">
+</app-seleccionar-evaluador-modal>

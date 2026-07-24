@@ -1,0 +1,345 @@
+// ============================================
+// VARIABLES
+// ============================================
+$upse-blue: #001b4c;
+$upse-blue-dark: #001433;
+$upse-blue-light: #e8f0fe;
+$upse-gold: #c9a84c;
+$upse-gold-light: #f8f0e0;
+$upse-green: #00a651;
+$upse-red: #dc2626;
+$shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ============================================
+// MODAL
+// ============================================
+.seleccionar-modal {
+  --border-radius: 16px;
+  --height: 80vh;
+  --max-height: 80vh;
+  --width: 95vw;
+  --max-width: 600px;
+
+  @media (min-width: 768px) {
+    --width: 90vw;
+    --max-width: 700px;
+    --height: 75vh;
+    --max-height: 75vh;
+  }
+
+  &::part(backdrop) {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-toolbar {
+    --background: #{$upse-blue};
+    --color: white;
+    --min-height: 50px;
+
+    @media (min-width: 768px) {
+      --min-height: 56px;
+    }
+
+    .modal-title-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .title-icon {
+        font-size: 20px;
+        color: $upse-gold;
+
+        @media (min-width: 768px) {
+          font-size: 24px;
+        }
+      }
+
+      span {
+        font-size: 16px;
+        font-weight: 600;
+
+        @media (min-width: 768px) {
+          font-size: 18px;
+        }
+      }
+    }
+
+    .close-btn {
+      --color: white;
+      ion-icon { font-size: 22px; }
+    }
+  }
+
+  .modal-content {
+    --background: #f8fafc;
+  }
+
+  .modal-container {
+    padding: 12px;
+    max-width: 700px;
+    margin: 0 auto;
+
+    @media (min-width: 480px) {
+      padding: 16px;
+    }
+
+    .filtros-section {
+      background: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      border: 1px solid #eef2f7;
+      box-shadow: $shadow-sm;
+
+      .filtros-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        @media (min-width: 500px) {
+          flex-direction: row;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .filtro-grupo {
+          flex: 1;
+
+          &.search-group {
+            @media (min-width: 500px) {
+              flex: 2;
+            }
+          }
+
+          .search-input {
+            --background: #f8fafc;
+            --border-radius: 8px;
+            --box-shadow: none;
+            --placeholder-color: #94a3b8;
+            padding: 0;
+            height: 34px;
+
+            @media (min-width: 480px) {
+              --border-radius: 10px;
+              height: 38px;
+            }
+          }
+
+          .concurso-select {
+            --background: #f8fafc;
+            --border-radius: 8px;
+            --padding-start: 10px;
+            --padding-end: 10px;
+            height: 34px;
+            width: 100%;
+            font-size: 12px;
+            color: #0f172a;
+
+            @media (min-width: 480px) {
+              --border-radius: 10px;
+              height: 38px;
+              font-size: 13px;
+            }
+          }
+        }
+
+        .btn-limpiar {
+          --color: #{$upse-red};
+          font-weight: 600;
+          font-size: 11px;
+          height: 32px;
+          --padding-start: 8px;
+          --padding-end: 8px;
+
+          @media (min-width: 480px) {
+            font-size: 12px;
+            height: 36px;
+            --padding-start: 12px;
+            --padding-end: 12px;
+          }
+        }
+      }
+    }
+
+    .lista-proyectos {
+      max-height: 55vh;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 2px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: $upse-blue;
+        border-radius: 2px;
+      }
+
+      .skeleton-list {
+        .skeleton-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 0;
+          border-bottom: 1px solid #f1f5f9;
+
+          .skeleton-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            flex-shrink: 0;
+          }
+
+          .skeleton-info {
+            flex: 1;
+
+            .skeleton-title {
+              height: 14px;
+              width: 70%;
+              margin-bottom: 4px;
+            }
+
+            .skeleton-subtitle {
+              height: 10px;
+              width: 50%;
+            }
+          }
+        }
+      }
+
+      .proyecto-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: $transition;
+        border: 2px solid transparent;
+
+        &:hover:not(.selected) {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+        }
+
+        &.selected {
+          background: $upse-blue-light;
+          border-color: $upse-blue;
+        }
+
+        .proyecto-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 700;
+          color: white;
+          flex-shrink: 0;
+
+          &.active {
+            background: linear-gradient(135deg, #{$upse-blue}, #1a3a7a);
+          }
+
+          &.inactive {
+            background: #94a3b8;
+          }
+        }
+
+        .proyecto-info {
+          flex: 1;
+          min-width: 0;
+
+          .proyecto-nombre {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .proyecto-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 2px;
+
+            .meta-tag {
+              font-size: 9px;
+              padding: 1px 8px;
+              border-radius: 4px;
+              font-weight: 500;
+
+              &.area {
+                background: $upse-blue-light;
+                color: $upse-blue;
+              }
+
+              &.nivel {
+                background: $upse-gold-light;
+                color: $upse-gold;
+              }
+
+              &.concurso {
+                background: #fef3c7;
+                color: #d97706;
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+
+                ion-icon {
+                  font-size: 10px;
+                }
+              }
+            }
+          }
+        }
+
+        .proyecto-check {
+          color: $upse-green;
+          font-size: 20px;
+          flex-shrink: 0;
+        }
+
+        .proyecto-badge {
+          flex-shrink: 0;
+
+          ion-badge {
+            font-size: 9px;
+            padding: 2px 8px;
+          }
+        }
+      }
+
+      .empty-proyectos {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 16px;
+        color: #94a3b8;
+
+        ion-icon {
+          font-size: 36px;
+          margin-bottom: 8px;
+        }
+
+        p {
+          margin: 0;
+          font-size: 13px;
+          text-align: center;
+        }
+      }
+    }
+  }
+}

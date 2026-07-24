@@ -49,7 +49,8 @@ import {
   trashOutline,
   createOutline,
   personRemoveOutline,
-  warningOutline
+  warningOutline,
+  chevronForwardOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -58,8 +59,9 @@ import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 
-// ✅ IMPORTAR EL MODAL
-import { AsignacionModalComponent } from '../../../shared/components/asignacion-modal/asignacion-modal.component';
+// ✅ IMPORTAR MODALES DE SELECCIÓN
+import { SeleccionarProyectoModalComponent } from '../../../shared/components/seleccionar-proyecto-modal/seleccionar-proyecto-modal.component';
+import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/seleccionar-evaluador-modal/seleccionar-evaluador-modal.component';
 
 @Component({
   selector: 'app-asignaciones',
@@ -88,13 +90,18 @@ import { AsignacionModalComponent } from '../../../shared/components/asignacion-
     IonLabel,
     IonSkeletonText,
     IonAlert,
-    AsignacionModalComponent  // ✅ IMPORTAR EL MODAL
+    // ✅ MODALES DE SELECCIÓN
+    SeleccionarProyectoModalComponent,
+    SeleccionarEvaluadorModalComponent
   ],
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss']
 })
 export class AsignacionesPage implements OnInit {
 
+  // ============================================
+  // DATOS PRINCIPALES
+  // ============================================
   proyectos: any[] = [];
   evaluadores: any[] = [];
 
@@ -102,23 +109,42 @@ export class AsignacionesPage implements OnInit {
   asignacionesRecientes: any[] = [];
   asignacionesCount: number = 0;
 
-  cargandoAsignacionesProyecto: boolean = false;
-
+  // ============================================
+  // FORMULARIO
+  // ============================================
   proyectoId: number | null = null;
   evaluadorId: number | null = null;
   fechaLimite: string | null = null;
 
-  submitting: boolean = false;
+  // ============================================
+  // ESTADO DE CARGA
+  // ============================================
   cargando: boolean = false;
+  submitting: boolean = false;
+  cargandoAsignacionesProyecto: boolean = false;
 
+  // ============================================
+  // ROL
+  // ============================================
   esAdmin: boolean = false;
 
-  // ✅ CONTROL DEL MODAL
-  modalAbierto = false;
+  // ============================================
+  // ✅ CONTROL DE MODALES DE SELECCIÓN
+  // ============================================
+  modalProyectoAbierto = false;
+  modalEvaluadorAbierto = false;
 
+  // ============================================
+  // ✅ GETTERS
+  // ============================================
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
     return this.proyectos.find(p => p.id === this.proyectoId) || null;
+  }
+
+  get evaluadorSeleccionado(): any {
+    if (!this.evaluadorId) return null;
+    return this.evaluadores.find(e => e.id === this.evaluadorId) || null;
   }
 
   get asignacionesDelProyecto(): any[] {
@@ -126,6 +152,9 @@ export class AsignacionesPage implements OnInit {
     return this.asignacionesTodas.filter(a => this.obtenerProyectoIdDeAsignacion(a) === this.proyectoId);
   }
 
+  // ============================================
+  // CONSTRUCTOR
+  // ============================================
   constructor(
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
@@ -157,29 +186,17 @@ export class AsignacionesPage implements OnInit {
       trashOutline,
       createOutline,
       personRemoveOutline,
-      warningOutline
+      warningOutline,
+      chevronForwardOutline
     });
 
     this.esAdmin = this.authService.esAdmin();
   }
 
+  // ============================================
+  // LIFECYCLE
+  // ============================================
   ngOnInit(): void {
-    this.cargarDatos();
-  }
-
-  // ============================================
-  // ABRIR / CERRAR MODAL
-  // ============================================
-  abrirModalAsignacion(): void {
-    this.modalAbierto = true;
-  }
-
-  cerrarModalAsignacion(): void {
-    this.modalAbierto = false;
-  }
-
-  onAsignacionCreada(event: any): void {
-    console.log('✅ Asignación creada desde modal:', event);
     this.cargarDatos();
   }
 
@@ -227,7 +244,7 @@ export class AsignacionesPage implements OnInit {
         if (res && res.ok && res.data) {
           this.evaluadores = res.data;
         } else {
-          this.evaluadores = [];
+          this.evaluadores = res ?? [];
         }
         this._evaluadoresListos = true;
         this.verificarCargaCompleta();
@@ -279,8 +296,37 @@ export class AsignacionesPage implements OnInit {
     return valor != null ? Number(valor) : null;
   }
 
-  onProyectoSeleccionado(event: any): void {
+  // ============================================
+  // ✅ ABRIR MODALES DE SELECCIÓN
+  // ============================================
+  abrirModalProyectos(): void {
+    if (this.proyectos.length === 0) {
+      this.cargarProyectos();
+    }
+    this.modalProyectoAbierto = true;
+  }
+
+  abrirModalEvaluadores(): void {
+    if (this.evaluadores.length === 0) {
+      this.cargarEvaluadores();
+    }
+    if (!this.proyectoId) {
+      this.showError('Primero selecciona un proyecto');
+      return;
+    }
+    this.modalEvaluadorAbierto = true;
+  }
+
+  // ============================================
+  // ✅ SELECCIÓN DESDE MODALES
+  // ============================================
+  onProyectoSeleccionado(proyectoId: number): void {
+    this.proyectoId = proyectoId;
     this.evaluadorId = null;
+  }
+
+  onEvaluadorSeleccionado(evaluadorId: number): void {
+    this.evaluadorId = evaluadorId;
   }
 
   // ============================================
@@ -576,23 +622,23 @@ export class AsignacionesPage implements OnInit {
   // ============================================
   // ALERTAS
   // ============================================
-  private showSuccess(message: string): void {
-    const alert = this.alertController.create({
+  private async showSuccess(message: string): Promise<void> {
+    const alert = await this.alertController.create({
       header: '✅ Éxito',
       message: message,
       buttons: ['OK'],
       cssClass: 'alert-success'
     });
-    alert.then(a => a.present());
+    await alert.present();
   }
 
-  private showError(message: string): void {
-    const alert = this.alertController.create({
+  private async showError(message: string): Promise<void> {
+    const alert = await this.alertController.create({
       header: '❌ Error',
       message: message,
       buttons: ['OK'],
       cssClass: 'alert-error'
     });
-    alert.then(a => a.present());
+    await alert.present();
   }
 }
