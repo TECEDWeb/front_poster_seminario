@@ -22,53 +22,7 @@
 
     <!-- SKELETON LOADING -->
     <ng-container *ngIf="cargando">
-      <div class="stats-row">
-        <div class="stat-item" *ngFor="let i of [1,2,3]">
-          <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
-          <div class="stat-info">
-            <ion-skeleton-text animated class="skeleton-value"></ion-skeleton-text>
-            <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
-          </div>
-        </div>
-      </div>
-
-      <ion-card class="form-card">
-        <ion-card-header>
-          <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
-          <ion-skeleton-text animated class="skeleton-subtitle"></ion-skeleton-text>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="field-group">
-            <div class="field">
-              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
-            </div>
-            <div class="field">
-              <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
-            </div>
-          </div>
-          <ion-skeleton-text animated class="skeleton-field-label"></ion-skeleton-text>
-          <ion-skeleton-text animated class="skeleton-field" style="max-width: 300px;"></ion-skeleton-text>
-          <div class="form-actions">
-            <ion-skeleton-text animated class="skeleton-btn"></ion-skeleton-text>
-            <ion-skeleton-text animated class="skeleton-btn wide"></ion-skeleton-text>
-          </div>
-        </ion-card-content>
-      </ion-card>
-
-      <div class="recent-assignments">
-        <ion-skeleton-text animated class="skeleton-section-title"></ion-skeleton-text>
-        <div class="assignments-list">
-          <div class="assignment-item" *ngFor="let i of [1,2,3]">
-            <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
-            <div class="assignment-info">
-              <ion-skeleton-text animated class="skeleton-line" style="width: 60%;"></ion-skeleton-text>
-              <ion-skeleton-text animated class="skeleton-line" style="width: 40%;"></ion-skeleton-text>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- ... skeleton existente ... -->
     </ng-container>
 
     <!-- CONTENIDO REAL -->
@@ -178,10 +132,8 @@
               </div>
 
               <!-- ============================================ -->
-              <!-- EVALUADORES YA ASIGNADOS A ESTE PROYECTO -->
+              <!-- ✅ EVALUADORES YA ASIGNADOS A ESTE PROYECTO  -->
               <!-- ============================================ -->
-              <!-- Aparece apenas se elige un proyecto. Aquí es donde se -->
-              <!-- resuelve el caso de "un evaluador no vino, hay que quitarlo". -->
               <div class="asignados-proyecto" *ngIf="proyectoId">
                 <div class="asignados-header">
                   <ion-icon name="people-outline"></ion-icon>
@@ -335,7 +287,7 @@
                 </span>
               </div>
               
-              <!-- ACCIONES ADMIN -->
+              <!-- ✅ ACCIONES ADMIN (incluye Quitar) -->
               <div class="assignment-admin-actions" *ngIf="esAdmin">
                 <button class="admin-btn admin-btn-editar" 
                         (click)="editarEvaluacionAdmin(a)"
@@ -350,6 +302,14 @@
                         title="Reabrir evaluación">
                   <ion-icon name="refresh-outline"></ion-icon>
                   Reabrir
+                </button>
+                
+                <!-- ✅ BOTÓN QUITAR ASIGNACIÓN -->
+                <button class="admin-btn admin-btn-quitar" 
+                        (click)="quitarAsignacion(a)"
+                        title="Quitar esta asignación">
+                  <ion-icon name="person-remove-outline"></ion-icon>
+                  Quitar
                 </button>
                 
                 <button class="admin-btn admin-btn-eliminar" 

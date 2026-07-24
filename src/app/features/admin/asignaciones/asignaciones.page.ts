@@ -22,8 +22,10 @@ import {
   IonChip,
   IonDatetime,
   IonLabel,
-  IonSkeletonText
+  IonSkeletonText,
+  IonAlert  // ✅ Importar IonAlert
 } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular';  // ✅ Para alertas personalizadas
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -46,7 +48,8 @@ import {
   closeOutline,
   trashOutline,
   createOutline,
-  personRemoveOutline
+  personRemoveOutline,
+  warningOutline  // ✅ Nuevo icono
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -80,7 +83,8 @@ import { UsuarioService } from '../../../core/services/usuario.service';
     IonChip,
     IonDatetime,
     IonLabel,
-    IonSkeletonText
+    IonSkeletonText,
+    IonAlert  // ✅ Importar IonAlert
   ],
   templateUrl: './asignaciones.page.html',
   styleUrls: ['./asignaciones.page.scss']
@@ -90,8 +94,6 @@ export class AsignacionesPage implements OnInit {
   proyectos: any[] = [];
   evaluadores: any[] = [];
 
-  // Lista completa (sin recortar) — se usa para filtrar por proyecto.
-  // `asignacionesRecientes` sigue siendo el recorte de 5 para la vista general.
   asignacionesTodas: any[] = [];
   asignacionesRecientes: any[] = [];
   asignacionesCount: number = 0;
@@ -107,14 +109,15 @@ export class AsignacionesPage implements OnInit {
 
   esAdmin: boolean = false;
 
+  // ✅ Estado para la alerta de confirmación
+  asignacionAEliminar: any = null;
+  mostrandoAlertaEliminar: boolean = false;
+
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
     return this.proyectos.find(p => p.id === this.proyectoId) || null;
   }
 
-  // Asignaciones (evaluador ↔ proyecto) del proyecto actualmente
-  // seleccionado en el formulario. Esto es lo que resuelve el caso de
-  // "veo quién está asignado a ESTE proyecto y quito al que no vino".
   get asignacionesDelProyecto(): any[] {
     if (!this.proyectoId) return [];
     return this.asignacionesTodas.filter(a => this.obtenerProyectoIdDeAsignacion(a) === this.proyectoId);
@@ -126,7 +129,8 @@ export class AsignacionesPage implements OnInit {
     private evaluacionService: EvaluacionService,
     private authService: AuthService,
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private alertController: AlertController  // ✅ Inyectar AlertController
   ) {
     addIcons({
       addOutline,
@@ -149,7 +153,8 @@ export class AsignacionesPage implements OnInit {
       closeOutline,
       trashOutline,
       createOutline,
-      personRemoveOutline
+      personRemoveOutline,
+      warningOutline  // ✅ Nuevo
     });
 
     this.esAdmin = this.authService.esAdmin();
@@ -247,8 +252,6 @@ export class AsignacionesPage implements OnInit {
     }
   }
 
-  // Extrae el id de proyecto de una asignación, sin importar si el
-  // backend lo entrega como proyecto_id, proyectoId o proyecto.id
   private obtenerProyectoIdDeAsignacion(a: any): number | null {
     const valor = a.proyecto_id ?? a.proyectoId ?? a.proyecto?.id ?? null;
     return valor != null ? Number(valor) : null;
@@ -259,7 +262,7 @@ export class AsignacionesPage implements OnInit {
   }
 
   onEvaluadorSeleccionado(event: any): void {
-    // Sin lógica adicional por ahora
+    // Sin lógica adicional
   }
 
   guardar(): void {
@@ -285,8 +288,6 @@ export class AsignacionesPage implements OnInit {
       return;
     }
 
-    // Aviso preventivo: si este evaluador YA está asignado a este mismo
-    // proyecto, confirmar antes de duplicar
     const yaAsignado = this.asignacionesDelProyecto.some(a => {
       const evalId = a.evaluador_id ?? a.evaluadorId ?? a.evaluador?.id;
       return Number(evalId) === Number(this.evaluadorId);
@@ -334,16 +335,9 @@ export class AsignacionesPage implements OnInit {
   }
 
   // ============================================
-  // DESASIGNAR (quitar un evaluador de un proyecto)
+  // ✅ QUITAR ASIGNACIÓN - CON ALERTA MEJORADA
   // ============================================
-  // Este es el caso que motivó esta sección: un proyecto tenía 5
-  // evaluadores esperados, uno no asistió, y hay que quitar su
-  // asignación para que no quede pendiente/afecte el cierre del proceso.
-  //
-  // Reutiliza el mismo endpoint que "Eliminar" en asignaciones
-  // recientes (cada asignación ES una fila de evaluación), pero con
-  // una confirmación que distingue si ya tiene respuestas guardadas.
-  quitarAsignacion(a: any): void {
+  async quitarAsignacion(a: any): Promise<void> {
     const evaluacionId = a.id || a.evaluacion_id;
     if (!evaluacionId) {
       this.showError('No se encontró el ID de esta asignación');
@@ -351,15 +345,41 @@ export class AsignacionesPage implements OnInit {
     }
 
     const nombreEvaluador = a.evaluador_nombre || a.evaluador?.nombre || 'este evaluador';
+    const nombreProyecto = a.proyecto_nombre || a.proyecto?.nombre || 'este proyecto';
+    
+    // Determinar si ya tiene evaluación
     const yaEvaluado = a.status === 'completed' || a.status === 'completado'
       || a.estado === 'evaluado' || a.yaEvaluado === true;
 
-    const mensaje = yaEvaluado
-      ? `⚠️ "${nombreEvaluador}" YA REGISTRÓ una evaluación para este proyecto. Quitar esta asignación borrará también sus respuestas guardadas. ¿Continuar de todas formas?`
-      : `¿Quitar la asignación de "${nombreEvaluador}" para este proyecto? Esta asignación aún no tiene evaluación registrada, así que es seguro quitarla.`;
+    // Crear alerta personalizada
+    const alert = await this.alertController.create({
+      header: yaEvaluado ? '⚠️ Eliminar evaluación' : 'Quitar asignación',
+      subHeader: `Proyecto: ${nombreProyecto}`,
+      message: yaEvaluado
+        ? `El evaluador <strong>"${nombreEvaluador}"</strong> YA REGISTRÓ una evaluación para este proyecto.<br><br>Quitar esta asignación <strong>BORRARÁ</strong> también sus respuestas guardadas. ¿Continuar de todas formas?`
+        : `¿Quitar la asignación de <strong>"${nombreEvaluador}"</strong> para el proyecto "${nombreProyecto}"?<br><br>Esta asignación aún no tiene evaluación registrada, así que es seguro quitarla.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: yaEvaluado ? 'Sí, eliminar todo' : 'Sí, quitar',
+          role: 'destructive',
+          cssClass: 'danger',
+          handler: () => {
+            this.ejecutarQuitarAsignacion(evaluacionId, nombreEvaluador, nombreProyecto);
+          }
+        }
+      ],
+      cssClass: yaEvaluado ? 'alert-danger' : 'alert-warning'
+    });
 
-    if (!confirm(mensaje)) return;
+    await alert.present();
+  }
 
+  private ejecutarQuitarAsignacion(evaluacionId: number, nombreEvaluador: string, nombreProyecto: string): void {
     this.evaluacionService.eliminarEvaluacion(evaluacionId).subscribe({
       next: () => {
         this.showSuccess(`Asignación de "${nombreEvaluador}" eliminada correctamente`);
@@ -371,6 +391,10 @@ export class AsignacionesPage implements OnInit {
       }
     });
   }
+
+  // ============================================
+  // MÉTODOS EXISTENTES
+  // ============================================
 
   editarEvaluacionAdmin(asignacion: any): void {
     const evaluacionId = asignacion.id || asignacion.evaluacion_id;
@@ -390,18 +414,34 @@ export class AsignacionesPage implements OnInit {
 
     const nombreProyecto = asignacion.proyecto_nombre || asignacion.proyecto?.nombre || 'proyecto';
 
-    if (!confirm(`¿Estás seguro de reabrir la evaluación del proyecto "${nombreProyecto}"? El evaluador podrá modificarla nuevamente.`)) {
-      return;
-    }
+    const alert = await this.alertController.create({
+      header: 'Reabrir evaluación',
+      message: `¿Estás seguro de reabrir la evaluación del proyecto "<strong>${nombreProyecto}</strong>"?<br><br>El evaluador podrá modificarla nuevamente.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Reabrir',
+          handler: () => {
+            this.ejecutarReabrirEvaluacion(evaluacionId, nombreProyecto);
+          }
+        }
+      ]
+    });
 
-    try {
-      await this.evaluacionService.reabrirEvaluacion(evaluacionId).toPromise();
-      this.showSuccess(`Evaluación de "${nombreProyecto}" reabierta correctamente`);
-      this.cargarDatos();
-    } catch (err: any) {
-      console.error('Error reabriendo:', err);
-      this.showError(err.error?.mensaje || 'Error al reabrir la evaluación');
-    }
+    await alert.present();
+  }
+
+  private ejecutarReabrirEvaluacion(evaluacionId: number, nombreProyecto: string): void {
+    this.evaluacionService.reabrirEvaluacion(evaluacionId).subscribe({
+      next: () => {
+        this.showSuccess(`Evaluación de "${nombreProyecto}" reabierta correctamente`);
+        this.cargarDatos();
+      },
+      error: (err: any) => {
+        console.error('Error reabriendo:', err);
+        this.showError(err.error?.mensaje || 'Error al reabrir la evaluación');
+      }
+    });
   }
 
   async eliminarEvaluacion(asignacion: any): Promise<void> {
@@ -413,18 +453,36 @@ export class AsignacionesPage implements OnInit {
 
     const nombreProyecto = asignacion.proyecto_nombre || asignacion.proyecto?.nombre || 'proyecto';
 
-    if (!confirm(`¿Estás seguro de eliminar la evaluación del proyecto "${nombreProyecto}"? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+    const alert = await this.alertController.create({
+      header: 'Eliminar evaluación',
+      message: `¿Estás seguro de eliminar la evaluación del proyecto "<strong>${nombreProyecto}</strong>"?<br><br>Esta acción <strong>no se puede deshacer</strong>.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          cssClass: 'danger',
+          handler: () => {
+            this.ejecutarEliminarEvaluacion(evaluacionId, nombreProyecto);
+          }
+        }
+      ]
+    });
 
-    try {
-      await this.evaluacionService.eliminarEvaluacion(evaluacionId).toPromise();
-      this.showSuccess(`Evaluación de "${nombreProyecto}" eliminada correctamente`);
-      this.cargarDatos();
-    } catch (err: any) {
-      console.error('Error eliminando:', err);
-      this.showError(err.error?.mensaje || 'Error al eliminar la evaluación');
-    }
+    await alert.present();
+  }
+
+  private ejecutarEliminarEvaluacion(evaluacionId: number, nombreProyecto: string): void {
+    this.evaluacionService.eliminarEvaluacion(evaluacionId).subscribe({
+      next: () => {
+        this.showSuccess(`Evaluación de "${nombreProyecto}" eliminada correctamente`);
+        this.cargarDatos();
+      },
+      error: (err: any) => {
+        console.error('Error eliminando:', err);
+        this.showError(err.error?.mensaje || 'Error al eliminar la evaluación');
+      }
+    });
   }
 
   verDetalleAsignacion(asignacion: any): void {
@@ -483,10 +541,23 @@ export class AsignacionesPage implements OnInit {
   }
 
   private showSuccess(message: string): void {
-    alert('✅ ' + message);
+    // Usar toast o alert simple
+    const alert = this.alertController.create({
+      header: '✅ Éxito',
+      message: message,
+      buttons: ['OK'],
+      cssClass: 'alert-success'
+    });
+    alert.then(a => a.present());
   }
 
   private showError(message: string): void {
-    alert('❌ ' + message);
+    const alert = this.alertController.create({
+      header: '❌ Error',
+      message: message,
+      buttons: ['OK'],
+      cssClass: 'alert-error'
+    });
+    alert.then(a => a.present());
   }
 }
