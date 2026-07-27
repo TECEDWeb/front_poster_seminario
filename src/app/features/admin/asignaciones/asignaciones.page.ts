@@ -96,9 +96,7 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
 })
 export class AsignacionesPage implements OnInit {
 
-  // ============================================
   // DATOS PRINCIPALES
-  // ============================================
   proyectos: any[] = [];
   evaluadores: any[] = [];
 
@@ -106,50 +104,37 @@ export class AsignacionesPage implements OnInit {
   asignacionesRecientes: any[] = [];
   asignacionesCount: number = 0;
 
-  // ============================================
   // FORMULARIO
-  // ============================================
   proyectoId: number | null = null;
   evaluadorId: number | null = null;
   fechaLimite: string | null = null;
 
-  // ============================================
   // ESTADO DE CARGA
-  // ============================================
   cargando: boolean = false;
   submitting: boolean = false;
   cargandoAsignacionesProyecto: boolean = false;
 
-  // ============================================
   // ROL
-  // ============================================
   esAdmin: boolean = false;
 
-  // ============================================
   // CONTROL DE MODALES DE SELECCIÓN
-  // ============================================
   modalProyectoAbierto = false;
   modalEvaluadorAbierto = false;
 
-  // ============================================
   // CALENDARIO (MODAL PROPIO)
-  // ============================================
   calendarModalOpen = false;
   fechaLimiteTemp: string | null = null;
   today: string = new Date().toISOString();
 
-  // ============================================
   // MODAL "VER TODAS"
-  // ============================================
   modalTodasAbierto = false;
   busquedaTodas = '';
   filtroEstadoTodas: string = 'todos';
   paginaActualTodas = 1;
   itemsPorPaginaTodas = 15;
 
-  // ============================================
+
   // GETTERS
-  // ============================================
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
     return this.proyectos.find(p => p.id === this.proyectoId) || null;
@@ -201,9 +186,8 @@ export class AsignacionesPage implements OnInit {
     return this.asignacionesFiltradas.slice(inicio, inicio + this.itemsPorPaginaTodas);
   }
 
-  // ============================================
+
   // CONSTRUCTOR
-  // ============================================
   constructor(
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
@@ -242,16 +226,12 @@ export class AsignacionesPage implements OnInit {
     this.esAdmin = this.authService.esAdmin();
   }
 
-  // ============================================
   // LIFECYCLE
-  // ============================================
   ngOnInit(): void {
     this.cargarDatos();
   }
 
-  // ============================================
   // CARGA DE DATOS
-  // ============================================
   cargarDatos(): void {
     this.cargando = true;
     this._proyectosListos = false;
@@ -357,21 +337,11 @@ export class AsignacionesPage implements OnInit {
     return a.fecha_asignacion || a.created_at || a.fecha || null;
   }
 
-  /**
-   * El backend ahora expone evaluacion_id explícitamente (viene de un
-   * LEFT JOIN con la tabla evaluaciones). Es DISTINTO de asignacion_id
-   * — son tablas con secuencias autoincrementales independientes, así
-   * que nunca deben confundirse. Todas las acciones que operan sobre
-   * la evaluación (editar, reabrir, eliminar, ver detalle) DEBEN usar
-   * evaluacion_id, nunca el id de la fila de "asignaciones".
-   */
   private obtenerEvaluacionId(a: any): number | null {
     return a.evaluacion_id ?? a.evaluacionId ?? null;
   }
 
-  // ============================================
   // HELPERS DE NOMBRE
-  // ============================================
   getNombreProyecto(a: any): string {
     return a.proyecto_nombre
       || a.proyectoNombre
@@ -392,9 +362,7 @@ export class AsignacionesPage implements OnInit {
       || 'Evaluador sin nombre';
   }
 
-  // ============================================
   // ABRIR MODALES DE SELECCIÓN
-  // ============================================
   abrirModalProyectos(): void {
     if (this.proyectos.length === 0) {
       this.cargarProyectos();
@@ -413,9 +381,7 @@ export class AsignacionesPage implements OnInit {
     this.modalEvaluadorAbierto = true;
   }
 
-  // ============================================
   // SELECCIÓN DESDE MODALES
-  // ============================================
   onProyectoSeleccionado(proyectoId: number): void {
     this.proyectoId = proyectoId;
     this.evaluadorId = null;
@@ -425,9 +391,7 @@ export class AsignacionesPage implements OnInit {
     this.evaluadorId = evaluadorId;
   }
 
-  // ============================================
   // CALENDARIO (MODAL PROPIO)
-  // ============================================
   abrirCalendarioModal(): void {
     this.fechaLimiteTemp = this.fechaLimite;
     this.calendarModalOpen = true;
@@ -442,9 +406,7 @@ export class AsignacionesPage implements OnInit {
     this.calendarModalOpen = false;
   }
 
-  // ============================================
   // MODAL "VER TODAS"
-  // ============================================
   abrirModalTodas(): void {
     this.busquedaTodas = '';
     this.filtroEstadoTodas = 'todos';
@@ -467,9 +429,7 @@ export class AsignacionesPage implements OnInit {
     this.paginaActualTodas = 1;
   }
 
-  // ============================================
   // GUARDAR ASIGNACIÓN
-  // ============================================
   guardar(): void {
     if (!this.proyectoId) {
       this.showError('Por favor, selecciona un proyecto');
@@ -539,9 +499,7 @@ export class AsignacionesPage implements OnInit {
     });
   }
 
-  // ============================================
   // QUITAR ASIGNACIÓN
-  // ============================================
   async quitarAsignacion(a: any): Promise<void> {
     const evaluacionId = this.obtenerEvaluacionId(a);
     if (!evaluacionId) {
@@ -595,9 +553,7 @@ export class AsignacionesPage implements OnInit {
     });
   }
 
-  // ============================================
   // ACCIONES ADMIN
-  // ============================================
   editarEvaluacionAdmin(asignacion: any): void {
     const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
@@ -696,9 +652,8 @@ export class AsignacionesPage implements OnInit {
     this.router.navigate(['/admin/evaluaciones', evaluacionId]);
   }
 
-  // ============================================
+
   // UTILIDADES
-  // ============================================
   resetForm(): void {
     this.proyectoId = null;
     this.evaluadorId = null;
@@ -772,9 +727,7 @@ export class AsignacionesPage implements OnInit {
     return classes[status] || 'status-pending';
   }
 
-  // ============================================
   // ALERTAS
-  // ============================================
   private async showSuccess(message: string): Promise<void> {
     const alert = await this.alertController.create({
       header: '✅ Éxito',

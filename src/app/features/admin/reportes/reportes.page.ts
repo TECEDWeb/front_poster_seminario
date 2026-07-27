@@ -25,6 +25,7 @@ import {
   folderOutline,
   checkmarkDoneOutline,
   trophyOutline,
+  trophy,
   documentOutline,
   timeOutline,
   funnelOutline,
@@ -51,6 +52,7 @@ import {
   createOutline,
   ribbonOutline,
   medalOutline,
+  medal,
   schoolOutline,
   starOutline,
   star
@@ -104,7 +106,6 @@ interface Ganador {
   evaluaciones: number;
   evaluadores?: any[];
   posicion: number;
-  medalla: string;
   clase: string;
 }
 
@@ -158,7 +159,12 @@ export class ReportesPage implements OnInit, OnDestroy {
   filtroBusqueda: string = '';
   filtroStatus: string = 'todos';
   filtroEvaluador: string = 'todos';
-  filtroConcurso: string = 'todos';
+
+  // Sin valor por defecto: obliga a elegir un concurso antes de
+  // mostrar cualquier podio, proyecto o evaluador. Esto evita el
+  // problema anterior donde "todos" combinaba concursos y daba la
+  // falsa sensación de estar "atascado" en el primer concurso creado.
+  filtroConcurso: string = '';
 
   concursosDisponibles: any[] = [];
   cargandoConcursos: boolean = false;
@@ -189,6 +195,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       folderOutline,
       checkmarkDoneOutline,
       trophyOutline,
+      trophy,
       documentOutline,
       timeOutline,
       funnelOutline,
@@ -215,6 +222,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       createOutline,
       ribbonOutline,
       medalOutline,
+      medal,
       schoolOutline,
       starOutline,
       star
@@ -224,8 +232,7 @@ export class ReportesPage implements OnInit, OnDestroy {
   }
 
   // Auto-refresh: recarga los datos cada cierto tiempo sin bloquear
-  // la pantalla (sin skeleton, sin cerrar acordeones abiertos). No es
-  // un WebSocket en vivo, pero acerca bastante el reporte a "tiempo real".
+  // la pantalla (sin skeleton, sin cerrar acordeones abiertos).
   private autoRefreshHandle: any;
   private readonly AUTO_REFRESH_MS = 60000; // 60 segundos
 
@@ -262,6 +269,10 @@ export class ReportesPage implements OnInit, OnDestroy {
     });
   }
 
+  get haySeleccionConcurso(): boolean {
+    return !!this.filtroConcurso;
+  }
+
   // `silencioso = true` se usa desde el auto-refresh: no muestra el
   // skeleton de carga y conserva qué proyectos tenías expandidos.
   cargarDatos(silencioso: boolean = false): void {
@@ -289,8 +300,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       next: (res: any) => {
         let data = res?.data ?? res ?? [];
 
-        // Conserva el estado "expandido" de los proyectos que ya
-        // estaban abiertos antes de este refresh
         const expandidosPrevios = new Set(
           this.proyectos.filter(p => p._expandido).map(p => p.id)
         );
@@ -331,27 +340,21 @@ export class ReportesPage implements OnInit, OnDestroy {
   }
 
   // ============================================
-  // GANADORES — AHORA RESPETAN EL FILTRO DE CONCURSO
+  // GANADORES — solo se calculan si hay un concurso elegido
   // ============================================
-  // ANTES: siempre calculaba sobre `this.proyectos` completo, sin
-  // importar qué concurso tuvieras seleccionado en el filtro. Por eso
-  // el podio nunca cambiaba al cambiar de concurso — mezclaba todos
-  // los proyectos de todos los concursos en un solo ranking.
-  //
-  // AHORA: si hay un concurso filtrado, el podio se calcula SOLO con
-  // los proyectos de ESE concurso. Si el filtro está en "todos", se
-  // muestra el podio combinado (con la advertencia de que mezclar
-  // concursos con rúbricas distintas puede no ser justo — ver nota
-  // más abajo).
   calcularGanadores(): void {
+    if (!this.filtroConcurso) {
+      this.ganadores = [];
+      return;
+    }
+
     if (!this.proyectos || this.proyectos.length === 0) {
       this.ganadores = [];
       return;
     }
 
-    const baseParaPodio = this.filtroConcurso !== 'todos'
-      ? this.proyectos.filter(p => Number(p.concursoId) === Number(this.filtroConcurso))
-      : this.proyectos;
+    const concursoIdNum = Number(this.filtroConcurso);
+    const baseParaPodio = this.proyectos.filter(p => Number(p.concursoId) === concursoIdNum);
 
     const proyectosConEvaluaciones = baseParaPodio.filter(p =>
       (p.evaluaciones || 0) > 0 && (p.promedio || 0) > 0
@@ -376,7 +379,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       evaluaciones: proyecto.evaluaciones || 0,
       evaluadores: proyecto.evaluadores || [],
       posicion: index + 1,
-      medalla: index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉',
       clase: index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'
     }));
   }
@@ -387,8 +389,8 @@ export class ReportesPage implements OnInit, OnDestroy {
       return;
     }
 
-    let mensaje = 'PODIO DEL CONCURSO\n\n';
-    mensaje += '━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    let mensaje = `PODIO DEL CONCURSO: ${this.getNombreConcurso(this.filtroConcurso)}\n\n`;
+    mensaje += '------------------------------\n\n';
 
     this.ganadores.forEach((g, index) => {
       const posicion = index === 0 ? '1er Lugar' : index === 1 ? '2do Lugar' : '3er Lugar';
@@ -399,11 +401,11 @@ export class ReportesPage implements OnInit, OnDestroy {
       mensaje += `Puntaje: ${g.promedio.toFixed(2)} / ${g.puntajeMaximo} (${pct}%)\n`;
       mensaje += `Evaluaciones: ${g.evaluaciones || 0}\n`;
       mensaje += `Área: ${g.area || 'Sin área'}\n`;
-      mensaje += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+      mensaje += '\n------------------------------\n\n';
     });
 
-    mensaje += `Total de proyectos evaluados: ${this.proyectos?.length || 0}\n`;
-    mensaje += `Promedio general: ${this.reportes?.promedio?.toFixed(2) || '0.00'}`;
+    const totalDelConcurso = this.proyectosFiltrados?.length || 0;
+    mensaje += `Total de proyectos evaluados en este concurso: ${totalDelConcurso}`;
 
     alert(mensaje);
   }
@@ -463,13 +465,26 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.vistaActual = vista;
   }
 
+  /** Se llama cuando el usuario elige o cambia el concurso en el selector principal */
+  onCambioConcursoSelector(): void {
+    this.filtroBusqueda = '';
+    this.filtroStatus = 'todos';
+    this.filtroEvaluador = 'todos';
+    this.aplicarFiltros();
+  }
+
   aplicarFiltros(): void {
-    // El podio depende del concurso filtrado, así que se recalcula
-    // aquí también — así cambiar el ion-select de concurso actualiza
-    // el podio al instante, sin esperar a un recargar().
     this.calcularGanadores();
 
+    if (!this.filtroConcurso) {
+      this.proyectosFiltrados = [];
+      return;
+    }
+
     let filtered = [...this.proyectos];
+
+    const concursoIdNum = Number(this.filtroConcurso);
+    filtered = filtered.filter(p => Number(p.concursoId) === concursoIdNum);
 
     if (this.filtroBusqueda && this.filtroBusqueda.trim()) {
       const texto = this.filtroBusqueda.toLowerCase().trim();
@@ -509,11 +524,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       );
     }
 
-    if (this.filtroConcurso !== 'todos') {
-      const concursoIdNum = Number(this.filtroConcurso);
-      filtered = filtered.filter(p => Number(p.concursoId) === concursoIdNum);
-    }
-
     this.proyectosFiltrados = filtered;
   }
 
@@ -521,16 +531,25 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.cargarDatos();
   }
 
+  /** Limpia los filtros secundarios, pero mantiene el concurso elegido */
   limpiarFiltros(): void {
     this.filtroBusqueda = '';
     this.filtroStatus = 'todos';
     this.filtroEvaluador = 'todos';
-    this.filtroConcurso = 'todos';
+    this.aplicarFiltros();
+  }
+
+  /** Vuelve a la pantalla de "elige un concurso" */
+  cambiarConcurso(): void {
+    this.filtroConcurso = '';
+    this.filtroBusqueda = '';
+    this.filtroStatus = 'todos';
+    this.filtroEvaluador = 'todos';
     this.aplicarFiltros();
   }
 
   getNombreConcurso(id: string): string {
-    if (id === 'todos') return 'Todos los concursos';
+    if (!id) return 'Sin concurso seleccionado';
     const concurso = this.concursosDisponibles.find(c => String(c.id) === String(id));
     return concurso?.nombre || 'Concurso';
   }
@@ -611,9 +630,7 @@ export class ReportesPage implements OnInit, OnDestroy {
     const csvContent = this.generarCSV(headers, filas);
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
 
-    const nombreConcurso = this.filtroConcurso !== 'todos'
-      ? this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_')
-      : 'todos';
+    const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
     const fecha = new Date().toISOString().split('T')[0];
     this.descargarArchivo(blob, `reporte-${nombreConcurso}-${fecha}.csv`);
 
@@ -639,15 +656,13 @@ export class ReportesPage implements OnInit, OnDestroy {
 
       doc.setFontSize(16);
       doc.setTextColor(0, 27, 76);
-      const titulo = this.filtroConcurso !== 'todos'
-        ? `Reporte - ${this.getNombreConcurso(this.filtroConcurso)}`
-        : 'Reporte General de Evaluaciones';
+      const titulo = `Reporte - ${this.getNombreConcurso(this.filtroConcurso)}`;
       doc.text(titulo, 14, 15);
 
       doc.setFontSize(9);
       doc.setTextColor(100);
       const fechaLegible = new Date().toLocaleString('es-EC');
-      doc.text(`Generado: ${fechaLegible}  •  Total: ${datos.length} proyecto(s)`, 14, 21);
+      doc.text(`Generado: ${fechaLegible}  -  Total: ${datos.length} proyecto(s)`, 14, 21);
 
       const columnas = [
         'Proyecto',
@@ -683,9 +698,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         alternateRowStyles: { fillColor: [232, 240, 254] }
       });
 
-      const nombreConcurso = this.filtroConcurso !== 'todos'
-        ? this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_')
-        : 'todos';
+      const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
       const fecha = new Date().toISOString().split('T')[0];
       doc.save(`reporte-${nombreConcurso}-${fecha}.pdf`);
 
@@ -910,8 +923,8 @@ export class ReportesPage implements OnInit, OnDestroy {
   }
 
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
-    const icono = tipo === 'success' ? '✅' : '❌';
-    alert(`${icono} ${mensaje}`);
+    const prefijo = tipo === 'success' ? '[OK]' : '[Error]';
+    alert(`${prefijo} ${mensaje}`);
   }
 
   tutorPrincipal(proyecto: any): string | null {

@@ -48,24 +48,65 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- 🏆 PODIO: 1er, 2do y 3er LUGAR -->
+    <!-- SELECTOR DE CONCURSO OBLIGATORIO -->
     <!-- ============================================ -->
-    <div class="podio-section" *ngIf="!cargando && ganadores && ganadores.length > 0">
+    <div class="concurso-selector-card">
+      <div class="csc-header">
+        <ion-icon name="trophy-outline"></ion-icon>
+        <div>
+          <h2>¿Qué concurso quieres revisar?</h2>
+          <p>Elige un concurso para ver su podio, proyectos y evaluadores</p>
+        </div>
+      </div>
+
+      <div class="csc-controls">
+        <ion-select
+          [(ngModel)]="filtroConcurso"
+          (ionChange)="onCambioConcursoSelector()"
+          placeholder="Selecciona un concurso"
+          interface="action-sheet"
+          class="csc-select"
+          [disabled]="cargandoConcursos">
+          <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
+            {{ c.nombre }}
+          </ion-select-option>
+        </ion-select>
+
+        <ion-button
+          fill="clear"
+          size="small"
+          class="csc-cambiar-btn"
+          *ngIf="haySeleccionConcurso"
+          (click)="cambiarConcurso()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Cambiar
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- MENSAJE: SIN CONCURSO SELECCIONADO -->
+    <div class="empty-sin-seleccion" *ngIf="!haySeleccionConcurso && !cargando">
+      <ion-icon name="funnel-outline"></ion-icon>
+      <h3>Selecciona un concurso para comenzar</h3>
+      <p>Elige uno de tus concursos arriba para ver su podio de ganadores, proyectos evaluados y rendimiento de evaluadores.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PODIO: 1er, 2do y 3er LUGAR -->
+    <!-- ============================================ -->
+    <div class="podio-section" *ngIf="haySeleccionConcurso && !cargando && ganadores && ganadores.length > 0">
       <div class="podio-header">
         <h2>
           <ion-icon name="trophy-outline"></ion-icon>
           Podio del Concurso
         </h2>
-        <p *ngIf="filtroConcurso !== 'todos'">{{ getNombreConcurso(filtroConcurso) }}</p>
-        <p *ngIf="filtroConcurso === 'todos'" class="podio-warning">
-          Mostrando el mejor puntaje combinado de todos los concursos. Si tus concursos usan rúbricas distintas, filtra por uno específico arriba para un ranking justo.
-        </p>
+        <p>{{ getNombreConcurso(filtroConcurso) }}</p>
       </div>
 
       <div class="podio-grid">
         <!-- 2do Lugar (izquierda) -->
         <div class="podio-card podio-2" *ngIf="ganadores.length >= 2">
-          <div class="podio-medalla">🥈</div>
+          <ion-icon name="medal" class="podio-medalla-icon medalla-plata"></ion-icon>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[1].nombre)">
             <span>{{ ganadores[1].nombre.charAt(0) || 'P' }}</span>
           </div>
@@ -82,8 +123,8 @@
 
         <!-- 1er Lugar (centro - más grande) -->
         <div class="podio-card podio-1" *ngIf="ganadores.length >= 1">
-          <div class="podio-corona">👑</div>
-          <div class="podio-medalla">🥇</div>
+          <ion-icon name="trophy" class="podio-corona-icon"></ion-icon>
+          <ion-icon name="medal" class="podio-medalla-icon medalla-oro"></ion-icon>
           <div class="podio-avatar podio-avatar-grande" [class]="getRandomColor(ganadores[0].nombre)">
             <span>{{ ganadores[0].nombre.charAt(0) || 'P' }}</span>
           </div>
@@ -95,12 +136,15 @@
               <span class="podio-label">Promedio</span>
             </div>
           </div>
-          <div class="podio-posicion podio-posicion-1">🏆 1er Lugar</div>
+          <div class="podio-posicion podio-posicion-1">
+            <ion-icon name="trophy-outline"></ion-icon>
+            1er Lugar
+          </div>
         </div>
 
         <!-- 3er Lugar (derecha) -->
         <div class="podio-card podio-3" *ngIf="ganadores.length >= 3">
-          <div class="podio-medalla">🥉</div>
+          <ion-icon name="medal" class="podio-medalla-icon medalla-bronce"></ion-icon>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[2].nombre)">
             <span>{{ ganadores[2].nombre.charAt(0) || 'P' }}</span>
           </div>
@@ -116,7 +160,6 @@
         </div>
       </div>
 
-      <!-- Botón de acción -->
       <div class="podio-actions">
         <button class="podio-btn" (click)="verGanadores()">
           <ion-icon name="trophy-outline"></ion-icon>
@@ -125,17 +168,17 @@
       </div>
     </div>
 
-    <!-- Mensaje cuando no hay ganadores -->
-    <div class="podio-empty" *ngIf="!cargando && ganadores && ganadores.length === 0">
+    <!-- Mensaje cuando no hay ganadores en el concurso elegido -->
+    <div class="podio-empty" *ngIf="haySeleccionConcurso && !cargando && ganadores && ganadores.length === 0">
       <div class="empty-icon">
         <ion-icon name="trophy-outline"></ion-icon>
       </div>
       <h3>No hay ganadores aún</h3>
-      <p>Espera a que se completen las evaluaciones para ver el podio</p>
+      <p>Espera a que se completen las evaluaciones de este concurso para ver el podio</p>
     </div>
 
     <!-- TOGGLE DE VISTA -->
-    <div class="vista-toggle" *ngIf="!cargando">
+    <div class="vista-toggle" *ngIf="haySeleccionConcurso && !cargando">
       <button
         class="toggle-btn"
         [class.active]="vistaActual === 'proyectos'"
@@ -153,7 +196,7 @@
     </div>
 
     <!-- FILTROS -->
-    <div class="filter-bar" *ngIf="!cargando && proyectos.length > 0 && vistaActual === 'proyectos'">
+    <div class="filter-bar" *ngIf="haySeleccionConcurso && !cargando && proyectos.length > 0 && vistaActual === 'proyectos'">
       <div class="filter-group search-group">
         <ion-searchbar
           [(ngModel)]="filtroBusqueda"
@@ -193,28 +236,12 @@
         </ion-select>
       </div>
 
-      <!-- Filtro por concurso -->
-      <div class="filter-group">
-        <ion-select
-          [(ngModel)]="filtroConcurso"
-          (ionChange)="aplicarFiltros()"
-          placeholder="Todos los concursos"
-          interface="popover"
-          class="filter-select"
-          [disabled]="cargandoConcursos">
-          <ion-select-option value="todos">Todos los concursos</ion-select-option>
-          <ion-select-option *ngFor="let c of concursosDisponibles" [value]="c.id">
-            {{ c.nombre }}
-          </ion-select-option>
-        </ion-select>
-      </div>
-
       <ion-button 
         fill="clear" 
         size="small" 
         class="btn-clear-filters" 
         (click)="limpiarFiltros()" 
-        *ngIf="filtroBusqueda || filtroStatus !== 'todos' || filtroEvaluador !== 'todos' || filtroConcurso !== 'todos'">
+        *ngIf="filtroBusqueda || filtroStatus !== 'todos' || filtroEvaluador !== 'todos'">
         <ion-icon name="close-outline"></ion-icon>
         Limpiar
       </ion-button>
@@ -243,16 +270,13 @@
     <!-- ============================================ -->
     <!-- VISTA: POR PROYECTO - LISTA CON ACORDEÓN -->
     <!-- ============================================ -->
-    <div class="proyectos-section" *ngIf="!cargando && !error && vistaActual === 'proyectos'">
+    <div class="proyectos-section" *ngIf="haySeleccionConcurso && !cargando && !error && vistaActual === 'proyectos'">
       <div class="section-header">
         <div class="section-header-left">
           <h2>Reportes por proyecto</h2>
-          <span class="section-count">{{ proyectosFiltrados.length }} de {{ proyectos.length }} proyectos</span>
+          <span class="section-count">{{ proyectosFiltrados.length }} proyecto(s)</span>
         </div>
         <div class="section-header-right">
-          <span class="filter-badge" *ngIf="filtroConcurso !== 'todos'">
-            Filtrado por: {{ getNombreConcurso(filtroConcurso) }}
-          </span>
           <ion-button fill="outline" size="small" class="export-mobile-btn" (click)="exportarExcelConFiltros()" [disabled]="cargando || exportando">
             <ion-icon name="download-outline"></ion-icon>
             Excel
@@ -268,7 +292,7 @@
       <div class="proyectos-lista">
         <div class="proyecto-item" *ngFor="let p of proyectosFiltrados || []; trackBy: trackById">
           
-          <!-- HEADER DEL PROYECTO (SIEMPRE VISIBLE) -->
+          <!-- HEADER DEL PROYECTO -->
           <div class="proyecto-header" (click)="toggleProyecto(p)" [class.expanded]="p._expandido">
             <div class="ph-left">
               <div class="ph-icon" [class]="getRandomColor(p.proyecto || p.nombre)">
@@ -311,11 +335,10 @@
             </div>
           </div>
 
-          <!-- CONTENIDO EXPANDIDO DEL PROYECTO -->
+          <!-- CONTENIDO EXPANDIDO -->
           <div class="proyecto-body" [class.expanded]="p._expandido">
             <div class="pb-content">
               
-              <!-- Progress bar -->
               <div class="pb-progress">
                 <div class="progress-bar">
                   <div class="progress-fill" [style.width]="getPorcentaje(p.promedio, p.puntajeMaximo) + '%'"></div>
@@ -323,7 +346,6 @@
                 <span class="progress-label">{{ getPorcentaje(p.promedio, p.puntajeMaximo) }}%</span>
               </div>
 
-              <!-- Tutores del proyecto -->
               <div class="pb-personas" *ngIf="(p.tutores || []).length > 0">
                 <div class="pb-section-title">
                   <ion-icon name="school-outline"></ion-icon>
@@ -343,7 +365,6 @@
                 </div>
               </div>
 
-              <!-- Participantes del proyecto -->
               <div class="pb-personas" *ngIf="(p.participantes || []).length > 0">
                 <div class="pb-section-title">
                   <ion-icon name="person-outline"></ion-icon>
@@ -359,13 +380,11 @@
                 </div>
               </div>
 
-              <!-- Aviso si no hay tutores/participantes cargados -->
               <div class="pb-personas-empty" *ngIf="(p.tutores || []).length === 0 && (p.participantes || []).length === 0">
                 <ion-icon name="alert-circle-outline"></ion-icon>
                 <span>Este reporte aún no incluye tutores/participantes para este proyecto</span>
               </div>
 
-              <!-- Evaluadores -->
               <div class="pb-evaluadores">
                 <div class="pb-section-title">
                   <ion-icon name="people-outline"></ion-icon>
@@ -386,7 +405,6 @@
                 </div>
               </div>
 
-              <!-- ACCIONES PARA ADMIN -->
               <div class="pb-acciones-admin" *ngIf="esAdmin && p.evaluacionId">
                 <div class="pb-section-title admin-title">
                   <ion-icon name="settings-outline"></ion-icon>
@@ -426,12 +444,12 @@
                   <span class="status-label">Estado:</span>
                   <span class="status-value" [class.estado-evaluado]="p.estadoEvaluacion === 'evaluado'"
                                            [class.estado-asignado]="p.estadoEvaluacion === 'asignado'">
-                    {{ p.estadoEvaluacion === 'evaluado' ? '✅ Evaluado' : '⏳ En progreso' }}
+                    <ion-icon [name]="p.estadoEvaluacion === 'evaluado' ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
+                    {{ p.estadoEvaluacion === 'evaluado' ? 'Evaluado' : 'En progreso' }}
                   </span>
                 </div>
               </div>
 
-              <!-- Acciones normales -->
               <div class="pb-actions">
                 <button class="pb-btn pb-btn-excel" (click)="exportarProyectoExcel(p)">
                   <ion-icon name="download-outline"></ion-icon>
@@ -454,31 +472,23 @@
       </div>
 
       <!-- EMPTY STATE -->
-      <div class="empty-state" *ngIf="proyectosFiltrados.length === 0 && proyectos.length > 0">
+      <div class="empty-state" *ngIf="proyectosFiltrados.length === 0">
         <div class="empty-icon">
           <ion-icon name="filter-outline"></ion-icon>
         </div>
-        <h3>No hay coincidencias</h3>
-        <p>No se encontraron proyectos con los filtros aplicados</p>
+        <h3>No hay proyectos</h3>
+        <p>No se encontraron proyectos con los filtros aplicados para este concurso</p>
         <ion-button fill="outline" class="btn-clear-filter" (click)="limpiarFiltros()">
           <ion-icon name="close-outline" slot="start"></ion-icon>
           Limpiar filtros
         </ion-button>
-      </div>
-
-      <div class="empty-state" *ngIf="proyectos.length === 0">
-        <div class="empty-icon">
-          <ion-icon name="stats-chart-outline"></ion-icon>
-        </div>
-        <h3>No hay datos disponibles</h3>
-        <p>No se encontraron reportes para mostrar</p>
       </div>
     </div>
 
     <!-- ============================================ -->
     <!-- VISTA: POR EVALUADOR -->
     <!-- ============================================ -->
-    <div class="evaluadores-resumen-section" *ngIf="!cargando && !error && vistaActual === 'evaluadores'">
+    <div class="evaluadores-resumen-section" *ngIf="haySeleccionConcurso && !cargando && !error && vistaActual === 'evaluadores'">
       <div class="section-header">
         <div class="section-header-left">
           <h2>Rendimiento por evaluador</h2>
@@ -565,7 +575,6 @@
             </div>
           </div>
 
-          <!-- Tutores -->
           <div class="detalle-tutores" *ngIf="(proyectoSeleccionado.tutores || []).length > 0">
             <h3>
               <ion-icon name="school-outline"></ion-icon>
@@ -587,7 +596,6 @@
             </div>
           </div>
 
-          <!-- Participantes -->
           <div class="detalle-participantes" *ngIf="(proyectoSeleccionado.participantes || []).length > 0">
             <h3>
               <ion-icon name="person-outline"></ion-icon>
@@ -607,14 +615,12 @@
             </div>
           </div>
 
-          <!-- Aviso si el backend aún no envía tutores/participantes -->
           <div class="detalle-personas-empty"
                *ngIf="(proyectoSeleccionado.tutores || []).length === 0 && (proyectoSeleccionado.participantes || []).length === 0">
             <ion-icon name="alert-circle-outline"></ion-icon>
             <span>Este proyecto aún no tiene tutores/participantes registrados en el reporte</span>
           </div>
 
-          <!-- Evaluadores -->
           <div class="detalle-evaluadores">
             <h3>Evaluadores</h3>
             <div class="evaluadores-grid">
@@ -631,7 +637,6 @@
             </div>
           </div>
 
-          <!-- Evaluaciones individuales -->
           <div class="detalle-evaluaciones" *ngIf="proyectoSeleccionado.evaluaciones?.length">
             <h3>Evaluaciones registradas</h3>
             <div class="evaluaciones-list">

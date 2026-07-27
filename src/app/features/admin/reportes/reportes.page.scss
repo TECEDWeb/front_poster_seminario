@@ -245,62 +245,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
       }
     }
-
-    .export-actions {
-      display: flex;
-      gap: 4px;
-
-      @media (min-width: 480px) {
-        gap: 6px;
-      }
-
-      .btn-export-desktop {
-        --border-radius: 6px;
-        --padding-start: 8px;
-        --padding-end: 8px;
-        font-weight: 600;
-        font-size: 0.7rem;
-        height: 30px;
-
-        @media (min-width: 480px) {
-          --border-radius: 8px;
-          --padding-start: 12px;
-          --padding-end: 12px;
-          font-size: 0.75rem;
-          height: 34px;
-        }
-
-        @media (min-width: 768px) {
-          --border-radius: 10px;
-          --padding-start: 16px;
-          --padding-end: 16px;
-          font-size: 0.85rem;
-          height: 40px;
-        }
-
-        &.btn-export-excel {
-          --background: #{$upse-green};
-          --color: #fff;
-
-          &:hover { --background: #008c45; }
-        }
-
-        &.btn-export-pdf {
-          --background: #{$upse-blue};
-          --color: #fff;
-
-          &:hover { --background: #{$upse-blue-dark}; }
-        }
-
-        span {
-          display: none;
-
-          @media (min-width: 480px) {
-            display: inline;
-          }
-        }
-      }
-    }
   }
 }
 
@@ -430,11 +374,155 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    // Paleta institucional
     &.stat-blue .stat-icon { background: linear-gradient(135deg, #{$upse-blue}, #1a3a7a); }
     &.stat-gold .stat-icon { background: linear-gradient(135deg, #{$upse-gold}, #{$upse-gold-dark}); }
     &.stat-green .stat-icon { background: linear-gradient(135deg, #{$upse-green}, #008c45); }
     &.stat-navy .stat-icon { background: linear-gradient(135deg, #{$upse-blue-dark}, #{$upse-blue}); }
+  }
+}
+
+// ============================================
+// SELECTOR DE CONCURSO OBLIGATORIO
+// ============================================
+.concurso-selector-card {
+  background: linear-gradient(135deg, #{$upse-blue-light} 0%, #ffffff 70%);
+  border: 1px solid #dde6f5;
+  border-radius: $radius;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: $shadow-sm;
+
+  @media (min-width: 480px) {
+    padding: 18px 20px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .csc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+
+    @media (min-width: 480px) {
+      gap: 12px;
+    }
+
+    ion-icon {
+      font-size: 1.6rem;
+      color: $upse-gold-dark;
+      flex-shrink: 0;
+
+      @media (min-width: 768px) {
+        font-size: 2rem;
+      }
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: $upse-blue;
+
+      @media (min-width: 480px) {
+        font-size: 1.05rem;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 1.2rem;
+      }
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 0.7rem;
+      color: #4a5a75;
+
+      @media (min-width: 768px) {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  .csc-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .csc-select {
+    --background: #ffffff;
+    --border-radius: 10px;
+    flex: 1;
+    height: 44px;
+    border: 2px solid $upse-blue;
+    border-radius: 10px;
+    font-weight: 600;
+    color: $upse-blue;
+
+    @media (min-width: 768px) {
+      height: 48px;
+    }
+  }
+
+  .csc-cambiar-btn {
+    --color: #64748b;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &:hover {
+      --color: #{$upse-red};
+    }
+  }
+}
+
+.empty-sin-seleccion {
+  text-align: center;
+  padding: 40px 16px;
+  background: #fff;
+  border-radius: $radius;
+  border: 2px dashed #cbd5e1;
+  margin-bottom: 16px;
+
+  @media (min-width: 768px) {
+    padding: 60px 20px;
+    margin-bottom: 20px;
+  }
+
+  ion-icon {
+    font-size: 2.8rem;
+    color: $upse-gold;
+    margin-bottom: 10px;
+
+    @media (min-width: 768px) {
+      font-size: 3.5rem;
+    }
+  }
+
+  h3 {
+    font-size: 1rem;
+    color: $upse-blue;
+    margin: 0 0 6px;
+
+    @media (min-width: 768px) {
+      font-size: 1.2rem;
+    }
+  }
+
+  p {
+    color: #6b7a99;
+    font-size: 0.8rem;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+
+    @media (min-width: 768px) {
+      font-size: 0.9rem;
+    }
   }
 }
 
@@ -536,24 +624,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 0.9rem;
       }
     }
-
-    .podio-warning {
-      max-width: 480px;
-      margin: 4px auto 0;
-      color: $upse-gold;
-      font-size: 0.6rem;
-      font-style: italic;
-      line-height: 1.4;
-
-      @media (min-width: 480px) {
-        font-size: 0.65rem;
-        margin: 6px auto 0;
-      }
-
-      @media (min-width: 768px) {
-        font-size: 0.75rem;
-      }
-    }
   }
 
   .podio-grid {
@@ -630,62 +700,21 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           padding-top: 30px;
           min-width: 180px;
         }
-
-        .podio-corona {
-          font-size: 1.8rem;
-          position: absolute;
-          top: -14px;
-          left: 50%;
-          transform: translateX(-50%);
-          animation: coronaPulse 2s ease-in-out infinite;
-
-          @media (min-width: 480px) {
-            font-size: 2rem;
-          }
-
-          @media (min-width: 600px) {
-            top: -18px;
-            font-size: 2.2rem;
-          }
-        }
       }
 
       &.podio-2 {
         border-color: rgba(192, 192, 192, 0.25);
-
-        .podio-medalla {
-          font-size: 1.8rem;
-
-          @media (min-width: 480px) {
-            font-size: 2rem;
-          }
-
-          @media (min-width: 600px) {
-            font-size: 2.2rem;
-          }
-        }
       }
 
       &.podio-3 {
         border-color: rgba(205, 127, 50, 0.25);
-
-        .podio-medalla {
-          font-size: 1.8rem;
-
-          @media (min-width: 480px) {
-            font-size: 2rem;
-          }
-
-          @media (min-width: 600px) {
-            font-size: 2.2rem;
-          }
-        }
       }
 
-      .podio-medalla {
-        font-size: 2rem;
+      // Íconos de medalla/corona (reemplazan a los emojis)
+      .podio-medalla-icon {
         display: block;
-        margin-bottom: 2px;
+        font-size: 2rem;
+        margin: 0 auto 2px;
 
         @media (min-width: 480px) {
           font-size: 2.2rem;
@@ -694,6 +723,30 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         @media (min-width: 600px) {
           font-size: 2.5rem;
           margin-bottom: 4px;
+        }
+
+        &.medalla-oro { color: $upse-gold; }
+        &.medalla-plata { color: #c0c0c0; }
+        &.medalla-bronce { color: #cd7f32; }
+      }
+
+      .podio-corona-icon {
+        display: block;
+        font-size: 1.8rem;
+        color: $upse-gold;
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: coronaPulse 2s ease-in-out infinite;
+
+        @media (min-width: 480px) {
+          font-size: 2rem;
+        }
+
+        @media (min-width: 600px) {
+          top: -18px;
+          font-size: 2.2rem;
         }
       }
 
@@ -881,6 +934,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           color: $upse-gold;
           font-weight: 700;
           font-size: 0.65rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+
+          ion-icon {
+            font-size: 0.9rem;
+          }
 
           @media (min-width: 480px) {
             font-size: 0.7rem;
@@ -888,6 +949,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
           @media (min-width: 768px) {
             font-size: 0.8rem;
+
+            ion-icon {
+              font-size: 1rem;
+            }
           }
         }
       }
@@ -1563,9 +1628,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: $shadow-md;
     }
 
-    // ============================================
-    // HEADER DEL PROYECTO - MOBILE FIRST
-    // ============================================
     .proyecto-header {
       display: flex;
       flex-direction: column;
@@ -1855,9 +1917,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    // ============================================
-    // BODY DEL PROYECTO (EXPANDIDO) - MOBILE FIRST
-    // ============================================
     .proyecto-body {
       max-height: 0;
       overflow: hidden;
@@ -1969,9 +2028,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
-        // ============================================
-        // TUTORES Y PARTICIPANTES - MOBILE FIRST
-        // ============================================
         .pb-personas {
           margin-bottom: 12px;
 
@@ -2133,9 +2189,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
-        // ============================================
-        // EVALUADORES - MOBILE FIRST
-        // ============================================
         .pb-evaluadores {
           margin-bottom: 12px;
 
@@ -2262,9 +2315,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
-        // ============================================
-        // ADMIN ACTIONS - MOBILE FIRST
-        // ============================================
         .pb-acciones-admin {
           background: #f8f9fc;
           border-radius: 8px;
@@ -2370,7 +2420,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 &:hover { background: #008c45; }
               }
 
-              // En móvil, si hay 4 botones, el cuarto ocupa toda la fila
               &:last-child:nth-child(odd) {
                 grid-column: 1 / -1;
               }
@@ -2386,6 +2435,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           .pb-admin-status {
             margin-top: 6px;
             font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
 
             @media (min-width: 480px) {
               font-size: 0.7rem;
@@ -2399,6 +2451,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
             .status-value {
               font-weight: 600;
+              display: inline-flex;
+              align-items: center;
+              gap: 4px;
+
+              ion-icon {
+                font-size: 0.85rem;
+              }
 
               &.estado-evaluado { color: $upse-green; }
               &.estado-asignado { color: $upse-gold-dark; }
@@ -2406,9 +2465,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
-        // ============================================
-        // ACCIONES NORMALES - MOBILE FIRST
-        // ============================================
         .pb-actions {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -2997,9 +3053,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  // ============================================
-  // TUTORES Y PARTICIPANTES EN MODAL - MOBILE FIRST
-  // ============================================
   .detalle-tutores, .detalle-participantes {
     margin-bottom: 16px;
 
