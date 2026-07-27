@@ -1,10 +1,20 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>
       Constructor de rúbrica
       <span class="subtitle" *ngIf="concursoNombre">{{ concursoNombre }}</span>
     </ion-title>
     <ion-buttons slot="end">
+      <!-- Botón DESCARGAR PDF -->
+      <ion-button (click)="descargarRubricaPDF()" [disabled]="descargando" class="btn-download-pdf">
+        <ion-icon [name]="descargando ? 'refresh-outline' : 'print-outline'" [class.spinning]="descargando" slot="icon-only"></ion-icon>
+        <span class="btn-label">{{ descargando ? 'Generando...' : 'PDF' }}</span>
+      </ion-button>
       <ion-button (click)="cerrarModal()">
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>

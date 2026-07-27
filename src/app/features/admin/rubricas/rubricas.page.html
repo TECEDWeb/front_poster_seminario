@@ -140,9 +140,9 @@
           <button class="icon-action" (click)="editar(r)" title="Editar datos generales">
             <ion-icon name="create-outline"></ion-icon>
           </button>
-          <!-- ✅ NUEVO BOTÓN DESCARGAR RÚBRICA -->
+          <!-- ✅ BOTÓN DESCARGAR RÚBRICA PDF -->
           <button class="icon-action download" (click)="descargarRubrica(r)" 
-                  [disabled]="descargando" title="Descargar rúbrica en PDF">
+                  [disabled]="descargando" title="Descargar rúbrica en PDF para evaluación física">
             <ion-icon [name]="descargando ? 'refresh-outline' : 'print-outline'" 
                       [class.spinning]="descargando"></ion-icon>
           </button>
@@ -227,7 +227,7 @@
               <ion-icon name="download-outline" slot="start"></ion-icon>
               Exportar Excel
             </ion-button>
-            <!-- ✅ NUEVO BOTÓN DESCARGAR RÚBRICA (secundario) -->
+            <!-- ✅ BOTÓN DESCARGAR RÚBRICA PDF (secundario) -->
             <ion-button fill="outline" size="small" class="action-btn-secondary btn-download-pdf" 
                         (click)="descargarRubrica(r)" [disabled]="descargando">
               <ion-icon [name]="descargando ? 'refresh-outline' : 'print-outline'" 

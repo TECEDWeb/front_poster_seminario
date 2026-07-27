@@ -130,7 +130,6 @@ export class RubricasPage implements OnInit {
   descargando: boolean = false;
 
   // Flag para saber que venimos de "Ver rúbrica" desde Concursos
-  // y evitar volver a intentar abrir el builder tras cerrarlo
   private concursoIdDesdeQueryParam: number | null = null;
 
   constructor(
@@ -168,9 +167,6 @@ export class RubricasPage implements OnInit {
     this.cargarRubricas();
     this.cargarConcursos();
 
-    // Si llegamos desde "Ver rúbrica" en el detalle de un Concurso,
-    // la URL trae ?concursoId=X — abrimos directamente esa rúbrica
-    // en el builder en lugar de mostrar solo la lista completa.
     this.route.queryParams.subscribe(params => {
       const concursoId = params['concursoId'] ? Number(params['concursoId']) : null;
       if (concursoId) {
@@ -180,12 +176,6 @@ export class RubricasPage implements OnInit {
     });
   }
 
-  /**
-   * Espera a que rubricas y concursos terminen de cargar, y entonces
-   * intenta abrir el builder de la rúbrica correspondiente al concursoId
-   * recibido por queryParam. Si aún no hay datos, reintenta con un
-   * pequeño polling (igual patrón que usa ConcursosPage para openModal).
-   */
   private intentarAbrirRubricaDesdeQueryParam(): void {
     if (!this.concursoIdDesdeQueryParam) return;
 
@@ -199,11 +189,9 @@ export class RubricasPage implements OnInit {
       if (rubrica) {
         this.abrirBuilder(rubrica);
       } else {
-        // El concurso existe pero aún no tiene rúbrica creada en la lista
         alert('No se encontró una rúbrica creada para este concurso todavía.');
       }
 
-      // Limpiar el queryParam para que no se reabra en refrescos posteriores
       this.router.navigate([], {
         relativeTo: this.route,
         queryParams: {},
@@ -221,7 +209,6 @@ export class RubricasPage implements OnInit {
       }
     }, 200);
 
-    // Seguridad: no esperar indefinidamente
     setTimeout(() => clearInterval(checkLoading), 8000);
   }
 
@@ -459,8 +446,12 @@ export class RubricasPage implements OnInit {
     });
   }
 
-  // NUEVO MÉTODO: DESCARGAR RÚBRICA EN FORMATO ESTRUCTURADO
+  // ==========================================================
+  // ✅ NUEVO MÉTODO: DESCARGAR RÚBRICA EN PDF PARA EVALUACIÓN FÍSICA
+  // ==========================================================
   async descargarRubrica(rubrica: RubricaConcurso): Promise<void> {
+    if (this.descargando) return;
+    
     this.descargando = true;
 
     try {
@@ -473,11 +464,12 @@ export class RubricasPage implements OnInit {
       const concurso = this.concursosDisponibles.find(c => c.id === rubrica.concursoId);
       const nombreConcurso = concurso?.nombre || `Concurso #${rubrica.concursoId}`;
 
-      doc.setFontSize(20);
+      // ========== TÍTULO PRINCIPAL ==========
+      doc.setFontSize(22);
       doc.setTextColor(0, 27, 76);
       doc.text('RÚBRICA DE EVALUACIÓN', 105, 20, { align: 'center' });
 
-      doc.setFontSize(12);
+      doc.setFontSize(13);
       doc.setTextColor(60, 60, 60);
       doc.text(`Concurso: ${nombreConcurso}`, 105, 30, { align: 'center' });
 
@@ -491,6 +483,7 @@ export class RubricasPage implements OnInit {
 
       let yPos = 48;
 
+      // ========== INFORMACIÓN GENERAL ==========
       doc.setFontSize(11);
       doc.setTextColor(0, 27, 76);
       doc.text('INFORMACIÓN GENERAL', 14, yPos);
@@ -529,6 +522,7 @@ export class RubricasPage implements OnInit {
 
       yPos = (doc as any).lastAutoTable.finalY + 8;
 
+      // ========== NIVELES DE DESEMPEÑO ==========
       doc.setFontSize(12);
       doc.setTextColor(0, 27, 76);
       doc.text('NIVELES DE DESEMPEÑO', 14, yPos);
@@ -572,6 +566,7 @@ export class RubricasPage implements OnInit {
         yPos += 10;
       }
 
+      // ========== SECCIONES Y CRITERIOS ==========
       if (rubrica.secciones && rubrica.secciones.length > 0) {
         doc.addPage();
 
@@ -582,11 +577,13 @@ export class RubricasPage implements OnInit {
         let ySection = 30;
 
         rubrica.secciones.forEach((seccion, idx) => {
+          // Verificar espacio en página
           if (ySection > 250) {
             doc.addPage();
             ySection = 20;
           }
 
+          // Título de sección con fondo
           const sectionTitle = `${idx + 1}. ${seccion.nombre}`;
           doc.setFontSize(13);
           doc.setTextColor(255, 255, 255);
@@ -596,6 +593,7 @@ export class RubricasPage implements OnInit {
 
           ySection += 10;
 
+          // Descripción de sección
           if (seccion.descripcion) {
             doc.setFontSize(9);
             doc.setTextColor(100, 100, 100);
@@ -604,7 +602,21 @@ export class RubricasPage implements OnInit {
             ySection += (descLines2.length * 4.5) + 3;
           }
 
+          // Criterios con casillas para evaluación física
           if (seccion.criterios && seccion.criterios.length > 0) {
+            // Obtener nombres de niveles para las columnas
+            const nivelesNombres = rubrica.niveles?.map(n => n.nombre) || ['Regular', 'Mediano', 'Completo'];
+            
+            // Asegurar que tenemos al menos 3 niveles para las columnas
+            const columnasNiveles = nivelesNombres.length >= 3 
+              ? nivelesNombres.slice(0, 3) 
+              : ['Regular', 'Mediano', 'Completo'];
+
+            // Asegurar que tenemos exactamente 3 columnas
+            while (columnasNiveles.length < 3) {
+              columnasNiveles.push(`Nivel ${columnasNiveles.length + 1}`);
+            }
+
             const criteriosData = seccion.criterios.map((c, cIdx) => [
               `${cIdx + 1}`,
               c.texto,
@@ -615,7 +627,7 @@ export class RubricasPage implements OnInit {
 
             autoTable(doc, {
               startY: ySection,
-              head: [['#', 'Criterio', 'Regular', 'Mediano', 'Completo']],
+              head: [['#', 'Criterio', columnasNiveles[0], columnasNiveles[1], columnasNiveles[2]]],
               body: criteriosData,
               theme: 'grid',
               headStyles: {
@@ -638,6 +650,7 @@ export class RubricasPage implements OnInit {
 
             ySection = (doc as any).lastAutoTable.finalY + 4;
 
+            // Línea de observaciones
             doc.setFontSize(9);
             doc.setTextColor(100, 100, 100);
             doc.text('Observaciones:', 18, ySection);
@@ -661,6 +674,7 @@ export class RubricasPage implements OnInit {
         doc.text('No hay secciones configuradas en esta rúbrica', 105, 80, { align: 'center' });
       }
 
+      // ========== FOOTER / PÁGINAS ==========
       const totalPages = doc.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -675,6 +689,7 @@ export class RubricasPage implements OnInit {
         doc.text(`Página ${i} de ${totalPages}`, 195, 287, { align: 'right' });
       }
 
+      // ========== GUARDAR ARCHIVO ==========
       const nombreArchivo = `rubrica-concurso-${rubrica.concursoId}-${new Date().toISOString().slice(0, 10)}.pdf`;
       doc.save(nombreArchivo);
 
@@ -719,7 +734,7 @@ export class RubricasPage implements OnInit {
         let mensaje = 'Error al exportar la rúbrica';
         if (err.status === 404) {
           mensaje = 'La funcionalidad de exportación Excel está en desarrollo.\n\n' +
-                    'Usa el botón "Descargar rúbrica" para obtener el PDF estructurado.';
+                    'Usa el botón "Descargar PDF" para obtener la rúbrica en formato físico.';
         } else if (err.error?.mensaje) {
           mensaje = err.error.mensaje;
         } else if (err.message) {

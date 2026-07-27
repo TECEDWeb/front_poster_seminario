@@ -20,17 +20,19 @@ import {
   alertCircleOutline, 
   optionsOutline, 
   saveOutline,
-  informationCircleOutline,  // ← AGREGAR ESTE
-  refreshOutline,            // ← AGREGAR ESTE
-  checkboxOutline,           // ← AGREGAR ESTE
-  eyeOutline,                // ← AGREGAR ESTE
-  downloadOutline,           // ← AGREGAR ESTE
-  filterOutline,             // ← AGREGAR ESTE
-  trophyOutline,             // ← AGREGAR ESTE
-  pricetagOutline,           // ← AGREGAR ESTE
-  documentTextOutline,       // ← AGREGAR ESTE
-  searchOutline,             // ← AGREGAR ESTE
-  funnelOutline              // ← AGREGAR ESTE
+  informationCircleOutline,
+  refreshOutline,
+  checkboxOutline,
+  eyeOutline,
+  downloadOutline,
+  filterOutline,
+  trophyOutline,
+  pricetagOutline,
+  documentTextOutline,
+  searchOutline,
+  funnelOutline,
+  printOutline,
+  arrowBackOutline
 } from 'ionicons/icons';
 
 import { SeccionService } from '../../../../core/services/seccion.service';
@@ -97,12 +99,14 @@ export class RubricaBuilderComponent implements OnChanges {
   agregandoNivelGlobal = false;
   nuevoNivelGlobal = { nombre: '', puntaje: null as number | null, descripcion: '' };
 
+  // Estado para descarga
+  descargando = false;
+
   constructor(
     private seccionService: SeccionService,
     private criterioService: CriterioService,
     private nivelService: NivelService
   ) {
-    // REGISTRAR TODOS LOS ÍCONOS NECESARIOS
     addIcons({
       addOutline, 
       createOutline, 
@@ -117,7 +121,7 @@ export class RubricaBuilderComponent implements OnChanges {
       alertCircleOutline, 
       optionsOutline, 
       saveOutline,
-      informationCircleOutline,  // ← IMPORTANTE
+      informationCircleOutline,
       refreshOutline,
       checkboxOutline,
       eyeOutline,
@@ -127,7 +131,9 @@ export class RubricaBuilderComponent implements OnChanges {
       pricetagOutline,
       documentTextOutline,
       searchOutline,
-      funnelOutline
+      funnelOutline,
+      printOutline,
+      arrowBackOutline
     });
   }
 
@@ -152,7 +158,6 @@ export class RubricaBuilderComponent implements OnChanges {
           agregandoCriterio: false,
           nuevoCriterioTexto: ''
         }));
-        // Cargar criterios para cada sección
         this.secciones.forEach(s => this.cargarCriterios(s));
       },
       error: (err) => {
@@ -457,6 +462,353 @@ export class RubricaBuilderComponent implements OnChanges {
     });
   }
 
+  // ==========================================================
+  // MÉTODO: DESCARGAR RÚBRICA EN PDF - FORMATO MANUAL
+  async descargarRubricaPDF(): Promise<void> {
+    if (this.descargando) return;
+    
+    this.descargando = true;
+
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      const autoTable = autoTableModule.default;
+
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageWidth = 297;
+      const pageHeight = 210;
+      const margin = 14;
+      const contentWidth = pageWidth - (margin * 2);
+
+      let yPos = 16;
+
+      // ==========================================================
+      // 1. ENCABEZADO
+      // ==========================================================
+      doc.setFillColor(0, 27, 76);
+      doc.rect(0, 0, pageWidth, 5, 'F');
+
+      doc.setFontSize(16);
+      doc.setTextColor(0, 27, 76);
+      doc.setFont('helvetica', 'bold');
+      doc.text('FORMULARIO DE EVALUACIÓN', pageWidth / 2, 18, { align: 'center' });
+
+      doc.setFontSize(11);
+      doc.setTextColor(80, 80, 80);
+      doc.setFont('helvetica', 'normal');
+      doc.text(this.concursoNombre || `CONCURSO #${this.concursoId}`, pageWidth / 2, 25, { align: 'center' });
+
+      doc.setDrawColor(201, 168, 76);
+      doc.setLineWidth(0.5);
+      doc.line(margin + 30, 28, pageWidth - margin - 30, 28);
+
+      yPos = 33;
+
+      // ==========================================================
+      // 2. DATOS DEL PROYECTO
+      // ==========================================================
+      doc.setFontSize(9);
+      doc.setTextColor(0, 27, 76);
+      doc.setFont('helvetica', 'bold');
+      doc.text('DATOS DEL PROYECTO', margin, yPos);
+      yPos += 2;
+
+      const datosGenerales = [
+        ['Proyecto:', '___________________________________________'],
+        ['Expositor(a):', '___________________________________________'],
+        ['Evaluador(a):', '___________________________________________'],
+        ['Fecha:', '___________________________________________']
+      ];
+
+      autoTable(doc, {
+        startY: yPos + 1,
+        body: datosGenerales,
+        theme: 'plain',
+        styles: {
+          fontSize: 9,
+          cellPadding: { top: 1.5, bottom: 1.5, left: 2, right: 2 },
+          valign: 'middle'
+        },
+        columnStyles: {
+          0: { cellWidth: 30, fontStyle: 'bold', textColor: [60, 60, 60] },
+          1: { cellWidth: contentWidth - 30 }
+        },
+        margin: { left: margin, right: margin },
+        tableWidth: contentWidth
+      });
+
+      yPos = (doc as any).lastAutoTable.finalY + 4;
+
+      // ==========================================================
+      // 3. NIVELES DE EVALUACIÓN - TODOS LOS NIVELES
+      // ==========================================================
+      doc.setFontSize(9);
+      doc.setTextColor(0, 27, 76);
+      doc.setFont('helvetica', 'bold');
+      doc.text('NIVELES DE EVALUACIÓN', margin, yPos);
+      yPos += 2;
+
+      // Obtener TODOS los niveles
+      let niveles: any[] = [];
+      
+      if (this.nivelesGlobales && this.nivelesGlobales.length > 0) {
+        niveles = this.nivelesGlobales.map(n => ({
+          nombre: n.nombre,
+          puntaje: n.puntaje
+        }));
+      } else {
+        // Niveles por defecto
+        niveles = [
+          { nombre: 'Nivel 1', puntaje: 1 },
+          { nombre: 'Nivel 2', puntaje: 2 },
+          { nombre: 'Nivel 3', puntaje: 3 },
+          { nombre: 'Nivel 4', puntaje: 4 },
+          { nombre: 'Nivel 5', puntaje: 5 }
+        ];
+      }
+
+      // Ordenar por puntaje
+      niveles.sort((a, b) => a.puntaje - b.puntaje);
+
+      // Crear tabla de niveles - usar autoTable
+      const nivelHeaders = niveles.map((n, i) => `Nivel ${i + 1}`);
+      const nivelFila = niveles.map(n => n.nombre);
+
+      autoTable(doc, {
+        startY: yPos + 1,
+        head: [nivelHeaders],
+        body: [nivelFila],
+        theme: 'grid',
+        headStyles: {
+          fillColor: [235, 245, 251],
+          textColor: [0, 27, 76],
+          fontSize: 8,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: {
+          fontSize: 7.5,
+          halign: 'center',
+          valign: 'middle'
+        },
+        styles: {
+          cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }
+        },
+        margin: { left: margin, right: margin },
+        tableWidth: contentWidth
+      });
+
+      yPos = (doc as any).lastAutoTable.finalY + 5;
+
+      // ==========================================================
+      // 4. SECCIONES Y CRITERIOS - CON TABLA CORRECTA
+      // ==========================================================
+      if (this.secciones && this.secciones.length > 0) {
+        let seccionIndex = 0;
+        
+        for (const seccion of this.secciones) {
+          // Verificar espacio en página
+          if (yPos > 170) {
+            doc.addPage();
+            yPos = 16;
+          }
+
+          seccionIndex++;
+
+          // ==========================================================
+          // 4a. ENCABEZADO DE SECCIÓN
+          // ==========================================================
+          doc.setFillColor(0, 27, 76);
+          doc.rect(margin, yPos - 1, contentWidth, 7, 'F');
+          doc.setFontSize(10);
+          doc.setTextColor(255, 255, 255);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`${seccionIndex}. ${seccion.nombre.toUpperCase()}`, margin + 4, yPos + 4.5);
+
+          yPos += 9;
+
+          // ==========================================================
+          // 4b. TABLA DE CRITERIOS
+          // ==========================================================
+          const criterios = seccion.criterios || [];
+          
+          if (criterios.length > 0) {
+            // Nombres de niveles (cortos)
+            const nivelesNombres = niveles.map((n, i) => `Nivel ${i + 1}`);
+
+            // Calcular anchos
+            const numNiveles = niveles.length;
+            const anchoCasilla = 10;
+            const anchoCriterio = contentWidth - 12 - (anchoCasilla * numNiveles);
+            
+            // Construir datos de la tabla
+            const criteriosData: any[][] = [];
+            
+            criterios.forEach((c, idx) => {
+              const fila = [`${idx + 1}. ${c.texto}`];
+              // Agregar una casilla vacía por cada nivel
+              for (let i = 0; i < numNiveles; i++) {
+                fila.push('');
+              }
+              criteriosData.push(fila);
+            });
+
+            // Construir encabezados
+            const headers = ['Criterio', ...nivelesNombres];
+
+            autoTable(doc, {
+              startY: yPos,
+              head: [headers],
+              body: criteriosData,
+              theme: 'grid',
+              headStyles: {
+                fillColor: [201, 168, 76],
+                textColor: [255, 255, 255],
+                fontSize: 7,
+                fontStyle: 'bold',
+                halign: 'center'
+              },
+              bodyStyles: {
+                fontSize: 7.5,
+                valign: 'middle'
+              },
+              columnStyles: {
+                0: { cellWidth: anchoCriterio, halign: 'left' }
+              },
+              // Todas las columnas de niveles con el mismo ancho
+              margin: { left: margin, right: margin },
+              tableWidth: contentWidth
+            });
+
+            yPos = (doc as any).lastAutoTable.finalY + 2;
+
+            // ==========================================================
+            // 4c. OBSERVACIONES
+            // ==========================================================
+            doc.setFontSize(8);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Observaciones:', margin + 2, yPos + 3);
+            
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(margin + 28, yPos + 3, pageWidth - margin - 2, yPos + 3);
+            
+            yPos += 6;
+            doc.line(margin + 2, yPos + 3, pageWidth - margin - 2, yPos + 3);
+            
+            yPos += 10;
+
+          } else {
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.setFont('helvetica', 'italic');
+            doc.text('(Sin criterios definidos)', margin + 4, yPos);
+            yPos += 8;
+          }
+
+          yPos += 2;
+        }
+
+      } else {
+        doc.setFontSize(11);
+        doc.setTextColor(150, 150, 150);
+        doc.text('No hay secciones configuradas en esta rúbrica', pageWidth / 2, 100, { align: 'center' });
+      }
+
+      // ==========================================================
+      // 5. RESULTADOS
+      // ==========================================================
+      if (yPos > 165) {
+        doc.addPage();
+        yPos = 16;
+      }
+
+      yPos += 3;
+      doc.setDrawColor(0, 27, 76);
+      doc.setLineWidth(0.4);
+      doc.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 6;
+
+      doc.setFontSize(10);
+      doc.setTextColor(0, 27, 76);
+      doc.setFont('helvetica', 'bold');
+      doc.text('RESULTADOS', margin, yPos);
+      yPos += 5;
+
+      const resultadosData = [
+        ['Puntaje total obtenido:', '______ / ______'],
+        ['% de cumplimiento:', '______ %']
+      ];
+
+      autoTable(doc, {
+        startY: yPos,
+        body: resultadosData,
+        theme: 'plain',
+        styles: {
+          fontSize: 9,
+          cellPadding: { top: 3, bottom: 3, left: 2, right: 2 },
+          valign: 'middle'
+        },
+        columnStyles: {
+          0: { cellWidth: 45, fontStyle: 'bold', textColor: [60, 60, 60] },
+          1: { cellWidth: contentWidth - 45, halign: 'center' }
+        },
+        margin: { left: margin, right: margin },
+        tableWidth: contentWidth
+      });
+
+      yPos = (doc as any).lastAutoTable.finalY + 8;
+
+      // ==========================================================
+      // 6. FIRMAS
+      // ==========================================================
+      const firmaY = yPos;
+      const firmaAncho = (contentWidth - 20) / 2;
+
+      doc.line(margin, firmaY, margin + firmaAncho, firmaY);
+      doc.setFontSize(8);
+      doc.setTextColor(80, 80, 80);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Firma del/la evaluador(a)', margin + (firmaAncho / 2), firmaY + 5, { align: 'center' });
+
+      doc.line(margin + firmaAncho + 20, firmaY, margin + firmaAncho + 20 + firmaAncho, firmaY);
+      doc.text('Firma del/la expositor(a)', margin + firmaAncho + 20 + (firmaAncho / 2), firmaY + 5, { align: 'center' });
+
+      yPos = firmaY + 14;
+
+      // ==========================================================
+      // 7. FOOTER
+      // ==========================================================
+      doc.setDrawColor(0, 27, 76);
+      doc.setLineWidth(0.3);
+      doc.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+
+      doc.setFontSize(6);
+      doc.setTextColor(180, 180, 180);
+      doc.setFont('helvetica', 'italic');
+      const fecha = new Date().toLocaleDateString('es-EC', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      doc.text(`Rúbrica #${this.concursoId} - ${this.concursoNombre || ''} - ${fecha}`, pageWidth / 2, pageHeight - 7, { align: 'center' });
+
+      // ==========================================================
+      // 8. GUARDAR
+      // ==========================================================
+      const nombreArchivo = `formulario-evaluacion-${this.concursoId}-${new Date().toISOString().slice(0, 10)}.pdf`;
+      doc.save(nombreArchivo);
+
+      this.descargando = false;
+      console.log(`✅ Formulario de evaluación exportado: ${nombreArchivo}`);
+
+    } catch (error) {
+      console.error('❌ Error generando el formulario:', error);
+      this.descargando = false;
+      alert('Error al generar el PDF del formulario. Por favor, intenta de nuevo.');
+    }
+  }
   cerrarModal(): void {
     this.cerrar.emit();
   }

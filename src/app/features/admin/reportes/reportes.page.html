@@ -47,9 +47,7 @@
       </div>
     </div>
 
-    <!-- ============================================ -->
     <!-- SELECTOR DE CONCURSO OBLIGATORIO -->
-    <!-- ============================================ -->
     <div class="concurso-selector-card">
       <div class="csc-header">
         <ion-icon name="trophy-outline"></ion-icon>
@@ -91,9 +89,7 @@
       <p>Elige uno de tus concursos arriba para ver su podio de ganadores, proyectos evaluados y rendimiento de evaluadores.</p>
     </div>
 
-    <!-- ============================================ -->
-    <!-- PODIO: 1er, 2do y 3er LUGAR -->
-    <!-- ============================================ -->
+    <!-- PODIO -->
     <div class="podio-section" *ngIf="haySeleccionConcurso && !cargando && ganadores && ganadores.length > 0">
       <div class="podio-header">
         <h2>
@@ -104,7 +100,6 @@
       </div>
 
       <div class="podio-grid">
-        <!-- 2do Lugar (izquierda) -->
         <div class="podio-card podio-2" *ngIf="ganadores.length >= 2">
           <ion-icon name="medal" class="podio-medalla-icon medalla-plata"></ion-icon>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[1].nombre)">
@@ -121,7 +116,6 @@
           <div class="podio-posicion">2do Lugar</div>
         </div>
 
-        <!-- 1er Lugar (centro - más grande) -->
         <div class="podio-card podio-1" *ngIf="ganadores.length >= 1">
           <ion-icon name="trophy" class="podio-corona-icon"></ion-icon>
           <ion-icon name="medal" class="podio-medalla-icon medalla-oro"></ion-icon>
@@ -142,7 +136,6 @@
           </div>
         </div>
 
-        <!-- 3er Lugar (derecha) -->
         <div class="podio-card podio-3" *ngIf="ganadores.length >= 3">
           <ion-icon name="medal" class="podio-medalla-icon medalla-bronce"></ion-icon>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[2].nombre)">
@@ -168,7 +161,6 @@
       </div>
     </div>
 
-    <!-- Mensaje cuando no hay ganadores en el concurso elegido -->
     <div class="podio-empty" *ngIf="haySeleccionConcurso && !cargando && ganadores && ganadores.length === 0">
       <div class="empty-icon">
         <ion-icon name="trophy-outline"></ion-icon>
@@ -267,9 +259,7 @@
       </ion-button>
     </div>
 
-    <!-- ============================================ -->
-    <!-- VISTA: POR PROYECTO - LISTA CON ACORDEÓN -->
-    <!-- ============================================ -->
+    <!-- VISTA: POR PROYECTO -->
     <div class="proyectos-section" *ngIf="haySeleccionConcurso && !cargando && !error && vistaActual === 'proyectos'">
       <div class="section-header">
         <div class="section-header-left">
@@ -346,6 +336,7 @@
                 <span class="progress-label">{{ getPorcentaje(p.promedio, p.puntajeMaximo) }}%</span>
               </div>
 
+              <!-- TUTORES -->
               <div class="pb-personas" *ngIf="(p.tutores || []).length > 0">
                 <div class="pb-section-title">
                   <ion-icon name="school-outline"></ion-icon>
@@ -365,6 +356,7 @@
                 </div>
               </div>
 
+              <!-- PARTICIPANTES -->
               <div class="pb-personas" *ngIf="(p.participantes || []).length > 0">
                 <div class="pb-section-title">
                   <ion-icon name="person-outline"></ion-icon>
@@ -385,6 +377,7 @@
                 <span>Este reporte aún no incluye tutores/participantes para este proyecto</span>
               </div>
 
+              <!-- EVALUADORES CON BOTÓN VER RESPUESTAS -->
               <div class="pb-evaluadores">
                 <div class="pb-section-title">
                   <ion-icon name="people-outline"></ion-icon>
@@ -398,13 +391,31 @@
                       <span class="pbe-rol">{{ e.rol || 'Evaluador' }}</span>
                     </div>
                     <div class="pbe-puntaje">
-                      {{ e.puntaje }}
+                      <span class="pbe-puntaje-valor">{{ e.puntaje }}</span>
                       <span class="pbe-max" *ngIf="p.puntajeMaximo">/ {{ p.puntajeMaximo }}</span>
                     </div>
+                    
+                    <!-- BOTÓN VER RESPUESTAS -->
+                    <!-- SI e.estado ES 'evaluado' O e.puntaje > 0 (para detectar evaluaciones completadas) -->
+                    <button
+                      class="pbe-respuestas-btn"
+                      *ngIf="e.estado === 'evaluado' || e.puntaje > 0"
+                      (click)="verRespuestas(e, p)"
+                      title="Ver respuestas de la evaluación">
+                      <ion-icon name="eye-outline"></ion-icon>
+                      <span class="pbe-btn-label">Ver respuestas</span>
+                    </button>
+                    
+                    <!-- Mostrar estado si no está evaluado -->
+                    <span class="pbe-estado estado-pendiente" *ngIf="e.estado !== 'evaluado' && e.puntaje === 0">
+                      <ion-icon name="time-outline"></ion-icon>
+                      Pendiente
+                    </span>
                   </div>
                 </div>
               </div>
 
+              <!-- ADMIN ACTIONS -->
               <div class="pb-acciones-admin" *ngIf="esAdmin && p.evaluacionId">
                 <div class="pb-section-title admin-title">
                   <ion-icon name="settings-outline"></ion-icon>
@@ -432,13 +443,6 @@
                     <ion-icon name="trash-outline"></ion-icon>
                     Eliminar
                   </button>
-                  
-                  <button class="pb-btn pb-btn-ver" 
-                          (click)="verDetalleEvaluacion(p)"
-                          title="Ver detalle completo de la evaluación">
-                    <ion-icon name="eye-outline"></ion-icon>
-                    Ver
-                  </button>
                 </div>
                 <div class="pb-admin-status" *ngIf="p.estadoEvaluacion">
                   <span class="status-label">Estado:</span>
@@ -450,6 +454,7 @@
                 </div>
               </div>
 
+              <!-- ACCIONES: EXCEL Y PDF -->
               <div class="pb-actions">
                 <button class="pb-btn pb-btn-excel" (click)="exportarProyectoExcel(p)">
                   <ion-icon name="download-outline"></ion-icon>
@@ -458,10 +463,6 @@
                 <button class="pb-btn pb-btn-pdf" (click)="exportarProyectoPDF(p)">
                   <ion-icon name="document-outline"></ion-icon>
                   PDF
-                </button>
-                <button class="pb-btn pb-btn-view" (click)="verDetalle(p)">
-                  <ion-icon name="eye-outline"></ion-icon>
-                  Ver detalle
                 </button>
               </div>
 
@@ -485,9 +486,7 @@
       </div>
     </div>
 
-    <!-- ============================================ -->
     <!-- VISTA: POR EVALUADOR -->
-    <!-- ============================================ -->
     <div class="evaluadores-resumen-section" *ngIf="haySeleccionConcurso && !cargando && !error && vistaActual === 'evaluadores'">
       <div class="section-header">
         <div class="section-header-left">
@@ -537,155 +536,6 @@
     </div>
 
   </div>
-
-  <!-- ============================================ -->
-  <!-- MODAL: DETALLE DE PROYECTO -->
-  <!-- ============================================ -->
-  <ion-modal [isOpen]="modalAbierto" (didDismiss)="cerrarModal()">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Detalle del proyecto</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="cerrarModal()">
-              <ion-icon name="close-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-
-      <ion-content class="modal-content">
-        <div class="modal-container" *ngIf="!cargandoDetalle && proyectoSeleccionado">
-          <div class="detalle-header">
-            <div class="detalle-titulo">
-              <h2>{{ proyectoSeleccionado.nombre }}</h2>
-              <p>{{ proyectoSeleccionado.descripcion || 'Sin descripción' }}</p>
-            </div>
-            <div class="detalle-stats">
-              <div class="detalle-stat">
-                <span class="stat-label">Promedio</span>
-                <span class="stat-value" [class]="getColorClass(proyectoSeleccionado.promedio, proyectoSeleccionado.puntajeMaximo)">
-                  {{ proyectoSeleccionado.promedio | number:'1.1-2' }} / {{ proyectoSeleccionado.puntajeMaximo }}
-                </span>
-              </div>
-              <div class="detalle-stat">
-                <span class="stat-label">Evaluaciones</span>
-                <span class="stat-value">{{ proyectoSeleccionado.evaluaciones.length || 0 }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="detalle-tutores" *ngIf="(proyectoSeleccionado.tutores || []).length > 0">
-            <h3>
-              <ion-icon name="school-outline"></ion-icon>
-              Tutores
-            </h3>
-            <div class="personas-grid">
-              <div class="persona-card persona-tutor" *ngFor="let t of proyectoSeleccionado.tutores">
-                <div class="persona-avatar">
-                  <span>{{ t.nombre.charAt(0) || 'T' }}</span>
-                </div>
-                <div class="persona-info">
-                  <span class="persona-nombre">{{ t.nombre }}</span>
-                  <span class="persona-badge" *ngIf="t.encargado">
-                    <ion-icon name="star"></ion-icon>
-                    Tutor encargado
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="detalle-participantes" *ngIf="(proyectoSeleccionado.participantes || []).length > 0">
-            <h3>
-              <ion-icon name="person-outline"></ion-icon>
-              Participantes
-            </h3>
-            <div class="personas-grid">
-              <div class="persona-card" *ngFor="let part of proyectoSeleccionado.participantes">
-                <div class="persona-avatar">
-                  <span>{{ part.nombre.charAt(0) || 'P' }}</span>
-                </div>
-                <div class="persona-info">
-                  <span class="persona-nombre">{{ part.nombre }}</span>
-                  <span class="persona-extra" *ngIf="part.cedula">CI: {{ part.cedula }}</span>
-                  <span class="persona-extra" *ngIf="part.email">{{ part.email }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="detalle-personas-empty"
-               *ngIf="(proyectoSeleccionado.tutores || []).length === 0 && (proyectoSeleccionado.participantes || []).length === 0">
-            <ion-icon name="alert-circle-outline"></ion-icon>
-            <span>Este proyecto aún no tiene tutores/participantes registrados en el reporte</span>
-          </div>
-
-          <div class="detalle-evaluadores">
-            <h3>Evaluadores</h3>
-            <div class="evaluadores-grid">
-              <div class="evaluador-card" *ngFor="let e of proyectoSeleccionado.evaluadores || []">
-                <div class="evaluador-avatar">
-                  <span>{{ e.nombre?.charAt(0) || 'E' }}</span>
-                </div>
-                <div class="evaluador-info">
-                  <span class="evaluador-nombre">{{ e.nombre }}</span>
-                  <span class="evaluador-rol">{{ e.rol || 'Evaluador' }}</span>
-                  <span class="evaluador-puntaje">Puntaje: {{ e.puntaje || 0 }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="detalle-evaluaciones" *ngIf="proyectoSeleccionado.evaluaciones?.length">
-            <h3>Evaluaciones registradas</h3>
-            <div class="evaluaciones-list">
-              <div class="evaluacion-item" *ngFor="let ev of proyectoSeleccionado.evaluaciones">
-                <div class="ei-info">
-                  <span class="ei-evaluador">{{ ev.evaluador }}</span>
-                  <span class="ei-meta">
-                    <span class="ei-estado" [class]="getEstadoEvaluacionClass(ev.estado)">
-                      {{ ev.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
-                    </span>
-                    <span class="ei-fecha" *ngIf="ev.fecha_evaluacion">
-                      {{ ev.fecha_evaluacion | date:'dd/MM/yyyy' }}
-                    </span>
-                  </span>
-                </div>
-                <button
-                  class="ei-btn"
-                  *ngIf="ev.estado === 'evaluado'"
-                  (click)="verRespuestas(ev.id)">
-                  <ion-icon name="eye-outline"></ion-icon>
-                  Ver respuestas
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="detalle-actions">
-            <ion-button fill="outline" size="small" (click)="exportarProyectoExcel(proyectoSeleccionado)">
-              <ion-icon name="download-outline" slot="start"></ion-icon>
-              Excel
-            </ion-button>
-            <ion-button fill="outline" size="small" (click)="exportarProyectoPDF(proyectoSeleccionado)">
-              <ion-icon name="document-outline" slot="start"></ion-icon>
-              PDF
-            </ion-button>
-            <ion-button fill="outline" size="small" (click)="cerrarModal()">
-              <ion-icon name="close-outline" slot="start"></ion-icon>
-              Cerrar
-            </ion-button>
-          </div>
-        </div>
-
-        <div class="modal-loading" *ngIf="cargandoDetalle">
-          <ion-spinner name="crescent"></ion-spinner>
-          <p>Cargando detalle del proyecto...</p>
-        </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
 
   <!-- ============================================ -->
   <!-- MODAL: RESPUESTAS DE EVALUACIÓN -->

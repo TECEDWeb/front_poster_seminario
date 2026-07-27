@@ -1,3 +1,4 @@
+@use "sass:color";
 @use 'upse-variables' as *;
 @use 'upse-mixins' as *;
 
@@ -402,7 +403,58 @@
   }
 }
 
-// Responsive
+// ============================================
+// ✅ ESTILOS PARA BOTÓN DE DESCARGA PDF
+// ============================================
+.btn-download-pdf {
+  --color: #{$upse-gold};
+  
+  .btn-label {
+    display: none;
+    
+    @media (min-width: 480px) {
+      display: inline;
+      margin-left: 4px;
+      font-size: 12px;
+    }
+  }
+
+  &:hover {
+    --color: #{color.adjust($upse-gold, $lightness: -15%)};
+  }
+
+  &[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// ============================================
+// TÍTULO CON SUBTÍTULO
+// ============================================
+.subtitle {
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+  margin-left: 8px;
+
+  @media (min-width: 480px) {
+    font-size: 13px;
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
 @media (max-width: 576px) {
   .builder-container {
     padding: 12px 8px 40px;
@@ -434,6 +486,21 @@
 
     ion-icon {
       font-size: 14px;
+    }
+  }
+
+  .btn-download-pdf {
+    .btn-label {
+      display: none;
+    }
+  }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+  .btn-download-pdf {
+    .btn-label {
+      display: inline;
+      font-size: 11px;
     }
   }
 }

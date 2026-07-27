@@ -76,18 +76,6 @@ interface PersonaProyecto {
   email?: string;
 }
 
-interface DetalleProyecto {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  evaluaciones: any[];
-  promedio: number;
-  evaluadores: any[];
-  participantes: PersonaProyecto[];
-  tutores: PersonaProyecto[];
-  puntajeMaximo: number;
-}
-
 interface EvaluadorResumen {
   nombre: string;
   rol: string;
@@ -160,20 +148,12 @@ export class ReportesPage implements OnInit, OnDestroy {
   filtroStatus: string = 'todos';
   filtroEvaluador: string = 'todos';
 
-  // Sin valor por defecto: obliga a elegir un concurso antes de
-  // mostrar cualquier podio, proyecto o evaluador. Esto evita el
-  // problema anterior donde "todos" combinaba concursos y daba la
-  // falsa sensación de estar "atascado" en el primer concurso creado.
   filtroConcurso: string = '';
 
   concursosDisponibles: any[] = [];
   cargandoConcursos: boolean = false;
 
   ganadores: Ganador[] = [];
-
-  modalAbierto = false;
-  proyectoSeleccionado: DetalleProyecto | null = null;
-  cargandoDetalle: boolean = false;
 
   modalRespuestasAbierto = false;
   cargandoRespuestas = false;
@@ -231,10 +211,8 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.esAdmin = this.authService.esAdmin();
   }
 
-  // Auto-refresh: recarga los datos cada cierto tiempo sin bloquear
-  // la pantalla (sin skeleton, sin cerrar acordeones abiertos).
   private autoRefreshHandle: any;
-  private readonly AUTO_REFRESH_MS = 60000; // 60 segundos
+  private readonly AUTO_REFRESH_MS = 60000;
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -273,8 +251,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     return !!this.filtroConcurso;
   }
 
-  // `silencioso = true` se usa desde el auto-refresh: no muestra el
-  // skeleton de carga y conserva qué proyectos tenías expandidos.
   cargarDatos(silencioso: boolean = false): void {
     if (!silencioso) {
       this.cargando = true;
@@ -339,9 +315,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     });
   }
 
-  // ============================================
-  // GANADORES — solo se calculan si hay un concurso elegido
-  // ============================================
   calcularGanadores(): void {
     if (!this.filtroConcurso) {
       this.ganadores = [];
@@ -465,7 +438,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.vistaActual = vista;
   }
 
-  /** Se llama cuando el usuario elige o cambia el concurso en el selector principal */
   onCambioConcursoSelector(): void {
     this.filtroBusqueda = '';
     this.filtroStatus = 'todos';
@@ -531,7 +503,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.cargarDatos();
   }
 
-  /** Limpia los filtros secundarios, pero mantiene el concurso elegido */
   limpiarFiltros(): void {
     this.filtroBusqueda = '';
     this.filtroStatus = 'todos';
@@ -539,7 +510,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.aplicarFiltros();
   }
 
-  /** Vuelve a la pantalla de "elige un concurso" */
   cambiarConcurso(): void {
     this.filtroConcurso = '';
     this.filtroBusqueda = '';
@@ -798,61 +768,72 @@ export class ReportesPage implements OnInit, OnDestroy {
     }
   }
 
-  verDetalleEvaluacion(proyecto: any): void {
-    this.verDetalle(proyecto);
-  }
-
-  async verDetalle(proyecto: any): Promise<void> {
-    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
-    if (!id) {
-      this.mostrarMensaje('No se puede ver detalle: ID del proyecto no encontrado', 'error');
-      return;
-    }
-
-    this.cargandoDetalle = true;
-    this.modalAbierto = true;
-    this.proyectoSeleccionado = null;
-
-    this.reporteService.getDetalleProyecto(id).subscribe({
-      next: (res: any) => {
-        const data = res?.data ?? res;
-        this.proyectoSeleccionado = {
-          id: data.id || id,
-          nombre: data.nombre || data.proyecto || proyecto.proyecto || proyecto.nombre || 'Proyecto',
-          descripcion: data.descripcion || '',
-          evaluaciones: data.evaluaciones || [],
-          promedio: data.promedio || proyecto.promedio || 0,
-          evaluadores: data.evaluadores || proyecto.evaluadores || [],
-          participantes: data.participantes || proyecto.participantes || [],
-          tutores: data.tutores || proyecto.tutores || [],
-          puntajeMaximo: data.puntajeMaximo || proyecto.puntajeMaximo || 100
-        };
-        this.cargandoDetalle = false;
-      },
-      error: (err) => {
-        console.error('Error cargando detalle:', err);
-        this.cargandoDetalle = false;
-        this.proyectoSeleccionado = {
-          id: id,
-          nombre: proyecto.proyecto || proyecto.nombre || 'Proyecto',
-          descripcion: '',
-          evaluaciones: [],
-          promedio: proyecto.promedio || 0,
-          evaluadores: proyecto.evaluadores || [],
-          participantes: proyecto.participantes || [],
-          tutores: proyecto.tutores || [],
-          puntajeMaximo: proyecto.puntajeMaximo || 100
-        };
-      }
-    });
-  }
-
-  verRespuestas(evaluacionId: number): void {
+  /**
+   * Abre el modal con las respuestas de la evaluación
+   * @param evaluador - El objeto del evaluador (contiene posiblemente evaluacionId)
+   * @param proyecto - El objeto del proyecto (para obtener el ID si es necesario)
+   */
+  verRespuestas(evaluador: any, proyecto: any): void {
+    // 1. Intentar obtener el evaluacionId del evaluador
+    let evaluacionId = evaluador?.evaluacionId || evaluador?.evaluacion_id;
+    
+    // 2. Si no tiene, intentar obtenerlo del proyecto
     if (!evaluacionId) {
-      this.mostrarMensaje('No se puede ver el detalle: ID de evaluación no disponible', 'error');
+      evaluacionId = proyecto?.evaluacionId || proyecto?.evaluacion_id;
+    }
+
+    // 3. Si aún no tenemos ID, obtenerlo del detalle del proyecto
+    if (!evaluacionId) {
+      const proyectoId = proyecto?.id || proyecto?.proyecto_id || proyecto?._id;
+      if (!proyectoId) {
+        this.mostrarMensaje('No se puede obtener el detalle: ID del proyecto no encontrado', 'error');
+        return;
+      }
+
+      this.cargandoRespuestas = true;
+      this.modalRespuestasAbierto = true;
+
+      this.reporteService.getDetalleProyecto(proyectoId).subscribe({
+        next: (res: any) => {
+          const data = res?.data ?? res;
+          // Buscar la evaluación del evaluador específico
+          const evaluaciones = data.evaluaciones || [];
+          
+          // Buscar por nombre del evaluador
+          const evaluacionEncontrada = evaluaciones.find((ev: any) => 
+            ev.evaluador === evaluador?.nombre
+          );
+          
+          if (evaluacionEncontrada?.id) {
+            this.abrirModalRespuestas(evaluacionEncontrada.id);
+          } else {
+            // Si no encuentra por nombre, tomar la primera evaluada
+            const evaluada = evaluaciones.find((ev: any) => ev.estado === 'evaluado');
+            if (evaluada?.id) {
+              this.abrirModalRespuestas(evaluada.id);
+            } else {
+              this.cargandoRespuestas = false;
+              this.mostrarMensaje('No hay evaluaciones completadas para este proyecto', 'error');
+            }
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando detalle del proyecto:', err);
+          this.cargandoRespuestas = false;
+          this.mostrarMensaje('Error al obtener el detalle del proyecto', 'error');
+        }
+      });
       return;
     }
 
+    // 4. Si tenemos el ID, abrir el modal directamente
+    this.abrirModalRespuestas(evaluacionId);
+  }
+
+  /**
+   * Abre el modal con las respuestas de la evaluación
+   */
+  private abrirModalRespuestas(evaluacionId: number): void {
     this.modalRespuestasAbierto = true;
     this.cargandoRespuestas = true;
     this.errorRespuestas = null;
@@ -868,23 +849,31 @@ export class ReportesPage implements OnInit, OnDestroy {
 
         const data = res?.data ?? res;
 
+        // Verificar si la respuesta tiene la estructura esperada
+        if (!data.detalles || !Array.isArray(data.detalles)) {
+          this.errorRespuestas = 'La respuesta no contiene detalles de la evaluación';
+          this.cargandoRespuestas = false;
+          return;
+        }
+
         const seccionesMap: { [nombre: string]: any[] } = {};
         (data.detalles || []).forEach((d: any) => {
-          if (!seccionesMap[d.seccion]) {
-            seccionesMap[d.seccion] = [];
+          const seccionNombre = d.seccion || 'Sin sección';
+          if (!seccionesMap[seccionNombre]) {
+            seccionesMap[seccionNombre] = [];
           }
-          seccionesMap[d.seccion].push(d);
+          seccionesMap[seccionNombre].push(d);
         });
 
         this.respuestasDetalle = {
-          evaluadorNombre: data.evaluadorNombre,
-          evaluadorRol: data.evaluadorRol,
-          proyectoNombre: data.proyectoNombre,
-          concursoNombre: data.concursoNombre,
-          rubricaNombre: data.rubricaNombre,
+          evaluadorNombre: data.evaluadorNombre || 'Evaluador',
+          evaluadorRol: data.evaluadorRol || 'Evaluador',
+          proyectoNombre: data.proyectoNombre || 'Proyecto',
+          concursoNombre: data.concursoNombre || '',
+          rubricaNombre: data.rubricaNombre || 'Rúbrica',
           observaciones: data.observaciones || '',
-          fecha: data.fecha,
-          puntajeMaximo: data.puntajeMaximo,
+          fecha: data.fecha || null,
+          puntajeMaximo: data.puntajeMaximo || 100,
           secciones: Object.keys(seccionesMap).map(nombre => ({
             nombre,
             items: seccionesMap[nombre]
@@ -913,15 +902,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.aplicarFiltros();
   }
 
-  cerrarModal(): void {
-    this.modalAbierto = false;
-    this.proyectoSeleccionado = null;
-  }
-
-  toggleFilter(): void {
-    this.aplicarFiltros();
-  }
-
   private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
     const prefijo = tipo === 'success' ? '[OK]' : '[Error]';
     alert(`${prefijo} ${mensaje}`);
@@ -931,11 +911,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     const tutores = proyecto?.tutores || [];
     if (tutores.length === 0) return null;
     return tutores.find((t: PersonaProyecto) => t.encargado)?.nombre || tutores[0]?.nombre || null;
-  }
-
-  nombresParticipantes(proyecto: any): string {
-    const participantes = proyecto?.participantes || [];
-    return participantes.map((p: PersonaProyecto) => p.nombre).join(', ');
   }
 
   getRandomColor(proyecto: string): string {

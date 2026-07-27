@@ -551,7 +551,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  // Fila de acciones rápidas (íconos): ver / editar / eliminar
+  // Fila de acciones rápidas (íconos)
   .card-actions-header {
     display: flex;
     justify-content: flex-end;
@@ -590,7 +590,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         height: 32px;
       }
 
-      // Foco accesible en vez del outline negro del navegador
       &:focus-visible {
         outline: none;
         box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.18);
@@ -602,6 +601,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           color: $upse-blue;
         }
 
+        // ✅ ESTILO PARA BOTÓN DE DESCARGA
+        &.download:hover {
+          background: $upse-gold-light;
+          color: $upse-gold;
+        }
+
         &.danger:hover {
           background: #fef2f2;
           color: #ef4444;
@@ -610,6 +615,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:active {
         transform: scale(0.92);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
     }
   }
@@ -823,7 +833,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  // Aviso cuando una rúbrica todavía no tiene nada configurado
   .empty-content-hint {
     display: flex;
     align-items: center;
@@ -888,24 +897,54 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    .action-btn-secondary {
-      --border-radius: 10px;
-      --color: #64748b;
-      --border-color: #e2e8f0;
-      font-weight: 500;
-      font-size: 12px;
-      height: 34px;
-      transition: $transition;
+    .actions-secondary-row {
+      display: flex;
+      gap: 6px;
 
-      &:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.15);
+      @media (min-width: 768px) {
+        gap: 8px;
       }
 
-      @media (hover: hover) and (pointer: fine) {
-        &:hover {
-          --color: #{$upse-blue};
-          --border-color: #{$upse-blue};
+      .action-btn-secondary {
+        --border-radius: 8px;
+        --color: #64748b;
+        --border-color: #e2e8f0;
+        font-weight: 500;
+        font-size: 11px;
+        height: 32px;
+        transition: $transition;
+        flex: 1;
+
+        @media (min-width: 768px) {
+          --border-radius: 10px;
+          font-size: 12px;
+          height: 36px;
+        }
+
+        &:focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.15);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          &:hover {
+            --color: #{$upse-blue};
+            --border-color: #{$upse-blue};
+          }
+        }
+
+        // ✅ ESTILO PARA BOTÓN DE PDF
+        &.btn-download-pdf {
+          --color: #{$upse-gold};
+          --border-color: #{$upse-gold};
+
+          @media (hover: hover) and (pointer: fine) {
+            &:hover {
+              --color: #{color.adjust($upse-gold, $lightness: -15%)};
+              --border-color: #{color.adjust($upse-gold, $lightness: -15%)};
+              background: $upse-gold-light;
+            }
+          }
         }
       }
     }
@@ -1129,7 +1168,9 @@ ion-fab-button {
   background: $upse-blue-dark;
 }
 
-
+// ============================================
+// MODALES
+// ============================================
 ion-modal {
   --border-radius: 16px;
   --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -1140,14 +1181,6 @@ ion-modal {
   }
 }
 
-// Modal de edición/creación de datos generales - tamaño mediano
-// ⚠️ Se usa una altura FIJA (calculada con min()) en vez de "auto".
-// "--height: auto" depende de que Ionic mida el contenido interno,
-// y esa medición podía fallar/ejecutarse antes de tiempo (coincidía
-// con el error de hidratación de "options-outline"), dejando el
-// wrapper del modal con altura 0 y mostrando solo el header.
-// Con una altura numérica fija, el modal siempre tiene un tamaño
-// garantizado sin depender de ningún cálculo de contenido.
 ion-modal:not(.builder-modal) {
   --width: 90%;
   --max-width: 500px;
@@ -1165,7 +1198,6 @@ ion-modal:not(.builder-modal) {
   }
 }
 
-// Modal del builder - ocupa toda la pantalla
 .builder-modal {
   --width: 100% !important;
   --height: 100% !important;
@@ -1313,170 +1345,5 @@ ion-modal:not(.builder-modal) {
 
   ion-select {
     --placeholder-color: #94a3b8;
-  }
-}
-// ============================================
-// ESTILOS PARA BOTÓN DE DESCARGA PDF
-// ============================================
-
-.card-actions {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 16px 16px;
-  border-top: 1px solid #f1f5f9;
-
-  @media (min-width: 768px) {
-    padding: 14px 20px 20px;
-  }
-
-  .action-btn-primary {
-    --background: #{$upse-blue};
-    --border-radius: 10px;
-    --box-shadow: 0 3px 10px rgba(0, 27, 76, 0.25);
-    font-weight: 600;
-    height: 40px;
-    font-size: 13px;
-    transition: $transition;
-
-    @media (min-width: 768px) {
-      height: 42px;
-      font-size: 14px;
-    }
-
-    &:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.2);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        --background: #{$upse-blue-dark};
-        --box-shadow: 0 5px 16px rgba(0, 27, 76, 0.35);
-        transform: translateY(-1px);
-      }
-    }
-  }
-
-  // Fila para botones secundarios
-  .actions-secondary-row {
-    display: flex;
-    gap: 6px;
-
-    @media (min-width: 768px) {
-      gap: 8px;
-    }
-
-    .action-btn-secondary {
-      --border-radius: 8px;
-      --color: #64748b;
-      --border-color: #e2e8f0;
-      font-weight: 500;
-      font-size: 11px;
-      height: 32px;
-      transition: $transition;
-      flex: 1;
-
-      @media (min-width: 768px) {
-        --border-radius: 10px;
-        font-size: 12px;
-        height: 36px;
-      }
-
-      &:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.15);
-      }
-
-      @media (hover: hover) and (pointer: fine) {
-        &:hover {
-          --color: #{$upse-blue};
-          --border-color: #{$upse-blue};
-        }
-      }
-
-      // Estilo especial para botón de PDF
-      &.btn-download-pdf {
-        --color: #{$upse-gold};
-        --border-color: #{$upse-gold};
-
-        @media (hover: hover) and (pointer: fine) {
-          &:hover {
-            --color: #{color.adjust($upse-gold, $lightness: -15%)};
-            --border-color: #{color.adjust($upse-gold, $lightness: -15%)};
-            background: $upse-gold-light;
-          }
-        }
-      }
-    }
-  }
-}
-
-// Estilo para botón de descarga en acciones rápidas
-.icon-action {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: none;
-  background: #f8fafc;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: $transition;
-  -webkit-tap-highlight-color: transparent;
-
-  ion-icon {
-    font-size: 16px;
-
-    @media (min-width: 768px) {
-      font-size: 17px;
-    }
-  }
-
-  @media (min-width: 768px) {
-    width: 32px;
-    height: 32px;
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.18);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    &:hover {
-      background: $upse-blue-light;
-      color: $upse-blue;
-    }
-
-    // Estilo especial para botón de descarga
-    &.download:hover {
-      background: $upse-gold-light;
-      color: $upse-gold;
-    }
-
-    &.danger:hover {
-      background: #fef2f2;
-      color: #ef4444;
-    }
-  }
-
-  &:active {
-    transform: scale(0.92);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        background: #f8fafc;
-        color: #64748b;
-      }
-    }
   }
 }
