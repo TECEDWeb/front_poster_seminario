@@ -19,7 +19,7 @@
 
 <ion-content class="proyectos-content">
 
-  <!-- NOTIFICACIÓN FLOTANTE -->
+  <!-- NOTIFICACION FLOTANTE -->
   <div class="toast-notification" *ngIf="notificacion" [class]="'toast-' + notificacion.tipo">
     <ion-icon [name]="notificacion.tipo === 'success' ? 'checkmark-done-outline' : 'alert-circle-outline'"></ion-icon>
     <span>{{ notificacion.mensaje }}</span>
@@ -30,7 +30,7 @@
     <!-- HEADER -->
     <div class="page-header">
       <div class="header-left">
-        <h1>Gestión de proyectos</h1>
+        <h1>Gestion de proyectos</h1>
         <p>{{ proyectos.length }} proyectos registrados en el sistema</p>
       </div>
       <div class="header-right">
@@ -71,7 +71,7 @@
         <ion-searchbar
           [(ngModel)]="busqueda"
           (ionInput)="filtrarProyectos()"
-          placeholder="Buscar por código, nombre, área, nivel, participante o tutor..."
+          placeholder="Buscar por codigo, nombre, area, nivel, participante o tutor..."
           class="filter-search"
           animated>
           <ion-icon name="search-outline" slot="start"></ion-icon>
@@ -86,7 +86,7 @@
           interface="popover"
           class="filter-select">
           <ion-select-option value="todos">Todos los niveles</ion-select-option>
-          <ion-select-option value="Básico">Básico</ion-select-option>
+          <ion-select-option value="Basico">Basico</ion-select-option>
           <ion-select-option value="Intermedio">Intermedio</ion-select-option>
           <ion-select-option value="Avanzado">Avanzado</ion-select-option>
         </ion-select>
@@ -153,9 +153,9 @@
           <!-- CABECERA -->
           <thead>
             <tr>
-              <th class="col-codigo">Código</th>  <!-- ✅ NUEVA COLUMNA -->
+              <th class="col-codigo">Codigo</th>
               <th class="col-proyecto">Proyecto</th>
-              <th class="col-area">Área</th>
+              <th class="col-area">Area</th>
               <th class="col-nivel">Nivel</th>
               <th class="col-tutor">Tutor encargado</th>
               <th class="col-participantes">Participantes</th>
@@ -170,7 +170,7 @@
                 [class.row-active]="p.activo"
                 [class.row-inactive]="!p.activo">
               
-              <!-- ✅ CÓDIGO -->
+              <!-- CODIGO -->
               <td class="col-codigo">
                 <span class="codigo-proyecto">{{ p.codigoProyecto || '—' }}</span>
               </td>
@@ -191,14 +191,14 @@
                 </div>
               </td>
 
-              <!-- Área -->
+              <!-- Area -->
               <td class="col-area">
                 <span class="tag-area">{{ p.area || '—' }}</span>
               </td>
 
               <!-- Nivel -->
               <td class="col-nivel">
-                <span class="tag-nivel" [class.nivel-basico]="p.nivel === 'Básico'"
+                <span class="tag-nivel" [class.nivel-basico]="p.nivel === 'Basico'"
                                         [class.nivel-intermedio]="p.nivel === 'Intermedio'"
                                         [class.nivel-avanzado]="p.nivel === 'Avanzado'">
                   {{ p.nivel || '—' }}
@@ -262,7 +262,7 @@
                   </div>
                   <h3>No hay proyectos</h3>
                   <p *ngIf="!busqueda && filtroNivel === 'todos' && filtroEstado === 'todos' && filtroConcurso === 'todos'">
-                    Comienza creando el primer proyecto de investigación
+                    Comienza creando el primer proyecto de investigacion
                   </p>
                   <p *ngIf="busqueda || filtroNivel !== 'todos' || filtroEstado !== 'todos' || filtroConcurso !== 'todos'">
                     No se encontraron proyectos con los filtros aplicados
@@ -279,7 +279,7 @@
       </div>
     </div>
 
-    <!-- GRID DE CARDS (SOLO MÓVIL) -->
+    <!-- GRID DE CARDS (SOLO MOVIL) -->
     <div class="proyectos-grid" *ngIf="!cargando">
       <div class="proyecto-card"
            *ngFor="let p of proyectosFiltrados || []; let i = index; trackBy: trackById"
@@ -293,7 +293,6 @@
           </div>
           <div class="card-info">
             <h3 class="card-title">{{ p.nombre }}</h3>
-            <!-- ✅ CÓDIGO EN TARJETA -->
             <div class="card-codigo" *ngIf="p.codigoProyecto">
               <ion-icon name="barcode-outline"></ion-icon>
               <span>{{ p.codigoProyecto }}</span>
@@ -335,7 +334,7 @@
                 {{ part.nombre }}
               </div>
               <div class="participant-more" *ngIf="(p.participantes?.length || 0) > 4">
-                +{{ (p.participantes.length || 0) - 4 }} más
+                +{{ (p.participantes.length || 0) - 4 }} mas
               </div>
             </div>
           </div>
@@ -353,7 +352,7 @@
             <ion-icon name="eye-outline"></ion-icon>
             <span>Ver</span>
           </button>
-          <button class="action-item" (click)="editar(p)" title="Editar información del proyecto">
+          <button class="action-item" (click)="editar(p)" title="Editar informacion del proyecto">
             <ion-icon name="create-outline"></ion-icon>
             <span>Editar</span>
           </button>
@@ -413,12 +412,12 @@
               </ion-item>
             </div>
 
-            <!-- ✅ NUEVO CAMPO: CÓDIGO DEL PROYECTO -->
+            <!-- CODIGO DEL PROYECTO -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="barcode-outline"></ion-icon>
-                Código del proyecto
-                <span class="field-hint">(opcional, se genera automáticamente)</span>
+                Codigo del proyecto
+                <span class="field-hint">(opcional, se genera automaticamente)</span>
               </label>
               <ion-item class="field-input" lines="none">
                 <ion-input
@@ -430,25 +429,25 @@
               </ion-item>
               <div class="codigo-preview" *ngIf="form.codigoProyecto">
                 <ion-icon name="checkmark-done-outline"></ion-icon>
-                <span>Código: <strong>{{ form.codigoProyecto }}</strong></span>
-                <span class="auto" *ngIf="!editando">(se usará este código)</span>
+                <span>Codigo: <strong>{{ form.codigoProyecto }}</strong></span>
+                <span class="auto" *ngIf="!editando">(se usara este codigo)</span>
               </div>
               <div class="codigo-preview" *ngIf="!form.codigoProyecto && !editando">
                 <ion-icon name="information-circle-outline"></ion-icon>
-                <span class="auto">Se generará automáticamente al guardar</span>
+                <span class="auto">Se generara automaticamente al guardar</span>
               </div>
             </div>
 
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="document-text-outline"></ion-icon>
-                Descripción
+                Descripcion
               </label>
               <ion-item class="field-input" lines="none">
                 <ion-textarea
                   [(ngModel)]="form.descripcion"
                   name="descripcion"
-                  placeholder="Ingrese una descripción del proyecto"
+                  placeholder="Ingrese una descripcion del proyecto"
                   rows="3">
                 </ion-textarea>
               </ion-item>
@@ -488,7 +487,7 @@
                     placeholder="Seleccione un nivel"
                     interface="popover"
                     required>
-                    <ion-select-option value="Básico">Básico</ion-select-option>
+                    <ion-select-option value="Basico">Basico</ion-select-option>
                     <ion-select-option value="Intermedio">Intermedio</ion-select-option>
                     <ion-select-option value="Avanzado">Avanzado</ion-select-option>
                   </ion-select>
@@ -498,30 +497,57 @@
               <div class="form-field">
                 <label class="field-label">
                   <ion-icon name="business-outline"></ion-icon>
-                  Área
+                  Area
                   <span class="required">*</span>
                 </label>
                 <ion-item class="field-input" lines="none">
                   <ion-select
                     [(ngModel)]="form.area"
                     name="area"
-                    placeholder="Seleccione un área"
+                    placeholder="Seleccione un area"
                     interface="popover"
                     required>
+
+                    <!-- CIENCIAS -->
+                    <ion-select-option value="Ciencias Administrativas">Ciencias Administrativas</ion-select-option>
+                    <ion-select-option value="Ciencias Agrarias">Ciencias Agrarias</ion-select-option>
+                    <ion-select-option value="Ciencias del Mar">Ciencias del Mar</ion-select-option>
+                    <ion-select-option value="Ciencias de la Educacion e Idiomas">Ciencias de la Educacion e Idiomas</ion-select-option>
+                    <ion-select-option value="Ciencias Sociales y Salud">Ciencias Sociales y Salud</ion-select-option>
+                    <ion-select-option value="Sistemas y Telecomunicaciones">Sistemas y Telecomunicaciones</ion-select-option>
+                    <ion-select-option value="Ciencias de la Ingenieria">Ciencias de la Ingenieria</ion-select-option>
+
+                    <!-- INGENIERIAS -->
+                    <ion-select-option value="Ingenieria de Software">Ingenieria de Software</ion-select-option>
+                    <ion-select-option value="Ingenieria Civil">Ingenieria Civil</ion-select-option>
+                    <ion-select-option value="Ingenieria Electronica">Ingenieria Electronica</ion-select-option>
+                    <ion-select-option value="Ingenieria Mecanica">Ingenieria Mecanica</ion-select-option>
+                    <ion-select-option value="Ingenieria Industrial">Ingenieria Industrial</ion-select-option>
+                    <ion-select-option value="Ingenieria Quimica">Ingenieria Quimica</ion-select-option>
+
+                    <!-- TECNOLOGIA -->
+                    <ion-select-option value="Tecnologia">Tecnologia</ion-select-option>
+                    <ion-select-option value="Tecnologias de la Informacion">Tecnologias de la Informacion</ion-select-option>
+
+                    <!-- OTRAS -->
                     <ion-select-option value="Ciencias">Ciencias</ion-select-option>
-                    <ion-select-option value="Tecnología">Tecnología</ion-select-option>
                     <ion-select-option value="Sociales">Sociales</ion-select-option>
                     <ion-select-option value="Humanidades">Humanidades</ion-select-option>
-                    <ion-select-option value="Ingeniería">Ingeniería</ion-select-option>
                     <ion-select-option value="Salud">Salud</ion-select-option>
                     <ion-select-option value="Artes">Artes</ion-select-option>
                     <ion-select-option value="Deportes">Deportes</ion-select-option>
+                    <ion-select-option value="Diseno y Comunicacion">Diseno y Comunicacion</ion-select-option>
+                    <ion-select-option value="Turismo y Hoteleria">Turismo y Hoteleria</ion-select-option>
+                    <ion-select-option value="Derecho">Derecho</ion-select-option>
+                    <ion-select-option value="Arquitectura">Arquitectura</ion-select-option>
+                    <ion-select-option value="Matematicas">Matematicas</ion-select-option>
+
                   </ion-select>
                 </ion-item>
               </div>
             </div>
 
-            <!-- ✅ PARTICIPANTES - YA NO ES OBLIGATORIO -->
+            <!-- PARTICIPANTES -->
             <div class="form-field">
               <label class="field-label">
                 <ion-icon name="people-outline"></ion-icon>
@@ -532,7 +558,7 @@
                 <ion-textarea
                   [(ngModel)]="form.participantesTexto"
                   name="participantesTexto"
-                  placeholder="Ej: Juan Pérez, María Gómez, Carlos Ruiz..."
+                  placeholder="Ej: Juan Perez, Maria Gomez, Carlos Ruiz..."
                   rows="2">
                 </ion-textarea>
               </ion-item>
@@ -656,7 +682,6 @@
               </div>
               <div>
                 <h2>{{ p.nombre }}</h2>
-                <!-- ✅ CÓDIGO EN DETALLE -->
                 <div class="detalle-codigo" *ngIf="p.codigoProyecto">
                   <ion-icon name="barcode-outline"></ion-icon>
                   <span>{{ p.codigoProyecto }}</span>
@@ -669,13 +694,13 @@
             </div>
 
             <p class="detalle-descripcion" *ngIf="p.descripcion">{{ p.descripcion }}</p>
-            <p class="detalle-descripcion empty" *ngIf="!p.descripcion">Sin descripción registrada</p>
+            <p class="detalle-descripcion empty" *ngIf="!p.descripcion">Sin descripcion registrada</p>
 
             <div class="detalle-meta-grid">
               <div class="meta-item">
                 <ion-icon name="business-outline"></ion-icon>
                 <div>
-                  <span class="meta-label">Área</span>
+                  <span class="meta-label">Area</span>
                   <span class="meta-value">{{ p.area || '—' }}</span>
                 </div>
               </div>
@@ -768,7 +793,7 @@
                 <span class="ev-puntaje" *ngIf="ev.puntaje_total">{{ ev.puntaje_total }} pts</span>
               </div>
               <p class="empty-mini" *ngIf="detalleEvaluaciones.totalEvaluaciones === 0">
-                Este proyecto aún no tiene evaluaciones asignadas
+                Este proyecto aun no tiene evaluaciones asignadas
               </p>
             </ng-container>
           </div>

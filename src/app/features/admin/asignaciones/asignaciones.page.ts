@@ -24,6 +24,7 @@ import {
   IonSearchbar,
   IonSelect,
   IonSelectOption,
+  IonSpinner  // ✅ AGREGADO
 } from '@ionic/angular/standalone';
 import { AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -50,12 +51,15 @@ import {
   createOutline,
   personRemoveOutline,
   warningOutline,
-  chevronForwardOutline
+  chevronForwardOutline,
+  chevronBackOutline,
+  chatbubbleOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { AsignacionService } from '../../../core/services/asignacion.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
+import { ReporteService } from '../../../core/services/reporte.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { SeleccionarProyectoModalComponent } from '../../../shared/components/seleccionar-proyecto-modal/seleccionar-proyecto-modal.component';
@@ -88,6 +92,7 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonSearchbar,
     IonSelect,
     IonSelectOption,
+    IonSpinner,  // ✅ AGREGADO
     SeleccionarProyectoModalComponent,
     SeleccionarEvaluadorModalComponent
   ],
@@ -121,7 +126,7 @@ export class AsignacionesPage implements OnInit {
   modalProyectoAbierto = false;
   modalEvaluadorAbierto = false;
 
-  // CALENDARIO (MODAL PROPIO)
+  // CALENDARIO
   calendarModalOpen = false;
   fechaLimiteTemp: string | null = null;
   today: string = new Date().toISOString();
@@ -133,6 +138,13 @@ export class AsignacionesPage implements OnInit {
   paginaActualTodas = 1;
   itemsPorPaginaTodas = 15;
 
+  // ==========================================================
+  // MODAL DE RESPUESTAS - VARIABLES
+  // ==========================================================
+  modalRespuestasAbierto = false;
+  cargandoRespuestas = false;
+  errorRespuestas: string | null = null;
+  respuestasDetalle: any = null;
 
   // GETTERS
   get proyectoSeleccionado(): any {
@@ -153,19 +165,16 @@ export class AsignacionesPage implements OnInit {
   get asignacionesFiltradas(): any[] {
     let resultado = [...this.asignacionesTodas];
 
-    // Ordenar por fecha descendente
     resultado.sort((a, b) => {
       const fechaA = new Date(this.obtenerFechaDeAsignacion(a) || 0).getTime();
       const fechaB = new Date(this.obtenerFechaDeAsignacion(b) || 0).getTime();
       return fechaB - fechaA;
     });
 
-    // Filtro por estado
     if (this.filtroEstadoTodas !== 'todos') {
-      resultado = resultado.filter(a => this.getStatusClass(a.status || a.estado || 'pending') === this.filtroEstadoTodas);
+      resultado = resultado.filter(a => this.getStatusClass(a.estado || a.status || 'pending') === this.filtroEstadoTodas);
     }
 
-    // Búsqueda por texto (proyecto o evaluador)
     if (this.busquedaTodas.trim()) {
       const term = this.busquedaTodas.trim().toLowerCase();
       resultado = resultado.filter(a =>
@@ -186,12 +195,12 @@ export class AsignacionesPage implements OnInit {
     return this.asignacionesFiltradas.slice(inicio, inicio + this.itemsPorPaginaTodas);
   }
 
-
   // CONSTRUCTOR
   constructor(
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
     private evaluacionService: EvaluacionService,
+    private reporteService: ReporteService,
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private router: Router,
@@ -220,7 +229,9 @@ export class AsignacionesPage implements OnInit {
       createOutline,
       personRemoveOutline,
       warningOutline,
-      chevronForwardOutline
+      chevronForwardOutline,
+      chevronBackOutline,
+      chatbubbleOutline
     });
 
     this.esAdmin = this.authService.esAdmin();
@@ -293,7 +304,15 @@ export class AsignacionesPage implements OnInit {
         const data = res?.data ?? res ?? [];
         this.asignacionesTodas = Array.isArray(data) ? data : [];
 
-        // Ordenar por fecha descendente (lo más reciente primero)
+        this.asignacionesTodas = this.asignacionesTodas.map((item: any) => {
+          return {
+            ...item,
+            asignacionId: item.id || item.asignacion_id,
+            evaluacion: item.evaluacion || null,
+            estado: item.estado || item.status || 'asignado'
+          };
+        });
+
         const ordenadas = [...this.asignacionesTodas].sort((a, b) => {
           const fechaA = new Date(this.obtenerFechaDeAsignacion(a) || 0).getTime();
           const fechaB = new Date(this.obtenerFechaDeAsignacion(b) || 0).getTime();
@@ -338,11 +357,42 @@ export class AsignacionesPage implements OnInit {
   }
 
   private obtenerEvaluacionId(a: any): number | null {
-    return a.evaluacion_id ?? a.evaluacionId ?? null;
+    if (a.evaluacion?.id) {
+      return Number(a.evaluacion.id);
+    }
+    if (a.evaluacion_id) {
+      return Number(a.evaluacion_id);
+    }
+    if (a.evaluacionId) {
+      return Number(a.evaluacionId);
+    }
+    if (a.id && a.tipo === 'evaluacion') {
+      return Number(a.id);
+    }
+    return null;
+  }
+
+  private obtenerAsignacionId(a: any): number | null {
+    if (a.id) {
+      return Number(a.id);
+    }
+    if (a.asignacion_id) {
+      return Number(a.asignacion_id);
+    }
+    if (a.asignacionId) {
+      return Number(a.asignacionId);
+    }
+    return null;
   }
 
   // HELPERS DE NOMBRE
   getNombreProyecto(a: any): string {
+    if (a.evaluacion?.proyecto?.nombre) {
+      return a.evaluacion.proyecto.nombre;
+    }
+    if (a.evaluacion?.proyecto?.titulo) {
+      return a.evaluacion.proyecto.titulo;
+    }
     return a.proyecto_nombre
       || a.proyectoNombre
       || a.proyecto?.nombre
@@ -353,6 +403,12 @@ export class AsignacionesPage implements OnInit {
   }
 
   getNombreEvaluador(a: any): string {
+    if (a.evaluacion?.evaluador?.nombre) {
+      return a.evaluacion.evaluador.nombre;
+    }
+    if (a.evaluacion?.evaluador?.nombre_completo) {
+      return a.evaluacion.evaluador.nombre_completo;
+    }
     return a.evaluador_nombre
       || a.evaluadorNombre
       || a.evaluador?.nombre
@@ -391,7 +447,7 @@ export class AsignacionesPage implements OnInit {
     this.evaluadorId = evaluadorId;
   }
 
-  // CALENDARIO (MODAL PROPIO)
+  // CALENDARIO
   abrirCalendarioModal(): void {
     this.fechaLimiteTemp = this.fechaLimite;
     this.calendarModalOpen = true;
@@ -481,88 +537,246 @@ export class AsignacionesPage implements OnInit {
       error: (err: any) => {
         this.submitting = false;
         console.error('Error asignando:', err);
-
-        let mensaje = err.error?.mensaje || err.error?.error || 'Error al asignar el proyecto';
-
-        if (mensaje.includes('rúbrica') || mensaje.includes('rubrica')) {
-          mensaje = 'El proyecto no tiene una rúbrica asociada. Por favor, crea una rúbrica primero.';
-        } else if (mensaje.includes('ya asignado') || mensaje.includes('Ya existe')) {
-          mensaje = 'Este proyecto ya fue asignado a este evaluador.';
-        } else if (mensaje.includes('evaluador') && mensaje.includes('no encontrado')) {
-          mensaje = 'El evaluador seleccionado no está disponible o no existe.';
-        } else if (mensaje.includes('secciones')) {
-          mensaje = 'La rúbrica no tiene secciones configuradas. Ve a Rúbricas → Configurar contenido primero.';
-        }
-
-        this.showError(mensaje);
+        this.showError(err.error?.mensaje || 'Error al asignar el proyecto');
       }
     });
   }
 
+  // ==========================================================
   // QUITAR ASIGNACIÓN
+  // ==========================================================
   async quitarAsignacion(a: any): Promise<void> {
+    const asignacionId = this.obtenerAsignacionId(a);
     const evaluacionId = this.obtenerEvaluacionId(a);
-    if (!evaluacionId) {
-      this.showError('Esta asignación no tiene una evaluación asociada (dato inconsistente). Contacta soporte técnico.');
+    const proyectoId = a.proyecto_id || a.proyectoId || a.proyecto?.id || null;
+    const evaluadorId = a.evaluador_id || a.evaluadorId || a.evaluador?.id || null;
+
+    if (!asignacionId && proyectoId && evaluadorId) {
+      this.asignacionService.listarConFiltros({
+        proyecto_id: proyectoId,
+        evaluador_id: evaluadorId
+      }).subscribe({
+        next: (res: any) => {
+          const data = res?.data ?? res ?? [];
+          if (Array.isArray(data) && data.length > 0) {
+            const asignacion = data[0];
+            this.confirmarYEliminarAsignacion(
+              asignacion.id,
+              evaluacionId,
+              proyectoId,
+              evaluadorId,
+              a
+            );
+          } else {
+            this.showError('No se encontró la asignación');
+          }
+        },
+        error: (err: any) => {
+          console.error('Error buscando asignación:', err);
+          this.showError('Error al buscar la asignación');
+        }
+      });
       return;
     }
 
-    const nombreEvaluador = this.getNombreEvaluador(a);
-    const nombreProyecto = this.getNombreProyecto(a);
+    this.confirmarYEliminarAsignacion(asignacionId, evaluacionId, proyectoId, evaluadorId, a);
+  }
 
-    const yaEvaluado = a.status === 'completed' || a.status === 'completado'
-      || a.estado === 'evaluado' || a.yaEvaluado === true;
+  private async confirmarYEliminarAsignacion(
+    asignacionId: number | null,
+    evaluacionId: number | null,
+    proyectoId: number | null,
+    evaluadorId: number | null,
+    asignacion: any
+  ): Promise<void> {
+    const nombreEvaluador = this.getNombreEvaluador(asignacion);
+    const nombreProyecto = this.getNombreProyecto(asignacion);
+
+    const yaEvaluado = asignacion.estado === 'evaluado'
+      || asignacion.status === 'evaluado'
+      || asignacion.status === 'completed'
+      || asignacion.evaluacion?.estado === 'evaluado';
 
     const alert = await this.alertController.create({
-      header: yaEvaluado ? '⚠️ Eliminar evaluación' : 'Quitar asignación',
+      header: yaEvaluado ? 'Eliminar asignación evaluada' : 'Eliminar asignación',
       subHeader: `Proyecto: ${nombreProyecto}`,
       message: yaEvaluado
-        ? `El evaluador <strong>"${nombreEvaluador}"</strong> YA REGISTRÓ una evaluación para este proyecto.<br><br>Quitar esta asignación <strong>BORRARÁ</strong> también sus respuestas guardadas. ¿Continuar de todas formas?`
-        : `¿Quitar la asignación de <strong>"${nombreEvaluador}"</strong> para el proyecto "${nombreProyecto}"?<br><br>Esta asignación aún no tiene evaluación registrada, así que es seguro quitarla.`,
+        ? `El evaluador <strong>"${nombreEvaluador}"</strong> ya evaluó este proyecto.<br><br>Eliminar esta asignación <strong>BORRARÁ</strong> también la evaluación y sus respuestas. Continuar?`
+        : `Eliminar la asignación de <strong>"${nombreEvaluador}"</strong> para el proyecto "${nombreProyecto}"?`,
       buttons: [
+        { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary'
-        },
-        {
-          text: yaEvaluado ? 'Sí, eliminar todo' : 'Sí, quitar',
+          text: 'Sí, eliminar todo',
           role: 'destructive',
-          cssClass: 'danger',
           handler: () => {
-            this.ejecutarQuitarAsignacion(evaluacionId, nombreEvaluador);
+            this.ejecutarQuitarAsignacion(asignacionId, evaluacionId, proyectoId, evaluadorId, nombreEvaluador);
           }
         }
-      ],
-      cssClass: yaEvaluado ? 'alert-danger' : 'alert-warning'
+      ]
     });
 
     await alert.present();
   }
 
-  private ejecutarQuitarAsignacion(evaluacionId: number, nombreEvaluador: string): void {
-    this.evaluacionService.eliminarEvaluacion(evaluacionId).subscribe({
-      next: () => {
-        this.showSuccess(`Asignación de "${nombreEvaluador}" eliminada correctamente`);
-        this.cargarDatos();
+  private ejecutarQuitarAsignacion(
+    asignacionId: number | null,
+    evaluacionId: number | null,
+    proyectoId: number | null,
+    evaluadorId: number | null,
+    nombreEvaluador: string
+  ): void {
+    if (evaluacionId) {
+      this.evaluacionService.eliminarEvaluacion(evaluacionId).subscribe({
+        next: () => {
+          console.log('Evaluacion eliminada:', evaluacionId);
+          this.eliminarAsignacionDirecta(asignacionId, proyectoId, evaluadorId, nombreEvaluador);
+        },
+        error: (err: any) => {
+          console.error('Error eliminando evaluación:', err);
+          this.eliminarAsignacionDirecta(asignacionId, proyectoId, evaluadorId, nombreEvaluador);
+        }
+      });
+    } else {
+      this.eliminarAsignacionDirecta(asignacionId, proyectoId, evaluadorId, nombreEvaluador);
+    }
+  }
+
+  private eliminarAsignacionDirecta(
+    asignacionId: number | null,
+    proyectoId: number | null,
+    evaluadorId: number | null,
+    nombreEvaluador: string
+  ): void {
+    if (asignacionId) {
+      this.asignacionService.eliminar(asignacionId).subscribe({
+        next: () => {
+          this.showSuccess(`Asignación de "${nombreEvaluador}" eliminada correctamente`);
+          this.cargarDatos();
+        },
+        error: (err: any) => {
+          console.error('Error eliminando asignación por ID:', err);
+          if (proyectoId && evaluadorId) {
+            this.eliminarAsignacionPorProyectoEvaluador(proyectoId, evaluadorId, nombreEvaluador);
+          } else {
+            this.showError(err.error?.mensaje || 'Error al eliminar la asignación');
+          }
+        }
+      });
+    } else if (proyectoId && evaluadorId) {
+      this.eliminarAsignacionPorProyectoEvaluador(proyectoId, evaluadorId, nombreEvaluador);
+    } else {
+      this.showError('No se encontró la asignación para eliminar');
+    }
+  }
+
+  private eliminarAsignacionPorProyectoEvaluador(
+    proyectoId: number,
+    evaluadorId: number,
+    nombreEvaluador: string
+  ): void {
+    this.asignacionService.listarConFiltros({
+      proyecto_id: proyectoId,
+      evaluador_id: evaluadorId
+    }).subscribe({
+      next: (res: any) => {
+        const data = res?.data ?? res ?? [];
+        if (Array.isArray(data) && data.length > 0) {
+          const asignacion = data[0];
+          this.asignacionService.eliminar(asignacion.id).subscribe({
+            next: () => {
+              this.showSuccess(`Asignación de "${nombreEvaluador}" eliminada correctamente`);
+              this.cargarDatos();
+            },
+            error: (err: any) => {
+              console.error('Error eliminando asignación:', err);
+              this.showError(err.error?.mensaje || 'Error al eliminar la asignación');
+            }
+          });
+        } else {
+          this.showError('No se encontró la asignación para eliminar');
+        }
       },
       error: (err: any) => {
-        console.error('Error quitando asignación:', err);
-        this.showError(err.error?.mensaje || 'Error al quitar la asignación');
+        console.error('Error buscando asignación:', err);
+        this.showError('Error al buscar la asignación');
       }
     });
   }
 
-  // ACCIONES ADMIN
-  editarEvaluacionAdmin(asignacion: any): void {
+  // ==========================================================
+  // VER DETALLE - ABRE MODAL CON RESPUESTAS
+  // ==========================================================
+  verDetalleAsignacion(asignacion: any): void {
     const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
       this.showError('No se encontró una evaluación asociada a esta asignación');
       return;
     }
-    this.router.navigate(['/admin/evaluaciones/formulario', evaluacionId]);
+
+    this.modalRespuestasAbierto = true;
+    this.cargandoRespuestas = true;
+    this.errorRespuestas = null;
+    this.respuestasDetalle = null;
+
+    this.reporteService.getDetalleEvaluacion(evaluacionId).subscribe({
+      next: (res: any) => {
+        if (res?.ok === false) {
+          this.errorRespuestas = res.mensaje || 'No se pudo cargar el detalle';
+          this.cargandoRespuestas = false;
+          return;
+        }
+
+        const data = res?.data ?? res;
+
+        if (!data.detalles || !Array.isArray(data.detalles) || data.detalles.length === 0) {
+          this.errorRespuestas = 'Esta evaluación no tiene respuestas registradas';
+          this.cargandoRespuestas = false;
+          return;
+        }
+
+        const seccionesMap: { [nombre: string]: any[] } = {};
+        (data.detalles || []).forEach((d: any) => {
+          const seccionNombre = d.seccion || 'Sin sección';
+          if (!seccionesMap[seccionNombre]) {
+            seccionesMap[seccionNombre] = [];
+          }
+          seccionesMap[seccionNombre].push(d);
+        });
+
+        this.respuestasDetalle = {
+          evaluadorNombre: data.evaluadorNombre || 'Evaluador',
+          evaluadorRol: data.evaluadorRol || 'Evaluador',
+          proyectoNombre: data.proyectoNombre || 'Proyecto sin nombre',
+          concursoNombre: data.concursoNombre || '',
+          rubricaNombre: data.rubricaNombre || 'Rúbrica',
+          observaciones: data.observaciones || '',
+          fecha: data.fecha || null,
+          puntajeMaximo: data.puntajeMaximo || 100,
+          secciones: Object.keys(seccionesMap).map(nombre => ({
+            nombre,
+            items: seccionesMap[nombre]
+          }))
+        };
+
+        this.cargandoRespuestas = false;
+      },
+      error: (err: any) => {
+        console.error('Error cargando respuestas:', err);
+        this.errorRespuestas = err.error?.mensaje || 'Error al cargar las respuestas';
+        this.cargandoRespuestas = false;
+      }
+    });
   }
 
+  cerrarModalRespuestas(): void {
+    this.modalRespuestasAbierto = false;
+    this.respuestasDetalle = null;
+    this.errorRespuestas = null;
+  }
+
+  // ==========================================================
+  // REABRIR EVALUACIÓN
+  // ==========================================================
   async reabrirEvaluacion(asignacion: any): Promise<void> {
     const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
@@ -574,7 +788,7 @@ export class AsignacionesPage implements OnInit {
 
     const alert = await this.alertController.create({
       header: 'Reabrir evaluación',
-      message: `¿Estás seguro de reabrir la evaluación del proyecto "<strong>${nombreProyecto}</strong>"?<br><br>El evaluador podrá modificarla nuevamente.`,
+      message: `Reabrir la evaluación del proyecto "<strong>${nombreProyecto}</strong>"? El evaluador podrá modificarla nuevamente.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -602,6 +816,21 @@ export class AsignacionesPage implements OnInit {
     });
   }
 
+  // ==========================================================
+  // EDITAR EVALUACIÓN ADMIN
+  // ==========================================================
+  editarEvaluacionAdmin(asignacion: any): void {
+    const evaluacionId = this.obtenerEvaluacionId(asignacion);
+    if (!evaluacionId) {
+      this.showError('No se encontró una evaluación asociada a esta asignación');
+      return;
+    }
+    this.router.navigate(['/admin/evaluaciones/formulario', evaluacionId]);
+  }
+
+  // ==========================================================
+  // ELIMINAR EVALUACIÓN
+  // ==========================================================
   async eliminarEvaluacion(asignacion: any): Promise<void> {
     const evaluacionId = this.obtenerEvaluacionId(asignacion);
     if (!evaluacionId) {
@@ -613,13 +842,12 @@ export class AsignacionesPage implements OnInit {
 
     const alert = await this.alertController.create({
       header: 'Eliminar evaluación',
-      message: `¿Estás seguro de eliminar la evaluación del proyecto "<strong>${nombreProyecto}</strong>"?<br><br>Esta acción <strong>no se puede deshacer</strong>.`,
+      message: `Eliminar la evaluación del proyecto "<strong>${nombreProyecto}</strong>"? Esta acción no se puede deshacer.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           role: 'destructive',
-          cssClass: 'danger',
           handler: () => {
             this.ejecutarEliminarEvaluacion(evaluacionId, nombreProyecto);
           }
@@ -643,16 +871,6 @@ export class AsignacionesPage implements OnInit {
     });
   }
 
-  verDetalleAsignacion(asignacion: any): void {
-    const evaluacionId = this.obtenerEvaluacionId(asignacion);
-    if (!evaluacionId) {
-      this.showError('No se encontró una evaluación asociada a esta asignación');
-      return;
-    }
-    this.router.navigate(['/admin/evaluaciones', evaluacionId]);
-  }
-
-
   // UTILIDADES
   resetForm(): void {
     this.proyectoId = null;
@@ -660,7 +878,6 @@ export class AsignacionesPage implements OnInit {
     this.fechaLimite = null;
   }
 
-  // Tiempo relativo tipo "Hace 2h" para actividades recientes
   tiempoRelativo(fecha: string | Date | null | undefined): string {
     if (!fecha) return '';
     const ahora = new Date().getTime();
@@ -683,13 +900,13 @@ export class AsignacionesPage implements OnInit {
     const icons: Record<string, string> = {
       'pending': 'time-outline',
       'pendiente': 'time-outline',
+      'asignado': 'time-outline',
       'in-progress': 'refresh-outline',
       'en_progreso': 'refresh-outline',
       'completed': 'checkmark-circle-outline',
       'completado': 'checkmark-circle-outline',
       'rejected': 'close-circle-outline',
       'rechazado': 'close-circle-outline',
-      'asignado': 'time-outline',
       'evaluado': 'checkmark-circle-outline'
     };
     return icons[status] || 'time-outline';
@@ -699,13 +916,13 @@ export class AsignacionesPage implements OnInit {
     const texts: Record<string, string> = {
       'pending': 'Pendiente',
       'pendiente': 'Pendiente',
+      'asignado': 'Asignado',
       'in-progress': 'En progreso',
       'en_progreso': 'En progreso',
       'completed': 'Completado',
       'completado': 'Completado',
       'rejected': 'Rechazado',
       'rechazado': 'Rechazado',
-      'asignado': 'Asignado',
       'evaluado': 'Evaluado'
     };
     return texts[status] || 'Pendiente';
@@ -730,7 +947,7 @@ export class AsignacionesPage implements OnInit {
   // ALERTAS
   private async showSuccess(message: string): Promise<void> {
     const alert = await this.alertController.create({
-      header: '✅ Éxito',
+      header: 'Exito',
       message: message,
       buttons: ['OK'],
       cssClass: 'alert-success'
@@ -740,7 +957,7 @@ export class AsignacionesPage implements OnInit {
 
   private async showError(message: string): Promise<void> {
     const alert = await this.alertController.create({
-      header: '❌ Error',
+      header: 'Error',
       message: message,
       buttons: ['OK'],
       cssClass: 'alert-error'

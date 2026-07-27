@@ -1,6 +1,15 @@
-@use 'upse-variables' as *;
-@use 'upse-mixins' as *;
+// ============================================
+// VARIABLES (por si no están en upse-variables)
+// ============================================
+$upse-blue: #001b4c;
+$upse-blue-dark: #001433;
+$upse-gold: #c9a84c;
+$shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+// ============================================
+// ESTILOS DEL LAYOUT PÚBLICO
+// ============================================
 .public-shell {
   display: flex;
   flex-direction: column;
@@ -80,21 +89,48 @@
       border-bottom: 2px solid transparent;
       transition: $transition;
 
-      &:hover, &.active {
+      &:hover,
+      &.active {
         color: $upse-blue;
         border-bottom-color: $upse-gold;
       }
     }
   }
 
+  // ==========================================
+  // BOTÓN DE LOGIN - CORREGIDO
+  // ==========================================
   .login-btn {
-    --background: $upse-blue;
-    --border-radius: 10px;
-    font-weight: 600;
-    font-size: 13px;
-    height: 38px;
+    --background: #{$upse-blue} !important;
+    --background-hover: #{$upse-blue-dark} !important;
+    --color: #ffffff !important;
+    --border-radius: 10px !important;
+    --box-shadow: 0 4px 12px rgba(0, 27, 76, 0.25) !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    height: 38px !important;
+    min-width: 130px !important;
 
-    &:hover { --background: $upse-blue-dark; }
+    &:hover {
+      --background: #{$upse-blue-dark} !important;
+      --box-shadow: 0 6px 20px rgba(0, 27, 76, 0.35) !important;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    ion-icon {
+      color: #ffffff !important;
+      font-size: 18px !important;
+    }
+
+    // Quitar cualquier estilo por defecto de Ionic
+    &::part(native) {
+      background: $upse-blue !important;
+      color: #ffffff !important;
+    }
   }
 }
 
@@ -109,7 +145,7 @@
 
   p {
     margin: 0;
-    color: rgba(255,255,255,0.75);
+    color: rgba(255, 255, 255, 0.75);
     font-size: 12px;
   }
 }

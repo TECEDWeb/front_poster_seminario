@@ -9,23 +9,37 @@
   cursor: default;
   overflow: hidden;
   border: 1px solid #eef2f7;
+  background: #ffffff;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(0, 27, 76, 0.12);
-    border-color: #e2e8f0;
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0, 27, 76, 0.12);
+      border-color: #e2e8f0;
+    }
   }
 
   ion-card-content {
     padding: 16px 18px;
     display: flex;
-    align-items: center;
-    gap: 14px;
+    flex-direction: column;
+    gap: 10px;
+
+    @media (min-width: 480px) {
+      padding: 18px 20px;
+      gap: 12px;
+    }
 
     @media (min-width: 768px) {
-      padding: 18px 20px;
-      gap: 16px;
+      padding: 20px 24px;
+      gap: 14px;
     }
+  }
+
+  .stats-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .stats-icon {
@@ -43,29 +57,88 @@
       transition: all 0.3s ease;
     }
 
+    @media (min-width: 480px) {
+      width: 48px;
+      height: 48px;
+      
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+
     @media (min-width: 768px) {
-      width: 50px;
-      height: 50px;
+      width: 52px;
+      height: 52px;
       
       ion-icon {
         font-size: 26px;
       }
     }
+
+    // Colores de fondo
+    &.bg-blue-upse { background: #e8f0fe; color: #001b4c; }
+    &.bg-green-upse { background: #e8f5e9; color: #00a651; }
+    &.bg-cyan-upse { background: #e0f7fa; color: #00838f; }
+    &.bg-orange-upse { background: #fff3e0; color: #f57c00; }
+    &.bg-gold-upse { background: #f8f0e0; color: #c9a84c; }
+    &.bg-teal-upse { background: #ccfbf1; color: #0d9488; }
+    &.bg-indigo { background: #eef2ff; color: #4f46e5; }
+    &.bg-amber { background: #fffbeb; color: #f59e0b; }
+    &.bg-emerald { background: #ecfdf5; color: #10b981; }
+    &.bg-violet { background: #f5f3ff; color: #8b5cf6; }
+    &.bg-rose { background: #fef2f2; color: #ef4444; }
+    &.bg-slate { background: #f1f5f9; color: #64748b; }
+  }
+
+  .stats-trend {
+    font-size: 12px;
+    font-weight: 600;
+
+    @media (min-width: 480px) {
+      font-size: 13px;
+    }
+
+    .trend-up {
+      color: #00a651;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .trend-down {
+      color: #dc2626;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    ion-icon {
+      font-size: 14px;
+
+      @media (min-width: 480px) {
+        font-size: 15px;
+      }
+    }
   }
 
   .stats-info {
-    flex: 1;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 
     .stats-value {
       display: block;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
-      line-height: 1.2;
+      line-height: 1.1;
       transition: all 0.3s ease;
 
-      @media (min-width: 768px) {
+      @media (min-width: 480px) {
         font-size: 28px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 32px;
       }
     }
 
@@ -76,82 +149,205 @@
       font-weight: 500;
       margin-top: 2px;
 
-      @media (min-width: 768px) {
+      @media (min-width: 480px) {
         font-size: 13px;
+        margin-top: 3px;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 14px;
       }
     }
   }
 
-  // Colores UPSE
+  // Colores UPSE - Borde izquierdo y hover
   &.stats-blue-upse {
     border-left: 4px solid #001b4c;
-    
-    .stats-icon {
-      background: #e8f0fe;
-      color: #001b4c;
-    }
     
     .stats-value {
       color: #001b4c;
     }
 
-    &:hover .stats-icon {
-      background: #001b4c;
-      color: white;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover .stats-icon {
+        background: #001b4c;
+        color: white;
+      }
     }
   }
 
   &.stats-green-upse {
     border-left: 4px solid #00a651;
     
-    .stats-icon {
-      background: #e8f5e9;
-      color: #00a651;
-    }
-    
     .stats-value {
       color: #00a651;
     }
 
-    &:hover .stats-icon {
-      background: #00a651;
-      color: white;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover .stats-icon {
+        background: #00a651;
+        color: white;
+      }
     }
   }
 
   &.stats-cyan-upse {
     border-left: 4px solid #00838f;
     
-    .stats-icon {
-      background: #e0f7fa;
-      color: #00838f;
-    }
-    
     .stats-value {
       color: #00838f;
     }
 
-    &:hover .stats-icon {
-      background: #00838f;
-      color: white;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover .stats-icon {
+        background: #00838f;
+        color: white;
+      }
     }
   }
 
   &.stats-orange-upse {
     border-left: 4px solid #f57c00;
     
-    .stats-icon {
-      background: #fff3e0;
-      color: #f57c00;
-    }
-    
     .stats-value {
       color: #f57c00;
     }
 
-    &:hover .stats-icon {
-      background: #f57c00;
-      color: white;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover .stats-icon {
+        background: #f57c00;
+        color: white;
+      }
+    }
+  }
+
+  &.stats-gold-upse {
+    border-left: 4px solid #c9a84c;
+    
+    .stats-value {
+      color: #c9a84c;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover .stats-icon {
+        background: #c9a84c;
+        color: white;
+      }
+    }
+  }
+
+  &.stats-teal-upse {
+    border-left: 4px solid #0d9488;
+    
+    .stats-value {
+      color: #0d9488;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover .stats-icon {
+        background: #0d9488;
+        color: white;
+      }
+    }
+  }
+
+  // Colores genéricos
+  &.stats-indigo {
+    border-left: 4px solid #4f46e5;
+    .stats-value { color: #4f46e5; }
+    @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #4f46e5; color: white; } }
+  }
+
+  &.stats-amber {
+    border-left: 4px solid #f59e0b;
+    .stats-value { color: #f59e0b; }
+    @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #f59e0b; color: white; } }
+  }
+
+  &.stats-emerald {
+    border-left: 4px solid #10b981;
+    .stats-value { color: #10b981; }
+    @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #10b981; color: white; } }
+  }
+
+  &.stats-violet {
+    border-left: 4px solid #8b5cf6;
+    .stats-value { color: #8b5cf6; }
+    @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #8b5cf6; color: white; } }
+  }
+
+  &.stats-rose {
+    border-left: 4px solid #ef4444;
+    .stats-value { color: #ef4444; }
+    @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #ef4444; color: white; } }
+  }
+
+  &.stats-slate {
+    border-left: 4px solid #64748b;
+    .stats-value { color: #64748b; }
+    @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #64748b; color: white; } }
+  }
+}
+
+// ============================================
+// MODO OSCURO
+// ============================================
+@media (prefers-color-scheme: dark) {
+  .stats-card {
+    background: #1e293b;
+    border-color: #334155;
+
+    .stats-value {
+      color: #f1f5f9;
+    }
+
+    .stats-label {
+      color: #94a3b8;
+    }
+
+    &.stats-blue-upse {
+      border-left-color: #60a5fa;
+      .stats-value { color: #60a5fa; }
+      @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #60a5fa; color: #0f172a; } }
+    }
+
+    &.stats-green-upse {
+      border-left-color: #4ade80;
+      .stats-value { color: #4ade80; }
+      @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #4ade80; color: #0f172a; } }
+    }
+
+    &.stats-cyan-upse {
+      border-left-color: #22d3ee;
+      .stats-value { color: #22d3ee; }
+      @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #22d3ee; color: #0f172a; } }
+    }
+
+    &.stats-orange-upse {
+      border-left-color: #fb923c;
+      .stats-value { color: #fb923c; }
+      @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #fb923c; color: #0f172a; } }
+    }
+
+    &.stats-gold-upse {
+      border-left-color: #fbbf24;
+      .stats-value { color: #fbbf24; }
+      @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #fbbf24; color: #0f172a; } }
+    }
+
+    &.stats-teal-upse {
+      border-left-color: #2dd4bf;
+      .stats-value { color: #2dd4bf; }
+      @media (hover: hover) and (pointer: fine) { &:hover .stats-icon { background: #2dd4bf; color: #0f172a; } }
+    }
+
+    .stats-icon {
+      &.bg-blue-upse { background: #1a2a4a; color: #60a5fa; }
+      &.bg-green-upse { background: #1a3a2a; color: #4ade80; }
+      &.bg-cyan-upse { background: #1a3a3a; color: #22d3ee; }
+      &.bg-orange-upse { background: #3a2a1a; color: #fb923c; }
+      &.bg-gold-upse { background: #3a2a1a; color: #fbbf24; }
+      &.bg-teal-upse { background: #1a3a3a; color: #2dd4bf; }
     }
   }
 }

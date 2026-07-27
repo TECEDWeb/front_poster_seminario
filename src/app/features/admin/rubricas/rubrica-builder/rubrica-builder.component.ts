@@ -462,7 +462,6 @@ export class RubricaBuilderComponent implements OnChanges {
     });
   }
 
-  // ==========================================================
   // MÉTODO: DESCARGAR RÚBRICA EN PDF - FORMATO MANUAL
   async descargarRubricaPDF(): Promise<void> {
     if (this.descargando) return;
