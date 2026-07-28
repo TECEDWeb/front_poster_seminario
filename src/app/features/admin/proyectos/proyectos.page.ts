@@ -30,6 +30,7 @@ import { ProyectoService } from '../../../core/services/proyecto.service';
 import { Proyecto } from '../../../core/models/proyecto.model';
 import { ConcursoService } from '../../../core/services/concurso.service';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { coincideBusqueda } from '../../../core/utils/texto.utils';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -212,15 +213,15 @@ export class ProyectosPage implements OnInit {
     let filtered = [...this.proyectos];
 
     if (this.busqueda.trim()) {
-      const texto = this.busqueda.toLowerCase().trim();
+      const texto = this.busqueda;
       filtered = filtered.filter(p =>
-        p.nombre?.toLowerCase().includes(texto) ||
-        p.area?.toLowerCase().includes(texto) ||
-        p.nivel?.toLowerCase().includes(texto) ||
-        p.descripcion?.toLowerCase().includes(texto) ||
-        (p.codigoProyecto?.toLowerCase().includes(texto)) ||  // ✅ BUSCAR POR CÓDIGO
-        (p.participantes || []).some(part => part.nombre?.toLowerCase().includes(texto)) ||
-        (p.tutores || []).some(t => t.nombre?.toLowerCase().includes(texto))
+        coincideBusqueda(p.nombre, texto) ||
+        coincideBusqueda(p.area, texto) ||
+        coincideBusqueda(p.nivel, texto) ||
+        coincideBusqueda(p.descripcion, texto) ||
+        coincideBusqueda(p.codigoProyecto, texto) ||
+        (p.participantes || []).some(part => coincideBusqueda(part.nombre, texto)) ||
+        (p.tutores || []).some(t => coincideBusqueda(t.nombre, texto))
       );
     }
 
@@ -234,7 +235,6 @@ export class ProyectosPage implements OnInit {
       filtered = filtered.filter(p => !p.activo);
     }
 
-    // Filtro por concurso
     if (this.filtroConcurso !== 'todos') {
       const concursoIdNum = Number(this.filtroConcurso);
       filtered = filtered.filter(p => Number(p.concursoId) === concursoIdNum);

@@ -41,14 +41,9 @@ export class AsignacionService {
     return this.http.get(this.apiUrl, { params });
   }
 
-  /**
-   * ✅ CORREGIDO - Obtener evaluadores disponibles
-   * Usa el endpoint específico de evaluadores
-   */
   obtenerEvaluadores(): Observable<any> {
     console.log('📤 AsignacionService: Solicitando evaluadores desde /usuarios/evaluadores...');
     
-    // ✅ Usar el endpoint específico de evaluadores
     return this.http.get(`${environment.apiUrl}/usuarios/evaluadores`).pipe(
       map((res: any) => {
         console.log('📥 AsignacionService: Respuesta de evaluadores:', res);
@@ -132,4 +127,8 @@ export class AsignacionService {
   getProyectos(): Observable<any> {
     return this.http.get(`${this.apiUrl}/proyectos`);
   }
+
+  asignarMasivo(payload: { proyectosIds: number[], evaluadoresIds: number[], fechaLimite?: string | null }): Observable<any> {
+  return this.http.post(`${this.apiUrl}/asignaciones/masivo`, payload);
+}
 }

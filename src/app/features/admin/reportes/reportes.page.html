@@ -271,17 +271,44 @@
             <ion-icon name="download-outline"></ion-icon>
             Excel
           </ion-button>
-          <ion-button fill="outline" size="small" class="export-mobile-btn export-mobile-pdf" (click)="exportarPDFConFiltros()" [disabled]="cargando || exportando">
+          <ion-button fill="outline" size="small" class="export-mobile-pdf" (click)="exportarPDFConFiltros()" [disabled]="cargando || exportando">
             <ion-icon [name]="exportando ? 'refresh-outline' : 'document-outline'" [class.spinning]="exportando"></ion-icon>
             PDF
           </ion-button>
         </div>
       </div>
 
-      <!-- LISTA DE PROYECTOS CON ACORDEÓN -->
+      <!-- LISTA DE PROYECTOS CON ACORDEÓN Y RANKING -->
       <div class="proyectos-lista">
-        <div class="proyecto-item" *ngFor="let p of proyectosFiltrados || []; trackBy: trackById">
+        <div 
+          class="proyecto-item" 
+          [class.top-1]="p.esPrimero"
+          [class.top-2]="p.esSegundo"
+          [class.top-3]="p.esTercero"
+          [class.top-4-5]="p.esTop5 && !p.esTop3"
+          *ngFor="let p of proyectosFiltrados || []; trackBy: trackById"
+        >
           
+          <!-- BADGE DE POSICIÓN -->
+          <div class="posicion-badge" *ngIf="p.esTop5">
+            <span class="posicion-numero">#{{ p.posicion }}</span>
+            <ion-icon 
+              *ngIf="p.esPrimero" 
+              name="trophy" 
+              class="posicion-icon oro"
+            ></ion-icon>
+            <ion-icon 
+              *ngIf="p.esSegundo" 
+              name="medal" 
+              class="posicion-icon plata"
+            ></ion-icon>
+            <ion-icon 
+              *ngIf="p.esTercero" 
+              name="medal" 
+              class="posicion-icon bronce"
+            ></ion-icon>
+          </div>
+
           <!-- HEADER DEL PROYECTO -->
           <div class="proyecto-header" (click)="toggleProyecto(p)" [class.expanded]="p._expandido">
             <div class="ph-left">
@@ -289,7 +316,10 @@
                 <span class="icon-letter">{{ (p.proyecto || p.nombre)?.charAt(0) || 'P' }}</span>
               </div>
               <div class="ph-info">
-                <span class="ph-nombre">{{ p.proyecto || p.nombre }}</span>
+                <span class="ph-nombre">
+                  {{ p.proyecto || p.nombre }}
+                  <span class="ph-posicion" *ngIf="p.esTop5">(#{{ p.posicion }})</span>
+                </span>
                 <div class="ph-meta">
                   <span class="ph-area">{{ p.area || 'Sin área' }}</span>
                   <span class="ph-nivel">{{ p.nivel || 'Sin nivel' }}</span>
@@ -297,6 +327,11 @@
                     <ion-icon name="school-outline"></ion-icon>
                     {{ tutorPrincipal(p) }}
                   </span>
+                </div>
+                <!-- NOMBRES DE PARTICIPANTES -->
+                <div class="ph-participantes" *ngIf="p.nombreParticipantes && p.nombreParticipantes !== 'Sin participantes'">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <span>{{ p.nombreParticipantes }}</span>
                 </div>
               </div>
             </div>
@@ -381,7 +416,7 @@
               <div class="pb-evaluadores">
                 <div class="pb-section-title">
                   <ion-icon name="people-outline"></ion-icon>
-                  <span>Evaluadores ({{ p.evaluadores?.length || 0 }})</span>
+                  <span>Evaluadores ({{ p.evaluadores.length || 0 }})</span>
                 </div>
                 <div class="pb-evaluadores-grid">
                   <div class="pb-evaluador" *ngFor="let e of (p.evaluadores || [])">
@@ -396,7 +431,6 @@
                     </div>
                     
                     <!-- BOTÓN VER RESPUESTAS -->
-                    <!-- SI e.estado ES 'evaluado' O e.puntaje > 0 (para detectar evaluaciones completadas) -->
                     <button
                       class="pbe-respuestas-btn"
                       *ngIf="e.estado === 'evaluado' || e.puntaje > 0"

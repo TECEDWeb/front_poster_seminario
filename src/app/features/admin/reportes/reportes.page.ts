@@ -97,6 +97,37 @@ interface Ganador {
   clase: string;
 }
 
+// Interfaz ProyectoRanking con TODAS las propiedades necesarias
+interface ProyectoRanking {
+  // Propiedades base
+  id: number;
+  nombre: string;
+  proyecto?: string;
+  area?: string;
+  nivel?: string;
+  promedio: number;
+  puntajeMaximo: number;
+  evaluaciones: number;
+  evaluadores: any[];
+  participantes: any[];
+  tutores: any[];
+  evaluacionId?: number;
+  estadoEvaluacion?: string;
+  estado?: string;
+  concursoId?: number;
+  concursoNombre?: string;
+  _expandido?: boolean;
+  
+  // Propiedades de ranking
+  posicion: number;
+  esTop5: boolean;
+  esTop3: boolean;
+  esPrimero: boolean;
+  esSegundo: boolean;
+  esTercero: boolean;
+  nombreParticipantes: string;
+}
+
 @Component({
   selector: 'app-reportes',
   standalone: true,
@@ -132,7 +163,7 @@ export class ReportesPage implements OnInit, OnDestroy {
   };
 
   proyectos: any[] = [];
-  proyectosFiltrados: any[] = [];
+  proyectosFiltrados: ProyectoRanking[] = [];
   evaluadoresResumen: EvaluadorResumen[] = [];
   nombresEvaluadores: string[] = [];
 
@@ -293,7 +324,10 @@ export class ReportesPage implements OnInit, OnDestroy {
             tutores: item.tutores || [],
             puntajeMaximo: item.puntajeMaximo || item.puntaje_maximo || 100,
             concursoId: item.concursoId ?? item.concurso_id ?? null,
-            concursoNombre: item.concursoNombre ?? item.concurso_nombre ?? null
+            concursoNombre: item.concursoNombre ?? item.concurso_nombre ?? null,
+            evaluaciones: item.evaluaciones || 0,
+            promedio: item.promedio || 0,
+            evaluadores: item.evaluadores || []
           };
         });
 
@@ -496,7 +530,55 @@ export class ReportesPage implements OnInit, OnDestroy {
       );
     }
 
-    this.proyectosFiltrados = filtered;
+    // ============================================
+    // ORDENAR POR PUNTAJE DE MAYOR A MENOR
+    // ============================================
+    filtered = filtered.sort((a, b) => {
+      const promedioA = a.promedio || 0;
+      const promedioB = b.promedio || 0;
+      return promedioB - promedioA;
+    });
+
+    // ============================================
+    // ASIGNAR POSICIONES Y METADATOS DE RANKING
+    // ============================================
+    this.proyectosFiltrados = filtered.map((p, index) => {
+      const posicion = index + 1;
+      
+      // Obtener nombres de participantes
+      const participantes = p.participantes || [];
+      const nombresParticipantes = participantes
+        .map((part: any) => part.nombre || '')
+        .filter((nombre: string) => nombre.trim() !== '')
+        .join(', ');
+
+      return {
+        id: p.id || index,
+        nombre: p.nombre || p.proyecto || 'Proyecto sin nombre',
+        proyecto: p.proyecto || p.nombre,
+        area: p.area || '',
+        nivel: p.nivel || '',
+        promedio: p.promedio || 0,
+        puntajeMaximo: p.puntajeMaximo || 100,
+        evaluaciones: p.evaluaciones || 0,
+        evaluadores: p.evaluadores || [],
+        participantes: p.participantes || [],
+        tutores: p.tutores || [],
+        evaluacionId: p.evaluacionId || null,
+        estadoEvaluacion: p.estadoEvaluacion || p.estado || 'asignado',
+        estado: p.estado || 'asignado',
+        concursoId: p.concursoId || null,
+        concursoNombre: p.concursoNombre || '',
+        _expandido: p._expandido || false,
+        posicion: posicion,
+        esTop5: posicion <= 5,
+        esTop3: posicion <= 3,
+        esPrimero: posicion === 1,
+        esSegundo: posicion === 2,
+        esTercero: posicion === 3,
+        nombreParticipantes: nombresParticipantes || 'Sin participantes'
+      };
+    });
   }
 
   recargar(): void {
@@ -524,7 +606,7 @@ export class ReportesPage implements OnInit, OnDestroy {
     return concurso?.nombre || 'Concurso';
   }
 
-  private getNombreConcursoFiltro(proyecto: any): string {
+  private getNombreConcursoFiltro(proyecto: ProyectoRanking): string {
     if (proyecto.concursoNombre) return proyecto.concursoNombre;
     if (proyecto.concursoId) {
       const concurso = this.concursosDisponibles.find(c => Number(c.id) === Number(proyecto.concursoId));
@@ -570,6 +652,7 @@ export class ReportesPage implements OnInit, OnDestroy {
     }
 
     const headers = [
+      'Posicion',
       'Proyecto',
       'Área',
       'Nivel',
@@ -584,11 +667,12 @@ export class ReportesPage implements OnInit, OnDestroy {
     ];
 
     const filas = datos.map(p => [
+      String(p.posicion || '-'),
       p.proyecto || p.nombre || '—',
       p.area || '—',
       p.nivel || '—',
       this.tutorPrincipal(p) || '—',
-      (p.participantes || []).map((part: any) => part.nombre).join(' | '),
+      p.nombreParticipantes || '—',
       String(p.evaluaciones || 0),
       String(p.promedio ? p.promedio.toFixed(2) : '0.00'),
       String(p.puntajeMaximo || 100),
@@ -635,10 +719,12 @@ export class ReportesPage implements OnInit, OnDestroy {
       doc.text(`Generado: ${fechaLegible}  -  Total: ${datos.length} proyecto(s)`, 14, 21);
 
       const columnas = [
+        '#',
         'Proyecto',
         'Área',
         'Nivel',
         'Tutor',
+        'Participantes',
         'Eval.',
         'Puntaje',
         '%',
@@ -647,10 +733,12 @@ export class ReportesPage implements OnInit, OnDestroy {
       ];
 
       const filas = datos.map(p => [
+        String(p.posicion || '-'),
         p.proyecto || p.nombre || '—',
         p.area || '—',
         p.nivel || '—',
         this.tutorPrincipal(p) || '—',
+        p.nombreParticipantes || '—',
         String(p.evaluaciones || 0),
         `${p.promedio ? p.promedio.toFixed(2) : '0.00'} / ${p.puntajeMaximo || 100}`,
         `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
@@ -664,8 +752,21 @@ export class ReportesPage implements OnInit, OnDestroy {
         startY: 26,
         theme: 'grid',
         headStyles: { fillColor: [0, 27, 76], textColor: 255, fontStyle: 'bold' },
-        styles: { fontSize: 8, cellPadding: 3 },
-        alternateRowStyles: { fillColor: [232, 240, 254] }
+        styles: { fontSize: 7, cellPadding: 2 },
+        alternateRowStyles: { fillColor: [232, 240, 254] },
+        columnStyles: {
+          0: { cellWidth: 12, halign: 'center' },
+          1: { cellWidth: 40 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 30 },
+          5: { cellWidth: 35 },
+          6: { cellWidth: 15, halign: 'center' },
+          7: { cellWidth: 25, halign: 'center' },
+          8: { cellWidth: 15, halign: 'center' },
+          9: { cellWidth: 20, halign: 'center' },
+          10: { cellWidth: 30 }
+        }
       });
 
       const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
@@ -681,8 +782,8 @@ export class ReportesPage implements OnInit, OnDestroy {
     }
   }
 
-  exportarProyectoExcel(proyecto: any): void {
-    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
+  exportarProyectoExcel(proyecto: ProyectoRanking): void {
+    const id = proyecto.id;
     if (!id) {
       this.mostrarMensaje('No se puede exportar: ID del proyecto no encontrado', 'error');
       return;
@@ -699,8 +800,8 @@ export class ReportesPage implements OnInit, OnDestroy {
     });
   }
 
-  exportarProyectoPDF(proyecto: any): void {
-    const id = proyecto.id || proyecto.proyecto_id || proyecto._id;
+  exportarProyectoPDF(proyecto: ProyectoRanking): void {
+    const id = proyecto.id;
     if (!id) {
       this.mostrarMensaje('No se puede exportar: ID del proyecto no encontrado', 'error');
       return;
@@ -717,8 +818,8 @@ export class ReportesPage implements OnInit, OnDestroy {
     });
   }
 
-  editarEvaluacionAdmin(proyecto: any): void {
-    const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
+  editarEvaluacionAdmin(proyecto: ProyectoRanking): void {
+    const evaluacionId = proyecto.evaluacionId;
     if (!evaluacionId) {
       this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
       return;
@@ -726,8 +827,8 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.router.navigate(['/admin/evaluaciones/formulario', evaluacionId]);
   }
 
-  async reabrirEvaluacion(proyecto: any): Promise<void> {
-    const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
+  async reabrirEvaluacion(proyecto: ProyectoRanking): Promise<void> {
+    const evaluacionId = proyecto.evaluacionId;
     if (!evaluacionId) {
       this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
       return;
@@ -747,8 +848,8 @@ export class ReportesPage implements OnInit, OnDestroy {
     }
   }
 
-  async eliminarEvaluacion(proyecto: any): Promise<void> {
-    const evaluacionId = proyecto.evaluacionId || proyecto.evaluacion_id;
+  async eliminarEvaluacion(proyecto: ProyectoRanking): Promise<void> {
+    const evaluacionId = proyecto.evaluacionId;
     if (!evaluacionId) {
       this.mostrarMensaje('No se encontró la evaluación para este proyecto', 'error');
       return;
@@ -768,23 +869,15 @@ export class ReportesPage implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Abre el modal con las respuestas de la evaluación
-   * @param evaluador - El objeto del evaluador (contiene posiblemente evaluacionId)
-   * @param proyecto - El objeto del proyecto (para obtener el ID si es necesario)
-   */
-  verRespuestas(evaluador: any, proyecto: any): void {
-    // 1. Intentar obtener el evaluacionId del evaluador
+  verRespuestas(evaluador: any, proyecto: ProyectoRanking): void {
     let evaluacionId = evaluador?.evaluacionId || evaluador?.evaluacion_id;
     
-    // 2. Si no tiene, intentar obtenerlo del proyecto
     if (!evaluacionId) {
-      evaluacionId = proyecto?.evaluacionId || proyecto?.evaluacion_id;
+      evaluacionId = proyecto?.evaluacionId;
     }
 
-    // 3. Si aún no tenemos ID, obtenerlo del detalle del proyecto
     if (!evaluacionId) {
-      const proyectoId = proyecto?.id || proyecto?.proyecto_id || proyecto?._id;
+      const proyectoId = proyecto?.id;
       if (!proyectoId) {
         this.mostrarMensaje('No se puede obtener el detalle: ID del proyecto no encontrado', 'error');
         return;
@@ -796,10 +889,8 @@ export class ReportesPage implements OnInit, OnDestroy {
       this.reporteService.getDetalleProyecto(proyectoId).subscribe({
         next: (res: any) => {
           const data = res?.data ?? res;
-          // Buscar la evaluación del evaluador específico
           const evaluaciones = data.evaluaciones || [];
           
-          // Buscar por nombre del evaluador
           const evaluacionEncontrada = evaluaciones.find((ev: any) => 
             ev.evaluador === evaluador?.nombre
           );
@@ -807,7 +898,6 @@ export class ReportesPage implements OnInit, OnDestroy {
           if (evaluacionEncontrada?.id) {
             this.abrirModalRespuestas(evaluacionEncontrada.id);
           } else {
-            // Si no encuentra por nombre, tomar la primera evaluada
             const evaluada = evaluaciones.find((ev: any) => ev.estado === 'evaluado');
             if (evaluada?.id) {
               this.abrirModalRespuestas(evaluada.id);
@@ -826,13 +916,9 @@ export class ReportesPage implements OnInit, OnDestroy {
       return;
     }
 
-    // 4. Si tenemos el ID, abrir el modal directamente
     this.abrirModalRespuestas(evaluacionId);
   }
 
-  /**
-   * Abre el modal con las respuestas de la evaluación
-   */
   private abrirModalRespuestas(evaluacionId: number): void {
     this.modalRespuestasAbierto = true;
     this.cargandoRespuestas = true;
@@ -849,7 +935,6 @@ export class ReportesPage implements OnInit, OnDestroy {
 
         const data = res?.data ?? res;
 
-        // Verificar si la respuesta tiene la estructura esperada
         if (!data.detalles || !Array.isArray(data.detalles)) {
           this.errorRespuestas = 'La respuesta no contiene detalles de la evaluación';
           this.cargandoRespuestas = false;

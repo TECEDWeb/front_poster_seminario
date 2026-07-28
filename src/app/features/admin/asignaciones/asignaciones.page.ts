@@ -24,7 +24,7 @@ import {
   IonSearchbar,
   IonSelect,
   IonSelectOption,
-  IonSpinner  // ✅ AGREGADO
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -53,7 +53,12 @@ import {
   warningOutline,
   chevronForwardOutline,
   chevronBackOutline,
-  chatbubbleOutline
+  chatbubbleOutline,
+  checkmarkOutline,
+  squareOutline,
+  peopleCircleOutline,
+  clipboardOutline,
+  checkmarkCircle
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -62,6 +67,7 @@ import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { ReporteService } from '../../../core/services/reporte.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
+import { ConcursoService } from '../../../core/services/concurso.service';
 import { SeleccionarProyectoModalComponent } from '../../../shared/components/seleccionar-proyecto-modal/seleccionar-proyecto-modal.component';
 import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/seleccionar-evaluador-modal/seleccionar-evaluador-modal.component';
 
@@ -92,7 +98,7 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonSearchbar,
     IonSelect,
     IonSelectOption,
-    IonSpinner,  // ✅ AGREGADO
+    IonSpinner,
     SeleccionarProyectoModalComponent,
     SeleccionarEvaluadorModalComponent
   ],
@@ -104,14 +110,30 @@ export class AsignacionesPage implements OnInit {
   // DATOS PRINCIPALES
   proyectos: any[] = [];
   evaluadores: any[] = [];
+  concursos: any[] = [];
 
   asignacionesTodas: any[] = [];
   asignacionesRecientes: any[] = [];
   asignacionesCount: number = 0;
 
-  // FORMULARIO
+  // SELECCIÓN MÚLTIPLE
+  proyectosSeleccionados: number[] = [];
+  evaluadoresSeleccionados: number[] = [];
+
+  // Modo de selección: 'individual' o 'masiva'
+  modoSeleccion: 'individual' | 'masiva' = 'individual';
+
+  // Proyecto individual (modo individual)
   proyectoId: number | null = null;
+  // Evaluador individual (modo individual)
   evaluadorId: number | null = null;
+
+  // Filtros para selección masiva
+  filtroConcursoMasivo: number | null = null;
+  filtroBusquedaProyectosMasivo: string = '';
+  filtroBusquedaEvaluadoresMasivo: string = '';
+
+  // Fecha límite (compartida)
   fechaLimite: string | null = null;
 
   // ESTADO DE CARGA
@@ -125,6 +147,7 @@ export class AsignacionesPage implements OnInit {
   // CONTROL DE MODALES DE SELECCIÓN
   modalProyectoAbierto = false;
   modalEvaluadorAbierto = false;
+  modalSeleccionMasivaAbierto = false;
 
   // CALENDARIO
   calendarModalOpen = false;
@@ -138,15 +161,15 @@ export class AsignacionesPage implements OnInit {
   paginaActualTodas = 1;
   itemsPorPaginaTodas = 15;
 
-  // ==========================================================
-  // MODAL DE RESPUESTAS - VARIABLES
-  // ==========================================================
+  // MODAL DE RESPUESTAS
   modalRespuestasAbierto = false;
   cargandoRespuestas = false;
   errorRespuestas: string | null = null;
   respuestasDetalle: any = null;
 
+  // ==========================================================
   // GETTERS
+  // ==========================================================
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
     return this.proyectos.find(p => p.id === this.proyectoId) || null;
@@ -160,6 +183,50 @@ export class AsignacionesPage implements OnInit {
   get asignacionesDelProyecto(): any[] {
     if (!this.proyectoId) return [];
     return this.asignacionesTodas.filter(a => this.obtenerProyectoIdDeAsignacion(a) === this.proyectoId);
+  }
+
+  get proyectosFiltradosMasivos(): any[] {
+    let resultado = [...this.proyectos];
+
+    if (this.filtroConcursoMasivo) {
+      resultado = resultado.filter(p => Number(p.concursoId) === Number(this.filtroConcursoMasivo));
+    }
+
+    if (this.filtroBusquedaProyectosMasivo.trim()) {
+      const term = this.filtroBusquedaProyectosMasivo.toLowerCase().trim();
+      resultado = resultado.filter(p =>
+        (p.nombre || '').toLowerCase().includes(term) ||
+        (p.area || '').toLowerCase().includes(term)
+      );
+    }
+
+    return resultado;
+  }
+
+  get evaluadoresFiltradosMasivos(): any[] {
+    let resultado = [...this.evaluadores];
+
+    if (this.filtroBusquedaEvaluadoresMasivo.trim()) {
+      const term = this.filtroBusquedaEvaluadoresMasivo.toLowerCase().trim();
+      resultado = resultado.filter(e =>
+        (e.nombre || '').toLowerCase().includes(term) ||
+        (e.especialidad || e.rol || '').toLowerCase().includes(term)
+      );
+    }
+
+    return resultado;
+  }
+
+  get proyectosSeleccionadosCount(): number {
+    return this.proyectosSeleccionados.length;
+  }
+
+  get evaluadoresSeleccionadosCount(): number {
+    return this.evaluadoresSeleccionados.length;
+  }
+
+  get puedeAsignarMasivo(): boolean {
+    return this.proyectosSeleccionados.length > 0 && this.evaluadoresSeleccionados.length > 0;
   }
 
   get asignacionesFiltradas(): any[] {
@@ -195,7 +262,38 @@ export class AsignacionesPage implements OnInit {
     return this.asignacionesFiltradas.slice(inicio, inicio + this.itemsPorPaginaTodas);
   }
 
+  // ==========================================================
+  // MÉTODOS PARA EL TEMPLATE (evitan arrow functions)
+  // ==========================================================
+  isAllProyectosSeleccionados(): boolean {
+    if (this.proyectosFiltradosMasivos.length === 0) return false;
+    return this.proyectosFiltradosMasivos.every(p => this.proyectosSeleccionados.includes(p.id));
+  }
+
+  isAllEvaluadoresSeleccionados(): boolean {
+    if (this.evaluadoresFiltradosMasivos.length === 0) return false;
+    return this.evaluadoresFiltradosMasivos.every(e => this.evaluadoresSeleccionados.includes(e.id));
+  }
+
+  getTodosProyectosText(): string {
+    return this.isAllProyectosSeleccionados() ? 'Deseleccionar todos' : 'Seleccionar todos';
+  }
+
+  getTodosEvaluadoresText(): string {
+    return this.isAllEvaluadoresSeleccionados() ? 'Deseleccionar todos' : 'Seleccionar todos';
+  }
+
+  getToggleAllProyectosIcon(): string {
+    return this.isAllProyectosSeleccionados() ? 'checkmark-circle' : 'square-outline';
+  }
+
+  getToggleAllEvaluadoresIcon(): string {
+    return this.isAllEvaluadoresSeleccionados() ? 'checkmark-circle' : 'square-outline';
+  }
+
+  // ==========================================================
   // CONSTRUCTOR
+  // ==========================================================
   constructor(
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
@@ -203,6 +301,7 @@ export class AsignacionesPage implements OnInit {
     private reporteService: ReporteService,
     private authService: AuthService,
     private usuarioService: UsuarioService,
+    private concursoService: ConcursoService,
     private router: Router,
     private alertController: AlertController
   ) {
@@ -231,18 +330,27 @@ export class AsignacionesPage implements OnInit {
       warningOutline,
       chevronForwardOutline,
       chevronBackOutline,
-      chatbubbleOutline
+      chatbubbleOutline,
+      checkmarkOutline,
+      squareOutline,
+      peopleCircleOutline,
+      clipboardOutline,
+      checkmarkCircle
     });
 
     this.esAdmin = this.authService.esAdmin();
   }
 
+  // ==========================================================
   // LIFECYCLE
+  // ==========================================================
   ngOnInit(): void {
     this.cargarDatos();
   }
 
+  // ==========================================================
   // CARGA DE DATOS
+  // ==========================================================
   cargarDatos(): void {
     this.cargando = true;
     this._proyectosListos = false;
@@ -251,6 +359,7 @@ export class AsignacionesPage implements OnInit {
 
     this.cargarProyectos();
     this.cargarEvaluadores();
+    this.cargarConcursos();
     this.cargarAsignacionesRecientes();
 
     clearTimeout(this._loadingSafety);
@@ -260,6 +369,18 @@ export class AsignacionesPage implements OnInit {
         console.warn('Carga forzada por timeout');
       }
     }, 8000);
+  }
+
+  cargarConcursos(): void {
+    this.concursoService.listar().subscribe({
+      next: (res: any) => {
+        this.concursos = res?.data ?? res ?? [];
+      },
+      error: (err: any) => {
+        console.error('Error cargando concursos:', err);
+        this.concursos = [];
+      }
+    });
   }
 
   cargarProyectos(): void {
@@ -385,7 +506,9 @@ export class AsignacionesPage implements OnInit {
     return null;
   }
 
+  // ==========================================================
   // HELPERS DE NOMBRE
+  // ==========================================================
   getNombreProyecto(a: any): string {
     if (a.evaluacion?.proyecto?.nombre) {
       return a.evaluacion.proyecto.nombre;
@@ -418,7 +541,23 @@ export class AsignacionesPage implements OnInit {
       || 'Evaluador sin nombre';
   }
 
-  // ABRIR MODALES DE SELECCIÓN
+  // ==========================================================
+  // CAMBIAR MODO DE SELECCIÓN
+  // ==========================================================
+  cambiarModoSeleccion(modo: 'individual' | 'masiva'): void {
+    this.modoSeleccion = modo;
+    if (modo === 'individual') {
+      this.proyectosSeleccionados = [];
+      this.evaluadoresSeleccionados = [];
+    } else {
+      this.proyectoId = null;
+      this.evaluadorId = null;
+    }
+  }
+
+  // ==========================================================
+  // SELECCIÓN INDIVIDUAL
+  // ==========================================================
   abrirModalProyectos(): void {
     if (this.proyectos.length === 0) {
       this.cargarProyectos();
@@ -437,7 +576,6 @@ export class AsignacionesPage implements OnInit {
     this.modalEvaluadorAbierto = true;
   }
 
-  // SELECCIÓN DESDE MODALES
   onProyectoSeleccionado(proyectoId: number): void {
     this.proyectoId = proyectoId;
     this.evaluadorId = null;
@@ -447,46 +585,92 @@ export class AsignacionesPage implements OnInit {
     this.evaluadorId = evaluadorId;
   }
 
-  // CALENDARIO
-  abrirCalendarioModal(): void {
-    this.fechaLimiteTemp = this.fechaLimite;
-    this.calendarModalOpen = true;
-  }
-
-  confirmarFecha(): void {
-    this.fechaLimite = this.fechaLimiteTemp;
-    this.calendarModalOpen = false;
-  }
-
-  cancelarFecha(): void {
-    this.calendarModalOpen = false;
-  }
-
-  // MODAL "VER TODAS"
-  abrirModalTodas(): void {
-    this.busquedaTodas = '';
-    this.filtroEstadoTodas = 'todos';
-    this.paginaActualTodas = 1;
-    this.modalTodasAbierto = true;
-  }
-
-  cerrarModalTodas(): void {
-    this.modalTodasAbierto = false;
-  }
-
-  cambiarPaginaTodas(delta: number): void {
-    const nueva = this.paginaActualTodas + delta;
-    if (nueva >= 1 && nueva <= this.totalPaginasTodas) {
-      this.paginaActualTodas = nueva;
+  // ==========================================================
+  // SELECCIÓN MASIVA
+  // ==========================================================
+  toggleProyectoMasivo(proyectoId: number): void {
+    const index = this.proyectosSeleccionados.indexOf(proyectoId);
+    if (index > -1) {
+      this.proyectosSeleccionados.splice(index, 1);
+    } else {
+      this.proyectosSeleccionados.push(proyectoId);
     }
   }
 
-  onFiltroChangeTodas(): void {
-    this.paginaActualTodas = 1;
+  toggleEvaluadorMasivo(evaluadorId: number): void {
+    const index = this.evaluadoresSeleccionados.indexOf(evaluadorId);
+    if (index > -1) {
+      this.evaluadoresSeleccionados.splice(index, 1);
+    } else {
+      this.evaluadoresSeleccionados.push(evaluadorId);
+    }
   }
 
-  // GUARDAR ASIGNACIÓN
-  guardar(): void {
+  estaProyectoSeleccionado(proyectoId: number): boolean {
+    return this.proyectosSeleccionados.includes(proyectoId);
+  }
+
+  estaEvaluadorSeleccionado(evaluadorId: number): boolean {
+    return this.evaluadoresSeleccionados.includes(evaluadorId);
+  }
+
+  toggleAllProyectosMasivos(): void {
+    const filtrados = this.proyectosFiltradosMasivos;
+    const idsFiltrados = filtrados.map(p => p.id);
+    const todosSeleccionados = idsFiltrados.every(id => this.proyectosSeleccionados.includes(id));
+
+    if (todosSeleccionados) {
+      idsFiltrados.forEach(id => {
+        const index = this.proyectosSeleccionados.indexOf(id);
+        if (index > -1) {
+          this.proyectosSeleccionados.splice(index, 1);
+        }
+      });
+    } else {
+      idsFiltrados.forEach(id => {
+        if (!this.proyectosSeleccionados.includes(id)) {
+          this.proyectosSeleccionados.push(id);
+        }
+      });
+    }
+  }
+
+  toggleAllEvaluadoresMasivos(): void {
+    const filtrados = this.evaluadoresFiltradosMasivos;
+    const idsFiltrados = filtrados.map(e => e.id);
+    const todosSeleccionados = idsFiltrados.every(id => this.evaluadoresSeleccionados.includes(id));
+
+    if (todosSeleccionados) {
+      idsFiltrados.forEach(id => {
+        const index = this.evaluadoresSeleccionados.indexOf(id);
+        if (index > -1) {
+          this.evaluadoresSeleccionados.splice(index, 1);
+        }
+      });
+    } else {
+      idsFiltrados.forEach(id => {
+        if (!this.evaluadoresSeleccionados.includes(id)) {
+          this.evaluadoresSeleccionados.push(id);
+        }
+      });
+    }
+  }
+
+  // ==========================================================
+  // ABRIR MODAL DE SELECCIÓN MASIVA
+  // ==========================================================
+  abrirModalSeleccionMasiva(): void {
+    this.modalSeleccionMasivaAbierto = true;
+  }
+
+  cerrarModalSeleccionMasiva(): void {
+    this.modalSeleccionMasivaAbierto = false;
+  }
+
+  // ==========================================================
+  // GUARDAR ASIGNACIÓN (INDIVIDUAL)
+  // ==========================================================
+  guardarIndividual(): void {
     if (!this.proyectoId) {
       this.showError('Por favor, selecciona un proyecto');
       return;
@@ -540,6 +724,108 @@ export class AsignacionesPage implements OnInit {
         this.showError(err.error?.mensaje || 'Error al asignar el proyecto');
       }
     });
+  }
+
+  // ==========================================================
+  // GUARDAR ASIGNACIÓN (MASIVA)
+  // ==========================================================
+  guardarMasivo(): void {
+    if (this.proyectosSeleccionados.length === 0) {
+      this.showError('Selecciona al menos un proyecto');
+      return;
+    }
+
+    if (this.evaluadoresSeleccionados.length === 0) {
+      this.showError('Selecciona al menos un evaluador');
+      return;
+    }
+
+    const totalAsignaciones = this.proyectosSeleccionados.length * this.evaluadoresSeleccionados.length;
+    const mensaje = `Se van a crear ${totalAsignaciones} asignaciones (${this.proyectosSeleccionados.length} proyectos × ${this.evaluadoresSeleccionados.length} evaluadores). ¿Continuar?`;
+
+    if (!confirm(mensaje)) {
+      return;
+    }
+
+    this.submitting = true;
+
+    const payload = {
+      proyectosIds: this.proyectosSeleccionados,
+      evaluadoresIds: this.evaluadoresSeleccionados,
+      fechaLimite: this.fechaLimite || null
+    };
+
+    this.asignacionService.asignarMasivo(payload).subscribe({
+      next: (res: any) => {
+        this.submitting = false;
+        const asignadas = res?.data?.asignadas || res?.asignadas || 0;
+        this.showSuccess(`${asignadas} asignaciones creadas correctamente`);
+        this.resetFormMasivo();
+        setTimeout(() => this.cargarDatos(), 500);
+      },
+      error: (err: any) => {
+        this.submitting = false;
+        console.error('Error asignación masiva:', err);
+        this.showError(err.error?.mensaje || 'Error al realizar las asignaciones');
+      }
+    });
+  }
+
+  // ==========================================================
+  // RESET DE FORMULARIOS
+  // ==========================================================
+  resetForm(): void {
+    this.proyectoId = null;
+    this.evaluadorId = null;
+    this.fechaLimite = null;
+  }
+
+  resetFormMasivo(): void {
+    this.proyectosSeleccionados = [];
+    this.evaluadoresSeleccionados = [];
+    this.fechaLimite = null;
+  }
+
+  // ==========================================================
+  // CALENDARIO
+  // ==========================================================
+  abrirCalendarioModal(): void {
+    this.fechaLimiteTemp = this.fechaLimite;
+    this.calendarModalOpen = true;
+  }
+
+  confirmarFecha(): void {
+    this.fechaLimite = this.fechaLimiteTemp;
+    this.calendarModalOpen = false;
+  }
+
+  cancelarFecha(): void {
+    this.calendarModalOpen = false;
+  }
+
+  // ==========================================================
+  // MODAL "VER TODAS"
+  // ==========================================================
+  abrirModalTodas(): void {
+    this.busquedaTodas = '';
+    this.filtroEstadoTodas = 'todos';
+    this.paginaActualTodas = 1;
+    this.modalTodasAbierto = true;
+  }
+
+  cerrarModalTodas(): void {
+    this.modalTodasAbierto = false;
+  }
+
+  cambiarPaginaTodas(delta: number): void {
+    const nueva = this.paginaActualTodas + delta;
+    if (nueva >= 1 && nueva <= this.totalPaginasTodas) {
+      this.paginaActualTodas = nueva;
+    }
+  }
+
+  onFiltroChangeTodas(): void {
+    this.paginaActualTodas = 1;
   }
 
   // ==========================================================
@@ -871,13 +1157,9 @@ export class AsignacionesPage implements OnInit {
     });
   }
 
+  // ==========================================================
   // UTILIDADES
-  resetForm(): void {
-    this.proyectoId = null;
-    this.evaluadorId = null;
-    this.fechaLimite = null;
-  }
-
+  // ==========================================================
   tiempoRelativo(fecha: string | Date | null | undefined): string {
     if (!fecha) return '';
     const ahora = new Date().getTime();
@@ -944,7 +1226,9 @@ export class AsignacionesPage implements OnInit {
     return classes[status] || 'status-pending';
   }
 
+  // ==========================================================
   // ALERTAS
+  // ==========================================================
   private async showSuccess(message: string): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Exito',
@@ -963,5 +1247,18 @@ export class AsignacionesPage implements OnInit {
       cssClass: 'alert-error'
     });
     await alert.present();
+  }
+
+  // ==========================================================
+// MÉTODOS PARA EL MODO MASIVO - OBTENER NOMBRES POR ID
+// ==========================================================
+  getNombreProyectoPorId(proyectoId: number): string {
+    const proyecto = this.proyectos.find(p => p.id === proyectoId);
+    return proyecto?.nombre || 'Proyecto sin nombre';
+  }
+
+  getNombreEvaluadorPorId(evaluadorId: number): string {
+    const evaluador = this.evaluadores.find(e => e.id === evaluadorId);
+    return evaluador?.nombre || 'Evaluador sin nombre';
   }
 }

@@ -1572,7 +1572,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 // ============================================
-// LISTA DE PROYECTOS (ACORDEÓN)
+// LISTA DE PROYECTOS (ACORDEÓN) CON RANKING - VERSIÓN MEJORADA
 // ============================================
 .proyectos-lista {
   display: flex;
@@ -1589,12 +1589,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .proyecto-item {
+    position: relative;
     background: #fff;
     border-radius: 10px;
     box-shadow: $shadow-sm;
     border: 1px solid #eef2f7;
     overflow: hidden;
-    transition: box-shadow 0.2s;
+    transition: all 0.3s ease;
 
     @media (min-width: 480px) {
       border-radius: 12px;
@@ -1608,30 +1609,179 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: $shadow-md;
     }
 
+    // ============================================
+    // ESTILOS POR POSICIÓN - BORDES LATERALES SUTILES
+    // ============================================
+    
+    // TOP 1 - ORO
+    &.top-1 {
+      border-left: 4px solid #ffd700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.12);
+
+      .proyecto-header {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.01) 100%);
+      }
+    }
+
+    // TOP 2 - PLATA
+    &.top-2 {
+      border-left: 4px solid #c0c0c0;
+      box-shadow: 0 0 12px rgba(192, 192, 192, 0.10);
+
+      .proyecto-header {
+        background: linear-gradient(135deg, rgba(192, 192, 192, 0.04) 0%, rgba(192, 192, 192, 0.01) 100%);
+      }
+    }
+
+    // TOP 3 - BRONCE
+    &.top-3 {
+      border-left: 4px solid #cd7f32;
+      box-shadow: 0 0 12px rgba(205, 127, 50, 0.10);
+
+      .proyecto-header {
+        background: linear-gradient(135deg, rgba(205, 127, 50, 0.04) 0%, rgba(205, 127, 50, 0.01) 100%);
+      }
+    }
+
+    // TOP 4-5
+    &.top-4-5 {
+      border-left: 4px solid rgba(0, 27, 76, 0.15);
+
+      .proyecto-header {
+        background: rgba(0, 27, 76, 0.02);
+      }
+    }
+
+    // ============================================
+    // BADGE DE POSICIÓN - COMPACTO Y AJUSTADO
+    // ============================================
+    .posicion-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 1px 6px 1px 5px;
+      border-radius: 10px;
+      font-size: 0.5rem;
+      font-weight: 700;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      z-index: 5;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
+      min-height: 16px;
+      line-height: 1;
+      letter-spacing: -0.3px;
+
+      @media (min-width: 480px) {
+        top: 6px;
+        right: 6px;
+        font-size: 0.55rem;
+        padding: 2px 8px 2px 6px;
+        min-height: 18px;
+        border-radius: 12px;
+        gap: 3px;
+      }
+
+      @media (min-width: 768px) {
+        top: 8px;
+        right: 8px;
+        font-size: 0.6rem;
+        padding: 2px 10px 2px 7px;
+        min-height: 20px;
+        border-radius: 14px;
+        gap: 4px;
+      }
+
+      // Colores por posición
+      .top-1 & {
+        background: linear-gradient(135deg, #ffd700, #f0c000);
+        color: #7a5a00;
+      }
+
+      .top-2 & {
+        background: linear-gradient(135deg, #d8d8d8, #b8b8b8);
+        color: #555555;
+      }
+
+      .top-3 & {
+        background: linear-gradient(135deg, #cd7f32, #b06a2a);
+        color: #ffffff;
+      }
+
+      .top-4-5 & {
+        background: $upse-blue;
+        color: #ffffff;
+      }
+
+      .posicion-numero {
+        font-weight: 800;
+        font-size: 0.45rem;
+        letter-spacing: -0.5px;
+
+        @media (min-width: 480px) {
+          font-size: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+          font-size: 0.55rem;
+        }
+      }
+
+      .posicion-icon {
+        font-size: 0.6rem;
+        line-height: 1;
+
+        @media (min-width: 480px) {
+          font-size: 0.7rem;
+        }
+
+        @media (min-width: 768px) {
+          font-size: 0.75rem;
+        }
+
+        &.oro { color: #ffd700; }
+        &.plata { color: #c0c0c0; }
+        &.bronce { color: #cd7f32; }
+      }
+    }
+
+    // ============================================
+    // HEADER DEL PROYECTO - CON ESPACIO PARA EL BADGE
+    // ============================================
     .proyecto-header {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       padding: 10px 12px;
+      padding-right: 50px;
       cursor: pointer;
       transition: background 0.2s;
 
       @media (min-width: 480px) {
         padding: 12px 14px;
-        gap: 8px;
+        padding-right: 60px;
+        gap: 6px;
       }
 
       @media (min-width: 640px) {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding: 14px 16px;
-        gap: 12px;
+        padding: 10px 14px;
+        padding-right: 70px;
+        gap: 8px;
       }
 
       @media (min-width: 768px) {
-        padding: 16px 20px;
-        gap: 16px;
+        padding: 12px 18px;
+        padding-right: 80px;
+        gap: 12px;
+      }
+
+      @media (min-width: 1024px) {
+        padding: 14px 20px;
+        padding-right: 90px;
       }
 
       &:hover {
@@ -1645,7 +1795,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       .ph-left {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 8px;
         min-width: 0;
         flex: 1;
@@ -1659,29 +1809,30 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .ph-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.8rem;
+          font-size: 0.65rem;
           font-weight: 700;
           color: #fff;
           flex-shrink: 0;
+          margin-top: 2px;
 
           @media (min-width: 480px) {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            font-size: 0.9rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 0.75rem;
           }
 
           @media (min-width: 768px) {
-            width: 40px;
-            height: 40px;
-            font-size: 1rem;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            font-size: 0.85rem;
+            border-radius: 10px;
           }
 
           &.color-blue { background: linear-gradient(135deg, #{$upse-blue}, #1a3a7a); }
@@ -1698,49 +1849,72 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
         .ph-info {
           min-width: 0;
+          flex: 1;
 
           .ph-nombre {
-            display: block;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 3px;
             font-weight: 600;
             color: $upse-blue;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 0.7rem;
 
             @media (min-width: 480px) {
-              font-size: 0.85rem;
+              font-size: 0.75rem;
+              gap: 4px;
             }
 
             @media (min-width: 768px) {
-              font-size: 0.95rem;
+              font-size: 0.85rem;
+              gap: 5px;
+            }
+
+            .ph-posicion {
+              font-size: 0.45rem;
+              color: $upse-gold-dark;
+              font-weight: 700;
+
+              @media (min-width: 480px) {
+                font-size: 0.5rem;
+              }
+
+              @media (min-width: 768px) {
+                font-size: 0.55rem;
+              }
+            }
+
+            // Efecto especial para el 1er lugar
+            .top-1 & {
+              color: #b8860b;
+              font-weight: 800;
             }
           }
 
           .ph-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
-            font-size: 0.6rem;
+            gap: 3px;
+            font-size: 0.5rem;
             color: #6b7a99;
 
             @media (min-width: 480px) {
+              font-size: 0.55rem;
+              gap: 4px;
+            }
+
+            @media (min-width: 768px) {
               font-size: 0.65rem;
               gap: 6px;
             }
 
-            @media (min-width: 768px) {
-              font-size: 0.75rem;
-              gap: 8px;
-            }
-
             .ph-area, .ph-nivel {
               background: #f0f4fb;
-              padding: 0 6px;
+              padding: 0 4px;
               border-radius: 3px;
 
               @media (min-width: 768px) {
-                padding: 0 8px;
+                padding: 0 6px;
                 border-radius: 4px;
               }
             }
@@ -1751,22 +1925,69 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
               gap: 2px;
               background: $upse-gold-light;
               color: $upse-gold-dark;
-              padding: 0 6px;
+              padding: 0 4px;
               border-radius: 3px;
               font-weight: 600;
 
               @media (min-width: 768px) {
-                padding: 0 8px;
+                padding: 0 6px;
                 border-radius: 4px;
                 gap: 3px;
               }
 
               ion-icon {
-                font-size: 0.7rem;
+                font-size: 0.55rem;
 
                 @media (min-width: 768px) {
-                  font-size: 0.85rem;
+                  font-size: 0.7rem;
                 }
+              }
+            }
+          }
+
+          // NOMBRES DE PARTICIPANTES
+          .ph-participantes {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.5rem;
+            color: #6b7a99;
+            margin-top: 1px;
+
+            @media (min-width: 480px) {
+              font-size: 0.55rem;
+              gap: 4px;
+              margin-top: 2px;
+            }
+
+            @media (min-width: 768px) {
+              font-size: 0.6rem;
+              gap: 5px;
+              margin-top: 3px;
+            }
+
+            ion-icon {
+              font-size: 0.55rem;
+              color: $upse-blue;
+              flex-shrink: 0;
+
+              @media (min-width: 768px) {
+                font-size: 0.65rem;
+              }
+            }
+
+            span {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .top-1 & {
+              color: #b8860b;
+              font-weight: 600;
+
+              ion-icon {
+                color: #b8860b;
               }
             }
           }
@@ -1776,27 +1997,27 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       .ph-right {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
         flex-shrink: 0;
 
         @media (min-width: 480px) {
-          gap: 10px;
+          gap: 6px;
         }
 
         @media (min-width: 768px) {
-          gap: 14px;
+          gap: 10px;
         }
 
         .ph-stats {
           display: flex;
-          gap: 8px;
+          gap: 4px;
 
           @media (min-width: 480px) {
-            gap: 10px;
+            gap: 6px;
           }
 
           @media (min-width: 768px) {
-            gap: 14px;
+            gap: 10px;
           }
 
           .ph-stat {
@@ -1805,15 +2026,15 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             .ph-stat-value {
               display: block;
               font-weight: 700;
-              font-size: 0.8rem;
+              font-size: 0.65rem;
               color: $upse-blue;
 
               @media (min-width: 480px) {
-                font-size: 0.85rem;
+                font-size: 0.7rem;
               }
 
               @media (min-width: 768px) {
-                font-size: 0.95rem;
+                font-size: 0.8rem;
               }
 
               &.highlight {
@@ -1823,20 +2044,35 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 &.color-red { color: $upse-red; }
                 &.color-gray { color: #94a3b8; }
               }
+
+              // Efecto especial para el 1er lugar
+              .top-1 &.highlight {
+                font-size: 0.8rem;
+                color: #ffd700 !important;
+                text-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+
+                @media (min-width: 480px) {
+                  font-size: 0.9rem;
+                }
+
+                @media (min-width: 768px) {
+                  font-size: 1rem;
+                }
+              }
             }
 
             .ph-stat-label {
-              font-size: 0.5rem;
+              font-size: 0.4rem;
               color: #a3b0c9;
               text-transform: uppercase;
-              letter-spacing: 0.5px;
+              letter-spacing: 0.3px;
 
               @media (min-width: 480px) {
-                font-size: 0.55rem;
+                font-size: 0.45rem;
               }
 
               @media (min-width: 768px) {
-                font-size: 0.6rem;
+                font-size: 0.5rem;
               }
             }
           }
@@ -1846,24 +2082,24 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           .status-badge {
             display: flex;
             align-items: center;
-            gap: 3px;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-size: 0.55rem;
+            gap: 2px;
+            padding: 1px 4px;
+            border-radius: 8px;
+            font-size: 0.45rem;
             font-weight: 600;
             white-space: nowrap;
 
             @media (min-width: 480px) {
-              padding: 3px 8px;
-              font-size: 0.6rem;
-              border-radius: 14px;
-              gap: 4px;
+              padding: 2px 6px;
+              font-size: 0.5rem;
+              border-radius: 10px;
+              gap: 3px;
             }
 
             @media (min-width: 768px) {
-              padding: 4px 10px;
-              font-size: 0.7rem;
-              border-radius: 20px;
+              padding: 2px 8px;
+              font-size: 0.6rem;
+              border-radius: 14px;
             }
 
             &.status-excellent { background: $upse-green-light; color: #0d7a3d; }
@@ -1872,10 +2108,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             &.status-low { background: $upse-red-light; color: $upse-red; }
 
             ion-icon {
-              font-size: 0.7rem;
+              font-size: 0.55rem;
 
               @media (min-width: 768px) {
-                font-size: 0.8rem;
+                font-size: 0.65rem;
               }
             }
           }
@@ -1883,11 +2119,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
         .ph-toggle {
           color: #a3b0c9;
-          font-size: 1rem;
+          font-size: 0.8rem;
           transition: transform 0.3s;
 
           @media (min-width: 768px) {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
           }
 
           .expanded & {
@@ -1897,6 +2133,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
+    // ============================================
+    // CUERPO EXPANDIDO
+    // ============================================
     .proyecto-body {
       max-height: 0;
       overflow: hidden;
@@ -1955,6 +2194,18 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
               @media (min-width: 768px) {
                 border-radius: 4px;
               }
+
+              .top-1 & {
+                background: linear-gradient(90deg, #ffd700, #ffed4a);
+              }
+
+              .top-2 & {
+                background: linear-gradient(90deg, #c0c0c0, #e0e0e0);
+              }
+
+              .top-3 & {
+                background: linear-gradient(90deg, #cd7f32, #e8a87c);
+              }
             }
           }
 
@@ -1973,6 +2224,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             @media (min-width: 768px) {
               font-size: 0.8rem;
               min-width: 40px;
+            }
+
+            .top-1 & {
+              color: #b8860b;
             }
           }
         }
@@ -2305,9 +2560,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
               }
 
-              // ============================================
-              // BOTÓN VER RESPUESTAS
-              // ============================================
               .pbe-respuestas-btn {
                 display: inline-flex !important;
                 align-items: center;
@@ -2999,9 +3251,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 24px;
   }
 
-  // ============================================
-  // HEADER DEL MODAL
-  // ============================================
   .detalle-header {
     background: linear-gradient(135deg, #{$upse-blue-light} 0%, #ffffff 80%);
     border-radius: 12px;
@@ -3116,9 +3365,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  // ============================================
-  // SECCIONES DE RESPUESTAS
-  // ============================================
   .detalle-secciones {
     background: #ffffff;
     border-radius: 12px;
@@ -3292,9 +3538,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  // ============================================
-  // OBSERVACIONES
-  // ============================================
   .detalle-observacion {
     background: #ffffff;
     border-radius: 12px;
@@ -3362,9 +3605,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  // ============================================
-  // LOADING DEL MODAL
-  // ============================================
   .modal-loading {
     display: flex;
     flex-direction: column;
@@ -3400,9 +3640,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  // ============================================
-  // ERROR DEL MODAL
-  // ============================================
   .modal-error {
     text-align: center;
     padding: 40px 16px;

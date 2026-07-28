@@ -12,7 +12,10 @@
         <ion-title>
           <div class="modal-title-content">
             <ion-icon name="people-outline" class="title-icon"></ion-icon>
-            <span>Seleccionar evaluador</span>
+            <span>{{ modoMultiple ? 'Seleccionar evaluadores' : 'Seleccionar evaluador' }}</span>
+            <span class="selected-count" *ngIf="modoMultiple && seleccionadosInternos.length > 0">
+              ({{ seleccionadosInternos.length }} seleccionados)
+            </span>
           </div>
         </ion-title>
         <ion-buttons slot="end">
@@ -50,6 +53,14 @@
               Limpiar
             </ion-button>
           </div>
+
+          <!-- Botón Seleccionar todos (modo múltiple) -->
+          <div class="filtros-actions" *ngIf="modoMultiple && evaluadoresFiltrados.length > 0">
+            <ion-button fill="clear" size="small" (click)="toggleAll()">
+              <ion-icon [name]="getToggleIcon()"></ion-icon>
+              {{ getTodosText() }}
+            </ion-button>
+          </div>
         </div>
 
         <!-- LISTA DE EVALUADORES -->
@@ -69,17 +80,30 @@
           <ng-container *ngIf="!cargando">
             <div
               class="evaluador-item"
+              [class.selected]="estaSeleccionado(e.id)"
               *ngFor="let e of evaluadoresFiltrados"
-              [class.selected]="e.id === evaluadorSeleccionadoId"
               (click)="seleccionarEvaluador(e.id)">
-              <div class="evaluador-avatar">
+              
+              <!-- Checkbox (modo múltiple) -->
+              <div class="item-checkbox" *ngIf="modoMultiple">
+                <ion-icon 
+                  [name]="estaSeleccionado(e.id) ? 'checkmark-circle' : 'ellipse-outline'"
+                  class="checkbox-icon">
+                </ion-icon>
+              </div>
+
+              <!-- Avatar (modo único) -->
+              <div class="evaluador-avatar" *ngIf="!modoMultiple">
                 <span>{{ (e.nombre || 'E').charAt(0).toUpperCase() }}</span>
               </div>
+
               <div class="evaluador-info">
                 <span class="evaluador-nombre">{{ e.nombre }}</span>
                 <span class="evaluador-rol">{{ e.especialidad || e.rol || 'Evaluador' }}</span>
               </div>
-              <div class="evaluador-check" *ngIf="e.id === evaluadorSeleccionadoId">
+
+              <!-- Check de selección (modo único) -->
+              <div class="evaluador-check" *ngIf="!modoMultiple && estaSeleccionado(e.id)">
                 <ion-icon name="checkmark-circle-outline"></ion-icon>
               </div>
             </div>
@@ -91,6 +115,18 @@
               <p *ngIf="!filtroBusqueda">No hay evaluadores disponibles</p>
             </div>
           </ng-container>
+        </div>
+
+        <!-- FOOTER: Botón confirmar (modo múltiple) -->
+        <div class="modal-footer" *ngIf="modoMultiple">
+          <ion-button 
+            expand="block"
+            class="confirmar-btn"
+            [disabled]="seleccionadosInternos.length === 0"
+            (click)="confirmarSeleccionMultiple()">
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            Confirmar {{ seleccionadosInternos.length }} evaluador(es)
+          </ion-button>
         </div>
 
       </div>

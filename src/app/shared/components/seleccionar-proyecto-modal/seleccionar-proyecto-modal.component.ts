@@ -24,7 +24,10 @@ import {
   folderOpenOutline,
   checkmarkCircleOutline,
   alertCircleOutline,
-  bugOutline
+  bugOutline,
+  checkmarkCircle,
+  ellipseOutline,
+  squareOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -57,8 +60,12 @@ export class SeleccionarProyectoModalComponent implements OnInit {
 
   @Input() isOpen = false;
   @Input() proyectoSeleccionadoId: number | null = null;
+  @Input() modoMultiple = false;
+  @Input() proyectosSeleccionadosIds: number[] = [];
+  
   @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() proyectoSeleccionado = new EventEmitter<number>();
+  @Output() proyectosSeleccionadosChange = new EventEmitter<number[]>();
 
   proyectos: any[] = [];
   proyectosFiltrados: any[] = [];
@@ -67,6 +74,9 @@ export class SeleccionarProyectoModalComponent implements OnInit {
   cargando = false;
   filtroBusqueda = '';
   filtroConcursoId: number | null = null;
+
+  // Para modo múltiple
+  seleccionadosInternos: number[] = [];
 
   constructor(
     private proyectoService: ProyectoService,
@@ -79,12 +89,21 @@ export class SeleccionarProyectoModalComponent implements OnInit {
       folderOpenOutline,
       checkmarkCircleOutline,
       alertCircleOutline,
-      bugOutline
+      bugOutline,
+      checkmarkCircle,
+      ellipseOutline,
+      squareOutline
     });
   }
 
   ngOnInit(): void {
     this.cargarDatos();
+  }
+
+  ngOnChanges(): void {
+    if (this.modoMultiple) {
+      this.seleccionadosInternos = [...this.proyectosSeleccionadosIds];
+    }
   }
 
   cargarDatos(): void {
@@ -105,10 +124,9 @@ export class SeleccionarProyectoModalComponent implements OnInit {
         } else {
           this.concursos = res ?? [];
         }
-        console.log('📊 CONCURSOS CARGADOS:', this.concursos);
       },
       error: (err) => {
-        console.error('❌ Error cargando concursos:', err);
+        console.error('Error cargando concursos:', err);
         this.concursos = [];
       }
     });
@@ -133,12 +151,11 @@ export class SeleccionarProyectoModalComponent implements OnInit {
           this.proyectos = res ?? [];
         }
         
-        console.log('📊 PROYECTOS CARGADOS (normalizados):', this.proyectos);
         this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
-        console.error('❌ Error cargando proyectos:', err);
+        console.error('Error cargando proyectos:', err);
         this.proyectos = [];
         this.proyectosFiltrados = [];
         this.cargando = false;
@@ -155,17 +172,12 @@ export class SeleccionarProyectoModalComponent implements OnInit {
   aplicarFiltros(): void {
     let filtrados = [...this.proyectos];
 
-    console.log('🔍 Aplicando filtros...');
-    console.log('🔍 filtroConcursoId:', this.filtroConcursoId);
-
     if (this.filtroConcursoId !== null && this.filtroConcursoId !== undefined) {
       const idNum = Number(this.filtroConcursoId);
       filtrados = filtrados.filter(p => {
         const concursoId = p.concursoId ?? p.concurso_id;
-        const coincide = Number(concursoId) === idNum;
-        return coincide;
+        return Number(concursoId) === idNum;
       });
-      console.log(`🔍 Proyectos con concurso ${idNum}:`, filtrados.length);
     }
 
     if (this.filtroBusqueda.trim()) {
@@ -176,11 +188,9 @@ export class SeleccionarProyectoModalComponent implements OnInit {
         const nivel = (p.nivel || '').toLowerCase();
         return nombre.includes(busqueda) || area.includes(busqueda) || nivel.includes(busqueda);
       });
-      console.log('🔍 Después de búsqueda:', filtrados.length);
     }
 
     this.proyectosFiltrados = filtrados;
-    console.log('🔍 Proyectos filtrados finales:', this.proyectosFiltrados.length);
   }
 
   limpiarFiltros(): void {
@@ -189,8 +199,73 @@ export class SeleccionarProyectoModalComponent implements OnInit {
     this.aplicarFiltros();
   }
 
+  // ==========================================================
+  // MÉTODOS PARA EL TEMPLATE
+  // ==========================================================
+  isAllSelected(): boolean {
+    if (this.proyectosFiltrados.length === 0) return false;
+    return this.proyectosFiltrados.every(p => this.seleccionadosInternos.includes(p.id));
+  }
+
+  getTodosText(): string {
+    return this.isAllSelected() ? 'Deseleccionar todos' : 'Seleccionar todos';
+  }
+
+  getToggleIcon(): string {
+    return this.isAllSelected() ? 'checkmark-circle' : 'square-outline';
+  }
+
+  // ==========================================================
+  // SELECCIÓN
+  // ==========================================================
   seleccionarProyecto(proyectoId: number): void {
-    this.proyectoSeleccionado.emit(proyectoId);
+    if (this.modoMultiple) {
+      this.toggleSeleccionMultiple(proyectoId);
+    } else {
+      this.proyectoSeleccionado.emit(proyectoId);
+      this.cerrarModal();
+    }
+  }
+
+  toggleSeleccionMultiple(proyectoId: number): void {
+    const index = this.seleccionadosInternos.indexOf(proyectoId);
+    if (index > -1) {
+      this.seleccionadosInternos.splice(index, 1);
+    } else {
+      this.seleccionadosInternos.push(proyectoId);
+    }
+  }
+
+  estaSeleccionado(proyectoId: number): boolean {
+    if (this.modoMultiple) {
+      return this.seleccionadosInternos.includes(proyectoId);
+    }
+    return this.proyectoSeleccionadoId === proyectoId;
+  }
+
+  toggleAll(): void {
+    const filtrados = this.proyectosFiltrados;
+    const idsFiltrados = filtrados.map(p => p.id);
+    const todosSeleccionados = idsFiltrados.every(id => this.seleccionadosInternos.includes(id));
+
+    if (todosSeleccionados) {
+      idsFiltrados.forEach(id => {
+        const index = this.seleccionadosInternos.indexOf(id);
+        if (index > -1) {
+          this.seleccionadosInternos.splice(index, 1);
+        }
+      });
+    } else {
+      idsFiltrados.forEach(id => {
+        if (!this.seleccionadosInternos.includes(id)) {
+          this.seleccionadosInternos.push(id);
+        }
+      });
+    }
+  }
+
+  confirmarSeleccionMultiple(): void {
+    this.proyectosSeleccionadosChange.emit(this.seleccionadosInternos);
     this.cerrarModal();
   }
 
@@ -208,6 +283,7 @@ export class SeleccionarProyectoModalComponent implements OnInit {
     console.log('📊 FILTRO CONCURSO:', this.filtroConcursoId);
     console.log('📊 FILTRO BUSQUEDA:', this.filtroBusqueda);
     console.log('📊 PROYECTOS FILTRADOS:', this.proyectosFiltrados);
+    console.log('📊 SELECCIONADOS (interno):', this.seleccionadosInternos);
     console.log('========================================');
   }
 }

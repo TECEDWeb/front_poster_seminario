@@ -12,7 +12,10 @@
         <ion-title>
           <div class="modal-title-content">
             <ion-icon name="folder-open-outline" class="title-icon"></ion-icon>
-            <span>Seleccionar proyecto</span>
+            <span>{{ modoMultiple ? 'Seleccionar proyectos' : 'Seleccionar proyecto' }}</span>
+            <span class="selected-count" *ngIf="modoMultiple && seleccionadosInternos.length > 0">
+              ({{ seleccionadosInternos.length }} seleccionados)
+            </span>
           </div>
         </ion-title>
         <ion-buttons slot="end">
@@ -25,14 +28,6 @@
 
     <ion-content class="modal-content">
       <div class="modal-container">
-
-        <!-- ✅ BARRA DE ESTADÍSTICAS -->
-        <div class="debug-bar">
-          <small>Proyectos: {{ proyectos.length }} | Filtrados: {{ proyectosFiltrados.length }}</small>
-          <ion-button fill="clear" size="small" (click)="debugInfo()" class="debug-btn">
-            <ion-icon name="bug-outline"></ion-icon>
-          </ion-button>
-        </div>
 
         <!-- FILTROS -->
         <div class="filtros-section">
@@ -72,6 +67,14 @@
               Limpiar
             </ion-button>
           </div>
+
+          <!-- Botón Seleccionar todos (modo múltiple) -->
+          <div class="filtros-actions" *ngIf="modoMultiple && proyectosFiltrados.length > 0">
+            <ion-button fill="clear" size="small" (click)="toggleAll()">
+              <ion-icon [name]="getToggleIcon()"></ion-icon>
+              {{ getTodosText() }}
+            </ion-button>
+          </div>
         </div>
 
         <!-- LISTA DE PROYECTOS -->
@@ -91,18 +94,28 @@
           <ng-container *ngIf="!cargando">
             <div
               class="proyecto-item"
+              [class.selected]="estaSeleccionado(p.id)"
               *ngFor="let p of proyectosFiltrados"
-              [class.selected]="p.id === proyectoSeleccionadoId"
               (click)="seleccionarProyecto(p.id)">
-              <div class="proyecto-icon" [class]="p.activo !== false ? 'active' : 'inactive'">
+              
+              <!-- Checkbox (modo múltiple) -->
+              <div class="item-checkbox" *ngIf="modoMultiple">
+                <ion-icon 
+                  [name]="estaSeleccionado(p.id) ? 'checkmark-circle' : 'ellipse-outline'"
+                  class="checkbox-icon">
+                </ion-icon>
+              </div>
+
+              <!-- Icono (modo único) -->
+              <div class="proyecto-icon" [class]="p.activo !== false ? 'active' : 'inactive'" *ngIf="!modoMultiple">
                 <span>{{ (p.nombre || 'P').charAt(0).toUpperCase() }}</span>
               </div>
+
               <div class="proyecto-info">
                 <span class="proyecto-nombre">{{ p.nombre }}</span>
                 <div class="proyecto-meta">
                   <span class="meta-tag area">{{ p.area || 'Sin área' }}</span>
                   <span class="meta-tag nivel">{{ p.nivel || 'Sin nivel' }}</span>
-                  <!-- ✅ Usar concursoId (camelCase) -->
                   <span class="meta-tag concurso" *ngIf="p.concursoId">
                     <ion-icon name="trophy-outline"></ion-icon>
                     {{ getNombreConcurso(p.concursoId) }}
@@ -113,9 +126,12 @@
                   </span>
                 </div>
               </div>
-              <div class="proyecto-check" *ngIf="p.id === proyectoSeleccionadoId">
+
+              <!-- Check de selección (modo único) -->
+              <div class="proyecto-check" *ngIf="!modoMultiple && estaSeleccionado(p.id)">
                 <ion-icon name="checkmark-circle-outline"></ion-icon>
               </div>
+
               <div class="proyecto-badge" *ngIf="p.activo === false">
                 <ion-badge color="medium">Inactivo</ion-badge>
               </div>
@@ -126,12 +142,20 @@
               <ion-icon name="alert-circle-outline"></ion-icon>
               <p *ngIf="filtroBusqueda || filtroConcursoId">No hay proyectos con estos filtros</p>
               <p *ngIf="!filtroBusqueda && !filtroConcursoId">No hay proyectos disponibles</p>
-              <small class="debug-hint">
-                Concurso filtrado: {{ filtroConcursoId }} | 
-                Proyectos totales: {{ proyectos.length }}
-              </small>
             </div>
           </ng-container>
+        </div>
+
+        <!-- FOOTER: Botón confirmar (modo múltiple) -->
+        <div class="modal-footer" *ngIf="modoMultiple">
+          <ion-button 
+            expand="block"
+            class="confirmar-btn"
+            [disabled]="seleccionadosInternos.length === 0"
+            (click)="confirmarSeleccionMultiple()">
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            Confirmar {{ seleccionadosInternos.length }} proyecto(s)
+          </ion-button>
         </div>
 
       </div>

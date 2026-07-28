@@ -1,49 +1,63 @@
 // ============================================
-// VARIABLES
+// VARIABLES - Paleta institucional UPSE
 // ============================================
 $upse-blue: #001b4c;
+$upse-blue-dark: #001433;
 $upse-blue-light: #e8f0fe;
+$upse-blue-hover: #002a6e;
 $upse-gold: #c9a84c;
+$upse-gold-dark: #a8873a;
+$upse-gold-light: #f8f0e0;
 $upse-green: #00a651;
+$upse-green-light: #e8f5e9;
 $upse-red: #dc2626;
+$upse-red-light: #fef2f2;
+$upse-red-hover: #b91c1c;
+$upse-gray: #f5f5f5;
+$upse-gray-dark: #64748b;
+$upse-gray-light: #f1f5f9;
 $shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 27, 76, 0.08);
+$shadow-lg: 0 8px 32px rgba(0, 27, 76, 0.12);
+$radius: 16px;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================
-// MODAL
+// MODAL - COMPLETO
 // ============================================
 .seleccionar-modal {
-  --border-radius: 16px;
+  --border-radius: 18px;
   --height: 70vh;
   --max-height: 70vh;
   --width: 95vw;
-  --max-width: 500px;
+  --max-width: 550px;
 
   @media (min-width: 768px) {
     --width: 90vw;
-    --max-width: 550px;
+    --max-width: 600px;
     --height: 65vh;
     --max-height: 65vh;
   }
 
   &::part(backdrop) {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
   }
 
   .modal-toolbar {
     --background: #{$upse-blue};
     --color: white;
-    --min-height: 50px;
+    --min-height: 52px;
 
     @media (min-width: 768px) {
-      --min-height: 56px;
+      --min-height: 60px;
     }
 
     .modal-title-content {
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
 
       .title-icon {
         font-size: 20px;
@@ -62,11 +76,28 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-size: 18px;
         }
       }
+
+      .selected-count {
+        font-size: 12px;
+        font-weight: 500;
+        color: $upse-gold;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 2px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.3px;
+      }
     }
 
     .close-btn {
       --color: white;
-      ion-icon { font-size: 22px; }
+      --padding-start: 8px;
+      --padding-end: 8px;
+      
+      ion-icon { font-size: 24px; }
+      
+      &:hover {
+        --color: #{$upse-gold};
+      }
     }
   }
 
@@ -75,21 +106,37 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .modal-container {
-    padding: 12px;
-    max-width: 550px;
+    padding: 14px;
+    max-width: 600px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 
     @media (min-width: 480px) {
-      padding: 16px;
+      padding: 18px;
     }
 
+    @media (min-width: 768px) {
+      padding: 22px;
+    }
+
+    // ============================================
+    // FILTROS - MEJORADOS
+    // ============================================
     .filtros-section {
       background: white;
-      border-radius: 12px;
-      padding: 10px 12px;
-      margin-bottom: 14px;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
       border: 1px solid #eef2f7;
       box-shadow: $shadow-sm;
+      flex-shrink: 0;
+
+      @media (min-width: 480px) {
+        padding: 16px 20px;
+        margin-bottom: 18px;
+      }
 
       .filtros-row {
         display: flex;
@@ -113,15 +160,23 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
           .search-input {
             --background: #f8fafc;
-            --border-radius: 8px;
+            --border-radius: 10px;
             --box-shadow: none;
             --placeholder-color: #94a3b8;
+            --color: #0f172a;
             padding: 0;
-            height: 34px;
+            height: 36px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
 
             @media (min-width: 480px) {
-              --border-radius: 10px;
-              height: 38px;
+              --border-radius: 12px;
+              height: 40px;
+            }
+
+            &:focus-within {
+              border-color: $upse-blue;
+              box-shadow: 0 0 0 3px rgba(0, 27, 76, 0.08);
             }
           }
         }
@@ -131,48 +186,84 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-weight: 600;
           font-size: 11px;
           height: 32px;
-          --padding-start: 8px;
-          --padding-end: 8px;
+          --padding-start: 10px;
+          --padding-end: 10px;
 
           @media (min-width: 480px) {
             font-size: 12px;
             height: 36px;
-            --padding-start: 12px;
-            --padding-end: 12px;
+            --padding-start: 14px;
+            --padding-end: 14px;
+          }
+
+          &:hover {
+            --color: #{$upse-red-hover};
+          }
+        }
+      }
+
+      .filtros-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #f1f5f9;
+
+        ion-button {
+          --color: #{$upse-blue};
+          font-size: 12px;
+          font-weight: 600;
+
+          ion-icon {
+            font-size: 16px;
+            margin-right: 4px;
+          }
+
+          &:hover {
+            --color: #{$upse-gold};
           }
         }
       }
     }
 
+    // ============================================
+    // LISTA DE EVALUADORES - MEJORADA
+    // ============================================
     .lista-evaluadores {
-      max-height: 45vh;
+      flex: 1;
       overflow-y: auto;
+      padding-bottom: 8px;
 
       &::-webkit-scrollbar {
-        width: 4px;
+        width: 5px;
       }
 
       &::-webkit-scrollbar-track {
         background: #f1f5f9;
-        border-radius: 2px;
+        border-radius: 3px;
       }
 
       &::-webkit-scrollbar-thumb {
         background: $upse-blue;
-        border-radius: 2px;
+        border-radius: 3px;
+        transition: $transition;
+        
+        &:hover {
+          background: $upse-blue-dark;
+        }
       }
 
       .skeleton-list {
         .skeleton-item {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 10px 0;
+          gap: 14px;
+          padding: 12px 0;
           border-bottom: 1px solid #f1f5f9;
 
           .skeleton-avatar {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             flex-shrink: 0;
           }
@@ -181,13 +272,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex: 1;
 
             .skeleton-title {
-              height: 14px;
+              height: 16px;
               width: 60%;
-              margin-bottom: 4px;
+              margin-bottom: 6px;
             }
 
             .skeleton-subtitle {
-              height: 10px;
+              height: 12px;
               width: 40%;
             }
           }
@@ -203,22 +294,44 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
         transition: $transition;
         border: 2px solid transparent;
+        margin-bottom: 2px;
+
+        @media (min-width: 480px) {
+          padding: 12px 14px;
+          gap: 14px;
+        }
 
         &:hover:not(.selected) {
           background: #f8fafc;
           border-color: #e2e8f0;
+          transform: translateX(4px);
         }
 
         &.selected {
           background: $upse-blue-light;
           border-color: $upse-blue;
+          box-shadow: 0 2px 8px rgba(0, 27, 76, 0.08);
+        }
+
+        .item-checkbox {
+          flex-shrink: 0;
+          
+          .checkbox-icon {
+            font-size: 22px;
+            color: #94a3b8;
+            transition: $transition;
+          }
+        }
+
+        &.selected .item-checkbox .checkbox-icon {
+          color: $upse-blue;
         }
 
         .evaluador-avatar {
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #{$upse-blue}, #1a3a7a);
+          background: linear-gradient(135deg, $upse-blue, $upse-blue-hover);
           color: white;
           display: flex;
           align-items: center;
@@ -227,6 +340,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-weight: 700;
           flex-shrink: 0;
           text-transform: uppercase;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+          @media (min-width: 480px) {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+          }
         }
 
         .evaluador-info {
@@ -238,11 +358,20 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 13px;
             font-weight: 600;
             color: #0f172a;
+
+            @media (min-width: 480px) {
+              font-size: 14px;
+            }
           }
 
           .evaluador-rol {
             font-size: 11px;
             color: #94a3b8;
+            margin-top: 2px;
+
+            @media (min-width: 480px) {
+              font-size: 12px;
+            }
           }
         }
 
@@ -263,13 +392,134 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
         ion-icon {
           font-size: 36px;
-          margin-bottom: 8px;
+          color: #cbd5e1;
+          margin-bottom: 10px;
         }
 
         p {
           margin: 0;
           font-size: 13px;
           text-align: center;
+        }
+      }
+    }
+
+    // ============================================
+    // FOOTER - BOTÓN CONFIRMAR
+    // ============================================
+    .modal-footer {
+      flex-shrink: 0;
+      padding-top: 12px;
+      border-top: 1px solid #eef2f7;
+      background: #f8fafc;
+      margin: 0 -14px -14px;
+      padding: 12px 14px 0;
+
+      @media (min-width: 480px) {
+        margin: 0 -18px -18px;
+        padding: 16px 18px 0;
+      }
+
+      .confirmar-btn {
+        --border-radius: 12px;
+        --background: #{$upse-blue};
+        --box-shadow: 0 4px 16px rgba(0, 27, 76, 0.3);
+        height: 46px;
+        font-weight: 700;
+        font-size: 14px;
+
+        @media (min-width: 480px) {
+          height: 50px;
+          font-size: 15px;
+        }
+
+        &:hover:not(:disabled) {
+          --background: #{$upse-blue-dark};
+          --box-shadow: 0 6px 24px rgba(0, 27, 76, 0.4);
+          transform: translateY(-2px);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          --box-shadow: none;
+        }
+
+        ion-icon {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// MODO OSCURO
+// ============================================
+@media (prefers-color-scheme: dark) {
+  .seleccionar-modal {
+    .modal-toolbar {
+      --background: #1a2a4a;
+    }
+
+    .modal-content {
+      --background: #0f172a;
+    }
+
+    .modal-container {
+      .filtros-section {
+        background: #1e293b;
+        border-color: #334155;
+        
+        .filtros-row {
+          .search-input {
+            --background: #0f172a;
+            --color: #f1f5f9;
+            border-color: #334155;
+            &:focus-within {
+              border-color: #60a5fa;
+              box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+            }
+          }
+        }
+
+        .filtros-actions {
+          border-top-color: #334155;
+          ion-button { --color: #60a5fa; }
+        }
+      }
+
+      .lista-evaluadores {
+        .evaluador-item {
+          &:hover:not(.selected) {
+            background: #1a2a4a;
+            border-color: #334155;
+          }
+          &.selected {
+            background: #1a2a4a;
+            border-color: #60a5fa;
+          }
+          .evaluador-info {
+            .evaluador-nombre { color: #f1f5f9; }
+            .evaluador-rol { color: #94a3b8; }
+          }
+        }
+
+        .empty-evaluadores {
+          color: #64748b;
+          ion-icon { color: #334155; }
+        }
+      }
+
+      .modal-footer {
+        border-top-color: #334155;
+        background: #0f172a;
+        .confirmar-btn {
+          --background: #60a5fa;
+          color: #0f172a;
+          --box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+          &:hover:not(:disabled) {
+            --background: #3b82f6;
+          }
         }
       }
     }
