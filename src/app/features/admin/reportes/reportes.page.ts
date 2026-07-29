@@ -456,9 +456,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       return;
     }
 
-    // Ya no forzamos width/height manualmente: con el CSS corregido
-    // (.podio-content-wrapper con width: fit-content), el elemento
-    // mide exactamente su contenido real.
     const config = {
       scale: 2.5,
       useCORS: true,
@@ -468,8 +465,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       onclone: (clonedDoc: Document) => {
         const clone = clonedDoc.getElementById('podioContainer') as HTMLElement | null;
         if (clone) {
-          // Solo limpiamos márgenes externos para que no se capture
-          // espacio extra alrededor del wrapper ya ajustado
           clone.style.margin = '0';
         }
       }
@@ -585,6 +580,9 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.aplicarFiltros();
   }
 
+  // ==========================================================
+  // 🔥 APLICAR FILTROS CON RANGOS CORREGIDOS
+  // ==========================================================
   aplicarFiltros(): void {
     this.calcularGanadores();
 
@@ -619,14 +617,20 @@ export class ReportesPage implements OnInit, OnDestroy {
       });
     }
 
+    // 🔥 FILTRO POR ESTADO CORREGIDO
     if (this.filtroStatus !== 'todos') {
       filtered = filtered.filter(p => {
         const pct = this.getPorcentaje(p.promedio, p.puntajeMaximo);
-        if (this.filtroStatus === 'excelente') return pct >= 89.5;
-        if (this.filtroStatus === 'bueno') return pct >= 79 && pct < 89.5;
-        if (this.filtroStatus === 'regular') return pct >= 68.5 && pct < 79;
-        if (this.filtroStatus === 'bajo') return pct < 68.5;
-        return true;
+        switch (this.filtroStatus) {
+          case 'excelente-superior': return pct >= 95;
+          case 'excelente': return pct >= 90 && pct < 95;
+          case 'muy-bueno': return pct >= 80 && pct < 90;
+          case 'bueno': return pct >= 70 && pct < 80;
+          case 'regular': return pct >= 60 && pct < 70;
+          case 'aceptable': return pct >= 50 && pct < 60;
+          case 'deficiente': return pct < 50;
+          default: return true;
+        }
       });
     }
 
@@ -858,7 +862,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         String(p.evaluaciones || 0),
         `${p.promedio ? p.promedio.toFixed(2) : '0.00'} / ${p.puntajeMaximo || 100}`,
         `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
-        this.getStatusText(p.promedio, p.puntajeMaximo),
+        this.getStatusText(p.promedio, p.puntajeMaximo), // ✅ Usa rangos corregidos
         this.getNombreConcursoFiltro(p)
       ]);
 
@@ -944,7 +948,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         doc.setTextColor(120);
         doc.setFont('helvetica', 'italic');
         doc.text(
-          'Este reporte fue generado automáticamente por el Sistema de Evaluación UPSE.',
+          'Este reporte fue generado automáticamente por el Sistema de Evaluación del grupo de Investigación TECED de la UPSE.',
           14, lineaY + 8
         );
         
@@ -955,7 +959,7 @@ export class ReportesPage implements OnInit, OnDestroy {
           14, lineaY + 13
         );
         doc.text(
-          'Sistema de Evaluación - UPSE',
+          'Sistema de Evaluación - TECED',
           14, lineaY + 17
         );
 
@@ -1037,7 +1041,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       String(p.promedio ? p.promedio.toFixed(2) : '0.00'),
       String(p.puntajeMaximo || 100),
       `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
-      this.getStatusText(p.promedio, p.puntajeMaximo),
+      this.getStatusText(p.promedio, p.puntajeMaximo), // ✅ Usa rangos corregidos
       this.getNombreConcursoFiltro(p),
       (p.evaluadores || []).map((e: any) => e.nombre).join(' | ')
     ]);
@@ -1271,39 +1275,60 @@ export class ReportesPage implements OnInit, OnDestroy {
     return Math.min(Math.round((promedio / maximo) * 100), 100);
   }
 
-  getStatusClass(promedio: number, maximo: number = 100): string {
-    if (!promedio) return 'status-low';
-    const pct = this.getPorcentaje(promedio, maximo);
-    if (pct >= 80) return 'status-excellent';
-    if (pct >= 60) return 'status-good';
-    if (pct >= 40) return 'status-regular';
-    return 'status-low';
-  }
+  // ==========================================================
+  // 🔥 MÉTODOS DE CALIFICACIÓN CORREGIDOS
+  // ==========================================================
 
   getStatusText(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'Sin datos';
     const pct = this.getPorcentaje(promedio, maximo);
-    if (pct >= 80) return 'Excelente';
-    if (pct >= 60) return 'Bueno';
-    if (pct >= 40) return 'Regular';
-    return 'Bajo';
+    
+    // Rangos correctos y detallados
+    if (pct >= 95) return 'Excelente';
+    if (pct >= 90) return 'Excelente';
+    if (pct >= 80) return 'Muy Bueno';
+    if (pct >= 70) return 'Bueno';
+    if (pct >= 60) return 'Regular';
+    if (pct >= 50) return 'Aceptable';
+    return 'Deficiente';
+  }
+
+  getStatusClass(promedio: number, maximo: number = 100): string {
+    if (!promedio) return 'status-low';
+    const pct = this.getPorcentaje(promedio, maximo);
+    
+    if (pct >= 95) return 'status-excellent-superior';
+    if (pct >= 90) return 'status-excellent';
+    if (pct >= 80) return 'status-very-good';
+    if (pct >= 70) return 'status-good';
+    if (pct >= 60) return 'status-regular';
+    if (pct >= 50) return 'status-acceptable';
+    return 'status-low';
   }
 
   getStatusIcon(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'alert-circle-outline';
     const pct = this.getPorcentaje(promedio, maximo);
-    if (pct >= 80) return 'checkmark-circle-outline';
-    if (pct >= 60) return 'time-outline';
-    if (pct >= 40) return 'alert-circle-outline';
+    
+    if (pct >= 95) return 'star-outline';
+    if (pct >= 90) return 'checkmark-circle-outline';
+    if (pct >= 80) return 'trophy-outline';
+    if (pct >= 70) return 'time-outline';
+    if (pct >= 60) return 'alert-circle-outline';
+    if (pct >= 50) return 'information-circle-outline';
     return 'close-circle-outline';
   }
 
   getColorClass(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'color-gray';
     const pct = this.getPorcentaje(promedio, maximo);
+    
+    if (pct >= 95) return 'color-gold-dark';
+    if (pct >= 90) return 'color-gold';
     if (pct >= 80) return 'color-green';
-    if (pct >= 60) return 'color-blue';
-    if (pct >= 40) return 'color-orange';
+    if (pct >= 70) return 'color-blue';
+    if (pct >= 60) return 'color-orange';
+    if (pct >= 50) return 'color-yellow';
     return 'color-red';
   }
 
