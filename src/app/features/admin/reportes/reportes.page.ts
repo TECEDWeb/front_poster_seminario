@@ -93,6 +93,7 @@ interface Ganador {
   puntajeMaximo: number;
   evaluaciones: number;
   evaluadores?: any[];
+  participantes?: any[];
   posicion: number;
   clase: string;
 }
@@ -385,6 +386,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       puntajeMaximo: proyecto.puntajeMaximo || 100,
       evaluaciones: proyecto.evaluaciones || 0,
       evaluadores: proyecto.evaluadores || [],
+      participantes: proyecto.participantes || [],  // 🔥 NUEVO
       posicion: index + 1,
       clase: index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'
     }));
@@ -396,24 +398,49 @@ export class ReportesPage implements OnInit, OnDestroy {
       return;
     }
 
-    let mensaje = `PODIO DEL CONCURSO: ${this.getNombreConcurso(this.filtroConcurso)}\n\n`;
-    mensaje += '------------------------------\n\n';
+    const nombreConcurso = this.getNombreConcurso(this.filtroConcurso);
+    let mensaje = '================================================\n';
+    mensaje += `           PODIO DEL CONCURSO\n`;
+    mensaje += `           ${nombreConcurso.toUpperCase()}\n`;
+    mensaje += '================================================\n\n';
+
+    // Títulos por posición
+    const titulos = ['1er LUGAR - GANADOR', '2do LUGAR', '3er LUGAR'];
 
     this.ganadores.forEach((g, index) => {
-      const posicion = index === 0 ? '1er Lugar' : index === 1 ? '2do Lugar' : '3er Lugar';
       const pct = this.getPorcentaje(g.promedio, g.puntajeMaximo);
+      const participantes = g.participantes || [];
+      const nombresParticipantes = participantes
+        .map((p: any) => p.nombre || '')
+        .filter((nombre: string) => nombre.trim() !== '')
+        .join(', ');
 
-      mensaje += `${posicion}\n`;
-      mensaje += `Proyecto: ${g.nombre}\n`;
-      mensaje += `Puntaje: ${g.promedio.toFixed(2)} / ${g.puntajeMaximo} (${pct}%)\n`;
-      mensaje += `Evaluaciones: ${g.evaluaciones || 0}\n`;
-      mensaje += `Área: ${g.area || 'Sin área'}\n`;
-      mensaje += '\n------------------------------\n\n';
+      mensaje += `\n${titulos[index]}\n`;
+      mensaje += '------------------------------------------------\n';
+      mensaje += `  Proyecto: ${g.nombre}\n`;
+      mensaje += `  Area: ${g.area || 'Sin area'}\n`;
+      mensaje += `  Puntaje: ${g.promedio.toFixed(2)} / ${g.puntajeMaximo} (${pct}%)\n`;
+      mensaje += `  Evaluaciones: ${g.evaluaciones || 0}\n`;
+      
+      // Mostrar participantes
+      if (nombresParticipantes) {
+        mensaje += `  Participantes: ${nombresParticipantes}\n`;
+      } else {
+        mensaje += `  Participantes: No registrados\n`;
+      }
+      
+      mensaje += '------------------------------------------------\n';
     });
 
-    const totalDelConcurso = this.proyectosFiltrados?.length || 0;
-    mensaje += `Total de proyectos evaluados en este concurso: ${totalDelConcurso}`;
+    // Resumen final
+    const totalProyectos = this.proyectosFiltrados?.length || 0;
+    mensaje += `\n  Total de proyectos evaluados: ${totalProyectos}\n`;
+    mensaje += `  Ganadores mostrados: ${this.ganadores.length}\n`;
+    mensaje += '\n================================================\n';
+    mensaje += '        FELICIDADES A LOS GANADORES!\n';
+    mensaje += '================================================';
 
+    // Usar alert con el mensaje mejorado
     alert(mensaje);
   }
 
@@ -516,10 +543,10 @@ export class ReportesPage implements OnInit, OnDestroy {
     if (this.filtroStatus !== 'todos') {
       filtered = filtered.filter(p => {
         const pct = this.getPorcentaje(p.promedio, p.puntajeMaximo);
-        if (this.filtroStatus === 'excelente') return pct >= 80;
-        if (this.filtroStatus === 'bueno') return pct >= 60 && pct < 80;
-        if (this.filtroStatus === 'regular') return pct >= 40 && pct < 60;
-        if (this.filtroStatus === 'bajo') return pct < 40;
+        if (this.filtroStatus === 'excelente') return pct >= 89.5;
+        if (this.filtroStatus === 'bueno') return pct >= 79 && pct < 89.5;
+        if (this.filtroStatus === 'regular') return pct >= 68.5 && pct < 79;
+        if (this.filtroStatus === 'bajo') return pct < 68.5;
         return true;
       });
     }

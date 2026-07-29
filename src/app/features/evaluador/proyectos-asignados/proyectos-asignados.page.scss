@@ -3,9 +3,12 @@
 // ============================================
 $primary: #6366f1;
 $primary-dark: #4f46e5;
+$primary-light: #818cf8;
 $success: #10b981;
+$success-dark: #059669;
 $danger: #ef4444;
 $warning: #f59e0b;
+$warning-dark: #d97706;
 $text-dark: #0f172a;
 $text-gray: #64748b;
 $text-light: #94a3b8;
@@ -13,7 +16,9 @@ $border: #e2e8f0;
 $bg-light: #f8fafc;
 $shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
 $shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+$shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
 $radius: 16px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================
 // CONTENT
@@ -273,6 +278,83 @@ $radius: 16px;
 }
 
 // ============================================
+// SEARCH
+// ============================================
+.search-container {
+  width: 100%;
+  margin-bottom: 12px;
+
+  .search-input {
+    --background: #ffffff;
+    --border-radius: 12px;
+    --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --placeholder-color: #94a3b8;
+    --placeholder-font-weight: 400;
+    --icon-color: #94a3b8;
+    --clear-button-color: #94a3b8;
+    padding: 0;
+    height: 44px;
+
+    --border-color: #e2e8f0;
+    --border-width: 1px;
+    --border-style: solid;
+
+    &.has-focus {
+      --border-color: #6366f1;
+      --box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+  }
+
+  .search-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #94a3b8;
+    animation: fadeIn 0.3s ease both;
+
+    ion-icon {
+      font-size: 14px;
+      color: #6366f1;
+    }
+
+    span {
+      font-style: italic;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// RESULT COUNT
+// ============================================
+.result-count {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 4px 0 0;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 8px;
+
+  span {
+    background: #f8fafc;
+    padding: 2px 12px;
+    border-radius: 12px;
+  }
+}
+
+// ============================================
 // LOADING
 // ============================================
 .loading-grid {
@@ -386,24 +468,26 @@ $radius: 16px;
 }
 
 // ============================================
-// PROYECTO CARD
+// PROYECTO CARD - MEJORADA
 // ============================================
 .proyecto-card {
   background: white;
   border-radius: $radius;
   border: 1px solid #eef2f7;
   box-shadow: $shadow-sm;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
   overflow: hidden;
   position: relative;
 
   &:hover {
     box-shadow: $shadow-md;
     border-color: #e2e8f0;
+    transform: translateY(-2px);
   }
 
   &.card-pending {
     border-left: 4px solid #f59e0b;
+    background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
   }
 
   &.card-completed {
@@ -413,6 +497,11 @@ $radius: 16px;
     &:hover {
       opacity: 1;
     }
+  }
+
+  &.card-reabierto {
+    border-left: 4px solid #6366f1;
+    background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
   }
 
   .card-header {
@@ -512,6 +601,15 @@ $radius: 16px;
             background: #10b981;
           }
         }
+
+        &.status-reabierto {
+          background: #eef2ff;
+          color: #4f46e5;
+
+          .status-dot {
+            background: #6366f1;
+          }
+        }
       }
     }
   }
@@ -549,43 +647,177 @@ $radius: 16px;
     }
   }
 
+  // ============================================
+  // 🎯 BOTONES LLAMATIVOS
+  // ============================================
   .card-actions {
     padding: 0 20px 16px;
 
+    // BOTÓN EVALUAR - EL MÁS LLAMATIVO
     .btn-evaluar {
-      --background: #6366f1;
-      --background-hover: #4f46e5;
-      --background-activated: #4338ca;
-      --border-radius: 10px;
+      --background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      --background-hover: linear-gradient(135deg, #4f46e5, #7c3aed);
+      --background-activated: linear-gradient(135deg, #4338ca, #6d28d9);
+      --border-radius: 14px;
       --color: white;
-      --box-shadow: 0 4px 16px rgba(99,102,241,0.3);
-      height: 44px;
-      font-weight: 600;
-      font-size: 14px;
+      --box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+      height: 52px;
+      font-weight: 700;
+      font-size: 15px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
 
-      &:hover:not(:disabled) {
-        transform: translateY(-1px);
+      @media (min-width: 480px) {
+        height: 56px;
+        font-size: 16px;
       }
 
+      // Efecto de brillo
+      &::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-3px);
+        --box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5);
+        
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0px) scale(0.98);
+      }
+
+      ion-icon {
+        font-size: 22px;
+        flex-shrink: 0;
+
+        &.btn-arrow {
+          font-size: 24px;
+          transition: transform 0.3s ease;
+        }
+      }
+
+      &:hover .btn-arrow {
+        transform: translateX(4px);
+      }
+
+      .btn-main-text {
+        font-weight: 700;
+        font-size: 15px;
+        margin: 0 4px;
+
+        @media (min-width: 480px) {
+          font-size: 16px;
+        }
+      }
+
+      .btn-sub-text {
+        font-weight: 400;
+        font-size: 10px;
+        opacity: 0.8;
+        display: none;
+
+        @media (min-width: 480px) {
+          display: block;
+        }
+      }
+
+      // Animación de pulso para llamar la atención
+      animation: pulse-glow 2s ease-in-out infinite;
+
       &:disabled {
-        --background: #e2e8f0;
-        --color: #94a3b8;
-        --box-shadow: none;
+        animation: none;
+      }
+    }
+
+    // BOTÓN RE-EVALUAR
+    .btn-re-evaluar {
+      --background: linear-gradient(135deg, #f59e0b, #d97706);
+      --background-hover: linear-gradient(135deg, #d97706, #b45309);
+      --background-activated: linear-gradient(135deg, #b45309, #92400e);
+      --border-radius: 14px;
+      --color: white;
+      --box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+      height: 48px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.3s ease;
+
+      @media (min-width: 480px) {
+        height: 52px;
+        font-size: 15px;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-3px);
+        --box-shadow: 0 6px 30px rgba(245, 158, 11, 0.5);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0px) scale(0.98);
+      }
+
+      ion-icon {
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .btn-badge-reabierto {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        font-size: 10px;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-weight: 600;
+      }
+    }
+
+    // BOTÓN COMPLETADO
+    .btn-completed {
+      --background: #d1fae5;
+      --color: #059669;
+      --border-radius: 14px;
+      height: 48px;
+      font-weight: 600;
+      font-size: 14px;
+      --box-shadow: none;
+      opacity: 0.8;
+
+      @media (min-width: 480px) {
+        height: 52px;
+        font-size: 15px;
+      }
+
+      &:hover {
+        --background: #d1fae5;
         opacity: 1;
       }
 
-      &.btn-completed {
-        --background: #d1fae5;
-        --color: #059669;
-        --box-shadow: none;
+      ion-icon {
+        font-size: 20px;
+        flex-shrink: 0;
 
-        &:hover {
-          --background: #d1fae5;
+        &.completed-icon {
+          color: #10b981;
+          font-size: 22px;
         }
       }
     }
   }
 
+  // OVERLAY DE COMPLETADO
   .completed-overlay {
     position: absolute;
     top: 12px;
@@ -604,10 +836,31 @@ $radius: 16px;
       font-size: 16px;
     }
   }
+
+  // BADGE DE URGENCIA
+  .urgency-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #fef3c7;
+    color: #d97706;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    animation: pulse-badge 2s ease-in-out infinite;
+
+    ion-icon {
+      font-size: 14px;
+    }
+  }
 }
 
 // ============================================
-// ANIMATIONS
+// ANIMACIONES
 // ============================================
 @keyframes pulse-dot {
   0%, 100% {
@@ -617,6 +870,24 @@ $radius: 16px;
   50% {
     transform: scale(1.5);
     opacity: 0.7;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(99, 102, 241, 0.6), 0 0 60px rgba(99, 102, 241, 0.2);
+  }
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
   }
 }
 
@@ -710,138 +981,21 @@ $radius: 16px;
       gap: 6px;
     }
 
-    .completed-overlay {
+    .completed-overlay,
+    .urgency-badge {
       position: static;
       margin-top: 8px;
       align-self: flex-start;
     }
-  }
-}
-// ============================================
-// 🔍 SEARCH BAR
-// ============================================
 
-.search-container {
-  width: 100%;
-  margin-bottom: 12px;
+    .card-actions {
+      .btn-evaluar {
+        height: 48px;
+        font-size: 14px;
 
-  .search-input {
-    --background: #ffffff;
-    --border-radius: 12px;
-    --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    --placeholder-color: #94a3b8;
-    --placeholder-font-weight: 400;
-    --icon-color: #94a3b8;
-    --clear-button-color: #94a3b8;
-    padding: 0;
-    height: 44px;
-
-    --border-color: #e2e8f0;
-    --border-width: 1px;
-    --border-style: solid;
-
-    &.has-focus {
-      --border-color: #6366f1;
-      --box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-  }
-}
-
-// ============================================
-// RESULT COUNT
-// ============================================
-
-.result-count {
-  font-size: 12px;
-  color: #94a3b8;
-  text-align: center;
-  padding: 4px 0 0;
-  border-top: 1px solid #f1f5f9;
-  margin-top: 8px;
-
-  span {
-    background: #f8fafc;
-    padding: 2px 12px;
-    border-radius: 12px;
-  }
-}
-
-// ============================================
-// FILTER BAR ACTUALIZADA
-// ============================================
-
-.filter-bar {
-  background: white;
-  border-radius: $radius;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  border: 1px solid #eef2f7;
-  box-shadow: $shadow-sm;
-
-  .filter-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-
-    .filter-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #64748b;
-    }
-
-    .filter-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-
-      ion-chip {
-        --background: #f1f5f9;
-        --color: #64748b;
-        font-size: 12px;
-        padding: 0 12px;
-        height: 28px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        ion-label {
-          font-weight: 500;
+        .btn-sub-text {
+          display: none;
         }
-
-        ion-badge {
-          font-size: 10px;
-          padding: 0 6px;
-          min-width: 18px;
-          height: 18px;
-        }
-
-        &.chip-active {
-          --background: #eef2ff;
-          --color: #4f46e5;
-          --border-color: #6366f1;
-          border: 1px solid #6366f1;
-        }
-
-        &:hover {
-          --background: #e2e8f0;
-        }
-      }
-    }
-  }
-}
-
-// ============================================
-// RESPONSIVE - SEARCH
-// ============================================
-
-@media (max-width: 480px) {
-  .filter-bar {
-    .filter-group {
-      flex-direction: column;
-      align-items: stretch;
-
-      .filter-chips {
-        justify-content: center;
       }
     }
   }

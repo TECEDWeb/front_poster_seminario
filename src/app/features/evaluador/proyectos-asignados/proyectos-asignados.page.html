@@ -58,25 +58,25 @@
       </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- 🔍 BARRA DE BÚSQUEDA Y FILTROS -->
-    <!-- ============================================ -->
+    <!-- FILTROS Y BÚSQUEDA -->
     <div class="filter-bar" *ngIf="!loading && totalAsignados > 0">
-      <!-- BUSCADOR -->
       <div class="search-container">
         <ion-searchbar
           [(ngModel)]="filtroBusqueda"
           (ionInput)="aplicarFiltros()"
           (ionClear)="aplicarFiltros()"
-          placeholder="Buscar proyecto por nombre..."
+          placeholder="Buscar proyecto por nombre, área, nivel o concurso..."
           class="search-input"
           animated
           debounce="300">
           <ion-icon name="search-outline" slot="start"></ion-icon>
         </ion-searchbar>
+        <div class="search-hint" *ngIf="filtroBusqueda && filtroBusqueda.trim()">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>Búsqueda sin distinción de tildes</span>
+        </div>
       </div>
 
-      <!-- FILTROS POR ESTADO -->
       <div class="filter-group">
         <span class="filter-label">Filtrar:</span>
         <div class="filter-chips">
@@ -101,15 +101,12 @@
         </div>
       </div>
 
-      <!-- CONTADOR DE RESULTADOS -->
       <div class="result-count" *ngIf="proyectosFiltrados.length !== totalAsignados">
         <span>{{ proyectosFiltrados.length }} de {{ totalAsignados }} proyectos</span>
       </div>
     </div>
 
-    <!-- ============================================ -->
     <!-- LOADING -->
-    <!-- ============================================ -->
     <div class="loading-grid" *ngIf="loading">
       <div class="proyecto-skeleton" *ngFor="let i of [1,2,3]">
         <div class="skeleton-header">
@@ -127,9 +124,7 @@
       </div>
     </div>
 
-    <!-- ============================================ -->
     <!-- ERROR -->
-    <!-- ============================================ -->
     <div class="error-container" *ngIf="!loading && error">
       <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
       <h3>Error al cargar los proyectos</h3>
@@ -140,9 +135,7 @@
       </ion-button>
     </div>
 
-    <!-- ============================================ -->
     <!-- LISTA DE PROYECTOS -->
-    <!-- ============================================ -->
     <div class="proyectos-list" *ngIf="!loading && !error">
       <div class="proyecto-card" 
            *ngFor="let p of proyectosFiltrados || []"
@@ -158,13 +151,21 @@
           <div class="card-info">
             <div class="card-title">{{ p.proyecto.nombre || 'Proyecto sin nombre' }}</div>
             <div class="card-subtitle">
-              <span class="subtitle-item">
+              <span class="subtitle-item" *ngIf="p.proyecto.tipo">
                 <ion-icon name="folder-outline"></ion-icon>
-                {{ p.proyecto.tipo || 'Proyecto' }}
+                {{ p.proyecto.tipo }}
               </span>
               <span class="subtitle-item" *ngIf="p.proyecto.concursoNombre">
                 <ion-icon name="trophy-outline"></ion-icon>
                 {{ p.proyecto.concursoNombre }}
+              </span>
+              <span class="subtitle-item" *ngIf="p.proyecto.area">
+                <ion-icon name="map-outline"></ion-icon>
+                {{ p.proyecto.area }}
+              </span>
+              <span class="subtitle-item" *ngIf="p.proyecto.nivel">
+                <ion-icon name="school-outline"></ion-icon>
+                {{ p.proyecto.nivel }}
               </span>
             </div>
           </div>
@@ -187,7 +188,7 @@
           </p>
 
           <div class="card-meta">
-            <div class="meta-item" *ngIf="p.proyecto.participantes.length">
+            <div class="meta-item" *ngIf="p.proyecto.participantes?.length">
               <ion-icon name="people-outline"></ion-icon>
               <span>{{ p.proyecto.participantes.length }} participante{{ p.proyecto.participantes.length !== 1 ? 's' : '' }}</span>
             </div>
@@ -202,16 +203,23 @@
           </div>
         </div>
 
+        <!-- ============================================ -->
+        <!-- 🎯 BOTONES MEJORADOS Y LLAMATIVOS -->
+        <!-- ============================================ -->
         <div class="card-actions">
+          
+          <!-- BOTÓN RE-EVALUAR - Reabierto -->
           <ion-button 
             *ngIf="p.yaEvaluado && p.reabierto"
             expand="block"
             class="btn-re-evaluar"
             (click)="evaluar(p.evaluacionId)">
             <ion-icon name="refresh-outline" slot="start"></ion-icon>
-            Re-evaluar
+            Re-evaluar proyecto
+            <ion-badge slot="end" class="btn-badge-reabierto">Reabierto</ion-badge>
           </ion-button>
 
+          <!-- BOTÓN COMPLETADO - Evaluado -->
           <ion-button 
             *ngIf="p.yaEvaluado && !p.reabierto"
             expand="block"
@@ -219,27 +227,36 @@
             disabled>
             <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
             Evaluación completada
+            <ion-icon name="checkmark-circle" slot="end" class="completed-icon"></ion-icon>
           </ion-button>
 
+          <!-- BOTÓN EVALUAR - Pendiente (MÁS LLAMATIVO) -->
           <ion-button 
             *ngIf="!p.yaEvaluado"
             expand="block"
             class="btn-evaluar"
             (click)="evaluar(p.evaluacionId)">
             <ion-icon name="clipboard-outline" slot="start"></ion-icon>
-            Evaluar proyecto
+            <span class="btn-main-text">Evaluar proyecto</span>
+            <span class="btn-sub-text">Haz clic para comenzar</span>
+            <ion-icon name="arrow-forward-circle-outline" slot="end" class="btn-arrow"></ion-icon>
           </ion-button>
         </div>
 
+        <!-- OVERLAY DE COMPLETADO -->
         <div class="completed-overlay" *ngIf="p.yaEvaluado && !p.reabierto">
           <ion-icon name="checkmark-circle"></ion-icon>
           <span>Completado</span>
         </div>
+
+        <!-- BADGE DE URGENCIA PARA PENDIENTES -->
+        <div class="urgency-badge" *ngIf="!p.yaEvaluado">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Pendiente</span>
+        </div>
       </div>
 
-      <!-- ============================================ -->
-      <!-- EMPTY STATE CON MENSAJE SEGÚN FILTRO -->
-      <!-- ============================================ -->
+      <!-- EMPTY STATE -->
       <div class="empty-state" *ngIf="proyectosFiltrados.length === 0 && !loading">
         <div class="empty-icon" *ngIf="proyectos.length === 0">
           <ion-icon name="folder-open-outline"></ion-icon>

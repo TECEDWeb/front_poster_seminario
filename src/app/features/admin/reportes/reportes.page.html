@@ -100,22 +100,29 @@
       </div>
 
       <div class="podio-grid">
+        <!-- 2do Lugar -->
         <div class="podio-card podio-2" *ngIf="ganadores.length >= 2">
           <ion-icon name="medal" class="podio-medalla-icon medalla-plata"></ion-icon>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[1].nombre)">
             <span>{{ ganadores[1].nombre.charAt(0) || 'P' }}</span>
           </div>
           <div class="podio-info">
-            <h3>{{ ganadores[1].nombre }}</h3>
+            <h3 class="podio-nombre-completo">{{ ganadores[1].nombre }}</h3>
             <span class="podio-area">{{ ganadores[1].area || 'Sin área' }}</span>
             <div class="podio-puntaje">
               <span class="podio-promedio">{{ ganadores[1].promedio | number:'1.2-2' }}</span>
               <span class="podio-label">Promedio</span>
             </div>
+            <!-- PORCENTAJE 2DO LUGAR -->
+            <div class="podio-porcentaje podio-porcentaje-plata">
+              <span class="porcentaje-valor">{{ getPorcentaje(ganadores[1].promedio, ganadores[1].puntajeMaximo) }}%</span>
+              <span class="porcentaje-label">Rendimiento</span>
+            </div>
           </div>
           <div class="podio-posicion">2do Lugar</div>
         </div>
 
+        <!-- 1er Lugar - GANADOR -->
         <div class="podio-card podio-1" *ngIf="ganadores.length >= 1">
           <ion-icon name="trophy" class="podio-corona-icon"></ion-icon>
           <ion-icon name="medal" class="podio-medalla-icon medalla-oro"></ion-icon>
@@ -129,6 +136,11 @@
               <span class="podio-promedio podio-ganador">{{ ganadores[0].promedio | number:'1.2-2' }}</span>
               <span class="podio-label">Promedio</span>
             </div>
+            <!-- PORCENTAJE 1ER LUGAR - DESTACADO -->
+            <div class="podio-porcentaje podio-porcentaje-ganador">
+              <span class="porcentaje-valor ganador">{{ getPorcentaje(ganadores[0].promedio, ganadores[0].puntajeMaximo) }}%</span>
+              <span class="porcentaje-label">Rendimiento</span>
+            </div>
           </div>
           <div class="podio-posicion podio-posicion-1">
             <ion-icon name="trophy-outline"></ion-icon>
@@ -136,6 +148,7 @@
           </div>
         </div>
 
+        <!-- 3er Lugar -->
         <div class="podio-card podio-3" *ngIf="ganadores.length >= 3">
           <ion-icon name="medal" class="podio-medalla-icon medalla-bronce"></ion-icon>
           <div class="podio-avatar" [class]="getRandomColor(ganadores[2].nombre)">
@@ -147,6 +160,11 @@
             <div class="podio-puntaje">
               <span class="podio-promedio">{{ ganadores[2].promedio | number:'1.2-2' }}</span>
               <span class="podio-label">Promedio</span>
+            </div>
+            <!-- PORCENTAJE 3ER LUGAR -->
+            <div class="podio-porcentaje podio-porcentaje-bronce">
+              <span class="porcentaje-valor">{{ getPorcentaje(ganadores[2].promedio, ganadores[2].puntajeMaximo) }}%</span>
+              <span class="porcentaje-label">Rendimiento</span>
             </div>
           </div>
           <div class="podio-posicion">3er Lugar</div>
@@ -571,9 +589,7 @@
 
   </div>
 
-  <!-- ============================================ -->
   <!-- MODAL: RESPUESTAS DE EVALUACIÓN -->
-  <!-- ============================================ -->
   <ion-modal [isOpen]="modalRespuestasAbierto" (didDismiss)="cerrarModalRespuestas()">
     <ng-template>
       <ion-header>
