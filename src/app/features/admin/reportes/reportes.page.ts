@@ -580,9 +580,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.aplicarFiltros();
   }
 
-  // ==========================================================
-  // 🔥 APLICAR FILTROS CON RANGOS CORREGIDOS
-  // ==========================================================
   aplicarFiltros(): void {
     this.calcularGanadores();
 
@@ -617,7 +614,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       });
     }
 
-    // 🔥 FILTRO POR ESTADO CORREGIDO
     if (this.filtroStatus !== 'todos') {
       filtered = filtered.filter(p => {
         const pct = this.getPorcentaje(p.promedio, p.puntajeMaximo);
@@ -862,8 +858,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         String(p.evaluaciones || 0),
         `${p.promedio ? p.promedio.toFixed(2) : '0.00'} / ${p.puntajeMaximo || 100}`,
         `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
-        this.getStatusText(p.promedio, p.puntajeMaximo), // ✅ Usa rangos corregidos
-        this.getNombreConcursoFiltro(p)
+        this.getStatusText(p.promedio, p.puntajeMaximo), 
       ]);
 
       autoTable(doc, {
@@ -1275,9 +1270,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     return Math.min(Math.round((promedio / maximo) * 100), 100);
   }
 
-  // ==========================================================
-  // 🔥 MÉTODOS DE CALIFICACIÓN CORREGIDOS
-  // ==========================================================
 
   getStatusText(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'Sin datos';
