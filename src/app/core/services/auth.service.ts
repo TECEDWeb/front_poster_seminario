@@ -12,9 +12,6 @@ import { Usuario, Rol } from '../models/usuario.model';
 })
 export class AuthService {
 
-  // =========================
-  // ESTADO - SIGNALS
-  // =========================
   private _usuario = signal<Usuario | null>(null);
   private _token = signal<string | null>(null);
   private _cargado = signal(false);
@@ -135,7 +132,7 @@ export class AuthService {
   // =========================
   async setSession(usuario: Usuario, token: string) {
     console.log('🔐 setSession - Token:', token.substring(0, 20) + '...');
-    console.log('🔐 setSession - Usuario:', usuario.nombre, 'Rol:', usuario.rol);
+    console.log('🔐 setSession - Usuario:', usuario.nombre, 'Email:', usuario.email, 'Rol:', usuario.rol);
 
     this._usuario.set(usuario);
     this._token.set(token);
@@ -384,5 +381,67 @@ export class AuthService {
 
   resetearPassword(token: string, nuevaPassword: string): Observable<any> {
     return this.http.post(`${environment.apiUrl}/auth/resetear-password`, { token, nuevaPassword });
+  }
+
+  // ==========================================================
+  // 🔥 GET USER INFO - CORREGIDO SIN nombre_completo
+  // ==========================================================
+  getUserInfo(): any {
+    // 1. Intentar obtener del usuario en memoria (signal)
+    const usuarioSignal = this._usuario();
+    if (usuarioSignal) {
+      return {
+        id: usuarioSignal.id || null,
+        nombre: usuarioSignal.nombre || 'Administrador',
+        email: usuarioSignal.email || 'Sin correo',
+        rol: usuarioSignal.rol || 'Administrador',
+        cedula: usuarioSignal.cedula || null
+      };
+    }
+
+    // 2. Intentar obtener del localStorage con clave 'usuario'
+    const userStr = localStorage.getItem('usuario');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && user.nombre) {
+          return {
+            id: user.id || null,
+            nombre: user.nombre || 'Administrador',
+            email: user.email || 'Sin correo',
+            rol: user.rol || 'Administrador',
+            cedula: user.cedula || null
+          };
+        }
+      } catch (e) {
+        console.error('Error parsing user from localStorage:', e);
+      }
+    }
+
+    // 3. Intentar obtener del token JWT
+    const token = this.getToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return {
+          id: payload.id || payload.sub || null,
+          nombre: payload.nombre || payload.name || 'Administrador',
+          email: payload.email || 'Sin correo',
+          rol: payload.rol || payload.role || 'Administrador',
+          cedula: payload.cedula || null
+        };
+      } catch (e) {
+        console.error('Error parsing token:', e);
+      }
+    }
+
+    // 4. Si no hay usuario, devolver un objeto por defecto
+    return {
+      id: null,
+      nombre: 'Administrador',
+      email: 'admin@upse.edu.ec',
+      rol: 'Administrador',
+      cedula: null
+    };
   }
 }

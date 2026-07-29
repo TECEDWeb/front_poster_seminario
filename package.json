@@ -28,6 +28,7 @@
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/status-bar": "8.0.2",
     "@ionic/angular": "^8.0.0",
+    "html2canvas": "^1.4.1",
     "ionicons": "^7.0.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",

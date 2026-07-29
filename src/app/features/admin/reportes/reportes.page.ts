@@ -61,6 +61,7 @@ import { ReporteService } from '../../../core/services/reporte.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ConcursoService } from '../../../core/services/concurso.service';
+import html2canvas from 'html2canvas';
 
 interface StatCard {
   icon: string;
@@ -93,14 +94,13 @@ interface Ganador {
   puntajeMaximo: number;
   evaluaciones: number;
   evaluadores?: any[];
-  participantes?: any[];
+  participantes?: any[];  
+  tutores?: any[]; 
   posicion: number;
   clase: string;
 }
 
-// Interfaz ProyectoRanking con TODAS las propiedades necesarias
 interface ProyectoRanking {
-  // Propiedades base
   id: number;
   nombre: string;
   proyecto?: string;
@@ -118,8 +118,6 @@ interface ProyectoRanking {
   concursoId?: number;
   concursoNombre?: string;
   _expandido?: boolean;
-  
-  // Propiedades de ranking
   posicion: number;
   esTop5: boolean;
   esTop3: boolean;
@@ -170,6 +168,7 @@ export class ReportesPage implements OnInit, OnDestroy {
 
   cargando: boolean = false;
   exportando: boolean = false;
+  descargandoImagen: boolean = false;
   error: string | null = null;
   fechaActualizacion: Date = new Date();
   statsCards: StatCard[] = [];
@@ -386,7 +385,8 @@ export class ReportesPage implements OnInit, OnDestroy {
       puntajeMaximo: proyecto.puntajeMaximo || 100,
       evaluaciones: proyecto.evaluaciones || 0,
       evaluadores: proyecto.evaluadores || [],
-      participantes: proyecto.participantes || [],  // 🔥 NUEVO
+      participantes: proyecto.participantes || [],
+      tutores: proyecto.tutores || [],
       posicion: index + 1,
       clase: index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'
     }));
@@ -404,7 +404,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     mensaje += `           ${nombreConcurso.toUpperCase()}\n`;
     mensaje += '================================================\n\n';
 
-    // Títulos por posición
     const titulos = ['1er LUGAR - GANADOR', '2do LUGAR', '3er LUGAR'];
 
     this.ganadores.forEach((g, index) => {
@@ -422,7 +421,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       mensaje += `  Puntaje: ${g.promedio.toFixed(2)} / ${g.puntajeMaximo} (${pct}%)\n`;
       mensaje += `  Evaluaciones: ${g.evaluaciones || 0}\n`;
       
-      // Mostrar participantes
       if (nombresParticipantes) {
         mensaje += `  Participantes: ${nombresParticipantes}\n`;
       } else {
@@ -432,7 +430,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       mensaje += '------------------------------------------------\n';
     });
 
-    // Resumen final
     const totalProyectos = this.proyectosFiltrados?.length || 0;
     mensaje += `\n  Total de proyectos evaluados: ${totalProyectos}\n`;
     mensaje += `  Ganadores mostrados: ${this.ganadores.length}\n`;
@@ -440,8 +437,90 @@ export class ReportesPage implements OnInit, OnDestroy {
     mensaje += '        FELICIDADES A LOS GANADORES!\n';
     mensaje += '================================================';
 
-    // Usar alert con el mensaje mejorado
     alert(mensaje);
+  }
+
+ 
+  descargarPodioImagen(): void {
+    if (!this.ganadores || this.ganadores.length === 0) {
+      this.mostrarMensaje('No hay ganadores para generar la imagen del podio', 'error');
+      return;
+    }
+
+    this.descargandoImagen = true;
+
+    const podioElement = document.getElementById('podioContainer');
+    if (!podioElement) {
+      this.descargandoImagen = false;
+      this.mostrarMensaje('No se encontró el elemento del podio', 'error');
+      return;
+    }
+
+    // Ya no forzamos width/height manualmente: con el CSS corregido
+    // (.podio-content-wrapper con width: fit-content), el elemento
+    // mide exactamente su contenido real.
+    const config = {
+      scale: 2.5,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#001b4c',
+      logging: false,
+      onclone: (clonedDoc: Document) => {
+        const clone = clonedDoc.getElementById('podioContainer') as HTMLElement | null;
+        if (clone) {
+          // Solo limpiamos márgenes externos para que no se capture
+          // espacio extra alrededor del wrapper ya ajustado
+          clone.style.margin = '0';
+        }
+      }
+    };
+
+    // Mostrar loading
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      color: white;
+      font-size: 18px;
+    `;
+    loadingOverlay.innerHTML = `
+      <div style="text-align: center;">
+        <ion-spinner name="crescent" style="color: white; width: 48px; height: 48px;"></ion-spinner>
+        <p style="margin-top: 16px;">Generando imagen del podio...</p>
+      </div>
+    `;
+    document.body.appendChild(loadingOverlay);
+
+    setTimeout(() => {
+      html2canvas(podioElement, config)
+        .then((canvas: HTMLCanvasElement) => {
+          document.body.removeChild(loadingOverlay);
+
+          const link = document.createElement('a');
+          const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
+          const fecha = new Date().toISOString().split('T')[0];
+          link.download = `podio-${nombreConcurso}-${fecha}.png`;
+          link.href = canvas.toDataURL('image/png', 1.0);
+          link.click();
+
+          this.descargandoImagen = false;
+          this.mostrarMensaje('Imagen del podio descargada correctamente', 'success');
+        })
+        .catch((error) => {
+          document.body.removeChild(loadingOverlay);
+          console.error('Error generando imagen:', error);
+          this.descargandoImagen = false;
+          this.mostrarMensaje('Error al generar la imagen del podio', 'error');
+        });
+    }, 300);
   }
 
   toggleProyecto(proyecto: any): void {
@@ -557,22 +636,15 @@ export class ReportesPage implements OnInit, OnDestroy {
       );
     }
 
-    // ============================================
-    // ORDENAR POR PUNTAJE DE MAYOR A MENOR
-    // ============================================
     filtered = filtered.sort((a, b) => {
       const promedioA = a.promedio || 0;
       const promedioB = b.promedio || 0;
       return promedioB - promedioA;
     });
 
-    // ============================================
-    // ASIGNAR POSICIONES Y METADATOS DE RANKING
-    // ============================================
     this.proyectosFiltrados = filtered.map((p, index) => {
       const posicion = index + 1;
       
-      // Obtener nombres de participantes
       const participantes = p.participantes || [];
       const nombresParticipantes = participantes
         .map((part: any) => part.nombre || '')
@@ -670,145 +742,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     window.URL.revokeObjectURL(url);
   }
 
-  exportarExcelConFiltros(): void {
-    const datos = this.proyectosFiltrados || [];
-
-    if (datos.length === 0) {
-      this.mostrarMensaje('No hay proyectos para exportar con los filtros actuales', 'error');
-      return;
-    }
-
-    const headers = [
-      'Posicion',
-      'Proyecto',
-      'Área',
-      'Nivel',
-      'Tutor encargado',
-      'Participantes',
-      'Evaluaciones',
-      'Puntaje',
-      'Puntaje máximo',
-      'Porcentaje',
-      'Estado',
-      'Concurso'
-    ];
-
-    const filas = datos.map(p => [
-      String(p.posicion || '-'),
-      p.proyecto || p.nombre || '—',
-      p.area || '—',
-      p.nivel || '—',
-      this.tutorPrincipal(p) || '—',
-      p.nombreParticipantes || '—',
-      String(p.evaluaciones || 0),
-      String(p.promedio ? p.promedio.toFixed(2) : '0.00'),
-      String(p.puntajeMaximo || 100),
-      `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
-      this.getStatusText(p.promedio, p.puntajeMaximo),
-      this.getNombreConcursoFiltro(p)
-    ]);
-
-    const csvContent = this.generarCSV(headers, filas);
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-
-    const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
-    const fecha = new Date().toISOString().split('T')[0];
-    this.descargarArchivo(blob, `reporte-${nombreConcurso}-${fecha}.csv`);
-
-    this.mostrarMensaje(`Excel exportado: ${datos.length} proyecto(s)`, 'success');
-  }
-
-  async exportarPDFConFiltros(): Promise<void> {
-    const datos = this.proyectosFiltrados || [];
-
-    if (datos.length === 0) {
-      this.mostrarMensaje('No hay proyectos para exportar con los filtros actuales', 'error');
-      return;
-    }
-
-    this.exportando = true;
-
-    try {
-      const { default: jsPDF } = await import('jspdf');
-      const autoTableModule = await import('jspdf-autotable');
-      const autoTable = autoTableModule.default;
-
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
-      doc.setFontSize(16);
-      doc.setTextColor(0, 27, 76);
-      const titulo = `Reporte - ${this.getNombreConcurso(this.filtroConcurso)}`;
-      doc.text(titulo, 14, 15);
-
-      doc.setFontSize(9);
-      doc.setTextColor(100);
-      const fechaLegible = new Date().toLocaleString('es-EC');
-      doc.text(`Generado: ${fechaLegible}  -  Total: ${datos.length} proyecto(s)`, 14, 21);
-
-      const columnas = [
-        '#',
-        'Proyecto',
-        'Área',
-        'Nivel',
-        'Tutor',
-        'Participantes',
-        'Eval.',
-        'Puntaje',
-        '%',
-        'Estado',
-        'Concurso'
-      ];
-
-      const filas = datos.map(p => [
-        String(p.posicion || '-'),
-        p.proyecto || p.nombre || '—',
-        p.area || '—',
-        p.nivel || '—',
-        this.tutorPrincipal(p) || '—',
-        p.nombreParticipantes || '—',
-        String(p.evaluaciones || 0),
-        `${p.promedio ? p.promedio.toFixed(2) : '0.00'} / ${p.puntajeMaximo || 100}`,
-        `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
-        this.getStatusText(p.promedio, p.puntajeMaximo),
-        this.getNombreConcursoFiltro(p)
-      ]);
-
-      autoTable(doc, {
-        head: [columnas],
-        body: filas,
-        startY: 26,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 27, 76], textColor: 255, fontStyle: 'bold' },
-        styles: { fontSize: 7, cellPadding: 2 },
-        alternateRowStyles: { fillColor: [232, 240, 254] },
-        columnStyles: {
-          0: { cellWidth: 12, halign: 'center' },
-          1: { cellWidth: 40 },
-          2: { cellWidth: 25 },
-          3: { cellWidth: 20 },
-          4: { cellWidth: 30 },
-          5: { cellWidth: 35 },
-          6: { cellWidth: 15, halign: 'center' },
-          7: { cellWidth: 25, halign: 'center' },
-          8: { cellWidth: 15, halign: 'center' },
-          9: { cellWidth: 20, halign: 'center' },
-          10: { cellWidth: 30 }
-        }
-      });
-
-      const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
-      const fecha = new Date().toISOString().split('T')[0];
-      doc.save(`reporte-${nombreConcurso}-${fecha}.pdf`);
-
-      this.mostrarMensaje(`PDF exportado: ${datos.length} proyecto(s)`, 'success');
-    } catch (err) {
-      console.error('Error generando PDF:', err);
-      this.mostrarMensaje('Error al generar el PDF', 'error');
-    } finally {
-      this.exportando = false;
-    }
-  }
-
   exportarProyectoExcel(proyecto: ProyectoRanking): void {
     const id = proyecto.id;
     if (!id) {
@@ -843,6 +776,308 @@ export class ReportesPage implements OnInit, OnDestroy {
         this.mostrarMensaje('Error al exportar el PDF del proyecto', 'error');
       }
     });
+  }
+
+  async exportarPDFConFiltros(): Promise<void> {
+    const datos = this.proyectosFiltrados || [];
+
+    if (datos.length === 0) {
+      this.mostrarMensaje('No hay proyectos para exportar con los filtros actuales', 'error');
+      return;
+    }
+
+    this.exportando = true;
+
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      const autoTable = autoTableModule.default;
+
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      
+      doc.setFillColor(0, 27, 76);
+      doc.rect(0, 0, 297, 8, 'F');
+
+      doc.setFontSize(10);
+      doc.setTextColor(0, 27, 76);
+      doc.setFont('helvetica', 'bold');
+      doc.text('UNIVERSIDAD ESTATAL PENÍNSULA DE SANTA ELENA', 14, 16);
+      
+      doc.setFontSize(8);
+      doc.setTextColor(100);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Facultad de Ciencias de la Ingeniería', 14, 21);
+      
+      doc.setFontSize(18);
+      doc.setTextColor(0, 27, 76);
+      doc.setFont('helvetica', 'bold');
+      doc.text('REPORTE DE EVALUACIONES', 14, 30);
+
+      doc.setFontSize(12);
+      doc.setTextColor(100);
+      doc.setFont('helvetica', 'normal');
+      doc.text(this.getNombreConcurso(this.filtroConcurso), 14, 38);
+
+      const fechaGeneracion = new Date();
+      const fechaStr = fechaGeneracion.toLocaleDateString('es-EC', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+      const horaStr = fechaGeneracion.toLocaleTimeString('es-EC', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const perfilY = 46;
+      doc.setFontSize(9);
+      doc.setTextColor(80);
+      doc.setFont('helvetica', 'normal');
+      
+      doc.text('Generado por: Ing. Marcia Bayas Sampedro, Ph.D.', 14, perfilY);
+      doc.text('Directora del Grupo de Investigación "Tecnología, Ciencia y Educación"', 14, perfilY + 5);
+      doc.text(`Fecha: ${fechaStr} - Hora: ${horaStr}`, 14, perfilY + 10);
+      doc.text(`Total de proyectos: ${datos.length}`, 14, perfilY + 15);
+      
+      doc.setDrawColor(201, 168, 76);
+      doc.setLineWidth(0.5);
+      doc.line(14, perfilY + 19, 283, perfilY + 19);
+
+      const columnas = [
+        '#', 'Proyecto', 'Área', 'Nivel', 'Tutor', 'Participantes',
+        'Eval.', 'Puntaje', '%', 'Estado', 'Concurso'
+      ];
+
+      const filas = datos.map(p => [
+        String(p.posicion || '-'),
+        p.proyecto || p.nombre || '—',
+        p.area || '—',
+        p.nivel || '—',
+        this.tutorPrincipal(p) || '—',
+        p.nombreParticipantes || '—',
+        String(p.evaluaciones || 0),
+        `${p.promedio ? p.promedio.toFixed(2) : '0.00'} / ${p.puntajeMaximo || 100}`,
+        `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
+        this.getStatusText(p.promedio, p.puntajeMaximo),
+        this.getNombreConcursoFiltro(p)
+      ]);
+
+      autoTable(doc, {
+        head: [columnas],
+        body: filas,
+        startY: perfilY + 24,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [0, 27, 76],
+          textColor: 255,
+          fontStyle: 'bold',
+          fontSize: 8,
+          halign: 'center'
+        },
+        styles: {
+          fontSize: 7,
+          cellPadding: 2,
+          valign: 'middle'
+        },
+        alternateRowStyles: {
+          fillColor: [232, 240, 254]
+        },
+        columnStyles: {
+          0: { cellWidth: 10, halign: 'center' },
+          1: { cellWidth: 50 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 30 },
+          5: { cellWidth: 35 },
+          6: { cellWidth: 12, halign: 'center' },
+          7: { cellWidth: 25, halign: 'center' },
+          8: { cellWidth: 15, halign: 'center' },
+          9: { cellWidth: 20, halign: 'center' },
+          10: { cellWidth: 30 }
+        },
+        didDrawPage: (data: any) => {
+          const pageCount = doc.getNumberOfPages();
+          const currentPage = doc.getCurrentPageInfo()?.pageNumber || 1;
+          
+          doc.setFontSize(7);
+          doc.setTextColor(150);
+          doc.setFont('helvetica', 'italic');
+          doc.text(
+            `Página ${currentPage} de ${pageCount}`,
+            14,
+            doc.internal.pageSize.height - 5
+          );
+          
+          doc.setDrawColor(201, 168, 76);
+          doc.setLineWidth(0.3);
+          doc.line(14, doc.internal.pageSize.height - 8, 283, doc.internal.pageSize.height - 8);
+        }
+      });
+      
+      const finalY = (doc as any).lastAutoTable?.finalY || 200;
+      
+      if (finalY < 220) {
+        const totalProyectos = datos.length;
+        const totalEvaluaciones = datos.reduce((sum, p) => sum + (p.evaluaciones || 0), 0);
+        const promedioGeneral = datos.reduce((sum, p) => sum + (p.promedio || 0), 0) / (totalProyectos || 1);
+
+        doc.setFontSize(9);
+        doc.setTextColor(0, 27, 76);
+        doc.setFont('helvetica', 'bold');
+        doc.text('RESUMEN ESTADÍSTICO', 14, finalY + 10);
+
+        doc.setFontSize(8);
+        doc.setTextColor(60);
+        doc.setFont('helvetica', 'normal');
+        
+        const statsY = finalY + 16;
+        doc.text(`Total proyectos: ${totalProyectos}`, 14, statsY);
+        doc.text(`Total evaluaciones: ${totalEvaluaciones}`, 60, statsY);
+        doc.text(`Promedio general: ${promedioGeneral.toFixed(2)} pts`, 110, statsY);
+
+        const lineaY = statsY + 12;
+        doc.setDrawColor(0, 27, 76);
+        doc.setLineWidth(0.3);
+        doc.line(14, lineaY, 283, lineaY);
+
+        doc.setFontSize(7);
+        doc.setTextColor(120);
+        doc.setFont('helvetica', 'italic');
+        doc.text(
+          'Este reporte fue generado automáticamente por el Sistema de Evaluación UPSE.',
+          14, lineaY + 8
+        );
+        
+        doc.setTextColor(100);
+        doc.setFont('helvetica', 'italic');
+        doc.text(
+          'Desarrollado por: Ing. Jefferson Pozo Catuto',
+          14, lineaY + 13
+        );
+        doc.text(
+          'Sistema de Evaluación - UPSE',
+          14, lineaY + 17
+        );
+
+        const firmaY = lineaY + 45;
+        
+        doc.setDrawColor(0, 27, 76);
+        doc.setLineWidth(0.5);
+        doc.line(14, firmaY, 85, firmaY);
+
+        doc.setFontSize(9);
+        doc.setTextColor(0, 27, 76);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Ing. Marcia Bayas Sampedro, Ph.D.', 14, firmaY + 6);
+        
+        doc.setFontSize(7.5);
+        doc.setTextColor(100);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Directora del Grupo de Investigación "Tecnología, Ciencia y Educación"', 14, firmaY + 12);
+        doc.text('Facultad de Ciencias de la Ingeniería', 14, firmaY + 17);
+        
+        doc.setFontSize(7);
+        doc.setTextColor(80);
+        doc.setFont('helvetica', 'italic');
+        doc.text(`Fecha: ${fechaStr}`, 200, firmaY + 6);
+        doc.text(`Hora: ${horaStr}`, 200, firmaY + 12);
+
+        const finalLineaY = firmaY + 27;
+        doc.setDrawColor(201, 168, 76);
+        doc.setLineWidth(0.3);
+        doc.line(14, finalLineaY, 283, finalLineaY);
+      }
+
+      const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
+      const fecha = new Date().toISOString().split('T')[0];
+      doc.save(`reporte-${nombreConcurso}-${fecha}.pdf`);
+
+      this.mostrarMensaje(`PDF exportado: ${datos.length} proyecto(s)`, 'success');
+    } catch (err) {
+      console.error('Error generando PDF:', err);
+      this.mostrarMensaje('Error al generar el PDF', 'error');
+    } finally {
+      this.exportando = false;
+    }
+  }
+
+  exportarExcelConFiltros(): void {
+    const datos = this.proyectosFiltrados || [];
+
+    if (datos.length === 0) {
+      this.mostrarMensaje('No hay proyectos para exportar con los filtros actuales', 'error');
+      return;
+    }
+
+    const fechaGeneracion = new Date();
+    const fechaStr = fechaGeneracion.toLocaleDateString('es-EC', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+    const horaStr = fechaGeneracion.toLocaleTimeString('es-EC', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const headers = [
+      'Posicion', 'Proyecto', 'Área', 'Nivel', 'Tutor encargado',
+      'Participantes', 'Evaluaciones', 'Puntaje', 'Puntaje máximo',
+      'Porcentaje', 'Estado', 'Concurso', 'Evaluadores asignados'
+    ];
+
+    const filas = datos.map(p => [
+      String(p.posicion || '-'),
+      p.proyecto || p.nombre || '—',
+      p.area || '—',
+      p.nivel || '—',
+      this.tutorPrincipal(p) || '—',
+      p.nombreParticipantes || '—',
+      String(p.evaluaciones || 0),
+      String(p.promedio ? p.promedio.toFixed(2) : '0.00'),
+      String(p.puntajeMaximo || 100),
+      `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
+      this.getStatusText(p.promedio, p.puntajeMaximo),
+      this.getNombreConcursoFiltro(p),
+      (p.evaluadores || []).map((e: any) => e.nombre).join(' | ')
+    ]);
+
+    let csvContent = '';
+
+    csvContent += `"REPORTE DE EVALUACIONES"\n`;
+    csvContent += `"${this.getNombreConcurso(this.filtroConcurso)}"\n`;
+    csvContent += `\n`;
+    csvContent += `"Generado por","Ing. Marcia Bayas Sampedro, Mgt."\n`;
+    csvContent += `"Directora del Grupo de Investigación "Tecnología, Ciencia y Educación""\n`;
+    csvContent += `"Fecha","${fechaStr}"\n`;
+    csvContent += `"Hora","${horaStr}"\n`;
+    csvContent += `"Total proyectos","${datos.length}"\n`;
+    csvContent += `\n`;
+
+    csvContent += this.generarCSV(headers, filas);
+    
+    const totalProyectos = datos.length;
+    const totalEvaluaciones = datos.reduce((sum, p) => sum + (p.evaluaciones || 0), 0);
+    const promedioGeneral = datos.reduce((sum, p) => sum + (p.promedio || 0), 0) / (totalProyectos || 1);
+
+    csvContent += `\n`;
+    csvContent += `"RESUMEN ESTADÍSTICO"\n`;
+    csvContent += `"Total proyectos","${totalProyectos}"\n`;
+    csvContent += `"Total evaluaciones","${totalEvaluaciones}"\n`;
+    csvContent += `"Promedio general","${promedioGeneral.toFixed(2)} pts"\n`;
+    csvContent += `\n`;
+    csvContent += `"Reporte generado automáticamente por el Sistema de Evaluación UPSE"\n`;
+    csvContent += `"Desarrollado por: Ing. Jefferson Pozo Catuto"\n`;
+    csvContent += `"Sistema de Evaluación - UPSE"\n`;
+    csvContent += `"Fecha de generación: ${fechaStr} ${horaStr}"\n`;
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    const nombreConcurso = this.getNombreConcurso(this.filtroConcurso).replace(/\s+/g, '_');
+    const fecha = new Date().toISOString().split('T')[0];
+    this.descargarArchivo(blob, `reporte-${nombreConcurso}-${fecha}.csv`);
+
+    this.mostrarMensaje(`Excel exportado: ${datos.length} proyecto(s)`, 'success');
   }
 
   editarEvaluacionAdmin(proyecto: ProyectoRanking): void {
@@ -1014,8 +1249,8 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.aplicarFiltros();
   }
 
-  private mostrarMensaje(mensaje: string, tipo: 'success' | 'error'): void {
-    const prefijo = tipo === 'success' ? '[OK]' : '[Error]';
+  private mostrarMensaje(mensaje: string, tipo: 'success' | 'error' | 'info'): void {
+    const prefijo = tipo === 'success' ? '[OK]' : tipo === 'error' ? '[Error]' : '[Info]';
     alert(`${prefijo} ${mensaje}`);
   }
 
