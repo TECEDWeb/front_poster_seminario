@@ -138,7 +138,11 @@ export class ConcursoService {
       tipo: data.tipo || null,
       fecha_inicio: data.fechaInicio || null,
       fecha_fin: data.fechaFin || null,
-      puntaje_maximo: data.puntajeMaximo || null,
+      // Esto es clave: Si el usuario deja el input vacío, envía null. 
+      // Si puso un número, envía el número (incluso si es 0).
+      puntaje_maximo: (data.puntajeMaximo !== null && data.puntajeMaximo !== undefined && data.puntajeMaximo !== '') 
+                      ? Number(data.puntajeMaximo) 
+                      : null,
       activo: data.activo ?? true
     };
   }
