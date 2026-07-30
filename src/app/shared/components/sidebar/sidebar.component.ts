@@ -82,7 +82,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { label: 'Rúbricas', route: '/admin/rubricas', icon: 'checkbox-outline', iconActive: 'checkbox' },
     { label: 'Asignaciones', route: '/admin/asignaciones', icon: 'swap-horizontal-outline', iconActive: 'swap-horizontal' },
     { label: 'Certificados', route: '/admin/certificados', icon: 'ribbon-outline', iconActive: 'ribbon' },
-
   ];
 
   evaluadorMenuItems: MenuItem[] = [
@@ -90,8 +89,27 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { label: 'Proyectos', route: '/evaluador/proyectos-asignados', icon: 'clipboard-outline', iconActive: 'clipboard' },
     { label: 'Resultados', route: '/evaluador/mis-resultados', icon: 'stats-chart-outline', iconActive: 'stats-chart' },
     { label: 'Certificados', route: '/evaluador/mis-certificados', icon: 'ribbon-outline', iconActive: 'ribbon' },
-
   ];
+
+  // ✅ NUEVO: Menú para el Coordinador
+  coordinadorMenuItems: MenuItem[] = [
+    { label: 'Dashboard', route: '/coordinador/dashboard', icon: 'grid-outline', iconActive: 'grid' },
+    { label: 'Mis Concursos', route: '/coordinador/concursos', icon: 'trophy-outline', iconActive: 'trophy' },
+    { label: 'Reportes', route: '/coordinador/reportes', icon: 'bar-chart-outline', iconActive: 'bar-chart' },
+  ];
+
+  // ✅ AGREGADO: Señal computada que decide qué array devolver según el rol del usuario
+  menuItems = computed(() => {
+    const u = this.usuario();
+    if (!u) return [];
+
+    switch (u.rol) {
+      case 'admin': return this.adminMenuItems;
+      case 'evaluador': return this.evaluadorMenuItems;
+      case 'coordinador': return this.coordinadorMenuItems;
+      default: return [];
+    }
+  });
 
   constructor() {
     addIcons({

@@ -7,32 +7,18 @@
       </div>
     </div>
 
+    <!-- ✅ MENÚ DINÁMICO PARA DESKTOP (Admin, Evaluador y ahora Coordinador) -->
     <div class="menu-items">
-      <ng-container *ngIf="usuario()?.rol === 'admin'">
-        <a *ngFor="let item of adminMenuItems"
-           class="menu-link"
-           [routerLink]="item.route"
-           routerLinkActive="active"
-           #rla="routerLinkActive">
-          <span class="menu-link-icon">
-            <ion-icon [name]="rla.isActive ? item.iconActive : item.icon"></ion-icon>
-          </span>
-          <span class="menu-link-text">{{ item.label }}</span>
-        </a>
-      </ng-container>
-
-      <ng-container *ngIf="usuario()?.rol === 'evaluador'">
-        <a *ngFor="let item of evaluadorMenuItems"
-           class="menu-link"
-           [routerLink]="item.route"
-           routerLinkActive="active"
-           #rla="routerLinkActive">
-          <span class="menu-link-icon">
-            <ion-icon [name]="rla.isActive ? item.iconActive : item.icon"></ion-icon>
-          </span>
-          <span class="menu-link-text">{{ item.label }}</span>
-        </a>
-      </ng-container>
+      <a *ngFor="let item of menuItems()"
+         class="menu-link"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         #rla="routerLinkActive">
+        <span class="menu-link-icon">
+          <ion-icon [name]="rla.isActive ? item.iconActive : item.icon"></ion-icon>
+        </span>
+        <span class="menu-link-text">{{ item.label }}</span>
+      </a>
     </div>
 
     <div class="menu-actions">
@@ -61,6 +47,7 @@
   </div>
 </nav>
 
+<!-- ✅ MENÚ MÓVIL DINÁMICO -->
 <ion-menu #mainMenu contentId="main-content" side="start" menuId="main-menu" type="overlay" class="mobile-menu">
   <ion-header class="mobile-menu-header">
     <ion-toolbar>
@@ -76,36 +63,22 @@
       <div class="avatar">{{ iniciales() }}</div>
       <div class="user-data">
         <strong>{{ u.nombre }}</strong>
-        <span>{{ u.rol }}</span>
+        <span>{{ u.rol | titlecase }}</span>
       </div>
     </div>
 
+    <!-- ✅ LISTA DINÁMICA PARA MÓVIL -->
     <ion-list lines="none">
-      <ng-container *ngIf="usuario()?.rol === 'admin'">
-        <ion-item *ngFor="let item of adminMenuItems"
-                  [routerLink]="item.route"
-                  routerLinkActive="active"
-                  #rla="routerLinkActive"
-                  (click)="cerrarMenu()"
-                  button
-                  detail="false">
-          <ion-icon [name]="rla.isActive ? item.iconActive : item.icon" slot="start"></ion-icon>
-          {{ item.label }}
-        </ion-item>
-      </ng-container>
-
-      <ng-container *ngIf="usuario()?.rol === 'evaluador'">
-        <ion-item *ngFor="let item of evaluadorMenuItems"
-                  [routerLink]="item.route"
-                  routerLinkActive="active"
-                  #rla="routerLinkActive"
-                  (click)="cerrarMenu()"
-                  button
-                  detail="false">
-          <ion-icon [name]="rla.isActive ? item.iconActive : item.icon" slot="start"></ion-icon>
-          {{ item.label }}
-        </ion-item>
-      </ng-container>
+      <ion-item *ngFor="let item of menuItems()"
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                #rla="routerLinkActive"
+                (click)="cerrarMenu()"
+                button
+                detail="false">
+        <ion-icon [name]="rla.isActive ? item.iconActive : item.icon" slot="start"></ion-icon>
+        {{ item.label }}
+      </ion-item>
     </ion-list>
 
     <div class="logout">

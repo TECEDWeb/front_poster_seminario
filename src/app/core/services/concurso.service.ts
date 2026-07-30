@@ -16,12 +16,11 @@ export class ConcursoService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Listar todos los concursos
+   * Listar todos los concursos (El backend ya filtra según el rol del usuario logueado)
    */
   listar(): Observable<Concurso[]> {
     return this.http.get<any>(this.apiUrl).pipe(
       map((res: any) => {
-        // Normalizar respuesta: soportar { data: [...] } o array directo
         const data = res?.data ?? res?.concursos ?? res ?? [];
         return Array.isArray(data) ? data.map((item: any) => this.mapearConcurso(item)) : [];
       })
@@ -41,12 +40,21 @@ export class ConcursoService {
   }
 
   /**
+   * ✅ NUEVO: Descargar el reporte de un concurso específico
+   * Esto abrirá la descarga en el navegador o devolverá un Blob según el backend
+   */
+  descargarReporte(id: number): Observable<Blob> {
+    // El { responseType: 'blob' } es fundamental para que Angular sepa que es un archivo (PDF/Excel)
+    return this.http.get(`${this.apiUrl}/${id}/reporte`, {
+      responseType: 'blob'
+    });
+  }
+
+  /**
    * Crear un nuevo concurso
    */
   crear(data: any): Observable<Concurso> {
-    // Convertir nombres de campos para el backend (camelCase a snake_case)
     const payload = this.mapearParaBackend(data);
-    
     return this.http.post<any>(this.apiUrl, payload).pipe(
       map((res: any) => {
         const result = res?.data ?? res ?? {};
@@ -60,7 +68,6 @@ export class ConcursoService {
    */
   actualizar(id: number, data: any): Observable<Concurso> {
     const payload = this.mapearParaBackend(data);
-    
     return this.http.put<any>(`${this.apiUrl}/${id}`, payload).pipe(
       map((res: any) => {
         const result = res?.data ?? res ?? {};
@@ -124,7 +131,9 @@ export class ConcursoService {
       fechaInicio: data.fecha_inicio || data.fechaInicio || '',
       fechaFin: data.fecha_fin || data.fechaFin || '',
       puntajeMaximo: data.puntaje_maximo || data.puntajeMaximo || null,
-      participantes: data.participantes || 0
+      participantes: data.participantes || 0,
+      // ✅ Agregamos esto aunque no esté en la interfaz pública para que viaje en el objeto
+      coordinadorId: data.coordinador_id || null 
     };
   }
 
@@ -138,12 +147,13 @@ export class ConcursoService {
       tipo: data.tipo || null,
       fecha_inicio: data.fechaInicio || null,
       fecha_fin: data.fechaFin || null,
-      // Esto es clave: Si el usuario deja el input vacío, envía null. 
-      // Si puso un número, envía el número (incluso si es 0).
+      // ✅ Corrección para aceptar el 0 correctamente
       puntaje_maximo: (data.puntajeMaximo !== null && data.puntajeMaximo !== undefined && data.puntajeMaximo !== '') 
                       ? Number(data.puntajeMaximo) 
                       : null,
-      activo: data.activo ?? true
+      activo: data.activo ?? true,
+      // ✅ Agregamos el coordinador_id para guardarlo en la BD
+      coordinador_id: data.coordinadorId || null
     };
   }
 }

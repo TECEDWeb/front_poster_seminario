@@ -55,8 +55,12 @@ import {
   checkmarkCircleOutline,
   alertCircleOutline,
   folderOpenOutline,
-  checkboxOutline
+  checkboxOutline,
+  downloadOutline // ✅ Icono para descargar
 } from 'ionicons/icons';
+
+// ✅ Importamos el AuthService para saber quién está logueado
+import { AuthService } from '../../../core/services/auth.service'; 
 
 @Component({
   selector: 'app-concursos',
@@ -106,6 +110,11 @@ export class ConcursosPage implements OnInit {
   editando = false;
   guardando = false;
 
+  // ✅ Variable para guardar el usuario logueado
+  usuarioActual: any = null;
+  esAdmin: boolean = false;
+  esCoordinador: boolean = false;
+
   form: any = {
     id: null,
     nombre: '',
@@ -130,7 +139,8 @@ export class ConcursosPage implements OnInit {
     private proyectoService: ProyectoService,
     private rubricaService: RubricaService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService // ✅ Inyectamos el AuthService
   ) {
     addIcons({
       addOutline,
@@ -154,11 +164,17 @@ export class ConcursosPage implements OnInit {
       checkmarkCircleOutline,
       alertCircleOutline,
       folderOpenOutline,
-      checkboxOutline
+      checkboxOutline,
+      downloadOutline // ✅ Agregamos el icono
     });
   }
 
   ngOnInit(): void {
+    // ✅ Obtenemos el usuario del AuthService
+    this.usuarioActual = this.authService.obtenerUsuario();
+    this.esAdmin = this.usuarioActual?.rol === 'admin';
+    this.esCoordinador = this.usuarioActual?.rol === 'coordinador';
+
     this.cargar();
 
     this.route.queryParams.subscribe(params => {
@@ -236,6 +252,9 @@ export class ConcursosPage implements OnInit {
   }
 
   abrirCrear(): void {
+    // ✅ Solo el admin puede abrir el modal de crear
+    if (!this.esAdmin) return; 
+    
     this.editando = false;
     this.form = {
       id: null,
@@ -260,6 +279,9 @@ export class ConcursosPage implements OnInit {
   }
 
   editar(concurso: Concurso): void {
+    // ✅ Solo el admin puede editar
+    if (!this.esAdmin) return;
+
     this.editando = true;
     this.form = {
       id: concurso.id,
@@ -316,10 +338,27 @@ export class ConcursosPage implements OnInit {
     });
   }
 
-  /**
-   * Abre un modal de solo lectura con el detalle completo del concurso:
-   * datos generales, proyectos inscritos y estado de su rúbrica.
-   */
+  // ✅ NUEVO: Método para descargar el reporte
+  descargarReporte(id: number, nombreConcurso: string) {
+    this.concursoService.descargarReporte(id).subscribe({
+      next: (blob: Blob) => {
+        // Crear un enlace invisible para descargar el archivo
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Reporte_${nombreConcurso}.xlsx`; // El nombre del archivo
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error descargando reporte:', err);
+        alert('No se pudo descargar el reporte. Verifica tus permisos.');
+      }
+    });
+  }
+
   verConcurso(concurso: Concurso): void {
     this.concursoSeleccionado = concurso;
     this.modalDetalleAbierto = true;
@@ -328,7 +367,6 @@ export class ConcursosPage implements OnInit {
     this.rubricaDelConcurso = null;
     this.tieneRubricaConfigurada = false;
 
-    // Proyectos inscritos en este concurso
     this.proyectoService.listar().subscribe({
       next: (proyectos: any) => {
         const data = proyectos?.data ?? proyectos?.proyectos ?? proyectos ?? [];
@@ -342,7 +380,6 @@ export class ConcursosPage implements OnInit {
       }
     });
 
-    // Estado de la rúbrica de este concurso
     this.rubricaService.obtenerPorConcurso(concurso.id).subscribe({
       next: (res: any) => {
         const rubrica = res?.data ?? res?.rubrica ?? res ?? null;
@@ -355,7 +392,6 @@ export class ConcursosPage implements OnInit {
       },
       error: (err) => {
         if (err.status === 404) {
-          // Caso normal: este concurso aún no tiene rúbrica creada
           console.log('Este concurso no tiene rúbrica configurada aún');
         } else {
           console.error('Error inesperado cargando rúbrica del concurso:', err);
@@ -367,22 +403,14 @@ export class ConcursosPage implements OnInit {
     });
   }
 
-  /**
-   * Extrae las secciones de la rúbrica sin importar la forma exacta del objeto:
-   * - rubrica.secciones (plano)
-   * - rubrica.niveles[].secciones (anidado por nivel)
-   */
   private extraerSecciones(rubrica: any): any[] {
     if (!rubrica) return [];
-
     if (Array.isArray(rubrica.secciones) && rubrica.secciones.length > 0) {
       return rubrica.secciones;
     }
-
     if (Array.isArray(rubrica.niveles)) {
       return rubrica.niveles.flatMap((n: any) => n.secciones ?? []);
     }
-
     return [];
   }
 
@@ -402,35 +430,19 @@ export class ConcursosPage implements OnInit {
     this.rubricaDelConcurso = null;
   }
 
-  /**
-   * Cierra el modal de detalle y, tras esperar a que termine su animación
-   * de salida (~350ms), abre el modal de edición. Abrir un modal nuevo
-   * mientras el anterior aún se está cerrando causa fallos de renderizado
-   * en Ionic — por eso el delay es necesario, no opcional.
-   */
   editarDesdeDetalle(): void {
-    if (!this.concursoSeleccionado) return;
+    if (!this.concursoSeleccionado || !this.esAdmin) return;
     const concurso = this.concursoSeleccionado;
-
     this.cerrarModalDetalle();
-
     setTimeout(() => {
       this.editar(concurso);
     }, 350);
   }
 
-  /**
-   * Cierra el modal de detalle y navega a la página de Rúbricas,
-   * pasando el concursoId por queryParam para que esa página pueda
-   * preseleccionar/filtrar directamente la rúbrica de este concurso
-   * en lugar de mostrar la lista completa.
-   */
   irARubricaDesdeDetalle(): void {
     if (!this.concursoSeleccionado) return;
     const concursoId = this.concursoSeleccionado.id;
-
     this.cerrarModalDetalle();
-
     setTimeout(() => {
       this.router.navigate(['/admin/rubricas'], {
         queryParams: { concursoId }
@@ -447,6 +459,7 @@ export class ConcursosPage implements OnInit {
   }
 
   confirmarEliminar(concurso: Concurso): void {
+    if (!this.esAdmin) return; // Solo admin elimina
     if (confirm(`¿Estás seguro de eliminar el concurso "${concurso.nombre}"?`)) {
       this.eliminarConcurso(concurso.id!);
     }

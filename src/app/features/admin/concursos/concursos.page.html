@@ -22,7 +22,8 @@
         <p>Administra los concursos científicos y sus convocatorias</p>
       </div>
       <div class="header-right">
-        <ion-button class="btn-add-desktop" (click)="abrirCrear()">
+        <!-- ✅ BOTÓN CREAR: Solo visible para ADMIN -->
+        <ion-button *ngIf="esAdmin" class="btn-add-desktop" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           <span>Nuevo concurso</span>
         </ion-button>
@@ -158,22 +159,32 @@
           </div>
 
           <div class="actions-right">
+            <!-- ✅ BOTÓN VER (Para todos) -->
             <ion-button fill="clear" size="small" class="action-btn" (click)="verConcurso(c)">
               <ion-icon name="eye-outline" slot="start"></ion-icon>
               Ver
             </ion-button>
 
-            <ion-button fill="clear" size="small" class="action-btn" (click)="editar(c)">
+            <!-- ✅ BOTÓN EDITAR (SOLO ADMIN) -->
+            <ion-button *ngIf="esAdmin" fill="clear" size="small" class="action-btn" (click)="editar(c)">
               <ion-icon name="create-outline" slot="start"></ion-icon>
               Editar
             </ion-button>
 
+            <!-- ✅ BOTÓN RÚBRICA (Para todos) -->
             <ion-button fill="clear" size="small" class="action-btn" routerLink="/admin/rubricas">
               <ion-icon name="list-outline" slot="start"></ion-icon>
               Rúbrica
             </ion-button>
 
-            <ion-button fill="clear" size="small" class="action-btn danger" (click)="confirmarEliminar(c)">
+            <!-- ✅ BOTÓN REPORTE (Para todos. El backend validará los permisos) -->
+            <ion-button fill="clear" size="small" class="action-btn" color="tertiary" (click)="descargarReporte(c.id, c.nombre)">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Reporte
+            </ion-button>
+
+            <!-- ✅ BOTÓN ELIMINAR (SOLO ADMIN) -->
+            <ion-button *ngIf="esAdmin" fill="clear" size="small" class="action-btn danger" (click)="confirmarEliminar(c)">
               <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
             </ion-button>
           </div>
@@ -192,7 +203,9 @@
         <p *ngIf="filtroTexto || filtroEstado !== 'todos'">
           No se encontraron concursos con los filtros aplicados
         </p>
-        <ion-button class="btn-primary" (click)="abrirCrear()">
+        
+        <!-- ✅ BOTÓN CREAR EN EMPTY STATE: Solo Admin -->
+        <ion-button *ngIf="esAdmin" class="btn-primary" (click)="abrirCrear()">
           <ion-icon name="add-outline" slot="start"></ion-icon>
           Crear concurso
         </ion-button>
@@ -201,7 +214,8 @@
 
   </div>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
+  <!-- ✅ FAB - SOLO VISIBLE EN MÓVIL Y SOLO PARA ADMIN -->
+  <ion-fab *ngIf="esAdmin" vertical="bottom" horizontal="end" slot="fixed" class="fab-mobile">
     <ion-fab-button color="primary" (click)="abrirCrear()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
@@ -503,7 +517,8 @@
           </div>
 
           <div class="detalle-actions">
-            <ion-button expand="block" class="edit-from-detail-btn" (click)="editarDesdeDetalle()">
+            <!-- ✅ EDITAR DESDE DETALLE: Solo Admin -->
+            <ion-button *ngIf="esAdmin" expand="block" class="edit-from-detail-btn" (click)="editarDesdeDetalle()">
               <ion-icon name="create-outline" slot="start"></ion-icon>
               Editar este concurso
             </ion-button>
