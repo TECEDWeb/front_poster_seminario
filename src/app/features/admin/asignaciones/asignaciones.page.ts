@@ -24,7 +24,8 @@ import {
   IonSearchbar,
   IonSelect,
   IonSelectOption,
-  IonSpinner
+  IonSpinner,
+  IonItem
 } from '@ionic/angular/standalone';
 import { AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -58,7 +59,9 @@ import {
   squareOutline,
   peopleCircleOutline,
   clipboardOutline,
-  checkmarkCircle
+  checkmarkCircle,
+  ribbonOutline,
+  trophyOutline
 } from 'ionicons/icons';
 
 import { ProyectoService } from '../../../core/services/proyecto.service';
@@ -70,6 +73,7 @@ import { UsuarioService } from '../../../core/services/usuario.service';
 import { ConcursoService } from '../../../core/services/concurso.service';
 import { SeleccionarProyectoModalComponent } from '../../../shared/components/seleccionar-proyecto-modal/seleccionar-proyecto-modal.component';
 import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/seleccionar-evaluador-modal/seleccionar-evaluador-modal.component';
+import { CoordinadorAsignacionService } from '../../../core/services/coordinador-asignacion.service';
 
 @Component({
   selector: 'app-asignaciones',
@@ -99,6 +103,7 @@ import { SeleccionarEvaluadorModalComponent } from '../../../shared/components/s
     IonSelect,
     IonSelectOption,
     IonSpinner,
+    IonItem,
     SeleccionarProyectoModalComponent,
     SeleccionarEvaluadorModalComponent
   ],
@@ -121,7 +126,7 @@ export class AsignacionesPage implements OnInit {
   evaluadoresSeleccionados: number[] = [];
 
   // Modo de selección: 'individual' o 'masiva'
-  modoSeleccion: 'individual' | 'masiva' = 'individual';
+  modoSeleccion: 'individual' | 'masiva' | 'coordinador' = 'individual';
 
   // Proyecto individual (modo individual)
   proyectoId: number | null = null;
@@ -167,9 +172,14 @@ export class AsignacionesPage implements OnInit {
   errorRespuestas: string | null = null;
   respuestasDetalle: any = null;
 
-  // ==========================================================
+  // MODO COORDINADOR
+  coordinadores: any[] = [];
+  asignacionesCoordinadores: any[] = [];
+  concursoIdCoordinador: number | null = null;
+  coordinadorId: number | null = null;
+  submittingCoordinador: boolean = false;
+
   // GETTERS
-  // ==========================================================
   get proyectoSeleccionado(): any {
     if (!this.proyectoId) return null;
     return this.proyectos.find(p => p.id === this.proyectoId) || null;
@@ -262,9 +272,14 @@ export class AsignacionesPage implements OnInit {
     return this.asignacionesFiltradas.slice(inicio, inicio + this.itemsPorPaginaTodas);
   }
 
-  // ==========================================================
+  get coordinadoresDelConcurso(): any[] {
+    if (!this.concursoIdCoordinador) return [];
+    return this.asignacionesCoordinadores.filter(
+      a => Number(a.concurso_id) === Number(this.concursoIdCoordinador)
+    );
+  }
+
   // MÉTODOS PARA EL TEMPLATE (evitan arrow functions)
-  // ==========================================================
   isAllProyectosSeleccionados(): boolean {
     if (this.proyectosFiltradosMasivos.length === 0) return false;
     return this.proyectosFiltradosMasivos.every(p => this.proyectosSeleccionados.includes(p.id));
@@ -291,9 +306,7 @@ export class AsignacionesPage implements OnInit {
     return this.isAllEvaluadoresSeleccionados() ? 'checkmark-circle' : 'square-outline';
   }
 
-  // ==========================================================
   // CONSTRUCTOR
-  // ==========================================================
   constructor(
     private proyectoService: ProyectoService,
     private asignacionService: AsignacionService,
@@ -302,6 +315,7 @@ export class AsignacionesPage implements OnInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private concursoService: ConcursoService,
+    private coordinadorAsignacionService: CoordinadorAsignacionService,
     private router: Router,
     private alertController: AlertController
   ) {
@@ -335,23 +349,21 @@ export class AsignacionesPage implements OnInit {
       squareOutline,
       peopleCircleOutline,
       clipboardOutline,
-      checkmarkCircle
+      checkmarkCircle,
+      ribbonOutline,
+      trophyOutline,
     });
 
     this.esAdmin = this.authService.esAdmin();
   }
 
-  // ==========================================================
   // LIFECYCLE
-  // ==========================================================
   ngOnInit(): void {
     this.cargarDatos();
   }
 
-  // ==========================================================
   // CARGA DE DATOS
-  // ==========================================================
-  cargarDatos(): void {
+ cargarDatos(): void {
     this.cargando = true;
     this._proyectosListos = false;
     this._evaluadoresListos = false;
@@ -361,6 +373,8 @@ export class AsignacionesPage implements OnInit {
     this.cargarEvaluadores();
     this.cargarConcursos();
     this.cargarAsignacionesRecientes();
+    this.cargarCoordinadores();
+    this.cargarAsignacionesCoordinadores();
 
     clearTimeout(this._loadingSafety);
     this._loadingSafety = setTimeout(() => {
@@ -369,6 +383,30 @@ export class AsignacionesPage implements OnInit {
         console.warn('Carga forzada por timeout');
       }
     }, 8000);
+  }
+
+  cargarCoordinadores(): void {
+    this.coordinadorAsignacionService.listarCoordinadores().subscribe({
+      next: (res: any) => {
+        this.coordinadores = res?.data ?? res ?? [];
+      },
+      error: (err: any) => {
+        console.error('Error cargando coordinadores:', err);
+        this.coordinadores = [];
+      }
+    });
+  }
+
+  cargarAsignacionesCoordinadores(): void {
+    this.coordinadorAsignacionService.listar().subscribe({
+      next: (res: any) => {
+        this.asignacionesCoordinadores = res?.data ?? res ?? [];
+      },
+      error: (err: any) => {
+        console.error('Error cargando asignaciones de coordinador:', err);
+        this.asignacionesCoordinadores = [];
+      }
+    });
   }
 
   cargarConcursos(): void {
@@ -541,23 +579,28 @@ export class AsignacionesPage implements OnInit {
       || 'Evaluador sin nombre';
   }
 
-  // ==========================================================
   // CAMBIAR MODO DE SELECCIÓN
-  // ==========================================================
-  cambiarModoSeleccion(modo: 'individual' | 'masiva'): void {
+  cambiarModoSeleccion(modo: 'individual' | 'masiva' | 'coordinador'): void {
     this.modoSeleccion = modo;
     if (modo === 'individual') {
       this.proyectosSeleccionados = [];
       this.evaluadoresSeleccionados = [];
+      this.concursoIdCoordinador = null;
+      this.coordinadorId = null;
+    } else if (modo === 'masiva') {
+      this.proyectoId = null;
+      this.evaluadorId = null;
+      this.concursoIdCoordinador = null;
+      this.coordinadorId = null;
     } else {
       this.proyectoId = null;
       this.evaluadorId = null;
+      this.proyectosSeleccionados = [];
+      this.evaluadoresSeleccionados = [];
     }
   }
 
-  // ==========================================================
   // SELECCIÓN INDIVIDUAL
-  // ==========================================================
   abrirModalProyectos(): void {
     if (this.proyectos.length === 0) {
       this.cargarProyectos();
@@ -1260,5 +1303,75 @@ export class AsignacionesPage implements OnInit {
   getNombreEvaluadorPorId(evaluadorId: number): string {
     const evaluador = this.evaluadores.find(e => e.id === evaluadorId);
     return evaluador?.nombre || 'Evaluador sin nombre';
+  }
+
+  guardarCoordinador(): void {
+    if (!this.concursoIdCoordinador) {
+      this.showError('Selecciona un concurso');
+      return;
+    }
+    if (!this.coordinadorId) {
+      this.showError('Selecciona un coordinador');
+      return;
+    }
+
+    const yaAsignado = this.coordinadoresDelConcurso.some(
+      a => Number(a.coordinador_id) === Number(this.coordinadorId)
+    );
+    if (yaAsignado) {
+      this.showError('Este coordinador ya está asignado a este concurso');
+      return;
+    }
+
+    this.submittingCoordinador = true;
+
+    this.coordinadorAsignacionService.asignar({
+      concursoId: this.concursoIdCoordinador,
+      coordinadorId: this.coordinadorId
+    }).subscribe({
+      next: () => {
+        this.submittingCoordinador = false;
+        this.showSuccess('Coordinador asignado correctamente al concurso');
+        this.coordinadorId = null;
+        this.cargarAsignacionesCoordinadores();
+      },
+      error: (err: any) => {
+        this.submittingCoordinador = false;
+        console.error('Error asignando coordinador:', err);
+        this.showError(err.error?.mensaje || 'Error al asignar el coordinador');
+      }
+    });
+  }
+
+  async quitarCoordinador(asignacion: any): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Quitar coordinador',
+      message: `¿Quitar a "<strong>${asignacion.coordinador_nombre}</strong>" del concurso "<strong>${asignacion.concurso_nombre}</strong>"?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Quitar',
+          role: 'destructive',
+          handler: () => {
+            this.coordinadorAsignacionService.eliminar(asignacion.id).subscribe({
+              next: () => {
+                this.showSuccess('Coordinador quitado del concurso');
+                this.cargarAsignacionesCoordinadores();
+              },
+              error: (err: any) => {
+                console.error('Error quitando coordinador:', err);
+                this.showError('Error al quitar el coordinador');
+              }
+            });
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  getNombreConcursoPorId(id: number): string {
+    const concurso = this.concursos.find(c => c.id === id);
+    return concurso?.nombre || 'Concurso';
   }
 }

@@ -146,12 +146,22 @@
                 <ion-icon name="people-circle-outline"></ion-icon>
                 Asignación masiva
               </button>
+              <button 
+                class="toggle-btn" 
+                [class.active]="modoSeleccion === 'coordinador'"
+                (click)="cambiarModoSeleccion('coordinador')">
+                <ion-icon name="ribbon-outline"></ion-icon>
+                Coordinador
+              </button>
             </div>
             <span class="modo-descripcion" *ngIf="modoSeleccion === 'individual'">
               Asigna un proyecto a un evaluador
             </span>
             <span class="modo-descripcion" *ngIf="modoSeleccion === 'masiva'">
               Selecciona varios proyectos y evaluadores para asignar en lote
+            </span>
+            <span class="modo-descripcion" *ngIf="modoSeleccion === 'coordinador'">
+              Asigna un concurso completo a un coordinador para seguimiento
             </span>
           </div>
 
@@ -320,7 +330,7 @@
           </ng-container>
 
           <!-- ============================================ -->
-          <!-- MODO MASIVO - REDISEÑADO -->
+          <!-- MODO MASIVO -->
           <!-- ============================================ -->
           <ng-container *ngIf="modoSeleccion === 'masiva'">
             <div class="masivo-container">
@@ -476,6 +486,110 @@
             </div>
           </ng-container>
 
+          <!-- ============================================ -->
+          <!-- MODO COORDINADOR -->
+          <!-- ============================================ -->
+          <ng-container *ngIf="modoSeleccion === 'coordinador'">
+            <form (ngSubmit)="guardarCoordinador()" #coordForm="ngForm">
+
+              <div class="field">
+                <label class="field-label">
+                  <ion-icon name="trophy-outline"></ion-icon>
+                  Concurso
+                  <span class="required">*</span>
+                </label>
+                <ion-item class="custom-item" lines="none">
+                  <ion-select
+                    [(ngModel)]="concursoIdCoordinador"
+                    name="concursoIdCoordinador"
+                    placeholder="Selecciona un concurso"
+                    interface="action-sheet"
+                    [class.has-value]="concursoIdCoordinador">
+                    <ion-select-option *ngFor="let c of concursos" [value]="c.id">
+                      {{ c.nombre }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+              <div class="asignados-proyecto" *ngIf="concursoIdCoordinador">
+                <div class="asignados-header">
+                  <ion-icon name="people-outline"></ion-icon>
+                  <span>Coordinadores asignados a este concurso ({{ coordinadoresDelConcurso.length }})</span>
+                </div>
+
+                <div class="asignados-list" *ngIf="coordinadoresDelConcurso.length > 0">
+                  <div class="asignado-item" *ngFor="let a of coordinadoresDelConcurso">
+                    <div class="asignado-avatar status-completed">
+                      <ion-icon name="ribbon-outline"></ion-icon>
+                    </div>
+                    <div class="asignado-info">
+                      <span class="asignado-nombre">{{ a.coordinador_nombre }}</span>
+                    </div>
+                    <button
+                      class="quitar-btn"
+                      type="button"
+                      (click)="quitarCoordinador(a)"
+                      title="Quitar coordinador">
+                      <ion-icon name="person-remove-outline"></ion-icon>
+                      Quitar
+                    </button>
+                  </div>
+                </div>
+
+                <div class="asignados-empty" *ngIf="coordinadoresDelConcurso.length === 0">
+                  <ion-icon name="information-circle-outline"></ion-icon>
+                  <span>Aún no hay coordinadores asignados a este concurso</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field-label">
+                  <ion-icon name="person-outline"></ion-icon>
+                  Coordinador
+                  <span class="required">*</span>
+                </label>
+                <ion-item class="custom-item" lines="none">
+                  <ion-select
+                    [(ngModel)]="coordinadorId"
+                    name="coordinadorId"
+                    placeholder="Selecciona un coordinador"
+                    interface="action-sheet"
+                    [disabled]="!concursoIdCoordinador"
+                    [class.has-value]="coordinadorId">
+                    <ion-select-option *ngFor="let c of coordinadores" [value]="c.id">
+                      {{ c.nombre }}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+
+                <div class="field-hint" *ngIf="!concursoIdCoordinador">
+                  <ion-icon name="alert-circle-outline"></ion-icon>
+                  <span>Primero selecciona un concurso</span>
+                </div>
+
+                <div class="field-hint warning" *ngIf="concursoIdCoordinador && coordinadores.length === 0">
+                  <ion-icon name="alert-circle-outline"></ion-icon>
+                  <span>No hay usuarios con rol coordinador en el sistema</span>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <ion-button
+                  type="submit"
+                  class="assign-btn"
+                  [disabled]="!concursoIdCoordinador || !coordinadorId || submittingCoordinador">
+                  <ion-icon
+                    [name]="submittingCoordinador ? 'refresh-outline' : 'checkmark-circle-outline'"
+                    slot="start"
+                    [class.spinning]="submittingCoordinador">
+                  </ion-icon>
+                  {{ submittingCoordinador ? 'Asignando...' : 'Asignar coordinador' }}
+                </ion-button>
+              </div>
+            </form>
+          </ng-container>
+
         </ion-card-content>
       </ion-card>
 
@@ -540,6 +654,54 @@
       <div class="empty-recent" *ngIf="asignacionesRecientes.length === 0">
         <ion-icon name="checkmark-done-outline"></ion-icon>
         <p>Aún no se han realizado asignaciones</p>
+      </div>
+
+      <!-- ASIGNACIONES DE COORDINADORES -->
+      <div class="recent-assignments" *ngIf="asignacionesCoordinadores.length > 0" style="margin-top: 20px;">
+        <div class="section-header">
+          <h3>
+            <ion-icon name="ribbon-outline"></ion-icon>
+            Coordinadores asignados
+          </h3>
+          <div class="section-actions">
+            <span class="total-badge">{{ asignacionesCoordinadores.length }} total</span>
+          </div>
+        </div>
+
+        <div class="assignments-list">
+          <div class="assignment-item" *ngFor="let a of asignacionesCoordinadores">
+            <div class="assignment-avatar status-completed">
+              <ion-icon name="ribbon-outline"></ion-icon>
+            </div>
+            <div class="assignment-info">
+              <div class="assignment-main">
+                <span class="assignment-project">{{ a.concurso_nombre }}</span>
+                <span class="assignment-evaluator">
+                  <ion-icon name="person-outline"></ion-icon>
+                  {{ a.coordinador_nombre }}
+                </span>
+              </div>
+              <div class="assignment-meta">
+                <span class="assignment-date">
+                  <ion-icon name="time-outline"></ion-icon>
+                  {{ tiempoRelativo(a.created_at) }}
+                </span>
+                <span class="assignment-status status-completed">
+                  Coordinando
+                </span>
+              </div>
+
+              <div class="assignment-admin-actions">
+                <button class="admin-btn admin-btn-eliminar"
+                        (click)="quitarCoordinador(a)"
+                        title="Quitar coordinador de este concurso">
+                  <ion-icon name="trash-outline"></ion-icon>
+                  <span class="btn-label">Quitar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </ng-container>

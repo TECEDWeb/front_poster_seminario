@@ -91,14 +91,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     { label: 'Certificados', route: '/evaluador/mis-certificados', icon: 'ribbon-outline', iconActive: 'ribbon' },
   ];
 
-  // ✅ NUEVO: Menú para el Coordinador
   coordinadorMenuItems: MenuItem[] = [
     { label: 'Dashboard', route: '/coordinador/dashboard', icon: 'grid-outline', iconActive: 'grid' },
     { label: 'Mis Concursos', route: '/coordinador/concursos', icon: 'trophy-outline', iconActive: 'trophy' },
     { label: 'Reportes', route: '/coordinador/reportes', icon: 'bar-chart-outline', iconActive: 'bar-chart' },
   ];
 
-  // ✅ AGREGADO: Señal computada que decide qué array devolver según el rol del usuario
   menuItems = computed(() => {
     const u = this.usuario();
     if (!u) return [];
