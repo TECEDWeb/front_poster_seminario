@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Reportes</span>
+      <span class="title-badge">Coordinador</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="reportes-content">
+  <div class="page-container">
+
+    <!-- CONCURSO ASIGNADO -->
+    <div class="concurso-banner" *ngIf="concursoAsignado">
+      <ion-icon name="trophy-outline"></ion-icon>
+      <div>
+        <span class="concurso-nombre">{{ concursoAsignado.nombre }}</span>
+        <span class="concurso-estado">{{ concursoAsignado.activo ? 'Activo' : 'Inactivo' }}</span>
+      </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="reportes-grid" *ngIf="!cargando && reportes">
+      <div class="report-card">
+        <span class="report-value">{{ reportes.proyectos || 0 }}</span>
+        <span class="report-label">Proyectos</span>
+      </div>
+      <div class="report-card">
+        <span class="report-value">{{ reportes.evaluados || 0 }}</span>
+        <span class="report-label">Evaluados</span>
+      </div>
+      <div class="report-card">
+        <span class="report-value">{{ reportes.pendientes || 0 }}</span>
+        <span class="report-label">Pendientes</span>
+      </div>
+      <div class="report-card">
+        <span class="report-value">{{ reportes.promedio | number:'1.1-2' }}</span>
+        <span class="report-label">Promedio</span>
+      </div>
+    </div>
+
+    <!-- SKELETON -->
+    <div class="reportes-grid" *ngIf="cargando">
+      <div class="report-card" *ngFor="let i of [1,2,3,4]">
+        <ion-skeleton-text animated class="skeleton-value"></ion-skeleton-text>
+        <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="actions-card" *ngIf="concursoAsignado">
+      <h3>Descargar reportes</h3>
+      <div class="actions-grid">
+        <ion-button expand="block" fill="outline" (click)="descargarPDF()">
+          <ion-icon name="document-outline" slot="start"></ion-icon>
+          PDF
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="descargarExcel()">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          Excel
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" *ngIf="!cargando && !concursoAsignado">
+      <ion-icon name="stats-chart-outline"></ion-icon>
+      <h3>Sin concurso asignado</h3>
+      <p>No se encontró un concurso asignado para generar reportes</p>
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,142 @@
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Dashboard</span>
+      <span class="title-badge">Coordinador</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="dashboard-content">
+  <div class="page-container">
+
+    <!-- BIENVENIDA -->
+    <div class="welcome-section">
+      <h1>Bienvenido, {{ nombreUsuario }}</h1>
+      <p>Gestiona tu concurso asignado y visualiza los resultados</p>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="stats-grid" *ngIf="!cargando">
+      <div class="stat-card blue" (click)="irA('proyectos')">
+        <div class="stat-icon">
+          <ion-icon name="folder-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.proyectos || 0 }}</span>
+          <span class="stat-label">Proyectos</span>
+        </div>
+      </div>
+
+      <div class="stat-card gold" (click)="irA('evaluadores')">
+        <div class="stat-icon">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.evaluadores || 0 }}</span>
+          <span class="stat-label">Evaluadores</span>
+        </div>
+      </div>
+
+      <div class="stat-card green">
+        <div class="stat-icon">
+          <ion-icon name="checkmark-done-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.evaluados || 0 }}</span>
+          <span class="stat-label">Evaluados</span>
+        </div>
+      </div>
+
+      <div class="stat-card purple">
+        <div class="stat-icon">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.pendientes || 0 }}</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKELETON -->
+    <div class="stats-grid" *ngIf="cargando">
+      <div class="stat-card" *ngFor="let i of [1,2,3,4]">
+        <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+        <div class="stat-content">
+          <ion-skeleton-text animated class="skeleton-value"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-label"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESO -->
+    <div class="progress-card" *ngIf="stats.total > 0">
+      <div class="progress-header">
+        <span class="progress-label">Progreso de evaluaciones</span>
+        <span class="progress-pct">{{ porcentajeProgreso }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="porcentajeProgreso"></div>
+      </div>
+      <div class="progress-sub">
+        {{ stats.evaluados || 0 }} de {{ stats.total || 0 }} proyectos evaluados
+        <span class="promedio-info" *ngIf="stats.promedio > 0">
+          · Promedio: {{ stats.promedio | number:'1.1-2' }} pts
+        </span>
+      </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="quick-actions">
+      <h3>Acciones rápidas</h3>
+      <div class="actions-grid">
+        <div class="action-card" (click)="irA('reportes')">
+          <ion-icon name="stats-chart-outline"></ion-icon>
+          <span>Ver reportes</span>
+        </div>
+        <div class="action-card" (click)="irA('certificados')">
+          <ion-icon name="ribbon-outline"></ion-icon>
+          <span>Certificados</span>
+        </div>
+        <div class="action-card" (click)="irA('proyectos')">
+          <ion-icon name="folder-outline"></ion-icon>
+          <span>Proyectos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCURSO ASIGNADO -->
+    <div class="concurso-card" *ngIf="concursoAsignado">
+      <div class="concurso-header">
+        <ion-icon name="trophy-outline"></ion-icon>
+        <div>
+          <h3>{{ concursoAsignado.nombre }}</h3>
+          <p>{{ concursoAsignado.descripcion || 'Sin descripción' }}</p>
+        </div>
+      </div>
+      <div class="concurso-info">
+        <span class="info-item">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{ concursoAsignado.fechaInicio | date:'dd/MM/yyyy' }} - {{ concursoAsignado.fechaFin | date:'dd/MM/yyyy' }}
+        </span>
+        <span class="info-item">
+          <ion-icon name="people-outline"></ion-icon>
+          {{ stats.proyectos || 0 }} proyectos
+        </span>
+        <span class="badge" [class]="concursoAsignado.activo ? 'badge-active' : 'badge-inactive'">
+          {{ concursoAsignado.activo ? 'Activo' : 'Inactivo' }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Evaluadores</span>
+      <span class="title-badge">Coordinador</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="evaluadores-content">
+  <div class="page-container">
+
+    <!-- CONCURSO ASIGNADO -->
+    <div class="concurso-banner" *ngIf="concursoAsignado">
+      <ion-icon name="trophy-outline"></ion-icon>
+      <div>
+        <span class="concurso-nombre">{{ concursoAsignado.nombre }}</span>
+        <span class="concurso-evaluadores">{{ evaluadores.length }} evaluadores</span>
+      </div>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="search-container">
+      <ion-searchbar
+        [(ngModel)]="filtroBusqueda"
+        (ionInput)="aplicarFiltros()"
+        placeholder="Buscar evaluador..."
+        class="search-input"
+        animated>
+      </ion-searchbar>
+    </div>
+
+    <!-- LISTA DE EVALUADORES -->
+    <div class="evaluadores-list" *ngIf="!cargando">
+      <div class="evaluador-card" *ngFor="let e of evaluadoresFiltrados; trackBy: trackById">
+        <div class="card-avatar">
+          <span>{{ e.nombre?.charAt(0) || 'E' }}</span>
+        </div>
+        <div class="card-info">
+          <h3>{{ e.nombre }}</h3>
+          <div class="card-meta">
+            <span class="meta-tag">{{ e.especialidad || e.rol || 'Evaluador' }}</span>
+            <span class="meta-tag" *ngIf="e.proyectosAsignados > 0">
+              {{ e.proyectosAsignados }} proyecto(s) asignado(s)
+            </span>
+          </div>
+        </div>
+        <div class="card-status">
+          <span class="status-badge" [class]="getEstadoClass(e.estado)">
+            <ion-icon [name]="e.estado === 'evaluado' ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
+            {{ getEstadoText(e.estado) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="evaluadoresFiltrados.length === 0">
+        <ion-icon name="people-outline"></ion-icon>
+        <h3>No hay evaluadores</h3>
+        <p>No se encontraron evaluadores asignados a este concurso</p>
+      </div>
+    </div>
+
+    <!-- SKELETON -->
+    <div class="skeleton-list" *ngIf="cargando">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+        <ion-skeleton-text animated class="skeleton-avatar"></ion-skeleton-text>
+        <div class="skeleton-info">
+          <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-meta"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

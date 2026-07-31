@@ -17,11 +17,15 @@ export const routes: Routes = [
         m => m.LoginPage
       )
   },
+
   {
-  path: 'recuperar-password',
-  loadComponent: () =>
-    import('./features/auth/recuperar-password/recuperar-password.page').then(m => m.RecuperarPasswordPage)
+    path: 'recuperar-password',
+    loadComponent: () =>
+      import('./features/auth/recuperar-password/recuperar-password.page').then(
+        m => m.RecuperarPasswordPage
+      )
   },
+
   {
     path: 'admin',
     loadChildren: () =>
@@ -35,6 +39,15 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/evaluador/evaluador.routes').then(
         m => m.EVALUADOR_ROUTES
+      )
+  },
+
+  // ✅ NUEVA RUTA PARA COORDINADOR
+  {
+    path: 'coordinador',
+    loadChildren: () =>
+      import('./features/coordinador/coordinador.routes').then(
+        m => m.COORDINADOR_ROUTES
       )
   },
 

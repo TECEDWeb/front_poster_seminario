@@ -1,0 +1,254 @@
+// src/app/features/layouts/coordinador-layout/coordinador-layout.page.scss
+
+// ============ VARIABLES ============
+$upse-red: #e74c3c;
+$upse-red-dark: #c0392b;
+$upse-red-light: #fde8e8;
+$upse-blue: #3498db;
+$upse-gray: #95a5a6;
+$upse-gray-light: #ecf0f1;
+$upse-gray-dark: #2c3e50;
+
+// ============ LAYOUT PRINCIPAL ============
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.coordinador-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f8f9fa;
+}
+
+// ============ HEADER ============
+ion-header {
+  ion-toolbar {
+    --background: #ffffff;
+    --border-color: #e9ecef;
+    --border-width: 0 0 1px 0;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --min-height: 64px;
+
+    ion-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $upse-gray-dark;
+      
+      ion-text {
+        color: $upse-red;
+      }
+    }
+
+    ion-buttons[slot="end"] {
+      ion-button {
+        --color: $upse-gray-dark;
+        
+        &:hover {
+          --color: $upse-red;
+        }
+      }
+    }
+  }
+}
+
+// ============ CONTENIDO ============
+ion-content {
+  --background: #f8f9fa;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+
+  .content-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+}
+
+// ============ MENÚ LATERAL ============
+ion-menu {
+  --background: #ffffff;
+  --border-color: #e9ecef;
+  --width: 280px;
+
+  ion-content {
+    --background: #ffffff;
+  }
+
+  .menu-header {
+    padding: 24px 16px;
+    background: $upse-red;
+    color: #ffffff;
+    text-align: center;
+
+    .menu-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+  }
+
+  .menu-items {
+    padding: 16px 0;
+
+    ion-item {
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --min-height: 48px;
+      --background-hover: #{$upse-red-light};
+      --background-hover: $upse-red-light;
+      --color: $upse-gray-dark;
+      --border-color: transparent;
+      --border-style: none;
+
+      ion-icon {
+        margin-right: 12px;
+        font-size: 1.2rem;
+        color: $upse-gray;
+      }
+
+      ion-label {
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+
+      &.active {
+        --background: #{$upse-red-light};
+        --color: #{$upse-red};
+        --border-color: #{$upse-red};
+        --border-width: 0 0 0 3px;
+        --border-style: solid;
+
+        ion-icon {
+          color: $upse-red;
+        }
+      }
+
+      &:hover {
+        --background: #{$upse-red-light};
+      }
+    }
+  }
+
+  .menu-footer {
+    padding: 16px;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: $upse-red-light;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: $upse-gray-light;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: $upse-gray-dark;
+      }
+
+      .user-details {
+        flex: 1;
+        text-align: left;
+
+        h4 {
+          margin: 0;
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: $upse-gray-dark;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.8rem;
+          color: $upse-gray;
+        }
+      }
+    }
+
+    .logout-btn {
+      margin-top: 12px;
+      --color: #{$upse-gray};
+      --color-hover: #{$upse-red};
+      font-size: 0.9rem;
+      text-transform: none;
+
+      ion-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+// ============ RESPONSIVE ============
+@media (max-width: 768px) {
+  .content-container {
+    padding: 0 8px;
+  }
+
+  ion-menu {
+    --width: 260px;
+  }
+}
+
+// ============ ANIMACIONES ============
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// ============ SIDEBAR TOGGLE ============
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  .menu-toggle {
+    display: flex;
+  }
+}

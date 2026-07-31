@@ -1,0 +1,401 @@
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Certificados</span>
+      <span class="title-badge">Coordinador</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="certificados-content">
+  <div class="page-container">
+
+    <!-- CONCURSO ASIGNADO -->
+    <div class="concurso-banner" *ngIf="concursoAsignado">
+      <ion-icon name="trophy-outline"></ion-icon>
+      <div>
+        <span class="concurso-nombre">{{ concursoAsignado.nombre }}</span>
+        <span class="concurso-certificados">{{ certificados.length }} certificados</span>
+      </div>
+    </div>
+
+    <!-- FILTROS Y BÚSQUEDA -->
+    <div class="filter-bar" *ngIf="!cargando">
+      <div class="search-container">
+        <ion-searchbar
+          [(ngModel)]="filtroBusqueda"
+          (ionInput)="aplicarFiltros()"
+          placeholder="Buscar certificado..."
+          class="search-input"
+          animated>
+        </ion-searchbar>
+      </div>
+
+      <div class="filter-group">
+        <ion-select
+          [(ngModel)]="filtroEstado"
+          (ionChange)="aplicarFiltros()"
+          placeholder="Filtrar por estado"
+          interface="popover"
+          class="filter-select">
+          <ion-select-option value="todos">Todos los estados</ion-select-option>
+          <ion-select-option value="activo">Activo</ion-select-option>
+          <ion-select-option value="pendiente">Pendiente</ion-select-option>
+          <ion-select-option value="generado">Generado</ion-select-option>
+          <ion-select-option value="entregado">Entregado</ion-select-option>
+        </ion-select>
+      </div>
+
+      <ion-button class="btn-crear" (click)="abrirCrear()">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nuevo certificado
+      </ion-button>
+    </div>
+
+    <!-- LISTA DE CERTIFICADOS -->
+    <div class="certificados-list" *ngIf="!cargando">
+      <div class="certificado-card" *ngFor="let c of certificadosFiltrados; trackBy: trackById">
+        <div class="card-icon" [class]="getEstadoClass(c.estado)">
+          <ion-icon [name]="getEstadoIcon(c.estado)"></ion-icon>
+        </div>
+        <div class="card-info">
+          <h3>{{ c.nombre || c.proyectoNombre || 'Certificado' }}</h3>
+          <div class="card-meta">
+            <span class="meta-tag tipo">{{ getTipoText(c.tipo) }}</span>
+            <span class="meta-tag" *ngIf="c.proyectoNombre">
+              <ion-icon name="folder-outline"></ion-icon>
+              {{ c.proyectoNombre }}
+            </span>
+            <span class="meta-tag fecha">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ c.fechaEmision | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+        </div>
+        <div class="card-status">
+          <span class="status-badge" [class]="getEstadoClass(c.estado)">
+            <ion-icon [name]="getEstadoIcon(c.estado)"></ion-icon>
+            {{ getEstadoText(c.estado) }}
+          </span>
+        </div>
+        <div class="card-actions">
+          <ion-button fill="clear" size="small" (click)="verDetalle(c)">
+            <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="descargarCertificado(c)">
+            <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" (click)="eliminarCertificado(c)">
+            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="certificadosFiltrados.length === 0">
+        <ion-icon name="ribbon-outline"></ion-icon>
+        <h3>No hay certificados</h3>
+        <p *ngIf="filtroBusqueda || filtroEstado !== 'todos'">No hay certificados con estos filtros</p>
+        <p *ngIf="!filtroBusqueda && filtroEstado === 'todos'">Aún no se han generado certificados para este concurso</p>
+        <ion-button fill="outline" class="btn-crear-empty" (click)="abrirCrear()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Crear primer certificado
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- SKELETON -->
+    <div class="skeleton-list" *ngIf="cargando">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+        <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+        <div class="skeleton-info">
+          <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-meta"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- ============================================ -->
+<!-- MODAL: DETALLE DEL CERTIFICADO -->
+<!-- ============================================ -->
+<ion-modal [isOpen]="modalDetalleAbierto" (didDismiss)="cerrarModalDetalle()" class="detalle-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Detalle del certificado</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrarModalDetalle()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content">
+      <div class="modal-container" *ngIf="certificadoSeleccionado">
+        
+        <!-- Encabezado -->
+        <div class="detalle-header">
+          <div class="detalle-icon" [class]="getEstadoClass(certificadoSeleccionado.estado)">
+            <ion-icon [name]="getEstadoIcon(certificadoSeleccionado.estado)"></ion-icon>
+          </div>
+          <div class="detalle-info">
+            <h2>{{ certificadoSeleccionado.nombre || certificadoSeleccionado.proyectoNombre || 'Certificado' }}</h2>
+            <div class="detalle-meta">
+              <span class="meta-item">
+                <ion-icon name="ribbon-outline"></ion-icon>
+                {{ getTipoText(certificadoSeleccionado.tipo) }}
+              </span>
+              <span class="meta-item">
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{ certificadoSeleccionado.fechaEmision | date:'dd/MM/yyyy' }}
+              </span>
+              <span class="status-badge" [class]="getEstadoClass(certificadoSeleccionado.estado)">
+                <ion-icon [name]="getEstadoIcon(certificadoSeleccionado.estado)"></ion-icon>
+                {{ getEstadoText(certificadoSeleccionado.estado) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido -->
+        <div class="detalle-body">
+          <div class="detalle-section">
+            <h4>Contenido del certificado</h4>
+            <div class="contenido-preview">
+              <p>{{ certificadoSeleccionado.contenido || 'Sin contenido' }}</p>
+            </div>
+          </div>
+
+          <div class="detalle-section" *ngIf="certificadoSeleccionado.proyectoNombre">
+            <h4>Proyecto</h4>
+            <p class="proyecto-nombre">{{ certificadoSeleccionado.proyectoNombre }}</p>
+          </div>
+
+          <div class="detalle-section" *ngIf="certificadoSeleccionado.concursoNombre">
+            <h4>Concurso</h4>
+            <p class="concurso-nombre">{{ certificadoSeleccionado.concursoNombre }}</p>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="detalle-actions">
+          <ion-button fill="outline" expand="block" (click)="descargarCertificado(certificadoSeleccionado)">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Descargar PDF
+          </ion-button>
+          <ion-button fill="outline" expand="block" color="danger" (click)="eliminarCertificado(certificadoSeleccionado)">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar certificado
+          </ion-button>
+        </div>
+
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- ============================================ -->
+<!-- MODAL: CREAR CERTIFICADO -->
+<!-- ============================================ -->
+<ion-modal [isOpen]="modalCrearAbierto" (didDismiss)="cerrarModalCrear()" class="crear-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Nuevo certificado</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrarModalCrear()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content">
+      <div class="modal-container">
+
+        <form (ngSubmit)="guardarCertificado()" #formCert="ngForm">
+
+          <!-- Proyecto -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="folder-outline"></ion-icon>
+              Proyecto
+              <span class="required">*</span>
+            </label>
+            <ion-select
+              [(ngModel)]="formCertificado.proyectoId"
+              name="proyectoId"
+              placeholder="Selecciona un proyecto"
+              interface="popover"
+              class="field-select"
+              required>
+              <ion-select-option *ngFor="let p of proyectosDisponibles" [value]="p.id">
+                {{ p.nombre }}
+              </ion-select-option>
+            </ion-select>
+          </div>
+
+          <!-- Nombre del participante -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="person-outline"></ion-icon>
+              Nombre del participante
+              <span class="required">*</span>
+            </label>
+            <ion-input
+              [(ngModel)]="formCertificado.participanteNombre"
+              name="participanteNombre"
+              placeholder="Nombre completo"
+              class="field-input"
+              required>
+            </ion-input>
+          </div>
+
+          <!-- Cédula -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="card-outline"></ion-icon>
+              Cédula
+              <span class="required">*</span>
+            </label>
+            <ion-input
+              [(ngModel)]="formCertificado.participanteCedula"
+              name="participanteCedula"
+              placeholder="Número de cédula"
+              class="field-input"
+              required>
+            </ion-input>
+          </div>
+
+          <!-- Rol -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="people-outline"></ion-icon>
+              Rol
+              <span class="required">*</span>
+            </label>
+            <ion-select
+              [(ngModel)]="formCertificado.rol"
+              name="rol"
+              placeholder="Selecciona un rol"
+              interface="popover"
+              class="field-select"
+              required>
+              <ion-select-option value="participante">Participante</ion-select-option>
+              <ion-select-option value="tutor">Tutor</ion-select-option>
+            </ion-select>
+          </div>
+
+          <!-- Tipo de certificado -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="ribbon-outline"></ion-icon>
+              Tipo de certificado
+              <span class="required">*</span>
+            </label>
+            <ion-select
+              [(ngModel)]="formCertificado.tipoCertificado"
+              name="tipoCertificado"
+              placeholder="Selecciona un tipo"
+              interface="popover"
+              class="field-select"
+              required>
+              <ion-select-option value="participacion">Participación</ion-select-option>
+              <ion-select-option value="ganador">Ganador</ion-select-option>
+              <ion-select-option value="reconocimiento">Reconocimiento</ion-select-option>
+              <ion-select-option value="mejor_proyecto">Mejor Proyecto</ion-select-option>
+            </ion-select>
+          </div>
+
+          <!-- Nombre del evento -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="trophy-outline"></ion-icon>
+              Nombre del evento
+              <span class="required">*</span>
+            </label>
+            <ion-input
+              [(ngModel)]="formCertificado.nombreEvento"
+              name="nombreEvento"
+              placeholder="Ej: Concurso de Ciencias UPSE 2026"
+              class="field-input"
+              required>
+            </ion-input>
+          </div>
+
+          <!-- Categoría / actividad -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="document-text-outline"></ion-icon>
+              Categoría o actividad
+              <span class="required">*</span>
+            </label>
+            <ion-input
+              [(ngModel)]="formCertificado.categoriaActividad"
+              name="categoriaActividad"
+              placeholder="Ej: Poster Científico"
+              class="field-input"
+              required>
+            </ion-input>
+          </div>
+
+          <!-- Fecha del evento -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="calendar-outline"></ion-icon>
+              Fecha del evento
+              <span class="required">*</span>
+            </label>
+            <ion-input
+              [(ngModel)]="formCertificado.fechaEvento"
+              name="fechaEvento"
+              type="date"
+              class="field-input"
+              required>
+            </ion-input>
+          </div>
+
+          <!-- Lugar (opcional) -->
+          <div class="field">
+            <label class="field-label">
+              <ion-icon name="location-outline"></ion-icon>
+              Lugar
+              <span class="field-hint">(opcional)</span>
+            </label>
+            <ion-input
+              [(ngModel)]="formCertificado.lugar"
+              name="lugar"
+              placeholder="Ej: Universidad Estatal Península de Santa Elena"
+              class="field-input">
+            </ion-input>
+          </div>
+
+          <!-- Botones -->
+          <div class="form-actions">
+            <ion-button type="button" fill="outline" class="cancel-btn" (click)="cerrarModalCrear()">
+              Cancelar
+            </ion-button>
+            <ion-button type="submit" class="save-btn" [disabled]="!formCert.valid || guardando">
+              <ion-icon [name]="guardando ? 'refresh-outline' : 'checkmark-circle-outline'" slot="start" [class.spinning]="guardando"></ion-icon>
+              {{ guardando ? 'Guardando...' : 'Crear certificado' }}
+            </ion-button>
+          </div>
+
+        </form>
+
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

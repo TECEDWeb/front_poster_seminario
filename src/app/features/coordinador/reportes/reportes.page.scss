@@ -1,0 +1,177 @@
+$upse-blue: #001b4c;
+$upse-blue-light: #e8f0fe;
+$upse-gold: #c9a84c;
+$upse-gold-light: #f8f0e0;
+$shadow-sm: 0 2px 8px rgba(0, 27, 76, 0.06);
+$radius: 16px;
+
+.reportes-content {
+  --background: #f0f4fb;
+}
+
+.page-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.toolbar-custom {
+  --background: #ffffff;
+  --color: #0f172a;
+
+  .title-text {
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .title-badge {
+    font-size: 10px;
+    background: $upse-blue-light;
+    color: $upse-blue;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+}
+
+// CONCURSO BANNER
+.concurso-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, $upse-blue, #001433);
+  border-radius: $radius;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: #fff;
+
+  ion-icon {
+    font-size: 28px;
+    color: $upse-gold;
+  }
+
+  .concurso-nombre {
+    font-size: 16px;
+    font-weight: 700;
+    display: block;
+  }
+
+  .concurso-estado {
+    font-size: 12px;
+    padding: 2px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+  }
+}
+
+// REPORTES GRID
+.reportes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .report-card {
+    background: #fff;
+    border-radius: $radius;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #eef2f7;
+    box-shadow: $shadow-sm;
+
+    .report-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: $upse-blue;
+      display: block;
+    }
+
+    .report-label {
+      font-size: 12px;
+      color: #94a3b8;
+      display: block;
+      margin-top: 4px;
+    }
+  }
+}
+
+// SKELETON
+.skeleton-value {
+  width: 60px;
+  height: 24px;
+  margin: 0 auto 4px;
+}
+
+.skeleton-label {
+  width: 80px;
+  height: 12px;
+  margin: 0 auto;
+}
+
+// ACTIONS CARD
+.actions-card {
+  background: #fff;
+  border-radius: $radius;
+  padding: 16px 20px;
+  border: 1px solid #eef2f7;
+  box-shadow: $shadow-sm;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 12px;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    ion-button {
+      --border-radius: 10px;
+      --border-color: #{$upse-blue};
+      --color: #{$upse-blue};
+      font-weight: 600;
+      height: 44px;
+    }
+  }
+}
+
+// EMPTY STATE
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+
+  ion-icon {
+    font-size: 48px;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 18px;
+    color: #0f172a;
+    margin: 0 0 4px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #94a3b8;
+    margin: 0;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

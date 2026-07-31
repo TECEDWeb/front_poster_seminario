@@ -1,0 +1,248 @@
+<!-- src/app/features/coordinador/certificados/generar/generacion-certificado.page.html -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+      <ion-button (click)="volver()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <ion-text>Generar Certificado</ion-text>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="togglePreview()">
+        <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="limpiarForm()">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Banner de concurso -->
+  <div class="concurso-banner" *ngIf="concursoAsignado">
+    <div class="concurso-info">
+      <span class="concurso-nombre">{{ concursoAsignado.nombre }}</span>
+      <span class="concurso-estado" [class.activo]="concursoAsignado.activo">
+        {{ concursoAsignado.activo ? 'Activo' : 'Inactivo' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="loading-container">
+    <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+    <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
+    <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
+    <ion-skeleton-text animated class="skeleton-field"></ion-skeleton-text>
+    <ion-skeleton-text animated class="skeleton-field" style="height: 100px;"></ion-skeleton-text>
+  </div>
+
+  <!-- Formulario -->
+  <form [formGroup]="form" (ngSubmit)="generarCertificado()" *ngIf="!cargando">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Datos del Certificado</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <!-- Proyecto -->
+        <ion-item>
+          <ion-label position="stacked">Proyecto *</ion-label>
+          <ion-select
+            formControlName="proyectoId"
+            placeholder="Seleccione un proyecto"
+            (ionChange)="onProyectoChange($event)"
+          >
+            <ion-select-option *ngFor="let proyecto of proyectos" [value]="proyecto.id">
+              {{ proyecto.titulo || proyecto.nombre }}
+            </ion-select-option>
+          </ion-select>
+          <ion-text color="danger" *ngIf="form.get('proyectoId')?.invalid && form.get('proyectoId')?.touched">
+            <small>Seleccione un proyecto</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Tipo de Certificado -->
+        <ion-item>
+          <ion-label position="stacked">Tipo de Certificado *</ion-label>
+          <ion-select formControlName="tipo" placeholder="Seleccione un tipo">
+            <ion-select-option *ngFor="let tipo of tiposCertificado" [value]="tipo.value">
+              {{ tipo.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Rol -->
+        <ion-item>
+          <ion-label position="stacked">Rol *</ion-label>
+          <ion-select formControlName="rol" placeholder="Seleccione un rol">
+            <ion-select-option *ngFor="let rol of roles" [value]="rol.value">
+              {{ rol.label }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Nombre del Participante -->
+        <ion-item>
+          <ion-label position="stacked">Nombre del Participante *</ion-label>
+          <ion-input
+            formControlName="nombre"
+            placeholder="Nombre completo"
+          ></ion-input>
+          <ion-text color="danger" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">
+            <small>{{ getErrorMessage('nombre') }}</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Cédula -->
+        <ion-item>
+          <ion-label position="stacked">Cédula *</ion-label>
+          <ion-input
+            formControlName="cedula"
+            placeholder="Número de cédula (10 dígitos)"
+            type="number"
+          ></ion-input>
+          <ion-text color="danger" *ngIf="form.get('cedula')?.invalid && form.get('cedula')?.touched">
+            <small>{{ getErrorMessage('cedula') }}</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Nombre del Evento -->
+        <ion-item>
+          <ion-label position="stacked">Nombre del Evento *</ion-label>
+          <ion-input
+            formControlName="nombreEvento"
+            placeholder="Nombre del evento"
+          ></ion-input>
+          <ion-text color="danger" *ngIf="form.get('nombreEvento')?.invalid && form.get('nombreEvento')?.touched">
+            <small>{{ getErrorMessage('nombreEvento') }}</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Categoría -->
+        <ion-item>
+          <ion-label position="stacked">Categoría / Actividad *</ion-label>
+          <ion-input
+            formControlName="categoriaActividad"
+            placeholder="Categoría o actividad"
+          ></ion-input>
+          <ion-text color="danger" *ngIf="form.get('categoriaActividad')?.invalid && form.get('categoriaActividad')?.touched">
+            <small>{{ getErrorMessage('categoriaActividad') }}</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Fecha del Evento -->
+        <ion-item>
+          <ion-label position="stacked">Fecha del Evento *</ion-label>
+          <ion-input
+            formControlName="fechaEvento"
+            type="date"
+          ></ion-input>
+          <ion-text color="danger" *ngIf="form.get('fechaEvento')?.invalid && form.get('fechaEvento')?.touched">
+            <small>{{ getErrorMessage('fechaEvento') }}</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Fecha de Emisión -->
+        <ion-item>
+          <ion-label position="stacked">Fecha de Emisión *</ion-label>
+          <ion-input
+            formControlName="fechaEmision"
+            type="date"
+          ></ion-input>
+          <ion-text color="danger" *ngIf="form.get('fechaEmision')?.invalid && form.get('fechaEmision')?.touched">
+            <small>{{ getErrorMessage('fechaEmision') }}</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Lugar -->
+        <ion-item>
+          <ion-label position="stacked">Lugar</ion-label>
+          <ion-input
+            formControlName="lugar"
+            placeholder="Lugar del evento"
+          ></ion-input>
+        </ion-item>
+
+        <!-- Contenido -->
+        <ion-item>
+          <ion-label position="stacked">Contenido del Certificado *</ion-label>
+          <ion-textarea
+            formControlName="contenido"
+            placeholder="Escriba el contenido del certificado..."
+            rows="6"
+          ></ion-textarea>
+          <ion-text color="danger" *ngIf="form.get('contenido')?.invalid && form.get('contenido')?.touched">
+            <small>{{ getErrorMessage('contenido') }}</small>
+          </ion-text>
+        </ion-item>
+
+        <!-- Firmantes (JSON) -->
+        <ion-item>
+          <ion-label position="stacked">Firmantes (JSON)</ion-label>
+          <ion-input
+            formControlName="firmantes"
+            placeholder='[{"nombre": "Dr. Juan Pérez", "cargo": "Director"}]'
+          ></ion-input>
+        </ion-item>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <ion-button
+            type="submit"
+            expand="block"
+            [disabled]="form.invalid || generando"
+          >
+            <ion-icon slot="start" name="save-outline"></ion-icon>
+            {{ generando ? 'Generando...' : 'Generar Certificado' }}
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </form>
+
+  <!-- Preview -->
+  <div class="preview-card" *ngIf="mostrandoPreview && form.get('contenido')?.value && form.get('proyectoId')?.value">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Vista Previa</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="preview-content">
+          <h3 class="preview-titulo">CERTIFICADO</h3>
+          <p class="preview-tipo">{{ getTipoText(form.get('tipo')?.value) }}</p>
+          <p class="preview-fecha">{{ form.get('fechaEmision')?.value | date:'dd/MM/yyyy' }}</p>
+          <p class="preview-texto">{{ form.get('contenido')?.value }}</p>
+          <p class="preview-proyecto">{{ getNombreProyecto(form.get('proyectoId')?.value) }}</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="generando" class="generando-overlay">
+    <ion-spinner></ion-spinner>
+    <p>Generando certificado...</p>
+  </div>
+
+  <!-- Mensaje de éxito -->
+  <ion-alert
+    *ngIf="certificadoGenerado"
+    header="¡Certificado Generado!"
+    subHeader="El certificado se ha generado exitosamente"
+    message="El certificado se ha descargado automáticamente."
+    [buttons]="botonesExito"
+  ></ion-alert>
+
+  <!-- Mensaje de error -->
+  <ion-alert
+    *ngIf="mostrarError"
+    header="Error"
+    [message]="mensajeError"
+    [buttons]="botonesError"
+  ></ion-alert>
+</ion-content>

@@ -1,0 +1,85 @@
+<ion-header>
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <span class="title-text">Proyectos</span>
+      <span class="title-badge">Coordinador</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="recargar()" [disabled]="cargando">
+        <ion-icon name="refresh-outline" [class.spinning]="cargando"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="proyectos-content">
+  <div class="page-container">
+
+    <!-- CONCURSO ASIGNADO -->
+    <div class="concurso-banner" *ngIf="concursoAsignado">
+      <ion-icon name="trophy-outline"></ion-icon>
+      <div>
+        <span class="concurso-nombre">{{ concursoAsignado.nombre }}</span>
+        <span class="concurso-proyectos">{{ proyectos.length }} proyectos</span>
+      </div>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="search-container">
+      <ion-searchbar
+        [(ngModel)]="filtroBusqueda"
+        (ionInput)="aplicarFiltros()"
+        placeholder="Buscar proyecto..."
+        class="search-input"
+        animated>
+      </ion-searchbar>
+    </div>
+
+    <!-- LISTA DE PROYECTOS -->
+    <div class="proyectos-list" *ngIf="!cargando">
+      <div class="proyecto-card" *ngFor="let p of proyectosFiltrados; trackBy: trackById">
+        <div class="card-icon">
+          <span>{{ p.nombre?.charAt(0) || 'P' }}</span>
+        </div>
+        <div class="card-info">
+          <h3>{{ p.nombre }}</h3>
+          <div class="card-meta">
+            <span class="meta-tag">{{ p.area || 'Sin área' }}</span>
+            <span class="meta-tag nivel">{{ p.nivel || 'Sin nivel' }}</span>
+            <span class="meta-tag" *ngIf="p.participantes?.length">
+              <ion-icon name="people-outline"></ion-icon>
+              {{ p.participantes.length }} participante(s)
+            </span>
+          </div>
+        </div>
+        <div class="card-status">
+          <span class="status-badge" [class]="p.estado === 'evaluado' ? 'status-completed' : 'status-pending'">
+            {{ p.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="proyectosFiltrados.length === 0">
+        <ion-icon name="folder-outline"></ion-icon>
+        <h3>No hay proyectos</h3>
+        <p>No se encontraron proyectos en este concurso</p>
+      </div>
+    </div>
+
+    <!-- SKELETON -->
+    <div class="skeleton-list" *ngIf="cargando">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+        <ion-skeleton-text animated class="skeleton-icon"></ion-skeleton-text>
+        <div class="skeleton-info">
+          <ion-skeleton-text animated class="skeleton-title"></ion-skeleton-text>
+          <ion-skeleton-text animated class="skeleton-meta"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
