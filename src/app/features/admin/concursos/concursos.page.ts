@@ -31,6 +31,7 @@ import { ConcursoService } from '../../../core/services/concurso.service';
 import { Concurso } from '../../../core/models/concurso.model';
 import { ProyectoService } from '../../../core/services/proyecto.service';
 import { RubricaService } from '../../../core/services/rubrica.service';
+import { UsuarioService } from '../../../core/services/usuario.service';
 import { getEstadoConcurso, getEstadoColor } from '../../../core/models/concurso.model';
 import { addIcons } from 'ionicons';
 import {
@@ -56,11 +57,11 @@ import {
   alertCircleOutline,
   folderOpenOutline,
   checkboxOutline,
-  downloadOutline // ✅ Icono para descargar
+  downloadOutline,
+  ribbonOutline
 } from 'ionicons/icons';
 
-// ✅ Importamos el AuthService para saber quién está logueado
-import { AuthService } from '../../../core/services/auth.service'; 
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-concursos',
@@ -110,10 +111,12 @@ export class ConcursosPage implements OnInit {
   editando = false;
   guardando = false;
 
-  // ✅ Variable para guardar el usuario logueado
   usuarioActual: any = null;
   esAdmin: boolean = false;
   esCoordinador: boolean = false;
+
+  // Lista de coordinadores para el selector del formulario
+  coordinadoresDisponibles: any[] = [];
 
   form: any = {
     id: null,
@@ -123,7 +126,8 @@ export class ConcursosPage implements OnInit {
     fechaInicio: '',
     fechaFin: '',
     puntajeMaximo: null,
-    activo: true
+    activo: true,
+    coordinadorId: null
   };
 
   // Modal "Ver detalle" (solo lectura)
@@ -138,9 +142,10 @@ export class ConcursosPage implements OnInit {
     private concursoService: ConcursoService,
     private proyectoService: ProyectoService,
     private rubricaService: RubricaService,
+    private usuarioService: UsuarioService,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService // ✅ Inyectamos el AuthService
+    private authService: AuthService
   ) {
     addIcons({
       addOutline,
@@ -165,17 +170,21 @@ export class ConcursosPage implements OnInit {
       alertCircleOutline,
       folderOpenOutline,
       checkboxOutline,
-      downloadOutline // ✅ Agregamos el icono
+      downloadOutline,
+      ribbonOutline
     });
   }
 
   ngOnInit(): void {
-    // ✅ Obtenemos el usuario del AuthService
     this.usuarioActual = this.authService.obtenerUsuario();
     this.esAdmin = this.usuarioActual?.rol === 'admin';
     this.esCoordinador = this.usuarioActual?.rol === 'coordinador';
 
     this.cargar();
+
+    if (this.esAdmin) {
+      this.cargarCoordinadores();
+    }
 
     this.route.queryParams.subscribe(params => {
       if (params['openModal'] === 'true') {
@@ -197,6 +206,18 @@ export class ConcursosPage implements OnInit {
     });
   }
 
+  cargarCoordinadores(): void {
+    this.usuarioService.getCoordinadores().subscribe({
+      next: (res: any) => {
+        this.coordinadoresDisponibles = res?.data ?? res ?? [];
+      },
+      error: (err: any) => {
+        console.error('Error cargando coordinadores:', err);
+        this.coordinadoresDisponibles = [];
+      }
+    });
+  }
+
   cargar(): void {
     this.cargando = true;
 
@@ -209,7 +230,7 @@ export class ConcursosPage implements OnInit {
         this.cargando = false;
       },
       error: (err) => {
-        console.error('❌ Error cargando concursos:', err);
+        console.error('Error cargando concursos:', err);
         this.concursos = [];
         this.concursosFiltrados = [];
         this.cargando = false;
@@ -252,9 +273,8 @@ export class ConcursosPage implements OnInit {
   }
 
   abrirCrear(): void {
-    // ✅ Solo el admin puede abrir el modal de crear
-    if (!this.esAdmin) return; 
-    
+    if (!this.esAdmin) return;
+
     this.editando = false;
     this.form = {
       id: null,
@@ -264,7 +284,8 @@ export class ConcursosPage implements OnInit {
       fechaInicio: '',
       fechaFin: '',
       puntajeMaximo: null,
-      activo: true
+      activo: true,
+      coordinadorId: null
     };
     this.modalAbierto = true;
   }
@@ -279,7 +300,6 @@ export class ConcursosPage implements OnInit {
   }
 
   editar(concurso: Concurso): void {
-    // ✅ Solo el admin puede editar
     if (!this.esAdmin) return;
 
     this.editando = true;
@@ -291,7 +311,8 @@ export class ConcursosPage implements OnInit {
       fechaInicio: concurso.fechaInicio || '',
       fechaFin: concurso.fechaFin || '',
       puntajeMaximo: concurso.puntajeMaximo || null,
-      activo: concurso.activo ?? true
+      activo: concurso.activo ?? true,
+      coordinadorId: (concurso as any).coordinadorId ?? null
     };
     this.modalAbierto = true;
   }
@@ -311,7 +332,8 @@ export class ConcursosPage implements OnInit {
       fecha_inicio: this.form.fechaInicio || null,
       fecha_fin: this.form.fechaFin || null,
       puntaje_maximo: this.form.puntajeMaximo || null,
-      activo: this.form.activo
+      activo: this.form.activo,
+      coordinador_id: this.form.coordinadorId || null
     };
 
     const req = this.editando
@@ -338,15 +360,13 @@ export class ConcursosPage implements OnInit {
     });
   }
 
-  // ✅ NUEVO: Método para descargar el reporte
   descargarReporte(id: number, nombreConcurso: string) {
     this.concursoService.descargarReporte(id).subscribe({
       next: (blob: Blob) => {
-        // Crear un enlace invisible para descargar el archivo
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Reporte_${nombreConcurso}.xlsx`; // El nombre del archivo
+        a.download = `Reporte_${nombreConcurso}.xlsx`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -459,7 +479,7 @@ export class ConcursosPage implements OnInit {
   }
 
   confirmarEliminar(concurso: Concurso): void {
-    if (!this.esAdmin) return; // Solo admin elimina
+    if (!this.esAdmin) return;
     if (confirm(`¿Estás seguro de eliminar el concurso "${concurso.nombre}"?`)) {
       this.eliminarConcurso(concurso.id!);
     }

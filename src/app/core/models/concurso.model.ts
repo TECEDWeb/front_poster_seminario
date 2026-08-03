@@ -9,8 +9,8 @@ export interface Concurso {
   fechaFin?: string;
   puntajeMaximo?: number;
   participantes?: number;
-  // ✅ Agregamos esta propiedad para que TypeScript no se queje
-  coordinadorId?: number | null; 
+  coordinadorId?: number | null;
+  coordinadorNombre?: string | null;
 }
 
 /**

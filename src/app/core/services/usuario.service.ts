@@ -15,9 +15,6 @@ export class UsuarioService {
     return this.http.get<{ ok: boolean; usuarios: Usuario[] }>(this.base);
   }
 
-  /**
-   * ✅ Obtener solo evaluadores
-   */
   getEvaluadores(): Observable<{ ok: boolean; data: Usuario[] }> {
     console.log('📤 UsuarioService: Solicitando evaluadores...');
     return this.http.get<{ ok: boolean; data: Usuario[] }>(`${this.base}/evaluadores`);
@@ -44,5 +41,10 @@ export class UsuarioService {
 
   eliminar(id: number): Observable<any> {
     return this.http.delete(`${this.base}/${id}`);
+  }
+ 
+  getCoordinadores(): Observable<{ ok: boolean; data: Usuario[] }> {
+    console.log('📤 UsuarioService: Solicitando coordinadores...');
+    return this.http.get<{ ok: boolean; data: Usuario[] }>(`${this.base}/coordinadores`);
   }
 }

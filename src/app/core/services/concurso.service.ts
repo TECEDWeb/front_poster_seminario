@@ -132,8 +132,8 @@ export class ConcursoService {
       fechaFin: data.fecha_fin || data.fechaFin || '',
       puntajeMaximo: data.puntaje_maximo || data.puntajeMaximo || null,
       participantes: data.participantes || 0,
-      // ✅ Agregamos esto aunque no esté en la interfaz pública para que viaje en el objeto
-      coordinadorId: data.coordinador_id || null 
+      coordinadorId: data.coordinador_id || null,
+      coordinadorNombre: data.coordinador_nombre || data.coordinadorNombre || null
     };
   }
 
