@@ -93,7 +93,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   coordinadorMenuItems: MenuItem[] = [
     { label: 'Dashboard', route: '/coordinador/dashboard', icon: 'grid-outline', iconActive: 'grid' },
-    { label: 'Mis Concursos', route: '/coordinador/concursos', icon: 'trophy-outline', iconActive: 'trophy' },
+    { label: 'Evaluadores', route: '/coordinador/evaluadores', icon: 'people-outline', iconActive: 'people' },
     { label: 'Reportes', route: '/coordinador/reportes', icon: 'bar-chart-outline', iconActive: 'bar-chart' },
   ];
 
