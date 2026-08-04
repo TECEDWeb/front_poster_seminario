@@ -1184,7 +1184,10 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.abrirModalRespuestas(evaluacionId);
   }
 
-    private abrirModalRespuestas(evaluacionId: number): void {
+  // ==========================================================
+  // FUNCIÓN ABRIR MODAL (CON OPCIONES DE NIVELES RESTAURADAS)
+  // ==========================================================
+  private abrirModalRespuestas(evaluacionId: number): void {
     this.modalRespuestasAbierto = true;
     this.cargandoRespuestas = true;
     this.errorRespuestas = null;
@@ -1199,8 +1202,6 @@ export class ReportesPage implements OnInit, OnDestroy {
         }
 
         const data = res?.data ?? res;
-
-        // Guardamos el ID aquí para poder usarlo al editar
         data.evaluacionId = evaluacionId;
 
         if (!data.detalles || !Array.isArray(data.detalles)) {
@@ -1215,15 +1216,18 @@ export class ReportesPage implements OnInit, OnDestroy {
           if (!seccionesMap[seccionNombre]) {
             seccionesMap[seccionNombre] = [];
           }
-          
-          // ==========================================================
-          // CAMBIO CRUCIAL: ELIMINAMOS LAS OPCIONES FALSAS.
-          // Solo dejamos el nivel y criterio originales (que ya tiene el Backend)
-          // ==========================================================
-          // d.opciones = d.opciones || [...];  <--- ELIMINAMOS ESTO
-          
-          // El nivel ya seleccionado por el evaluador (tal cual viene de la BD)
-          d.nivelSeleccionado = { nombre: d.nivel, puntaje: d.puntaje };
+
+          // reales que ahora manda el backend (con nivel_id válido).
+          d.opciones = (d.opciones && d.opciones.length > 0)
+            ? d.opciones
+            : [{ nombre: d.nivel, puntaje: d.puntaje, nivel_id: d.nivel_id }];
+
+          // El nivel ya seleccionado por el evaluador (con su id real)
+          d.nivelSeleccionado = {
+            nombre: d.nivel,
+            puntaje: d.puntaje,
+            nivel_id: d.nivel_id
+          };
 
           seccionesMap[seccionNombre].push(d);
         });
@@ -1253,6 +1257,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       }
     });
   }
+
   cerrarModalRespuestas(): void {
     this.modalRespuestasAbierto = false;
     this.respuestasDetalle = null;
@@ -1260,9 +1265,9 @@ export class ReportesPage implements OnInit, OnDestroy {
   }
 
   // ==========================================================
-  // NUEVA FUNCIÓN: Guarda los cambios hechos en PUNTAJES y NIVELES
+  // FUNCIÓN GUARDAR (CON IDs REALES)
   // ==========================================================
-    async guardarEvaluacionCompleta() {
+  async guardarEvaluacionCompleta() {
     const evaluacionId = this.respuestasDetalle.evaluacionId;
     if (!evaluacionId) {
       this.mostrarMensaje('Error: ID de evaluación no válido.', 'error');
@@ -1271,13 +1276,13 @@ export class ReportesPage implements OnInit, OnDestroy {
 
     this.guardandoRespuesta = true;
 
-    // 1. Construir el payload con los IDs de criterios y niveles
+    // 1. Construir el payload con los IDs de criterios y niveles seleccionados
     const detallesActualizados: any[] = [];
     this.respuestasDetalle.secciones.forEach((seccion: any) => {
       seccion.items.forEach((item: any) => {
         detallesActualizados.push({
-          criterio_id: item.criterio_id,  // <-- ENVIAMOS EL ID
-          nivel_id: item.nivel_id         // <-- ENVIAMOS EL ID
+          criterio_id: item.criterio_id,
+          nivel_id: item.nivelSeleccionado?.nivel_id || item.nivel_id // Usa el ID seleccionado o el original
         });
       });
     });
