@@ -16,7 +16,8 @@ import {
   IonSearchbar,
   IonSelect,
   IonSelectOption,
-  IonModal
+  IonModal,
+  IonTextarea   
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -148,7 +149,8 @@ interface ProyectoRanking {
     IonSearchbar,
     IonSelect,
     IonSelectOption,
-    IonModal
+    IonModal,
+    IonTextarea
   ],
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss']
