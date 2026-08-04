@@ -17,7 +17,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonModal,
-  IonTextarea   
+  IonTextarea
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -96,10 +96,17 @@ interface Ganador {
   puntajeMaximo: number;
   evaluaciones: number;
   evaluadores?: any[];
-  participantes?: any[];  
-  tutores?: any[]; 
+  participantes?: any[];
+  tutores?: any[];
+  posicion?: number;
+}
+
+interface GrupoPodio {
   posicion: number;
-  clase: string;
+  medalla: 'gold' | 'silver' | 'bronze';
+  etiqueta: string;
+  proyectos: Ganador[];
+  empatados: boolean;
 }
 
 interface ProyectoRanking {
@@ -188,13 +195,13 @@ export class ReportesPage implements OnInit, OnDestroy {
   cargandoConcursos: boolean = false;
 
   ganadores: Ganador[] = [];
+  gruposPodio: GrupoPodio[] = [];
 
-  // Variables para el modal
   modalRespuestasAbierto = false;
   cargandoRespuestas = false;
   errorRespuestas: string | null = null;
   respuestasDetalle: any = null;
-  guardandoRespuesta: boolean = false; 
+  guardandoRespuesta: boolean = false;
 
   esAdmin: boolean = false;
 
@@ -349,20 +356,39 @@ export class ReportesPage implements OnInit, OnDestroy {
           this.proyectos = [];
           this.proyectosFiltrados = [];
           this.ganadores = [];
+          this.gruposPodio = [];
         }
         this.cargando = false;
       }
     });
   }
 
-  calcularGanadores(): void {
-    if (!this.filtroConcurso) {
-      this.ganadores = [];
-      return;
-    }
+  // ==========================================================
+  // ✅ RANKING DENSO (1, 2, 2, 3, 4, 5...)
+  // A diferencia del ranking "olímpico" (1, 2, 2, 4), aquí un
+  // empate NO hace que se salten posiciones: el siguiente
+  // promedio distinto siempre ocupa la posición inmediata
+  // siguiente. Así el 3er lugar (o el que corresponda) nunca
+  // desaparece por culpa de un empate más arriba.
+  // ==========================================================
+  private asignarPosicionesConEmpate<T extends { promedio: number }>(lista: T[]): (T & { posicion: number })[] {
+    let posicionActual = 0;
+    let anteriorPromedio: number | null = null;
 
-    if (!this.proyectos || this.proyectos.length === 0) {
-      this.ganadores = [];
+    return lista.map((item) => {
+      if (anteriorPromedio === null || item.promedio !== anteriorPromedio) {
+        posicionActual++;
+      }
+      anteriorPromedio = item.promedio;
+      return { ...item, posicion: posicionActual };
+    });
+  }
+
+  calcularGanadores(): void {
+    this.gruposPodio = [];
+    this.ganadores = [];
+
+    if (!this.filtroConcurso || !this.proyectos || this.proyectos.length === 0) {
       return;
     }
 
@@ -374,7 +400,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     );
 
     if (proyectosConEvaluaciones.length === 0) {
-      this.ganadores = [];
       return;
     }
 
@@ -382,24 +407,54 @@ export class ReportesPage implements OnInit, OnDestroy {
       (b.promedio || 0) - (a.promedio || 0)
     );
 
-    this.ganadores = sorted.slice(0, 3).map((proyecto, index) => ({
-      id: proyecto.id,
-      nombre: proyecto.nombre || proyecto.proyecto || 'Proyecto',
-      area: proyecto.area || 'Sin área',
-      nivel: proyecto.nivel || 'Sin nivel',
-      promedio: proyecto.promedio || 0,
-      puntajeMaximo: proyecto.puntajeMaximo || 100,
-      evaluaciones: proyecto.evaluaciones || 0,
-      evaluadores: proyecto.evaluadores || [],
-      participantes: proyecto.participantes || [],
-      tutores: proyecto.tutores || [],
-      posicion: index + 1,
-      clase: index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'
-    }));
+    const conPosicion = this.asignarPosicionesConEmpate(sorted);
+
+    const top = conPosicion.filter(p => p.posicion <= 3);
+
+    const mapear = (p: any): Ganador => ({
+      id: p.id,
+      nombre: p.nombre || p.proyecto || 'Proyecto',
+      area: p.area || 'Sin área',
+      nivel: p.nivel || 'Sin nivel',
+      promedio: p.promedio || 0,
+      puntajeMaximo: p.puntajeMaximo || 100,
+      evaluaciones: p.evaluaciones || 0,
+      evaluadores: p.evaluadores || [],
+      participantes: p.participantes || [],
+      tutores: p.tutores || [],
+      posicion: p.posicion
+    });
+
+    this.ganadores = top.map(mapear);
+
+    const mapaGrupos = new Map<number, Ganador[]>();
+    top.forEach(p => {
+      const ganador = mapear(p);
+      if (!mapaGrupos.has(p.posicion)) {
+        mapaGrupos.set(p.posicion, []);
+      }
+      mapaGrupos.get(p.posicion)!.push(ganador);
+    });
+
+    const configMedallas: Record<number, { medalla: 'gold' | 'silver' | 'bronze'; etiqueta: string }> = {
+      1: { medalla: 'gold', etiqueta: '1er Lugar' },
+      2: { medalla: 'silver', etiqueta: '2do Lugar' },
+      3: { medalla: 'bronze', etiqueta: '3er Lugar' }
+    };
+
+    this.gruposPodio = Array.from(mapaGrupos.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([posicion, proyectos]) => ({
+        posicion,
+        medalla: configMedallas[posicion]?.medalla || 'gold',
+        etiqueta: configMedallas[posicion]?.etiqueta || `${posicion}° Lugar`,
+        proyectos,
+        empatados: proyectos.length > 1
+      }));
   }
 
   verGanadores(): void {
-    if (!this.ganadores || this.ganadores.length === 0) {
+    if (!this.gruposPodio || this.gruposPodio.length === 0) {
       this.mostrarMensaje('No hay ganadores aún', 'error');
       return;
     }
@@ -408,37 +463,36 @@ export class ReportesPage implements OnInit, OnDestroy {
     let mensaje = '================================================\n';
     mensaje += `           PODIO DEL CONCURSO\n`;
     mensaje += `           ${nombreConcurso.toUpperCase()}\n`;
-    mensaje += '================================================\n\n';
+    mensaje += '================================================\n';
 
-    const titulos = ['1er LUGAR - GANADOR', '2do LUGAR', '3er LUGAR'];
-
-    this.ganadores.forEach((g, index) => {
-      const pct = this.getPorcentaje(g.promedio, g.puntajeMaximo);
-      const participantes = g.participantes || [];
-      const nombresParticipantes = participantes
-        .map((p: any) => p.nombre || '')
-        .filter((nombre: string) => nombre.trim() !== '')
-        .join(', ');
-
-      mensaje += `\n${titulos[index]}\n`;
+    this.gruposPodio.forEach(grupo => {
+      mensaje += `\n${grupo.etiqueta.toUpperCase()}${grupo.empatados ? ' (EMPATE)' : ''}\n`;
       mensaje += '------------------------------------------------\n';
-      mensaje += `  Proyecto: ${g.nombre}\n`;
-      mensaje += `  Area: ${g.area || 'Sin area'}\n`;
-      mensaje += `  Puntaje: ${g.promedio.toFixed(2)} / ${g.puntajeMaximo} (${pct}%)\n`;
-      mensaje += `  Evaluaciones: ${g.evaluaciones || 0}\n`;
-      
-      if (nombresParticipantes) {
-        mensaje += `  Participantes: ${nombresParticipantes}\n`;
-      } else {
-        mensaje += `  Participantes: No registrados\n`;
-      }
-      
+
+      grupo.proyectos.forEach((g, idx) => {
+        const pct = this.getPorcentaje(g.promedio, g.puntajeMaximo);
+        const participantes = g.participantes || [];
+        const nombresParticipantes = participantes
+          .map((p: any) => p.nombre || '')
+          .filter((nombre: string) => nombre.trim() !== '')
+          .join(', ');
+
+        mensaje += `  Proyecto: ${g.nombre}\n`;
+        mensaje += `  Area: ${g.area || 'Sin area'}\n`;
+        mensaje += `  Puntaje: ${g.promedio.toFixed(2)} / ${g.puntajeMaximo} (${pct}%)\n`;
+        mensaje += `  Evaluaciones: ${g.evaluaciones || 0}\n`;
+        mensaje += `  Participantes: ${nombresParticipantes || 'No registrados'}\n`;
+        if (idx < grupo.proyectos.length - 1) {
+          mensaje += '  - - - - - - - - - - - - - - - - - - - - - - -\n';
+        }
+      });
       mensaje += '------------------------------------------------\n';
     });
 
     const totalProyectos = this.proyectosFiltrados?.length || 0;
+    const totalGanadores = this.gruposPodio.reduce((acc, g) => acc + g.proyectos.length, 0);
     mensaje += `\n  Total de proyectos evaluados: ${totalProyectos}\n`;
-    mensaje += `  Ganadores mostrados: ${this.ganadores.length}\n`;
+    mensaje += `  Ganadores mostrados: ${totalGanadores}\n`;
     mensaje += '\n================================================\n';
     mensaje += '        FELICIDADES A LOS GANADORES!\n';
     mensaje += '================================================';
@@ -446,9 +500,9 @@ export class ReportesPage implements OnInit, OnDestroy {
     alert(mensaje);
   }
 
- 
+
   descargarPodioImagen(): void {
-    if (!this.ganadores || this.ganadores.length === 0) {
+    if (!this.gruposPodio || this.gruposPodio.length === 0) {
       this.mostrarMensaje('No hay ganadores para generar la imagen del podio', 'error');
       return;
     }
@@ -476,7 +530,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       }
     };
 
-    // Mostrar loading
     const loadingOverlay = document.createElement('div');
     loadingOverlay.style.cssText = `
       position: fixed;
@@ -648,9 +701,11 @@ export class ReportesPage implements OnInit, OnDestroy {
       return promedioB - promedioA;
     });
 
-    this.proyectosFiltrados = filtered.map((p, index) => {
-      const posicion = index + 1;
-      
+    const conPosicion = this.asignarPosicionesConEmpate(filtered);
+
+    this.proyectosFiltrados = conPosicion.map((p: any) => {
+      const posicion = p.posicion;
+
       const participantes = p.participantes || [];
       const nombresParticipantes = participantes
         .map((part: any) => part.nombre || '')
@@ -658,7 +713,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         .join(', ');
 
       return {
-        id: p.id || index,
+        id: p.id || 0,
         nombre: p.nombre || p.proyecto || 'Proyecto sin nombre',
         proyecto: p.proyecto || p.nombre,
         area: p.area || '',
@@ -800,7 +855,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       const autoTable = autoTableModule.default;
 
       const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      
+
       doc.setFillColor(0, 27, 76);
       doc.rect(0, 0, 297, 8, 'F');
 
@@ -808,12 +863,12 @@ export class ReportesPage implements OnInit, OnDestroy {
       doc.setTextColor(0, 27, 76);
       doc.setFont('helvetica', 'bold');
       doc.text('UNIVERSIDAD ESTATAL PENÍNSULA DE SANTA ELENA', 14, 16);
-      
+
       doc.setFontSize(8);
       doc.setTextColor(100);
       doc.setFont('helvetica', 'normal');
       doc.text('Facultad de Ciencias de la Ingeniería', 14, 21);
-      
+
       doc.setFontSize(18);
       doc.setTextColor(0, 27, 76);
       doc.setFont('helvetica', 'bold');
@@ -839,12 +894,12 @@ export class ReportesPage implements OnInit, OnDestroy {
       doc.setFontSize(9);
       doc.setTextColor(80);
       doc.setFont('helvetica', 'normal');
-      
+
       doc.text('Generado por: Ing. Marcia Bayas Sampedro, Ph.D.', 14, perfilY);
       doc.text('Directora del Grupo de Investigación "Tecnología, Ciencia y Educación"', 14, perfilY + 5);
       doc.text(`Fecha: ${fechaStr} - Hora: ${horaStr}`, 14, perfilY + 10);
       doc.text(`Total de proyectos: ${datos.length}`, 14, perfilY + 15);
-      
+
       doc.setDrawColor(201, 168, 76);
       doc.setLineWidth(0.5);
       doc.line(14, perfilY + 19, 283, perfilY + 19);
@@ -864,7 +919,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         String(p.evaluaciones || 0),
         `${p.promedio ? p.promedio.toFixed(2) : '0.00'} / ${p.puntajeMaximo || 100}`,
         `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
-        this.getStatusText(p.promedio, p.puntajeMaximo), 
+        this.getStatusText(p.promedio, p.puntajeMaximo),
       ]);
 
       autoTable(doc, {
@@ -903,7 +958,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         didDrawPage: (data: any) => {
           const pageCount = doc.getNumberOfPages();
           const currentPage = doc.getCurrentPageInfo()?.pageNumber || 1;
-          
+
           doc.setFontSize(7);
           doc.setTextColor(150);
           doc.setFont('helvetica', 'italic');
@@ -912,15 +967,15 @@ export class ReportesPage implements OnInit, OnDestroy {
             14,
             doc.internal.pageSize.height - 5
           );
-          
+
           doc.setDrawColor(201, 168, 76);
           doc.setLineWidth(0.3);
           doc.line(14, doc.internal.pageSize.height - 8, 283, doc.internal.pageSize.height - 8);
         }
       });
-      
+
       const finalY = (doc as any).lastAutoTable?.finalY || 200;
-      
+
       if (finalY < 220) {
         const totalProyectos = datos.length;
         const totalEvaluaciones = datos.reduce((sum, p) => sum + (p.evaluaciones || 0), 0);
@@ -934,7 +989,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         doc.setFontSize(8);
         doc.setTextColor(60);
         doc.setFont('helvetica', 'normal');
-        
+
         const statsY = finalY + 16;
         doc.text(`Total proyectos: ${totalProyectos}`, 14, statsY);
         doc.text(`Total evaluaciones: ${totalEvaluaciones}`, 60, statsY);
@@ -952,7 +1007,7 @@ export class ReportesPage implements OnInit, OnDestroy {
           'Este reporte fue generado automáticamente por el Sistema de Evaluación del grupo de Investigación TECED de la UPSE.',
           14, lineaY + 8
         );
-        
+
         doc.setTextColor(100);
         doc.setFont('helvetica', 'italic');
         doc.text(
@@ -965,7 +1020,7 @@ export class ReportesPage implements OnInit, OnDestroy {
         );
 
         const firmaY = lineaY + 45;
-        
+
         doc.setDrawColor(0, 27, 76);
         doc.setLineWidth(0.5);
         doc.line(14, firmaY, 85, firmaY);
@@ -974,13 +1029,13 @@ export class ReportesPage implements OnInit, OnDestroy {
         doc.setTextColor(0, 27, 76);
         doc.setFont('helvetica', 'bold');
         doc.text('Ing. Marcia Bayas Sampedro, Ph.D.', 14, firmaY + 6);
-        
+
         doc.setFontSize(7.5);
         doc.setTextColor(100);
         doc.setFont('helvetica', 'normal');
         doc.text('Directora del Grupo de Investigación "Tecnología, Ciencia y Educación"', 14, firmaY + 12);
         doc.text('Facultad de Ciencias de la Ingeniería', 14, firmaY + 17);
-        
+
         doc.setFontSize(7);
         doc.setTextColor(80);
         doc.setFont('helvetica', 'italic');
@@ -1042,7 +1097,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       String(p.promedio ? p.promedio.toFixed(2) : '0.00'),
       String(p.puntajeMaximo || 100),
       `${this.getPorcentaje(p.promedio, p.puntajeMaximo)}%`,
-      this.getStatusText(p.promedio, p.puntajeMaximo), // ✅ Usa rangos corregidos
+      this.getStatusText(p.promedio, p.puntajeMaximo),
       this.getNombreConcursoFiltro(p),
       (p.evaluadores || []).map((e: any) => e.nombre).join(' | ')
     ]);
@@ -1060,7 +1115,7 @@ export class ReportesPage implements OnInit, OnDestroy {
     csvContent += `\n`;
 
     csvContent += this.generarCSV(headers, filas);
-    
+
     const totalProyectos = datos.length;
     const totalEvaluaciones = datos.reduce((sum, p) => sum + (p.evaluaciones || 0), 0);
     const promedioGeneral = datos.reduce((sum, p) => sum + (p.promedio || 0), 0) / (totalProyectos || 1);
@@ -1138,7 +1193,7 @@ export class ReportesPage implements OnInit, OnDestroy {
 
   verRespuestas(evaluador: any, proyecto: ProyectoRanking): void {
     let evaluacionId = evaluador?.evaluacionId || evaluador?.evaluacion_id;
-    
+
     if (!evaluacionId) {
       evaluacionId = proyecto?.evaluacionId;
     }
@@ -1157,11 +1212,11 @@ export class ReportesPage implements OnInit, OnDestroy {
         next: (res: any) => {
           const data = res?.data ?? res;
           const evaluaciones = data.evaluaciones || [];
-          
-          const evaluacionEncontrada = evaluaciones.find((ev: any) => 
+
+          const evaluacionEncontrada = evaluaciones.find((ev: any) =>
             ev.evaluador === evaluador?.nombre
           );
-          
+
           if (evaluacionEncontrada?.id) {
             this.abrirModalRespuestas(evaluacionEncontrada.id);
           } else {
@@ -1186,9 +1241,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.abrirModalRespuestas(evaluacionId);
   }
 
-  // ==========================================================
-  // FUNCIÓN ABRIR MODAL (CON OPCIONES DE NIVELES RESTAURADAS)
-  // ==========================================================
   private abrirModalRespuestas(evaluacionId: number): void {
     this.modalRespuestasAbierto = true;
     this.cargandoRespuestas = true;
@@ -1219,12 +1271,10 @@ export class ReportesPage implements OnInit, OnDestroy {
             seccionesMap[seccionNombre] = [];
           }
 
-          // reales que ahora manda el backend (con nivel_id válido).
           d.opciones = (d.opciones && d.opciones.length > 0)
             ? d.opciones
             : [{ nombre: d.nivel, puntaje: d.puntaje, nivel_id: d.nivel_id }];
 
-          // El nivel ya seleccionado por el evaluador (con su id real)
           d.nivelSeleccionado = {
             nombre: d.nivel,
             puntaje: d.puntaje,
@@ -1266,9 +1316,6 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.errorRespuestas = null;
   }
 
-  // ==========================================================
-  // FUNCIÓN GUARDAR (CON IDs REALES)
-  // ==========================================================
   async guardarEvaluacionCompleta() {
     const evaluacionId = this.respuestasDetalle.evaluacionId;
     if (!evaluacionId) {
@@ -1278,13 +1325,12 @@ export class ReportesPage implements OnInit, OnDestroy {
 
     this.guardandoRespuesta = true;
 
-    // 1. Construir el payload con los IDs de criterios y niveles seleccionados
     const detallesActualizados: any[] = [];
     this.respuestasDetalle.secciones.forEach((seccion: any) => {
       seccion.items.forEach((item: any) => {
         detallesActualizados.push({
           criterio_id: item.criterio_id,
-          nivel_id: item.nivelSeleccionado?.nivel_id || item.nivel_id // Usa el ID seleccionado o el original
+          nivel_id: item.nivelSeleccionado?.nivel_id || item.nivel_id
         });
       });
     });
@@ -1308,7 +1354,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       this.guardandoRespuesta = false;
     }
   }
-  
+
   verProyectosDeEvaluador(nombreEvaluador: string): void {
     this.filtroEvaluador = nombreEvaluador;
     this.vistaActual = 'proyectos';
@@ -1341,8 +1387,7 @@ export class ReportesPage implements OnInit, OnDestroy {
   getStatusText(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'Sin datos';
     const pct = this.getPorcentaje(promedio, maximo);
-    
-    // Rangos correctos y detallados
+
     if (pct >= 95) return 'Excelente';
     if (pct >= 90) return 'Excelente';
     if (pct >= 80) return 'Muy Bueno';
@@ -1355,7 +1400,7 @@ export class ReportesPage implements OnInit, OnDestroy {
   getStatusClass(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'status-low';
     const pct = this.getPorcentaje(promedio, maximo);
-    
+
     if (pct >= 95) return 'status-excellent-superior';
     if (pct >= 90) return 'status-excellent';
     if (pct >= 80) return 'status-very-good';
@@ -1368,7 +1413,7 @@ export class ReportesPage implements OnInit, OnDestroy {
   getStatusIcon(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'alert-circle-outline';
     const pct = this.getPorcentaje(promedio, maximo);
-    
+
     if (pct >= 95) return 'star-outline';
     if (pct >= 90) return 'checkmark-circle-outline';
     if (pct >= 80) return 'trophy-outline';
@@ -1381,7 +1426,7 @@ export class ReportesPage implements OnInit, OnDestroy {
   getColorClass(promedio: number, maximo: number = 100): string {
     if (!promedio) return 'color-gray';
     const pct = this.getPorcentaje(promedio, maximo);
-    
+
     if (pct >= 95) return 'color-gold-dark';
     if (pct >= 90) return 'color-gold';
     if (pct >= 80) return 'color-green';
@@ -1401,5 +1446,9 @@ export class ReportesPage implements OnInit, OnDestroy {
 
   trackByNombre(index: number, item: EvaluadorResumen): string {
     return item?.nombre ?? index.toString();
+  }
+
+  trackByPosicion(index: number, item: GrupoPodio): number {
+    return item?.posicion ?? index;
   }
 }

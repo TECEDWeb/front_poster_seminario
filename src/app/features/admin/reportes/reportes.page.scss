@@ -556,8 +556,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .podio-content {
-      // Contenedor interno, ya no necesita ancho propio especial,
-      // simplemente organiza header + grid
+      // Contenedor interno: solo organiza header + lista de rankings
     }
 
     .podio-header {
@@ -591,317 +590,283 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
-    .podio-grid {
+    // ============================================
+    // LEADERBOARD PROFESIONAL — SOPORTA EMPATES
+    // ============================================
+    .podio-rank-list {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 0 4px;
+      gap: 20px;
       position: relative;
       z-index: 1;
 
-      @media (min-width: 600px) {
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-end;
-        gap: 16px;
+      @media (min-width: 768px) {
+        gap: 24px;
+      }
+    }
+
+    .podio-rank-group {
+
+      &.rank-1 {
+        .rank-medal-badge {
+          background: linear-gradient(135deg, #ffe27a, #{$upse-gold} 60%, #{$upse-gold-dark});
+          box-shadow: 0 4px 18px rgba(201, 168, 76, 0.45);
+        }
+        .rank-card {
+          border-color: rgba(201, 168, 76, 0.35);
+          background: linear-gradient(135deg, rgba(201, 168, 76, 0.14) 0%, rgba(255, 255, 255, 0.04) 100%);
+        }
+        .rank-card-promedio {
+          color: $upse-gold;
+          text-shadow: 0 0 20px rgba(201, 168, 76, 0.35);
+        }
+        .rank-group-title h3 { color: $upse-gold; }
       }
 
-      .podio-card {
-        width: 100%;
-        max-width: 280px;
-        background: rgba(255, 255, 255, 0.06);
-        backdrop-filter: blur(10px);
+      &.rank-2 {
+        .rank-medal-badge {
+          background: linear-gradient(135deg, #f1f1f1, #c0c0c0 60%, #9c9c9c);
+          box-shadow: 0 4px 14px rgba(192, 192, 192, 0.35);
+        }
+        .rank-card { border-color: rgba(192, 192, 192, 0.25); }
+        .rank-card-promedio { color: #e2e2e2; }
+        .rank-group-title h3 { color: #d8d8d8; }
+      }
+
+      &.rank-3 {
+        .rank-medal-badge {
+          background: linear-gradient(135deg, #e3a877, #cd7f32 60%, #a3661f);
+          box-shadow: 0 4px 14px rgba(205, 127, 50, 0.35);
+        }
+        .rank-card { border-color: rgba(205, 127, 50, 0.25); }
+        .rank-card-promedio { color: #e8a877; }
+        .rank-group-title h3 { color: #e0a26b; }
+      }
+    }
+
+    .rank-group-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+
+      @media (min-width: 480px) {
+        gap: 14px;
+      }
+    }
+
+    .rank-medal-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 1.3rem;
+        color: $upse-blue-dark;
+      }
+
+      @media (min-width: 480px) {
+        width: 46px;
+        height: 46px;
+
+        ion-icon { font-size: 1.5rem; }
+      }
+    }
+
+    .rank-group-title {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #fff;
+
+        @media (min-width: 480px) {
+          font-size: 1.15rem;
+        }
+      }
+
+      .rank-empate-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.08);
+        padding: 2px 10px;
         border-radius: 20px;
-        padding: 20px 16px 16px;
-        text-align: center;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
+        width: fit-content;
 
-        @media (min-width: 600px) {
-          flex: 1;
-          min-width: 160px;
-          max-width: 280px;
+        ion-icon { font-size: 0.8rem; }
+
+        @media (min-width: 480px) {
+          font-size: 0.7rem;
+        }
+      }
+    }
+
+    .rank-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+
+      @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      &.single {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .rank-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 14px 16px;
+      transition: all 0.25s ease;
+
+      @media (min-width: 480px) {
+        padding: 16px 18px;
+        gap: 14px;
+      }
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+      }
+
+      .rank-card-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+
+        @media (min-width: 480px) {
+          width: 52px;
+          height: 52px;
+          font-size: 1.25rem;
         }
 
-        &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-        }
+        &.color-blue { background: linear-gradient(135deg, #{$upse-blue}, #1a3a7a); }
+        &.color-gold { background: linear-gradient(135deg, #{$upse-gold}, #{$upse-gold-dark}); }
+        &.color-navy { background: linear-gradient(135deg, #{$upse-blue-dark}, #{$upse-blue}); }
+        &.color-teal { background: linear-gradient(135deg, #{$upse-teal}, #005662); }
+        &.color-green { background: linear-gradient(135deg, #{$upse-green}, #008c45); }
+        &.color-slate { background: linear-gradient(135deg, #64748b, #475569); }
+      }
 
-        &.podio-1 {
-          background: linear-gradient(180deg, rgba(201, 168, 76, 0.2) 0%, rgba(201, 168, 76, 0.03) 100%);
-          border-color: rgba(201, 168, 76, 0.4);
-          padding-top: 30px;
+      .rank-card-body {
+        flex: 1;
+        min-width: 0;
 
-          @media (min-width: 600px) {
-            transform: scale(1.05);
-            padding-top: 30px;
-            min-width: 180px;
-          }
-        }
-
-        &.podio-2 {
-          border-color: rgba(192, 192, 192, 0.25);
-        }
-
-        &.podio-3 {
-          border-color: rgba(205, 127, 50, 0.25);
-        }
-
-        .podio-medalla-icon {
-          display: block;
-          font-size: 2.5rem;
-          margin: 0 auto 4px;
-
-          &.medalla-oro { color: $upse-gold; }
-          &.medalla-plata { color: #c0c0c0; }
-          &.medalla-bronce { color: #cd7f32; }
-        }
-
-        .podio-corona-icon {
-          display: block;
-          font-size: 2.2rem;
-          color: $upse-gold;
-          position: absolute;
-          top: -18px;
-          left: 50%;
-          transform: translateX(-50%);
-          animation: coronaPulse 2s ease-in-out infinite;
-        }
-
-        .podio-avatar {
-          width: 72px;
-          height: 72px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 10px;
-          font-size: 1.8rem;
+        .rank-card-nombre {
+          margin: 0 0 2px;
+          font-size: 0.9rem;
           font-weight: 700;
           color: #fff;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+          line-height: 1.25;
+          word-break: break-word;
 
-          &.podio-avatar-grande {
-            width: 80px;
-            height: 80px;
-            font-size: 2rem;
-            box-shadow: 0 4px 20px rgba(201, 168, 76, 0.4);
-          }
-
-          &.color-blue { background: linear-gradient(135deg, #{$upse-blue}, #1a3a7a); }
-          &.color-gold { background: linear-gradient(135deg, #{$upse-gold}, #{$upse-gold-dark}); }
-          &.color-navy { background: linear-gradient(135deg, #{$upse-blue-dark}, #{$upse-blue}); }
-          &.color-teal { background: linear-gradient(135deg, #{$upse-teal}, #005662); }
-          &.color-green { background: linear-gradient(135deg, #{$upse-green}, #008c45); }
-          &.color-slate { background: linear-gradient(135deg, #64748b, #475569); }
-        }
-
-        .podio-info {
-          .podio-nombre-completo {
-            margin: 0 0 2px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #fff;
-            line-height: 1.2;
-            word-break: break-word;
-
-            &.ganador {
-              font-size: 1.7rem;
-              color: $upse-gold;
-              text-shadow: 0 0 30px rgba(201, 168, 76, 0.3);
-            }
-          }
-
-          .podio-area {
-            display: block;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.75rem;
-            margin-bottom: 6px;
-          }
-
-          .podio-participantes {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 4px 12px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            margin-bottom: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-
-            ion-icon {
-              font-size: 0.85rem;
-              color: rgba(255, 255, 255, 0.4);
-              flex-shrink: 0;
-            }
-
-            .participantes-lista {
-              font-size: 0.65rem;
-              color: rgba(255, 255, 255, 0.7);
-              line-height: 1.3;
-              word-break: break-word;
-
-              .participantes-mas {
-                color: rgba(255, 255, 255, 0.4);
-                font-weight: 600;
-                margin-left: 2px;
-              }
-            }
-
-            &.podio-participantes-ganador {
-              background: rgba(201, 168, 76, 0.12);
-              border-color: rgba(201, 168, 76, 0.15);
-
-              ion-icon {
-                color: rgba(201, 168, 76, 0.6);
-              }
-
-              .participantes-lista {
-                color: rgba(255, 255, 255, 0.85);
-
-                .participantes-mas {
-                  color: rgba(201, 168, 76, 0.6);
-                }
-              }
-            }
-          }
-
-          .podio-tutores {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 4px 12px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 10px;
-            margin-bottom: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-
-            ion-icon {
-              font-size: 0.85rem;
-              color: rgba(255, 255, 255, 0.3);
-              flex-shrink: 0;
-            }
-
-            .tutores-lista {
-              font-size: 0.65rem;
-              color: rgba(255, 255, 255, 0.6);
-              line-height: 1.3;
-              word-break: break-word;
-
-              .tutores-mas {
-                color: rgba(255, 255, 255, 0.35);
-                font-weight: 600;
-                margin-left: 2px;
-              }
-            }
-
-            &.podio-tutores-ganador {
-              background: rgba(201, 168, 76, 0.08);
-              border-color: rgba(201, 168, 76, 0.1);
-
-              ion-icon {
-                color: rgba(201, 168, 76, 0.5);
-              }
-
-              .tutores-lista {
-                color: rgba(255, 255, 255, 0.8);
-
-                .tutores-mas {
-                  color: rgba(201, 168, 76, 0.5);
-                }
-              }
-            }
-          }
-
-          .podio-participantes-empty {
-            margin-bottom: 8px;
-            text-align: center;
-
-            .sin-participantes {
-              font-size: 0.55rem;
-              color: rgba(255, 255, 255, 0.25);
-              font-style: italic;
-            }
-          }
-
-          .podio-puntaje {
-            margin-top: 8px;
-
-            .podio-promedio {
-              display: block;
-              font-size: 2rem;
-              font-weight: 700;
-              color: #fff;
-
-              &.podio-ganador {
-                color: $upse-gold;
-                font-size: 2.2rem;
-                text-shadow: 0 0 30px rgba(201, 168, 76, 0.4);
-              }
-            }
-
-            .podio-label {
-              font-size: 0.7rem;
-              color: rgba(255, 255, 255, 0.5);
-              text-transform: uppercase;
-              letter-spacing: 1px;
-            }
-          }
-
-          .podio-porcentaje {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-
-            .porcentaje-valor {
-              display: block;
-              font-size: 1.8rem;
-              font-weight: 700;
-              color: rgba(255, 255, 255, 0.9);
-
-              &.ganador {
-                color: $upse-gold;
-                font-size: 2.5rem;
-                text-shadow: 0 0 30px rgba(201, 168, 76, 0.4);
-              }
-            }
-
-            .porcentaje-label {
-              font-size: 0.6rem;
-              color: rgba(255, 255, 255, 0.4);
-              text-transform: uppercase;
-              letter-spacing: 1px;
-            }
+          @media (min-width: 480px) {
+            font-size: 1rem;
           }
         }
 
-        .podio-posicion {
-          margin-top: 12px;
-          font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.5);
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-          padding-top: 10px;
+        .rank-card-area {
+          display: block;
+          font-size: 0.68rem;
+          color: rgba(255, 255, 255, 0.55);
+          margin-bottom: 6px;
 
-          &.podio-posicion-1 {
-            color: $upse-gold;
-            font-weight: 700;
-            font-size: 0.8rem;
-            display: flex;
+          @media (min-width: 480px) {
+            font-size: 0.72rem;
+          }
+        }
+
+        .rank-card-personas {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+
+          .rank-persona-chip {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 4px;
+            font-size: 0.62rem;
+            color: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 8px;
+            border-radius: 10px;
 
             ion-icon {
-              font-size: 1rem;
+              font-size: 0.75rem;
+              color: rgba(255, 255, 255, 0.5);
             }
+
+            @media (min-width: 480px) {
+              font-size: 0.67rem;
+            }
+          }
+        }
+
+        .rank-card-personas-empty {
+          font-size: 0.6rem;
+          color: rgba(255, 255, 255, 0.3);
+          font-style: italic;
+        }
+      }
+
+      .rank-card-score {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        flex-shrink: 0;
+        padding-left: 8px;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+
+        @media (min-width: 480px) {
+          padding-left: 12px;
+        }
+
+        .rank-card-promedio {
+          font-size: 1.3rem;
+          font-weight: 800;
+          color: #fff;
+          line-height: 1;
+
+          @media (min-width: 480px) {
+            font-size: 1.5rem;
+          }
+        }
+
+        .rank-card-pct {
+          font-size: 0.65rem;
+          color: rgba(255, 255, 255, 0.5);
+          margin-top: 2px;
+
+          @media (min-width: 480px) {
+            font-size: 0.7rem;
           }
         }
       }
@@ -2248,10 +2213,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
-        // ============================================
-        // EVALUADORES - REDISEÑADO
-        // ============================================
-
         .pb-evaluadores {
           margin-bottom: 16px;
 
@@ -2668,9 +2629,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
-        // ============================================
-        // ACCIONES EXCEL Y PDF - MEJORADO
-        // ============================================
         .pb-actions {
           display: flex;
           flex-wrap: wrap;

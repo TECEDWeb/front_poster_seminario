@@ -90,10 +90,10 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- PODIO - CON CONTENEDOR SEPARADO PARA CAPTURA -->
+    <!-- PODIO - LEADERBOARD PROFESIONAL CON EMPATES  -->
     <!-- ============================================ -->
-    <div class="podio-section" *ngIf="haySeleccionConcurso && !cargando && ganadores && ganadores.length > 0">
-      
+    <div class="podio-section" *ngIf="haySeleccionConcurso && !cargando && gruposPodio && gruposPodio.length > 0">
+
       <!-- CONTENIDO DEL PODIO (PARA CAPTURA DE IMAGEN) -->
       <div class="podio-content-wrapper" id="podioContainer">
         <div class="podio-content">
@@ -105,178 +105,60 @@
             <p>{{ getNombreConcurso(filtroConcurso) }}</p>
           </div>
 
-          <div class="podio-grid">
-            <!-- 2do Lugar -->
-            <ng-container *ngIf="ganadores.length >= 2">
-              <div class="podio-card podio-2">
-                <ion-icon name="medal" class="podio-medalla-icon medalla-plata"></ion-icon>
-                <div class="podio-avatar" [class]="getRandomColor(ganadores[1].nombre)">
-                  <span>{{ ganadores[1].nombre.charAt(0) || 'P' }}</span>
+          <div class="podio-rank-list">
+            <div
+              class="podio-rank-group"
+              [class]="'rank-' + grupo.posicion"
+              *ngFor="let grupo of gruposPodio; trackBy: trackByPosicion">
+
+              <div class="rank-group-header">
+                <div class="rank-medal-badge" [class]="grupo.medalla">
+                  <ion-icon [name]="grupo.posicion === 1 ? 'trophy' : 'medal'"></ion-icon>
                 </div>
-                <div class="podio-info">
-                  <h3 class="podio-nombre-completo">{{ ganadores[1].nombre }}</h3>
-                  <span class="podio-area">{{ ganadores[1].area || 'Sin área' }}</span>
-                  
-                  <ng-container *ngIf="ganadores[1].participantes && ganadores[1].participantes.length > 0">
-                    <div class="podio-participantes">
-                      <ion-icon name="people-outline"></ion-icon>
-                      <span class="participantes-lista">
-                        <span *ngFor="let part of ganadores[1].participantes | slice:0:2; let last = last">
-                          {{ part.nombre }}<span *ngIf="!last">, </span>
-                        </span>
-                        <span *ngIf="ganadores[1].participantes.length > 2" class="participantes-mas">
-                          +{{ ganadores[1].participantes.length - 2 }} más
-                        </span>
-                      </span>
-                    </div>
-                  </ng-container>
-                  
-                  <ng-container *ngIf="ganadores[1].tutores && ganadores[1].tutores.length > 0">
-                    <div class="podio-tutores">
-                      <ion-icon name="school-outline"></ion-icon>
-                      <span class="tutores-lista">
-                        <span *ngFor="let t of ganadores[1].tutores | slice:0:2; let last = last">
-                          {{ t.nombre }}<span *ngIf="!last">, </span>
-                        </span>
-                        <span *ngIf="ganadores[1].tutores.length > 2" class="tutores-mas">
-                          +{{ ganadores[1].tutores.length - 2 }} más
-                        </span>
-                      </span>
-                    </div>
-                  </ng-container>
-
-                  <div class="podio-participantes-empty" *ngIf="(!ganadores[1].participantes || ganadores[1].participantes.length === 0) && (!ganadores[1].tutores || ganadores[1].tutores.length === 0)">
-                    <span class="sin-participantes">Sin participantes o tutores registrados</span>
-                  </div>
-
-                  <div class="podio-puntaje">
-                    <span class="podio-promedio">{{ ganadores[1].promedio | number:'1.2-2' }}</span>
-                    <span class="podio-label">Promedio</span>
-                  </div>
-                  <div class="podio-porcentaje podio-porcentaje-plata">
-                    <span class="porcentaje-valor">{{ getPorcentaje(ganadores[1].promedio, ganadores[1].puntajeMaximo) }}%</span>
-                    <span class="porcentaje-label">Rendimiento</span>
-                  </div>
-                </div>
-                <div class="podio-posicion">2do Lugar</div>
-              </div>
-            </ng-container>
-
-            <!-- 1er Lugar - GANADOR -->
-            <ng-container *ngIf="ganadores.length >= 1">
-              <div class="podio-card podio-1">
-                <ion-icon name="trophy" class="podio-corona-icon"></ion-icon>
-                <ion-icon name="medal" class="podio-medalla-icon medalla-oro"></ion-icon>
-                <div class="podio-avatar podio-avatar-grande" [class]="getRandomColor(ganadores[0].nombre)">
-                  <span>{{ ganadores[0].nombre.charAt(0) || 'P' }}</span>
-                </div>
-                <div class="podio-info">
-                  <h2 class="podio-nombre-completo ganador">{{ ganadores[0].nombre }}</h2>
-                  <span class="podio-area">{{ ganadores[0].area || 'Sin área' }}</span>
-                  
-                  <ng-container *ngIf="ganadores[0].participantes && ganadores[0].participantes.length > 0">
-                    <div class="podio-participantes podio-participantes-ganador">
-                      <ion-icon name="people-outline"></ion-icon>
-                      <span class="participantes-lista">
-                        <span *ngFor="let part of ganadores[0].participantes | slice:0:2; let last = last">
-                          {{ part.nombre }}<span *ngIf="!last">, </span>
-                        </span>
-                        <span *ngIf="ganadores[0].participantes.length > 2" class="participantes-mas">
-                          +{{ ganadores[0].participantes.length - 2 }} más
-                        </span>
-                      </span>
-                    </div>
-                  </ng-container>
-                  
-                  <ng-container *ngIf="ganadores[0].tutores && ganadores[0].tutores.length > 0">
-                    <div class="podio-tutores podio-tutores-ganador">
-                      <ion-icon name="school-outline"></ion-icon>
-                      <span class="tutores-lista">
-                        <span *ngFor="let t of ganadores[0].tutores | slice:0:2; let last = last">
-                          {{ t.nombre }}<span *ngIf="!last">, </span>
-                        </span>
-                        <span *ngIf="ganadores[0].tutores.length > 2" class="tutores-mas">
-                          +{{ ganadores[0].tutores.length - 2 }} más
-                        </span>
-                      </span>
-                    </div>
-                  </ng-container>
-
-                  <div class="podio-participantes-empty" *ngIf="(!ganadores[0].participantes || ganadores[0].participantes.length === 0) && (!ganadores[0].tutores || ganadores[0].tutores.length === 0)">
-                    <span class="sin-participantes">Sin participantes o tutores registrados</span>
-                  </div>
-
-                  <div class="podio-puntaje">
-                    <span class="podio-promedio podio-ganador">{{ ganadores[0].promedio | number:'1.2-2' }}</span>
-                    <span class="podio-label">Promedio</span>
-                  </div>
-                  <div class="podio-porcentaje podio-porcentaje-ganador">
-                    <span class="porcentaje-valor ganador">{{ getPorcentaje(ganadores[0].promedio, ganadores[0].puntajeMaximo) }}%</span>
-                    <span class="porcentaje-label">Rendimiento</span>
-                  </div>
-                </div>
-                <div class="podio-posicion podio-posicion-1">
-                  <ion-icon name="trophy-outline"></ion-icon>
-                  1er Lugar
+                <div class="rank-group-title">
+                  <h3>{{ grupo.etiqueta }}</h3>
+                  <span class="rank-empate-tag" *ngIf="grupo.empatados">
+                    <ion-icon name="ribbon-outline"></ion-icon>
+                    Empate entre {{ grupo.proyectos.length }} proyectos
+                  </span>
                 </div>
               </div>
-            </ng-container>
 
-            <!-- 3er Lugar -->
-            <ng-container *ngIf="ganadores.length >= 3">
-              <div class="podio-card podio-3">
-                <ion-icon name="medal" class="podio-medalla-icon medalla-bronce"></ion-icon>
-                <div class="podio-avatar" [class]="getRandomColor(ganadores[2].nombre)">
-                  <span>{{ ganadores[2].nombre.charAt(0) || 'P' }}</span>
-                </div>
-                <div class="podio-info">
-                  <h3 class="podio-nombre-completo">{{ ganadores[2].nombre }}</h3>
-                  <span class="podio-area">{{ ganadores[2].area || 'Sin área' }}</span>
-                  
-                  <ng-container *ngIf="ganadores[2].participantes && ganadores[2].participantes.length > 0">
-                    <div class="podio-participantes">
-                      <ion-icon name="people-outline"></ion-icon>
-                      <span class="participantes-lista">
-                        <span *ngFor="let part of ganadores[2].participantes | slice:0:2; let last = last">
-                          {{ part.nombre }}<span *ngIf="!last">, </span>
-                        </span>
-                        <span *ngIf="ganadores[2].participantes.length > 2" class="participantes-mas">
-                          +{{ ganadores[2].participantes.length - 2 }} más
-                        </span>
+              <div class="rank-cards" [class.single]="grupo.proyectos.length === 1">
+                <div class="rank-card" *ngFor="let proyecto of grupo.proyectos">
+                  <div class="rank-card-avatar" [class]="getRandomColor(proyecto.nombre)">
+                    <span>{{ proyecto.nombre.charAt(0) || 'P' }}</span>
+                  </div>
+
+                  <div class="rank-card-body">
+                    <h4 class="rank-card-nombre">{{ proyecto.nombre }}</h4>
+                    <span class="rank-card-area">{{ proyecto.area || 'Sin área' }}</span>
+
+                    <div class="rank-card-personas"
+                         *ngIf="(proyecto.participantes && proyecto.participantes.length > 0) || (proyecto.tutores && proyecto.tutores.length > 0)">
+                      <span class="rank-persona-chip" *ngIf="proyecto.participantes && proyecto.participantes.length > 0">
+                        <ion-icon name="people-outline"></ion-icon>
+                        {{ proyecto.participantes.length }} participante{{ proyecto.participantes.length === 1 ? '' : 's' }}
+                      </span>
+                      <span class="rank-persona-chip" *ngIf="proyecto.tutores && proyecto.tutores.length > 0">
+                        <ion-icon name="school-outline"></ion-icon>
+                        {{ tutorPrincipal(proyecto) || (proyecto.tutores.length + ' tutor(es)') }}
                       </span>
                     </div>
-                  </ng-container>
-                  
-                  <ng-container *ngIf="ganadores[2].tutores && ganadores[2].tutores.length > 0">
-                    <div class="podio-tutores">
-                      <ion-icon name="school-outline"></ion-icon>
-                      <span class="tutores-lista">
-                        <span *ngFor="let t of ganadores[2].tutores | slice:0:2; let last = last">
-                          {{ t.nombre }}<span *ngIf="!last">, </span>
-                        </span>
-                        <span *ngIf="ganadores[2].tutores.length > 2" class="tutores-mas">
-                          +{{ ganadores[2].tutores.length - 2 }} más
-                        </span>
-                      </span>
+
+                    <div class="rank-card-personas-empty"
+                         *ngIf="!(proyecto.participantes && proyecto.participantes.length > 0) && !(proyecto.tutores && proyecto.tutores.length > 0)">
+                      <span>Sin participantes o tutores registrados</span>
                     </div>
-                  </ng-container>
-
-                  <div class="podio-participantes-empty" *ngIf="(!ganadores[2].participantes || ganadores[2].participantes.length === 0) && (!ganadores[2].tutores || ganadores[2].tutores.length === 0)">
-                    <span class="sin-participantes">Sin participantes o tutores registrados</span>
                   </div>
 
-                  <div class="podio-puntaje">
-                    <span class="podio-promedio">{{ ganadores[2].promedio | number:'1.2-2' }}</span>
-                    <span class="podio-label">Promedio</span>
-                  </div>
-                  <div class="podio-porcentaje podio-porcentaje-bronce">
-                    <span class="porcentaje-valor">{{ getPorcentaje(ganadores[2].promedio, ganadores[2].puntajeMaximo) }}%</span>
-                    <span class="porcentaje-label">Rendimiento</span>
+                  <div class="rank-card-score">
+                    <span class="rank-card-promedio">{{ proyecto.promedio | number:'1.2-2' }}</span>
+                    <span class="rank-card-pct">{{ getPorcentaje(proyecto.promedio, proyecto.puntajeMaximo) }}%</span>
                   </div>
                 </div>
-                <div class="podio-posicion">3er Lugar</div>
               </div>
-            </ng-container>
+            </div>
           </div>
         </div>
       </div>
@@ -294,7 +176,7 @@
       </div>
     </div>
 
-    <div class="podio-empty" *ngIf="haySeleccionConcurso && !cargando && ganadores && ganadores.length === 0">
+    <div class="podio-empty" *ngIf="haySeleccionConcurso && !cargando && gruposPodio && gruposPodio.length === 0">
       <div class="empty-icon">
         <ion-icon name="trophy-outline"></ion-icon>
       </div>
@@ -700,9 +582,6 @@
   </div>
 
   <!-- ============================================== -->
-  <!-- MODAL: RESPUESTAS DE EVALUACIÓN (CON EDICIÓN)   -->
-  <!-- ============================================== -->
-    <!-- ============================================== -->
   <!-- MODAL: VER RESPUESTAS + EDITAR PUNTAJES        -->
   <!-- ============================================== -->
   <ion-modal [isOpen]="modalRespuestasAbierto" (didDismiss)="cerrarModalRespuestas()">
