@@ -1184,7 +1184,7 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.abrirModalRespuestas(evaluacionId);
   }
 
-  private abrirModalRespuestas(evaluacionId: number): void {
+    private abrirModalRespuestas(evaluacionId: number): void {
     this.modalRespuestasAbierto = true;
     this.cargandoRespuestas = true;
     this.errorRespuestas = null;
@@ -1217,14 +1217,12 @@ export class ReportesPage implements OnInit, OnDestroy {
           }
           
           // ==========================================================
-          // CAMBIO CRUCIAL: Inyectamos opciones si el backend no las envía
+          // CAMBIO CRUCIAL: ELIMINAMOS LAS OPCIONES FALSAS.
+          // Solo dejamos el nivel y criterio originales (que ya tiene el Backend)
           // ==========================================================
-          d.opciones = d.opciones || [
-            { nombre: 'Bajo', puntaje: 1 },
-            { nombre: 'Medio', puntaje: 2 },
-            { nombre: 'Alto', puntaje: 3 }
-          ];
-          // El nivel ya seleccionado por el evaluador
+          // d.opciones = d.opciones || [...];  <--- ELIMINAMOS ESTO
+          
+          // El nivel ya seleccionado por el evaluador (tal cual viene de la BD)
           d.nivelSeleccionado = { nombre: d.nivel, puntaje: d.puntaje };
 
           seccionesMap[seccionNombre].push(d);
@@ -1255,7 +1253,6 @@ export class ReportesPage implements OnInit, OnDestroy {
       }
     });
   }
-
   cerrarModalRespuestas(): void {
     this.modalRespuestasAbierto = false;
     this.respuestasDetalle = null;
@@ -1265,7 +1262,7 @@ export class ReportesPage implements OnInit, OnDestroy {
   // ==========================================================
   // NUEVA FUNCIÓN: Guarda los cambios hechos en PUNTAJES y NIVELES
   // ==========================================================
-  async guardarEvaluacionCompleta() {
+    async guardarEvaluacionCompleta() {
     const evaluacionId = this.respuestasDetalle.evaluacionId;
     if (!evaluacionId) {
       this.mostrarMensaje('Error: ID de evaluación no válido.', 'error');
@@ -1274,13 +1271,13 @@ export class ReportesPage implements OnInit, OnDestroy {
 
     this.guardandoRespuesta = true;
 
-    // 1. Construir el payload con los nuevos niveles seleccionados
-    const detallesActualizados: any[] = []; // <-- TIPADO EXPLÍCITO PARA EVITAR ERRORES
+    // 1. Construir el payload con los IDs de criterios y niveles
+    const detallesActualizados: any[] = [];
     this.respuestasDetalle.secciones.forEach((seccion: any) => {
       seccion.items.forEach((item: any) => {
         detallesActualizados.push({
-          id: item.id, // El ID del detalle de la evaluación
-          nivelSeleccionado: item.nivelSeleccionado // { nombre: 'Alto', puntaje: 4 }
+          criterio_id: item.criterio_id,  // <-- ENVIAMOS EL ID
+          nivel_id: item.nivel_id         // <-- ENVIAMOS EL ID
         });
       });
     });
@@ -1291,11 +1288,9 @@ export class ReportesPage implements OnInit, OnDestroy {
     };
 
     try {
-      // 2. Llamar al backend para sobrescribir toda la evaluación
-      // NOTA: Tu backend debe aceptar PUT en /api/evaluaciones/:id/actualizar
       await this.evaluacionService.actualizarEvaluacion(evaluacionId, payload).toPromise();
 
-      this.mostrarMensaje('¡Puntajes y niveles sobrescritos y guardados con éxito!', 'success');
+      this.mostrarMensaje('¡Puntajes y niveles guardados con éxito!', 'success');
       this.cerrarModalRespuestas();
       this.recargar();
 
@@ -1306,7 +1301,7 @@ export class ReportesPage implements OnInit, OnDestroy {
       this.guardandoRespuesta = false;
     }
   }
-
+  
   verProyectosDeEvaluador(nombreEvaluador: string): void {
     this.filtroEvaluador = nombreEvaluador;
     this.vistaActual = 'proyectos';
