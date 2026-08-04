@@ -47,8 +47,6 @@ export class EvaluacionService {
   /**
    * Lista de evaluaciones completadas con detalle real
    * (proyecto, porcentaje, puntaje, fecha).
-   * IMPORTANTE: usa /api/evaluador/mis-resultados, NO /api/evaluaciones/mis-resultados
-   * — este último solo devuelve {nombre, observaciones, estado}, sin id ni porcentaje.
    */
   getMisResultados(): Observable<any> {
     return this.http.get<any>(`${this.evaluadorApiUrl}/mis-resultados`).pipe(
@@ -109,12 +107,6 @@ export class EvaluacionService {
     };
   }
 
-  /**
-   * El endpoint correcto ya devuelve los nombres que necesitamos
-   * (id, proyectoNombre, concursoNombre, evaluadorNombre, fecha,
-   * puntajeTotal, puntajeMaximo, porcentaje). Solo forzamos tipos
-   * numéricos porque MySQL puede devolver DECIMAL/SUM como string.
-   */
   private normalizarResultado(item: any): ResumenEvaluacion {
     if (!item) return item;
     return {
@@ -128,8 +120,11 @@ export class EvaluacionService {
       puntajeMaximo: item.puntajeMaximo != null ? Number(item.puntajeMaximo) : undefined,
     } as ResumenEvaluacion;
   }
+
+  // ============ MÉTODOS PARA EDICIÓN DE RESPUESTAS ============
+
   /**
-   * OBTENER DETALLE DE EVALUACIÓN PARA EDICIÓN (EVALUADOR)
+   * OBTENER DETALLE DE EVALUACIÓN PARA EDICIÓN (ADMIN)
    * GET /api/evaluaciones/:id/editar
    */
   getEvaluacionParaEditar(id: number): Observable<any> {
@@ -137,7 +132,7 @@ export class EvaluacionService {
   }
 
   /**
-   * ACTUALIZAR EVALUACIÓN SIN FINALIZAR (EVALUADOR)
+   * ACTUALIZAR EVALUACIÓN (ADMIN)
    * PUT /api/evaluaciones/:id/actualizar
    */
   actualizarEvaluacion(id: number, payload: any): Observable<any> {
@@ -168,4 +163,14 @@ export class EvaluacionService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  // ==========================================================
+  // NUEVO MÉTODO AGREGADO PARA SOBRESCRIBIR SOLO LAS OBSERVACIONES
+  // ==========================================================
+  /**
+   * ACTUALIZAR OBSERVACIÓN DE UNA EVALUACIÓN (ADMIN)
+   * PUT /api/evaluaciones/:id/observaciones
+   */
+  actualizarObservacionEvaluacion(id: number, payload: { observaciones: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/observaciones`, payload);
+  }
 }

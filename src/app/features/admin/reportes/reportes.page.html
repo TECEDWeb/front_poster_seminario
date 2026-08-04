@@ -699,12 +699,17 @@
 
   </div>
 
-  <!-- MODAL: RESPUESTAS DE EVALUACIÓN -->
+  <!-- ============================================== -->
+  <!-- MODAL: RESPUESTAS DE EVALUACIÓN (CON EDICIÓN)   -->
+  <!-- ============================================== -->
+    <!-- ============================================== -->
+  <!-- MODAL: VER RESPUESTAS + EDITAR PUNTAJES        -->
+  <!-- ============================================== -->
   <ion-modal [isOpen]="modalRespuestasAbierto" (didDismiss)="cerrarModalRespuestas()">
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Respuestas de la evaluación</ion-title>
+          <ion-title>Ver y Editar Evaluación</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="cerrarModalRespuestas()">
               <ion-icon name="close-outline"></ion-icon>
@@ -727,15 +732,12 @@
           </div>
 
           <ng-container *ngIf="!cargandoRespuestas && !errorRespuestas && respuestasDetalle">
+            
             <div class="detalle-header">
               <h2>{{ respuestasDetalle.proyectoNombre }}</h2>
-              <p *ngIf="respuestasDetalle.concursoNombre">{{ respuestasDetalle.concursoNombre }}</p>
-              <span class="detalle-rubrica">{{ respuestasDetalle.rubricaNombre }}</span>
-
               <div class="er-evaluador-tag">
                 <ion-icon name="person-outline"></ion-icon>
                 <span>{{ respuestasDetalle.evaluadorNombre }}</span>
-                <span class="er-rol-badge">{{ respuestasDetalle.evaluadorRol }}</span>
               </div>
             </div>
 
@@ -747,23 +749,65 @@
                 </div>
 
                 <div class="detalle-criterio" *ngFor="let item of seccion.items">
-                  <p class="criterio-texto">{{ item.criterio }}</p>
-                  <div class="detalle-nivel-elegido">
-                    <ion-icon name="checkmark-circle-outline"></ion-icon>
-                    <span class="nivel-nombre">{{ item.nivel }}</span>
-                    <span class="nivel-puntaje">{{ item.puntaje }} pts</span>
+                  <p class="criterio-texto"><strong>{{ item.criterio }}</strong></p>
+                  
+                  <div class="detalle-nivel-container">
+                    
+                    <!-- 1. MOSTRAMOS EL NIVEL ORIGINAL DEL EVALUADOR (Solo texto) -->
+                    <div class="detalle-nivel-original">
+                      <ion-icon name="checkmark-circle-outline" style="color: #00a651;"></ion-icon>
+                      <span style="font-weight: 600; color: #0d7a3d;">{{ item.nivel }} ({{ item.puntaje }} pts)</span>
+                      <span style="margin-left: 10px; font-size: 0.7rem; color: #6b7a99;">Evaluador</span>
+                    </div>
+
+                    <!-- 2. OPCIÓN PARA EDITAR (Desplegable) -->
+                    <div class="detalle-nivel-edicion" style="margin-top: 6px;">
+                      <ion-icon name="create-outline" style="color: #c9a84c; margin-right: 6px;"></ion-icon>
+                      <span style="font-size: 0.75rem; font-weight: 500; color: #4a5a75;">Cambiar a: </span>
+                      <ion-select 
+                        [(ngModel)]="item.nivelSeleccionado"
+                        interface="popover"
+                        placeholder="Selecciona nuevo nivel"
+                        class="nivel-selector"
+                        style="--border-radius: 8px; --background: #f8fafc; min-width: 120px;">
+                        <ion-select-option *ngFor="let opcion of item.opciones" [value]="opcion">
+                          {{ opcion.nombre }} ({{ opcion.puntaje }} pts)
+                        </ion-select-option>
+                      </ion-select>
+                    </div>
+
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="detalle-observacion" *ngIf="respuestasDetalle.observaciones">
+            <!-- OBSERVACIONES EDITABLES -->
+            <div class="detalle-observacion" *ngIf="respuestasDetalle.observaciones !== undefined">
               <div class="obs-header">
                 <ion-icon name="chatbubble-outline"></ion-icon>
-                <span>Observaciones del evaluador</span>
+                <span>Observaciones (Editable)</span>
               </div>
-              <p>{{ respuestasDetalle.observaciones }}</p>
+              <ion-textarea
+                [(ngModel)]="respuestasDetalle.observaciones"
+                auto-grow
+                rows="4"
+                placeholder="Escribe o modifica la observación..."
+                class="editable-observacion">
+              </ion-textarea>
             </div>
+
+            <!-- BOTÓN PARA SOBRESCRIBIR Y GUARDAR TODO -->
+            <div class="detalle-actions" *ngIf="respuestasDetalle.evaluacionId">
+              <ion-button 
+                expand="block" 
+                color="warning" 
+                (click)="guardarEvaluacionCompleta()"
+                [disabled]="guardandoRespuesta">
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                {{ guardandoRespuesta ? 'Guardando...' : 'Sobrescribir y Guardar Evaluación' }}
+              </ion-button>
+            </div>
+
           </ng-container>
 
         </div>

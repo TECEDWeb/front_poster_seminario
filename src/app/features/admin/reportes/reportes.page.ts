@@ -55,7 +55,8 @@ import {
   medal,
   schoolOutline,
   starOutline,
-  star
+  star,
+  saveOutline
 } from 'ionicons/icons';
 import { ReporteService } from '../../../core/services/reporte.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
@@ -186,10 +187,12 @@ export class ReportesPage implements OnInit, OnDestroy {
 
   ganadores: Ganador[] = [];
 
+  // Variables para el modal
   modalRespuestasAbierto = false;
   cargandoRespuestas = false;
   errorRespuestas: string | null = null;
   respuestasDetalle: any = null;
+  guardandoRespuesta: boolean = false; 
 
   esAdmin: boolean = false;
 
@@ -236,7 +239,8 @@ export class ReportesPage implements OnInit, OnDestroy {
       medal,
       schoolOutline,
       starOutline,
-      star
+      star,
+      saveOutline
     });
 
     this.esAdmin = this.authService.esAdmin();
@@ -1196,6 +1200,9 @@ export class ReportesPage implements OnInit, OnDestroy {
 
         const data = res?.data ?? res;
 
+        // Guardamos el ID aquí para poder usarlo al editar
+        data.evaluacionId = evaluacionId;
+
         if (!data.detalles || !Array.isArray(data.detalles)) {
           this.errorRespuestas = 'La respuesta no contiene detalles de la evaluación';
           this.cargandoRespuestas = false;
@@ -1208,10 +1215,23 @@ export class ReportesPage implements OnInit, OnDestroy {
           if (!seccionesMap[seccionNombre]) {
             seccionesMap[seccionNombre] = [];
           }
+          
+          // ==========================================================
+          // CAMBIO CRUCIAL: Inyectamos opciones si el backend no las envía
+          // ==========================================================
+          d.opciones = d.opciones || [
+            { nombre: 'Bajo', puntaje: 1 },
+            { nombre: 'Medio', puntaje: 2 },
+            { nombre: 'Alto', puntaje: 3 }
+          ];
+          // El nivel ya seleccionado por el evaluador
+          d.nivelSeleccionado = { nombre: d.nivel, puntaje: d.puntaje };
+
           seccionesMap[seccionNombre].push(d);
         });
 
         this.respuestasDetalle = {
+          evaluacionId: evaluacionId,
           evaluadorNombre: data.evaluadorNombre || 'Evaluador',
           evaluadorRol: data.evaluadorRol || 'Evaluador',
           proyectoNombre: data.proyectoNombre || 'Proyecto',
@@ -1240,6 +1260,51 @@ export class ReportesPage implements OnInit, OnDestroy {
     this.modalRespuestasAbierto = false;
     this.respuestasDetalle = null;
     this.errorRespuestas = null;
+  }
+
+  // ==========================================================
+  // NUEVA FUNCIÓN: Guarda los cambios hechos en PUNTAJES y NIVELES
+  // ==========================================================
+  async guardarEvaluacionCompleta() {
+    const evaluacionId = this.respuestasDetalle.evaluacionId;
+    if (!evaluacionId) {
+      this.mostrarMensaje('Error: ID de evaluación no válido.', 'error');
+      return;
+    }
+
+    this.guardandoRespuesta = true;
+
+    // 1. Construir el payload con los nuevos niveles seleccionados
+    const detallesActualizados: any[] = []; // <-- TIPADO EXPLÍCITO PARA EVITAR ERRORES
+    this.respuestasDetalle.secciones.forEach((seccion: any) => {
+      seccion.items.forEach((item: any) => {
+        detallesActualizados.push({
+          id: item.id, // El ID del detalle de la evaluación
+          nivelSeleccionado: item.nivelSeleccionado // { nombre: 'Alto', puntaje: 4 }
+        });
+      });
+    });
+
+    const payload = {
+      observaciones: this.respuestasDetalle.observaciones,
+      detalles: detallesActualizados
+    };
+
+    try {
+      // 2. Llamar al backend para sobrescribir toda la evaluación
+      // NOTA: Tu backend debe aceptar PUT en /api/evaluaciones/:id/actualizar
+      await this.evaluacionService.actualizarEvaluacion(evaluacionId, payload).toPromise();
+
+      this.mostrarMensaje('¡Puntajes y niveles sobrescritos y guardados con éxito!', 'success');
+      this.cerrarModalRespuestas();
+      this.recargar();
+
+    } catch (error: any) {
+      console.error('Error al guardar la evaluación:', error);
+      this.mostrarMensaje(error.error?.mensaje || 'Error al guardar los puntajes en el servidor.', 'error');
+    } finally {
+      this.guardandoRespuesta = false;
+    }
   }
 
   verProyectosDeEvaluador(nombreEvaluador: string): void {
